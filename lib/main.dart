@@ -1,0 +1,31 @@
+import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:update_camtrans/services/service_notification.dart';
+
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+
+import 'firebase_options.dart';
+import 'principal.dart';
+
+Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
+
+  await ServiceNotification.initialiser();
+
+  ServiceNotification.ecouterMessages();
+
+  ServiceNotification.ecouterOuverture();
+
+  await dotenv.load(fileName: ".env");
+
+  runApp(
+    const ProviderScope(
+      child: MonApplication(),
+    ),
+  );
+}

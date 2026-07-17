@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "60771248934",
+    "project_id": "transport-intelligent-ia",
+    "storage_bucket": "transport-intelligent-ia.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:60771248934:android:aba026d148c110f4a82fe7",
+        "android_client_info": {
+          "package_name": "com.joan.update_camtrans"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBgUDgopszTDY1KONS-I6ZG3gSSgOJIk8M"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
