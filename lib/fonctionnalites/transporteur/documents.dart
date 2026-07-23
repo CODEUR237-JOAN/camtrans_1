@@ -113,7 +113,7 @@ class _DocumentsState extends State<Documents> {
 
             const SizedBox(height: 15),
 
-            ...documents.map(
+            ...documents.map<Widget>(
                   (document) => Card(
                 elevation: 3,
                 margin: const EdgeInsets.only(bottom: 15),
@@ -125,7 +125,7 @@ class _DocumentsState extends State<Documents> {
                   leading: CircleAvatar(
                     radius: 28,
                     backgroundColor: (document["couleur"] as Color)
-                        .withOpacity(.15),
+                        .withValues(alpha: .15),
                     child: Icon(
                       document["icone"],
                       color: document["couleur"],
@@ -148,7 +148,7 @@ class _DocumentsState extends State<Documents> {
                           ),
                           decoration: BoxDecoration(
                             color: (document["couleur"] as Color)
-                                .withOpacity(.15),
+                                .withValues(alpha: .15),
                             borderRadius:
                             BorderRadius.circular(20),
                           ),

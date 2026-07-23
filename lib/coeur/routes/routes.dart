@@ -7,6 +7,7 @@ import '../../fonctionnalites/authentification/inscription_client.dart';
 import '../../fonctionnalites/authentification/inscription_transporteur.dart';
 import '../../fonctionnalites/authentification/mot_de_passe_oublie.dart';
 import '../../fonctionnalites/authentification/verification_email.dart';
+import '../../fonctionnalites/client/carte.dart';
 import '../../fonctionnalites/client/creer_demande.dart';
 import '../../fonctionnalites/client/facture.dart';
 import '../../fonctionnalites/client/historique.dart';
@@ -15,6 +16,9 @@ import '../../fonctionnalites/client/tableau_de_bord_client.dart';
 import '../../fonctionnalites/demarrage/ecran_splash.dart';
 import '../../fonctionnalites/demarrage/onboarding.dart';
 import '../../fonctionnalites/transporteur/tableau_de_bord_transporteur.dart';
+import '../../fonctionnalites/ia/ecran_assistant_ia.dart';
+import '../../fonctionnalites/paiement/ecran_paiement.dart';
+import '../../fonctionnalites/admin/tableau_de_bord_admin.dart';
 
 class RoutesApplication {
   RoutesApplication._();
@@ -46,12 +50,17 @@ class RoutesApplication {
       "/tableau-bord-client";
 
   static const String creerDemande = "/creer-demande";
+  static const String carte = "/carte";
   static const String suivi = "/suivi";
   static const String historique = "/historique";
   static const String factures = "/factures";
 
   static const String tableauBordTransporteur =
       "/tableau-bord-transporteur";
+
+  static const String assistantIA = "/assistant-ia";
+  static const String paiement = "/paiement";
+  static const String admin = "/admin";
 
   // ===========================
   // Routeur GoRouter
@@ -116,8 +125,12 @@ class RoutesApplication {
         pageBuilder: (context, state) => _page(const CreerDemande(), state.pageKey),
       ),
       GoRoute(
+        path: carte,
+        pageBuilder: (context, state) => _page(const VueCarte(), state.pageKey),
+      ),
+      GoRoute(
         path: suivi,
-        pageBuilder: (context, state) => _page(const SuiviTransport(), state.pageKey),
+        pageBuilder: (context, state) => _page(const SuiviTransport(courseId: ""), state.pageKey),
       ),
       GoRoute(
         path: historique,
@@ -126,6 +139,25 @@ class RoutesApplication {
       GoRoute(
         path: factures,
         pageBuilder: (context, state) => _page(const Facture(), state.pageKey),
+      ),
+      GoRoute(
+        path: assistantIA,
+        pageBuilder: (context, state) => _page(const EcranAssistantIA(), state.pageKey),
+      ),
+      GoRoute(
+        path: paiement,
+        pageBuilder: (context, state) {
+          final args = state.extra as Map<String, dynamic>? ?? {};
+          return _page(EcranPaiement(
+            courseId: args['courseId'] ?? 'demo_course_123',
+            montant: args['montant'] ?? 15000.0,
+            transporteurId: args['transporteurId'] ?? 'transp_456',
+          ), state.pageKey);
+        },
+      ),
+      GoRoute(
+        path: admin,
+        pageBuilder: (context, state) => _page(const TableauDeBordAdmin(), state.pageKey),
       ),
     ],
     errorBuilder: (context, state) => Scaffold(

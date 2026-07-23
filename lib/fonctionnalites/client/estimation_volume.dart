@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../coeur/constantes/couleurs.dart';
 import '../../coeur/constantes/tailles.dart';
@@ -210,10 +211,7 @@ class _EstimationVolumeState
               texte: "Continuer",
               icone: Icons.arrow_forward,
               auClic: () {
-                Navigator.pushNamed(
-                  context,
-                  "/carte",
-                );
+                context.push("/carte");
               },
             ),
           ],

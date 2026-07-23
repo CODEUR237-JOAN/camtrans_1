@@ -1,224 +1,189 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong2/latlong.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 
 import '../../coeur/constantes/couleurs.dart';
-import '../../coeur/constantes/tailles.dart';
-import '../../coeur/widgets/bouton_principal.dart';
+import '../../coeur/etat/carte_provider.dart';
+import '../../services/cache_tile_provider.dart';
+import '../../services/service_gps.dart';
+import 'widgets/couche_transporteurs.dart';
 
-class EstimationVolume extends StatefulWidget {
-  const EstimationVolume({super.key});
+class VueCarte extends ConsumerStatefulWidget {
+  const VueCarte({super.key});
 
   @override
-  State<EstimationVolume> createState() =>
-      _EstimationVolumeState();
+  ConsumerState<VueCarte> createState() => _VueCarteState();
 }
 
-class _EstimationVolumeState
-    extends State<EstimationVolume> {
-  final _longueur = TextEditingController();
-  final _largeur = TextEditingController();
-  final _hauteur = TextEditingController();
-  final _poids = TextEditingController();
+class _VueCarteState extends ConsumerState<VueCarte> with TickerProviderStateMixin {
+  final MapController _mapController = MapController();
 
-  double _volume = 0;
-  double _prix = 0;
-  String _vehicule = "-";
+  void _centrerSurMoi(LatLng? position) {
+    if (position != null) {
+      _animerCarte(position, 16.0);
+    }
+  }
 
-  void _calculer() {
-    final longueur =
-        double.tryParse(_longueur.text) ?? 0;
+  void _animerCarte(LatLng destination, double zoomDestination) {
+    final latTween = Tween<double>(
+      begin: _mapController.camera.center.latitude,
+      end: destination.latitude,
+    );
+    final lngTween = Tween<double>(
+      begin: _mapController.camera.center.longitude,
+      end: destination.longitude,
+    );
+    final zoomTween = Tween<double>(
+      begin: _mapController.camera.zoom,
+      end: zoomDestination,
+    );
 
-    final largeur =
-        double.tryParse(_largeur.text) ?? 0;
+    final animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 600),
+    );
 
-    final hauteur =
-        double.tryParse(_hauteur.text) ?? 0;
+    final animation = CurvedAnimation(
+      parent: animationController,
+      curve: Curves.fastOutSlowIn,
+    );
 
-    final poids =
-        double.tryParse(_poids.text) ?? 0;
+    animationController.addListener(() {
+      _mapController.move(
+        LatLng(latTween.evaluate(animation), lngTween.evaluate(animation)),
+        zoomTween.evaluate(animation),
+      );
+    });
 
-    setState(() {
-      _volume =
-          (longueur * largeur * hauteur) / 1000000;
-
-      if (_volume <= 0.20 && poids <= 30) {
-        _vehicule = "Moto";
-        _prix = 2500;
-      } else if (_volume <= 1 && poids <= 500) {
-        _vehicule = "Tricycle";
-        _prix = 6000;
-      } else if (_volume <= 4 && poids <= 1000) {
-        _vehicule = "Pick-up";
-        _prix = 15000;
-      } else if (_volume <= 10 && poids <= 3000) {
-        _vehicule = "Camionnette";
-        _prix = 30000;
-      } else if (_volume <= 35 && poids <= 10000) {
-        _vehicule = "Camion";
-        _prix = 70000;
-      } else {
-        _vehicule = "Semi-remorque";
-        _prix = 150000;
+    animation.addStatusListener((status) {
+      if (status == AnimationStatus.completed || status == AnimationStatus.dismissed) {
+        animationController.dispose();
       }
     });
-  }
 
-  @override
-  void dispose() {
-    _longueur.dispose();
-    _largeur.dispose();
-    _hauteur.dispose();
-    _poids.dispose();
-    super.dispose();
-  }
-
-  Widget champ({
-    required TextEditingController controleur,
-    required String texte,
-  }) {
-    return TextField(
-      controller: controleur,
-      keyboardType:
-      const TextInputType.numberWithOptions(
-        decimal: true,
-      ),
-      decoration: InputDecoration(
-        labelText: texte,
-        border: OutlineInputBorder(
-          borderRadius:
-          BorderRadius.circular(15),
-        ),
-      ),
-    );
+    animationController.forward();
   }
 
   @override
   Widget build(BuildContext context) {
+    final etatCarte = ref.watch(carteProvider);
+
     return Scaffold(
-      backgroundColor: CouleursApp.fond,
       appBar: AppBar(
-        title: const Text(
-          "Estimation du volume",
+        title: const Text("Carte"),
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back),
+          onPressed: () => context.pop(),
         ),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(
-          TaillesApp.margePage,
-        ),
-        child: Column(
-          children: [
-            champ(
-              controleur: _longueur,
-              texte: "Longueur (cm)",
-            ),
-
-            const SizedBox(height: 15),
-
-            champ(
-              controleur: _largeur,
-              texte: "Largeur (cm)",
-            ),
-
-            const SizedBox(height: 15),
-
-            champ(
-              controleur: _hauteur,
-              texte: "Hauteur (cm)",
-            ),
-
-            const SizedBox(height: 15),
-
-            champ(
-              controleur: _poids,
-              texte: "Poids (Kg)",
-            ),
-
-            const SizedBox(height: 25),
-
-            BoutonPrincipal(
-              texte: "Calculer",
-              icone: Icons.calculate,
-              auClic: _calculer,
-            ),
-
-            const SizedBox(height: 30),
-
-            Card(
-              elevation: 4,
-              shape: RoundedRectangleBorder(
-                borderRadius:
-                BorderRadius.circular(20),
-              ),
-              child: Padding(
-                padding:
-                const EdgeInsets.all(20),
-                child: Column(
-                  children: [
-                    const Icon(
-                      Icons.analytics,
-                      size: 70,
-                      color: CouleursApp.primaire,
-                    ),
-
-                    const SizedBox(height: 20),
-
-                    Text(
-                      "Volume : ${_volume.toStringAsFixed(2)} m³",
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight:
-                        FontWeight.bold,
-                      ),
-                    ),
-
-                    const SizedBox(height: 15),
-
-                    Text(
-                      "Véhicule conseillé : $_vehicule",
-                      style: const TextStyle(
-                        fontSize: 18,
-                      ),
-                    ),
-
-                    const SizedBox(height: 15),
-
-                    Text(
-                      "Prix estimatif",
-                      style: TextStyle(
-                        color: Colors.grey.shade600,
-                      ),
-                    ),
-
-                    const SizedBox(height: 8),
-
-                    Text(
-                      "${_prix.toStringAsFixed(0)} FCFA",
-                      style: const TextStyle(
-                        fontSize: 30,
-                        color: Colors.green,
-                        fontWeight:
-                        FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
+      body: Column(
+        children: [
+          if (etatCarte.horsLigne)
+            Container(
+              width: double.infinity,
+              color: Colors.orange.shade100,
+              padding: const EdgeInsets.all(8.0),
+              child: const Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(Icons.wifi_off, color: Colors.orange),
+                  SizedBox(width: 8),
+                  Text(
+                    "Mode hors ligne actif.",
+                    style: TextStyle(color: Colors.orange, fontWeight: FontWeight.bold),
+                  ),
+                ],
               ),
             ),
-
-            const SizedBox(height: 30),
-
-            BoutonPrincipal(
-              texte: "Continuer",
-              icone: Icons.arrow_forward,
-              auClic: () {
-                Navigator.pushNamed(
-                  context,
-                  "/carte",
-                );
-              },
+          if (etatCarte.erreurGps)
+            Container(
+              width: double.infinity,
+              color: CouleursApp.erreur.withValues(alpha: 0.1),
+              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+              child: Row(
+                children: [
+                  const Icon(Icons.location_off, color: CouleursApp.erreur),
+                  const SizedBox(width: 8),
+                  const Expanded(
+                    child: Text(
+                      "Le GPS est désactivé ou l'autorisation a été refusée.",
+                      style: TextStyle(color: CouleursApp.erreur),
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: () async {
+                      final serviceGps = ref.read(serviceGpsProvider);
+                      await serviceGps.ouvrirParametresApplication();
+                      ref.read(carteProvider.notifier).actualiserPosition();
+                    },
+                    child: const Text("Paramètres"),
+                  ),
+                ],
+              ),
             ),
-          ],
-        ),
+          Expanded(
+            child: etatCarte.chargement
+                ? const Center(child: CircularProgressIndicator())
+                : FlutterMap(
+                    mapController: _mapController,
+                    options: MapOptions(
+                      initialCenter: etatCarte.positionActuelle ?? const LatLng(3.8480, 11.5021),
+                      initialZoom: 15.0,
+                      maxZoom: 19.0,
+                      minZoom: 3.0,
+                    ),
+                    children: [
+                      TileLayer(
+                        urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                        userAgentPackageName: 'com.camtrans.update_camtrans',
+                        tileProvider: CachedTileProvider(),
+                      ),
+                      const CoucheTransporteurs(),
+                      if (etatCarte.positionActuelle != null)
+                        MarkerLayer(
+                          markers: [
+                            Marker(
+                              point: etatCarte.positionActuelle!,
+                              width: 60,
+                              height: 60,
+                              child: const Icon(
+                                Icons.person_pin_circle,
+                                color: CouleursApp.primaire,
+                                size: 50,
+                              )
+                                  .animate(onPlay: (controller) => controller.repeat())
+                                  .scale(
+                                    begin: const Offset(0.9, 0.9),
+                                    end: const Offset(1.1, 1.1),
+                                    duration: 1.seconds,
+                                    curve: Curves.easeInOut,
+                                  )
+                                  .then()
+                                  .scale(
+                                    begin: const Offset(1.1, 1.1),
+                                    end: const Offset(0.9, 0.9),
+                                    duration: 1.seconds,
+                                    curve: Curves.easeInOut,
+                                  ),
+                            ),
+                          ],
+                        ),
+                    ],
+                  ),
+          ),
+        ],
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          ref.read(carteProvider.notifier).actualiserPosition();
+          _centrerSurMoi(etatCarte.positionActuelle);
+        },
+        child: const Icon(Icons.my_location),
       ),
     );
   }
 }
+

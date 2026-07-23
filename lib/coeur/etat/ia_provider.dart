@@ -1,0 +1,88 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../modeles/message_ia.dart';
+import '../../services/service_ia.dart';
+
+class IAState {
+  final List<MessageIA> messages;
+  final bool enReponse;
+
+  IAState({this.messages = const [], this.enReponse = false});
+
+  IAState copierAvec({List<MessageIA>? messages, bool? enReponse}) {
+    return IAState(
+      messages: messages ?? this.messages,
+      enReponse: enReponse ?? this.enReponse,
+    );
+  }
+}
+
+class IANotifier extends StateNotifier<IAState> {
+  final ServiceIA _serviceIA;
+
+  IANotifier(this._serviceIA) : super(IAState());
+
+  void ajouterMessageUtilisateur(String texte, {List<String>? cheminsImages}) {
+    final msgU = MessageIA(
+      texte: texte,
+      estUtilisateur: true,
+      piecesJointes: cheminsImages ?? [],
+    );
+    state = state.copierAvec(messages: [...state.messages, msgU], enReponse: true);
+
+    _demanderReponseIA(texte, cheminsImages);
+  }
+
+  void _demanderReponseIA(String prompt, List<String>? cheminsImages) async {
+    // Créer une coquille vide pour le message de l'IA
+    final msgIA = MessageIA(
+      texte: "",
+      estUtilisateur: false,
+      estEnChargement: true,
+    );
+    
+    // L'ajouter à la liste
+    state = state.copierAvec(messages: [...state.messages, msgIA]);
+    
+    final msgId = msgIA.id;
+    String texteAccumule = "";
+
+    try {
+      final stream = _serviceIA.envoyerMessageStream(prompt, cheminsImages: cheminsImages);
+
+      await for (final chunk in stream) {
+        texteAccumule += chunk;
+        
+        // Mettre à jour le message spécifique dans la liste
+        final index = state.messages.indexWhere((m) => m.id == msgId);
+        if (index != -1) {
+          final listeMiseAJour = List<MessageIA>.from(state.messages);
+          listeMiseAJour[index] = listeMiseAJour[index].copierAvec(
+            texte: texteAccumule,
+            estEnChargement: false,
+          );
+          state = state.copierAvec(messages: listeMiseAJour);
+        }
+      }
+    } catch (e) {
+      final index = state.messages.indexWhere((m) => m.id == msgId);
+      if (index != -1) {
+        final listeMiseAJour = List<MessageIA>.from(state.messages);
+        listeMiseAJour[index] = listeMiseAJour[index].copierAvec(
+          texte: "Une erreur est survenue lors de la communication avec l'IA.",
+          estEnChargement: false,
+        );
+        state = state.copierAvec(messages: listeMiseAJour);
+      }
+    } finally {
+      state = state.copierAvec(enReponse: false);
+    }
+  }
+
+  void effacerHistorique() {
+    state = IAState();
+  }
+}
+
+final iaProvider = StateNotifierProvider<IANotifier, IAState>((ref) {
+  return IANotifier(ref.read(serviceIAProvider));
+});

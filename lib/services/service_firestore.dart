@@ -123,6 +123,34 @@ class ServiceFirestore {
   }
 
   // ===========================
+  // Flux d'une collection avec condition
+  // ===========================
+
+  Stream<QuerySnapshot<Map<String, dynamic>>> fluxCollectionCondition({
+    required String collection,
+    required String champ,
+    required dynamic valeur,
+  }) {
+    return _db
+        .collection(collection)
+        .where(champ, isEqualTo: valeur)
+        .snapshots();
+  }
+
+  // ===========================
+  // Flux des transporteurs disponibles
+  // ===========================
+
+  Stream<QuerySnapshot<Map<String, dynamic>>> fluxTransporteursDisponibles() {
+    return _db
+        .collection("transporteurs")
+        .where("disponible", isEqualTo: true)
+        // Note: 'actif' n'est pas indexé par défaut avec disponible, si erreur Firestore d'index, enlever cette ligne et filtrer côté client.
+        //.where("actif", isEqualTo: true)
+        .snapshots();
+  }
+
+  // ===========================
   // Flux des courses (Client)
   // ===========================
 

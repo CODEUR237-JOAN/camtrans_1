@@ -267,7 +267,7 @@ class _InscriptionTransporteurState extends ConsumerState<InscriptionTransporteu
                       const SizedBox(height: 15),
 
                       DropdownButtonFormField<String>(
-                        value: _vehicule,
+                        initialValue: _vehicule,
                         decoration: InputDecoration(
                           labelText: "Type de véhicule",
                           prefixIcon: const Icon(Icons.local_shipping_outlined),

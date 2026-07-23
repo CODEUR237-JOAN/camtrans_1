@@ -134,7 +134,7 @@ class _EntretienState extends State<Entretien> {
 
             const SizedBox(height: 15),
 
-            ...entretiens.map(
+            ...entretiens.map<Widget>(
                   (entretien) => Card(
                 margin:
                 const EdgeInsets.only(bottom: 15),
@@ -150,7 +150,7 @@ class _EntretienState extends State<Entretien> {
                     radius: 28,
                     backgroundColor:
                     (entretien["couleur"] as Color)
-                        .withOpacity(.15),
+                        .withValues(alpha: .15),
                     child: Icon(
                       entretien["icone"],
                       color: entretien["couleur"],

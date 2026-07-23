@@ -47,11 +47,11 @@ class _InscriptionClientState extends ConsumerState<InscriptionClient> {
     });
 
     try {
-      print("--- DÉBUT DE L'INSCRIPTION ---");
+      debugPrint("--- DÉBUT DE L'INSCRIPTION ---");
       final serviceAuth = ref.read(serviceAuthentificationProvider);
       final serviceDb = ref.read(serviceFirestoreProvider);
 
-      print("1. Appel de Firebase Auth...");
+      debugPrint("1. Appel de Firebase Auth...");
       // Inscription Firebase Auth avec Timeout
       final userCred = await serviceAuth.inscription(
         email: _email.text,
@@ -60,7 +60,7 @@ class _InscriptionClientState extends ConsumerState<InscriptionClient> {
         throw Exception("Délai d'attente dépassé pour l'authentification (Problème de connexion internet ou serveur Firebase injoignable).");
       });
 
-      print("2. Auth réussie. UID: ${userCred.user?.uid}");
+      debugPrint("2. Auth réussie. UID: ${userCred.user?.uid}");
 
       // Création du document Client
       if (userCred.user != null) {
@@ -79,7 +79,7 @@ class _InscriptionClientState extends ConsumerState<InscriptionClient> {
           dateCreation: DateTime.now(),
         );
 
-        print("3. Enregistrement dans Firestore...");
+        debugPrint("3. Enregistrement dans Firestore...");
         // Sauvegarder dans la collection "clients" avec Timeout
         await serviceDb.ajouterDocument(
           collection: "clients",
@@ -89,12 +89,12 @@ class _InscriptionClientState extends ConsumerState<InscriptionClient> {
           throw Exception("Délai d'attente dépassé pour la base de données (Firestore injoignable).");
         });
 
-        print("4. Envoi de l'email de vérification...");
+        debugPrint("4. Envoi de l'email de vérification...");
         // Envoyer l'email de vérification
         await serviceAuth.envoyerVerificationEmail().timeout(const Duration(seconds: 10), onTimeout: () {
-           print("Attention: L'envoi de l'e-mail a pris trop de temps, mais le compte est créé.");
+           debugPrint("Attention: L'envoi de l'e-mail a pris trop de temps, mais le compte est créé.");
         });
-        print("--- FIN DE L'INSCRIPTION ---");
+        debugPrint("--- FIN DE L'INSCRIPTION ---");
       }
 
       if (!mounted) return;

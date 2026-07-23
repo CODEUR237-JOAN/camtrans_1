@@ -1,257 +1,142 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../coeur/constantes/couleurs.dart';
-import '../../coeur/constantes/tailles.dart';
-import '../../coeur/widgets/bouton_principal.dart';
+import '../../coeur/etat/transporteur_provider.dart';
 
-class Portefeuille extends StatelessWidget {
+class Portefeuille extends ConsumerWidget {
   const Portefeuille({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final statsRevenus = ref.watch(statsRevenusProvider);
+    final fluxRevenus = ref.watch(fluxMesRevenusProvider);
+
     return Scaffold(
-      backgroundColor: CouleursApp.fond,
+      backgroundColor: const Color(0xFFF4F7FB),
       appBar: AppBar(
-        title: const Text("Mon portefeuille"),
+        title: const Text("Revenus & Portefeuille", style: TextStyle(color: Colors.black87, fontWeight: FontWeight.bold)),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        iconTheme: const IconThemeData(color: Colors.black87),
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(
-          TaillesApp.margePage,
-        ),
+        padding: const EdgeInsets.all(24),
         child: Column(
-          crossAxisAlignment:
-          CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Carte Solde
             Container(
               width: double.infinity,
               padding: const EdgeInsets.all(25),
               decoration: BoxDecoration(
-                gradient:
-                CouleursApp.degradePrincipal,
-                borderRadius:
-                BorderRadius.circular(20),
+                gradient: CouleursApp.degradePrincipal,
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: [
+                  BoxShadow(color: CouleursApp.primaire.withValues(alpha: 0.3), blurRadius: 20, offset: const Offset(0, 10))
+                ]
               ),
-              child: const Column(
-                crossAxisAlignment:
-                CrossAxisAlignment.start,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  const Text("Revenus totaux générés", style: TextStyle(color: Colors.white70, fontSize: 16)),
+                  const SizedBox(height: 10),
                   Text(
-                    "Solde disponible",
-                    style: TextStyle(
-                      color: Colors.white70,
-                      fontSize: 16,
-                    ),
+                    "${statsRevenus['total']?.toStringAsFixed(0)} FCFA",
+                    style: const TextStyle(color: Colors.white, fontSize: 34, fontWeight: FontWeight.bold),
                   ),
-                  SizedBox(height: 10),
-                  Text(
-                    "425 000 FCFA",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 34,
-                      fontWeight:
-                      FontWeight.bold,
-                    ),
+                  const SizedBox(height: 20),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text("Cette semaine", style: TextStyle(color: Colors.white70, fontSize: 13)),
+                          Text("${statsRevenus['cetteSemaine']?.toStringAsFixed(0)} FCFA", style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+                        ],
+                      ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          const Text("Ce mois", style: TextStyle(color: Colors.white70, fontSize: 13)),
+                          Text("${statsRevenus['ceMois']?.toStringAsFixed(0)} FCFA", style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+                        ],
+                      ),
+                    ],
                   ),
                 ],
               ),
             ),
-
-            const SizedBox(height: 25),
-
-            Row(
-              children: [
-                Expanded(
-                  child: _statistique(
-                    "Aujourd'hui",
-                    "75 000 FCFA",
-                    Icons.today,
-                  ),
-                ),
-                const SizedBox(width: 15),
-                Expanded(
-                  child: _statistique(
-                    "Cette semaine",
-                    "310 000 FCFA",
-                    Icons.date_range,
-                  ),
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 15),
-
-            Row(
-              children: [
-                Expanded(
-                  child: _statistique(
-                    "Ce mois",
-                    "1 240 000 FCFA",
-                    Icons.calendar_month,
-                  ),
-                ),
-                const SizedBox(width: 15),
-                Expanded(
-                  child: _statistique(
-                    "Courses",
-                    "58",
-                    Icons.local_shipping,
-                  ),
-                ),
-              ],
-            ),
-
+            
             const SizedBox(height: 30),
-
-            const Text(
-              "Retrait",
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
+            
+            // Bouton de retrait
+            SizedBox(
+              width: double.infinity,
+              height: 55,
+              child: ElevatedButton.icon(
+                onPressed: () {
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Fonctionnalité de retrait bientôt disponible !")));
+                },
+                icon: const Icon(Icons.account_balance_wallet, color: Colors.white),
+                label: const Text("Demander un paiement", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.black87,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                ),
               ),
             ),
 
+            const SizedBox(height: 35),
+            const Text("Historique des paiements", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
             const SizedBox(height: 15),
 
-            BoutonPrincipal(
-              texte: "Retirer via Orange Money",
-              icone: Icons.account_balance_wallet,
-              auClic: () {},
-            ),
-
-            const SizedBox(height: 15),
-
-            BoutonPrincipal(
-              texte: "Retirer via MTN Mobile Money",
-              icone: Icons.phone_android,
-              auClic: () {},
-            ),
-
-            const SizedBox(height: 15),
-
-            BoutonPrincipal(
-              texte: "Virement bancaire",
-              icone: Icons.account_balance,
-              auClic: () {},
-            ),
-
-            const SizedBox(height: 30),
-
-            const Text(
-              "Historique des transactions",
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-
-            const SizedBox(height: 15),
-
-            _transaction(
-              "Paiement course",
-              "Douala → Yaoundé",
-              "+30 000 FCFA",
-              Colors.green,
-              Icons.arrow_downward,
-            ),
-
-            _transaction(
-              "Retrait Orange Money",
-              "N° 699123456",
-              "-100 000 FCFA",
-              Colors.red,
-              Icons.arrow_upward,
-            ),
-
-            _transaction(
-              "Paiement course",
-              "Kribi → Douala",
-              "+18 000 FCFA",
-              Colors.green,
-              Icons.arrow_downward,
-            ),
-
-            _transaction(
-              "Paiement course",
-              "Bafoussam → Douala",
-              "+55 000 FCFA",
-              Colors.green,
-              Icons.arrow_downward,
-            ),
-
-            const SizedBox(height: 25),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _statistique(
-      String titre,
-      String valeur,
-      IconData icone,
-      ) {
-    return Card(
-      shape: RoundedRectangleBorder(
-        borderRadius:
-        BorderRadius.circular(18),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(18),
-        child: Column(
-          children: [
-            Icon(
-              icone,
-              color: CouleursApp.primaire,
-              size: 35,
-            ),
-            const SizedBox(height: 12),
-            Text(
-              valeur,
-              style: const TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 18,
-              ),
-            ),
-            const SizedBox(height: 6),
-            Text(
-              titre,
-              textAlign: TextAlign.center,
+            fluxRevenus.when(
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (err, _) => Text("Erreur: $err"),
+              data: (paiements) {
+                if (paiements.isEmpty) {
+                  return const Center(
+                    child: Padding(
+                      padding: EdgeInsets.all(40.0),
+                      child: Text("Aucun revenu enregistré pour le moment.", style: TextStyle(color: Colors.grey)),
+                    ),
+                  );
+                }
+                return ListView.builder(
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  itemCount: paiements.length,
+                  itemBuilder: (context, index) {
+                    final paiement = paiements[index];
+                    return Card(
+                      elevation: 0,
+                      margin: const EdgeInsets.only(bottom: 12),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15), side: BorderSide(color: Colors.grey.shade200)),
+                      child: ListTile(
+                        contentPadding: const EdgeInsets.all(16),
+                        leading: CircleAvatar(
+                          backgroundColor: Colors.green.withValues(alpha: 0.1),
+                          child: const Icon(Icons.arrow_downward, color: Colors.green),
+                        ),
+                        title: const Text("Paiement reçu", style: TextStyle(fontWeight: FontWeight.bold)),
+                        subtitle: Text(
+                          "${paiement.datePaiement.day}/${paiement.datePaiement.month}/${paiement.datePaiement.year}",
+                          style: const TextStyle(color: Colors.grey),
+                        ),
+                        trailing: Text(
+                          "+${paiement.montantNet.toStringAsFixed(0)} FCFA",
+                          style: const TextStyle(fontWeight: FontWeight.w900, color: Colors.green, fontSize: 15),
+                        ),
+                      ),
+                    );
+                  },
+                );
+              }
             ),
           ],
-        ),
-      ),
-    );
-  }
-
-  Widget _transaction(
-      String titre,
-      String sousTitre,
-      String montant,
-      Color couleur,
-      IconData icone,
-      ) {
-    return Card(
-      margin: const EdgeInsets.only(
-        bottom: 12,
-      ),
-      child: ListTile(
-        leading: CircleAvatar(
-          backgroundColor:
-          couleur.withOpacity(.15),
-          child: Icon(
-            icone,
-            color: couleur,
-          ),
-        ),
-        title: Text(titre),
-        subtitle: Text(sousTitre),
-        trailing: Text(
-          montant,
-          style: TextStyle(
-            color: couleur,
-            fontWeight: FontWeight.bold,
-            fontSize: 16,
-          ),
         ),
       ),
     );

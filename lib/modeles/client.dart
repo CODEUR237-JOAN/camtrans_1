@@ -30,6 +30,7 @@ class Client extends Utilisateur {
     this.moyenPaiementPrefere = "",
   });
 
+  @override
   Client copyWith({
     String? id,
     String? nom,
@@ -131,6 +132,7 @@ class Client extends Utilisateur {
     );
   }
 
+  @override
   Map<String, dynamic> toJson() =>
       toMap();
 

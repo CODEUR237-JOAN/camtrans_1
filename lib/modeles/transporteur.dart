@@ -73,6 +73,7 @@ class Transporteur extends Utilisateur {
     this.longitude = 0,
   });
 
+  @override
   Transporteur copyWith({
     String? id,
     String? nom,
@@ -238,6 +239,7 @@ class Transporteur extends Utilisateur {
     );
   }
 
+  @override
   Map<String, dynamic> toJson() => toMap();
 
   factory Transporteur.fromJson(Map<String, dynamic> json) =>

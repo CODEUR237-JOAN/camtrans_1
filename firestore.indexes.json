@@ -5,7 +5,7 @@
       "queryScope": "COLLECTION",
       "fields": [
         {
-          "fieldPath": "clientId",
+          "fieldPath": "statut",
           "order": "ASCENDING"
         },
         {
@@ -19,11 +19,39 @@
       "queryScope": "COLLECTION",
       "fields": [
         {
-          "fieldPath": "transporteurId",
+          "fieldPath": "clientId",
           "order": "ASCENDING"
         },
         {
           "fieldPath": "dateCreation",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "paiements",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "transporteurId",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "datePaiement",
+          "order": "DESCENDING"
+        }
+      ]
+    },
+    {
+      "collectionGroup": "paiements",
+      "queryScope": "COLLECTION",
+      "fields": [
+        {
+          "fieldPath": "statut",
+          "order": "ASCENDING"
+        },
+        {
+          "fieldPath": "datePaiement",
           "order": "DESCENDING"
         }
       ]

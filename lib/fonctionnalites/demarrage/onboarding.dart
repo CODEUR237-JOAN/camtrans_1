@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
-import 'dart:ui';
+
 
 import '../../coeur/constantes/couleurs.dart';
 import '../../coeur/constantes/images.dart';
-import '../../coeur/constantes/tailles.dart';
 import '../../coeur/constantes/textes.dart';
 import '../../coeur/routes/routes.dart';
 

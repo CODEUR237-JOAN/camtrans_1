@@ -127,7 +127,7 @@ class _GestionCoursesState extends State<GestionCourses> {
                         backgroundColor:
                         (course["couleur"]
                         as Color)
-                            .withOpacity(.15),
+                            .withValues(alpha: .15),
                         child: Icon(
                           Icons.local_shipping,
                           color:

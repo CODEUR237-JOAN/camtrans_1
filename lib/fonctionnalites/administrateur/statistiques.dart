@@ -330,7 +330,7 @@ class _StatistiquesAdministrateurState
       child: ListTile(
         leading: CircleAvatar(
           backgroundColor:
-          couleur.withOpacity(.15),
+          couleur.withValues(alpha: .15),
           child: Icon(
             icone,
             color: couleur,

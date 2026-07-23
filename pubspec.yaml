@@ -83,6 +83,12 @@ dependencies:
   go_router: ^14.2.7
   iconsax_flutter: ^1.0.0
   http: ^1.6.0
+  dio_cache_interceptor: ^3.5.1
+  dio_cache_interceptor_file_store: ^1.2.3
+  path_provider: ^2.1.5
+  connectivity_plus: ^7.3.0
+  cached_network_image: ^3.4.1
+  qr_flutter: ^4.1.0
 dev_dependencies:
   flutter_test:
     sdk: flutter

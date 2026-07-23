@@ -14,6 +14,8 @@ class MonApplication extends StatelessWidget {
       title: "Transport Intelligent IA",
 
       theme: ThemeApplication.themeClair,
+      darkTheme: ThemeApplication.themeSombre,
+      themeMode: ThemeMode.system,
 
       localizationsDelegates: const [
         GlobalMaterialLocalizations.delegate,

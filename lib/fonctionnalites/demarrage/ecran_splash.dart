@@ -4,7 +4,6 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../coeur/constantes/couleurs.dart';
-import '../../coeur/constantes/images.dart';
 import '../../coeur/constantes/tailles.dart';
 import '../../coeur/constantes/textes.dart';
 import '../../coeur/routes/routes.dart';
@@ -51,7 +50,7 @@ class _EcranSplashState extends State<EcranSplash> {
                   borderRadius: BorderRadius.circular(35),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.15),
+                      color: Colors.black.withValues(alpha: 0.15),
                       blurRadius: 30,
                       offset: const Offset(0, 10),
                     ),
@@ -98,6 +97,26 @@ class _EcranSplashState extends State<EcranSplash> {
                   ),
                 ),
               ).animate().fadeIn(delay: 1000.ms, duration: 600.ms),
+
+              const SizedBox(height: 25),
+
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.2),
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: Colors.white.withValues(alpha: 0.5)),
+                ),
+                child: const Text(
+                  "L'Excellence Logistique",
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 14,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 1.2,
+                  ),
+                ),
+              ).animate().fadeIn(delay: 800.ms).slideY(begin: 0.5),
 
               const Spacer(),
 

@@ -4,7 +4,6 @@ import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../coeur/constantes/couleurs.dart';
-import '../../coeur/constantes/images.dart';
 import '../../coeur/constantes/tailles.dart';
 import '../../coeur/constantes/textes.dart';
 import '../../coeur/routes/routes.dart';
@@ -52,6 +51,8 @@ class _ConnexionState extends ConsumerState<Connexion> {
           collection: 'clients', 
           id: userCred.user!.uid
         );
+
+        if (!mounted) return;
 
         if (docClient.exists) {
           context.go(RoutesApplication.tableauBordClient);

@@ -84,7 +84,7 @@ class _NotificationsPageState
               height: 45,
               child: ListView(
                 scrollDirection: Axis.horizontal,
-                children: [
+                children: <Widget>[
                   _filtre("Toutes"),
                   _filtre("Non lues"),
                   _filtre("Courses"),
@@ -121,7 +121,7 @@ class _NotificationsPageState
                         (notification[
                         "couleur"]
                         as Color)
-                            .withOpacity(.15),
+                            .withValues(alpha: .15),
                         child: Icon(
                           notification["icone"],
                           color:
@@ -161,8 +161,8 @@ class _NotificationsPageState
                                   color: (notification[
                                   "couleur"]
                                   as Color)
-                                      .withOpacity(
-                                      .15),
+                                      .withValues(
+                                      alpha: .15),
                                   borderRadius:
                                   BorderRadius
                                       .circular(

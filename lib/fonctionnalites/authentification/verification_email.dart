@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../coeur/constantes/couleurs.dart';
-import '../../coeur/constantes/images.dart';
 import '../../coeur/constantes/tailles.dart';
 import '../../coeur/routes/routes.dart';
 import '../../coeur/widgets/bouton_principal.dart';

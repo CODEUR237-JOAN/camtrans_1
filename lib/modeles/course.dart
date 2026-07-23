@@ -29,6 +29,8 @@ class Course {
 
   final String typeVehicule;
 
+  final String typeMarchandise;
+
   final double prixEstime;
 
   final double prixFinal;
@@ -95,6 +97,7 @@ class Course {
     required this.volumeM3,
     required this.poidsKg,
     required this.typeVehicule,
+    required this.typeMarchandise,
     required this.prixEstime,
     required this.prixFinal,
     required this.modePaiement,
@@ -138,6 +141,7 @@ class Course {
       "volumeM3": volumeM3,
       "poidsKg": poidsKg,
       "typeVehicule": typeVehicule,
+      "typeMarchandise": typeMarchandise,
       "prixEstime": prixEstime,
       "prixFinal": prixFinal,
       "modePaiement": modePaiement,
@@ -182,6 +186,7 @@ class Course {
       volumeM3: Parseur.toDouble(map["volumeM3"]),
       poidsKg: Parseur.toDouble(map["poidsKg"]),
       typeVehicule: map["typeVehicule"] ?? "",
+      typeMarchandise: map["typeMarchandise"] ?? "",
       prixEstime: Parseur.toDouble(map["prixEstime"]),
       prixFinal: Parseur.toDouble(map["prixFinal"]),
       modePaiement: map["modePaiement"] ?? "",

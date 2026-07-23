@@ -46,40 +46,42 @@ class CarteInformation extends StatelessWidget {
         borderRadius: BorderRadius.circular(TaillesApp.rayonCarte),
         onTap: auClic,
         child: Padding(
-          padding: remplissage ?? const EdgeInsets.all(TaillesApp.espaceGrand),
+          padding: remplissage ?? const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.center,
+            mainAxisSize: MainAxisSize.min,
             children: [
               Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   if (icone != null)
                     Container(
-                      width: 45,
-                      height: 45,
+                      width: 40,
+                      height: 40,
                       decoration: BoxDecoration(
                         color: (couleurIcone ?? CouleursApp.primaire).withValues(alpha: 0.10),
-                        borderRadius: BorderRadius.circular(12),
+                        borderRadius: BorderRadius.circular(10),
                       ),
                       child: Icon(
                         icone,
                         color: couleurIcone ?? CouleursApp.primaire,
-                        size: 24,
+                        size: 20,
                       ),
                     ),
 
-                  if (icone != null) const SizedBox(width: 12),
+                  if (icone != null) const SizedBox(width: 10),
 
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisAlignment: MainAxisAlignment.center,
+                      mainAxisSize: MainAxisSize.min,
                       children: [
                         Text(
                           titre,
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                           style: const TextStyle(
-                            fontSize: 15,
+                            fontSize: 14,
                             fontWeight: FontWeight.bold,
                             color: CouleursApp.textePrincipal,
                             height: 1.2,
@@ -87,11 +89,13 @@ class CarteInformation extends StatelessWidget {
                         ),
                         if (sousTitre != null)
                           Padding(
-                            padding: const EdgeInsets.only(top: 4),
+                            padding: const EdgeInsets.only(top: 2),
                             child: Text(
                               sousTitre!,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                               style: const TextStyle(
-                                fontSize: 13,
+                                fontSize: 12,
                                 color: CouleursApp.texteSecondaire,
                               ),
                             ),
@@ -101,18 +105,21 @@ class CarteInformation extends StatelessWidget {
                   ),
 
                   if (valeur != null)
-                    Text(
-                      valeur!,
-                      style: TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.w900,
-                        color: couleurValeur ?? CouleursApp.primaire,
+                    Padding(
+                      padding: const EdgeInsets.only(left: 4),
+                      child: Text(
+                        valeur!,
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w900,
+                          color: couleurValeur ?? CouleursApp.primaire,
+                        ),
                       ),
                     ),
                 ],
               ),
               if (enfant != null) ...[
-                const SizedBox(height: TaillesApp.espaceGrand),
+                const SizedBox(height: 12),
                 enfant!,
               ],
             ],

@@ -1,459 +1,392 @@
-import 'dart:ui';
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import 'package:flutter_map/flutter_map.dart';
-import 'package:latlong2/latlong.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
+import 'package:intl/intl.dart';
 
-// ==========================================
-// PALETTE PREMIUM
-// ==========================================
-const Color pBlue = Color(0xFF2697FF);
-const Color pDarkBlue = Color(0xFF1E3A8A);
-const Color pBg = Color(0xFFF4F7FB);
-const Color pSurface = Colors.white;
-const Color pSuccess = Color(0xFF16A34A);
-const Color pTextMain = Color(0xFF1E293B);
-const Color pTextMuted = Color(0xFF64748B);
+import '../../coeur/etat/demande_expedition_provider.dart';
+import '../../coeur/constantes/couleurs.dart';
+import 'widgets/resume_expedition_bottom_sheet.dart';
 
-class CreerDemande extends StatefulWidget {
+class CreerDemande extends ConsumerWidget {
   const CreerDemande({super.key});
 
   @override
-  State<CreerDemande> createState() => _CreerDemandeState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final etat = ref.watch(demandeExpeditionProvider);
+    final notifier = ref.read(demandeExpeditionProvider.notifier);
 
-class _CreerDemandeState extends State<CreerDemande> {
-  final _depart = TextEditingController();
-  final _destination = TextEditingController();
-  final _description = TextEditingController();
+    return Scaffold(
+      backgroundColor: const Color(0xFFF8F9FA),
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        centerTitle: true,
+        iconTheme: const IconThemeData(color: Colors.black87),
+        title: const Text(
+          "Nouvelle Expédition",
+          style: TextStyle(color: Colors.black87, fontWeight: FontWeight.bold, fontSize: 18),
+        ),
+      ),
+      body: SingleChildScrollView(
+        physics: const BouncingScrollPhysics(),
+        padding: const EdgeInsets.all(20),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            _buildSectionTitle("1. Trajet"),
+            _buildTrajetCard(context, etat, notifier),
+            
+            const SizedBox(height: 24),
+            _buildSectionTitle("2. Marchandise & Véhicule"),
+            _buildMarchandiseVehiculeCard(context, etat, notifier),
+            
+            const SizedBox(height: 24),
+            _buildSectionTitle("3. Planification"),
+            _buildPlanificationCard(context, etat, notifier),
 
-  String _categorie = "Lourd";
-  DateTime? _dateTransport;
-  bool _calculIA = false;
-
-  void _simulerCalculIA() {
-    if (_depart.text.isNotEmpty && _destination.text.isNotEmpty) {
-      setState(() => _calculIA = true);
-      Future.delayed(const Duration(seconds: 2), () {
-        if (mounted) setState(() => _calculIA = false);
-      });
-    }
+            const SizedBox(height: 24),
+            _buildSectionTitle("4. Détails Supplémentaires"),
+            _buildDetailsCard(context, etat, notifier),
+            
+            const SizedBox(height: 100),
+          ],
+        ),
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      floatingActionButton: _buildSubmitButton(context, etat),
+    );
   }
 
-  Future<void> _choisirDate() async {
-    final date = await showDatePicker(
-      context: context,
-      firstDate: DateTime.now(),
-      lastDate: DateTime(2035),
-      initialDate: DateTime.now(),
-      builder: (context, child) {
-        return Theme(
-          data: Theme.of(context).copyWith(
-            colorScheme: const ColorScheme.light(
-              primary: pBlue,
-              onPrimary: Colors.white,
-              onSurface: pTextMain,
+  Widget _buildSectionTitle(String title) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12, left: 4),
+      child: Text(
+        title,
+        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black87),
+      ),
+    ).animate().fadeIn(delay: 100.ms).slideX(begin: -0.1);
+  }
+
+  Widget _buildCard({required Widget child}) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: Colors.grey.withValues(alpha: 0.2)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.02),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: child,
+    );
+  }
+
+  Widget _buildTrajetCard(BuildContext context, EtatDemandeExpedition etat, DemandeExpeditionNotifier notifier) {
+    return _buildCard(
+      child: Column(
+        children: [
+          _buildTextField(
+            hint: "Point de départ (ex: Douala, Akwa)",
+            icon: Iconsax.location_copy,
+            iconColor: Colors.black54,
+            initialValue: etat.depart,
+            onChanged: notifier.setDepart,
+          ),
+          Padding(
+            padding: const EdgeInsets.only(left: 22, top: 4, bottom: 4),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Container(width: 2, height: 20, color: Colors.grey.withValues(alpha: 0.3)),
             ),
           ),
-          child: child!,
-        );
-      },
-    );
-
-    if (date != null && mounted) {
-      setState(() => _dateTransport = date);
-    }
+          _buildTextField(
+            hint: "Destination (ex: Yaoundé, Bastos)",
+            icon: Iconsax.location_tick_copy,
+            iconColor: CouleursApp.primaire,
+            initialValue: etat.destination,
+            onChanged: notifier.setDestination,
+          ),
+        ],
+      ),
+    ).animate().fadeIn(delay: 200.ms).slideY(begin: 0.1);
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: pBg,
-      body: CustomScrollView(
-        physics: const BouncingScrollPhysics(),
-        slivers: [
-          _buildSliverAppBar(),
-          SliverToBoxAdapter(
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  _buildTrajetSection(),
-                  const SizedBox(height: 30),
-                  _buildMarchandiseSection(),
-                  const SizedBox(height: 30),
-                  _buildAISection(),
-                  const SizedBox(height: 30),
-                  _buildDateSection(),
-                  const SizedBox(height: 30),
-                  _buildPhotoSection(),
-                  const SizedBox(height: 100), // Espace pour le FAB
-                ],
-              ),
+  Widget _buildMarchandiseVehiculeCard(BuildContext context, EtatDemandeExpedition etat, DemandeExpeditionNotifier notifier) {
+    final marchandises = ["Colis standard", "Matériaux", "Électroménager", "Déménagement", "Autre"];
+    final vehicules = [
+      {"nom": "Moto", "icon": Icons.motorcycle},
+      {"nom": "Voiture", "icon": Icons.directions_car},
+      {"nom": "Camionnette", "icon": Icons.airport_shuttle},
+      {"nom": "Camion léger", "icon": Icons.local_shipping},
+      {"nom": "Camion lourd", "icon": Icons.fire_truck},
+    ];
+
+    return _buildCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text("Type de marchandise", style: TextStyle(fontWeight: FontWeight.w600, color: Colors.black87)),
+          const SizedBox(height: 12),
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: marchandises.map((m) {
+              final isSelected = etat.typeMarchandise == m;
+              return ChoiceChip(
+                label: Text(m),
+                selected: isSelected,
+                onSelected: (val) => notifier.setTypeMarchandise(val ? m : ""),
+                selectedColor: Colors.black87,
+                labelStyle: TextStyle(color: isSelected ? Colors.white : Colors.black87),
+                backgroundColor: Colors.grey.shade100,
+              );
+            }).toList(),
+          ),
+          const SizedBox(height: 24),
+          const Text("Catégorie de véhicule", style: TextStyle(fontWeight: FontWeight.w600, color: Colors.black87)),
+          const SizedBox(height: 12),
+          SizedBox(
+            height: 90,
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              itemCount: vehicules.length,
+              itemBuilder: (context, index) {
+                final v = vehicules[index];
+                final isSelected = etat.categorieVehicule == v["nom"];
+                return GestureDetector(
+                  onTap: () => notifier.setCategorieVehicule(v["nom"] as String),
+                  child: Container(
+                    width: 90,
+                    margin: const EdgeInsets.only(right: 12),
+                    decoration: BoxDecoration(
+                      color: isSelected ? Colors.black87 : Colors.grey.shade100,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: isSelected ? Colors.black : Colors.transparent),
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(v["icon"] as IconData, color: isSelected ? Colors.white : Colors.black54, size: 28),
+                        const SizedBox(height: 8),
+                        Text(
+                          v["nom"] as String,
+                          textAlign: TextAlign.center,
+                          style: TextStyle(fontSize: 12, color: isSelected ? Colors.white : Colors.black87, fontWeight: isSelected ? FontWeight.bold : FontWeight.normal),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
             ),
           )
         ],
       ),
-      floatingActionButton: _buildSubmitFAB(),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
-    );
+    ).animate().fadeIn(delay: 300.ms).slideY(begin: 0.1);
   }
 
-  // ==========================================
-  // HEADER CARTE (OPENSTREETMAP)
-  // ==========================================
-  Widget _buildSliverAppBar() {
-    return SliverAppBar(
-      expandedHeight: 250.0,
-      pinned: true,
-      backgroundColor: pDarkBlue,
-      elevation: 0,
-      leading: IconButton(
-        icon: const Icon(Icons.arrow_back_ios, color: Colors.white),
-        onPressed: () => Navigator.pop(context),
-      ),
-      flexibleSpace: FlexibleSpaceBar(
-        background: Stack(
-          fit: StackFit.expand,
-          children: [
-            FlutterMap(
-              options: const MapOptions(
-                initialCenter: LatLng(4.0511, 9.7679),
-                initialZoom: 13,
-                interactionOptions: InteractionOptions(flags: InteractiveFlag.none),
-              ),
-              children: [
-                TileLayer(
-            urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-            userAgentPackageName: 'com.joan.update_camtrans',
-          ),
-              ],
-            ),
-            // Glassmorphism Overlay
-            Positioned.fill(
-              child: BackdropFilter(
-                filter: ImageFilter.blur(sigmaX: 2, sigmaY: 2),
-                child: Container(
-                  decoration: BoxDecoration(
-                    gradient: LinearGradient(
-                      begin: Alignment.topCenter,
-                      end: Alignment.bottomCenter,
-                      colors: [pDarkBlue.withOpacity(0.7), pDarkBlue.withOpacity(0.2), pBg],
-                    ),
-                  ),
-                ),
-              ),
-            ),
-            Positioned(
-              bottom: 30,
-              left: 20,
-              child: const Text(
-                "Nouvelle Expédition",
-                style: TextStyle(color: pTextMain, fontSize: 28, fontWeight: FontWeight.bold),
-              ).animate().fadeIn(delay: 200.ms).slideY(begin: 0.5),
-            )
-          ],
-        ),
-      ),
-    );
-  }
-
-  // ==========================================
-  // SECTION TRAJET
-  // ==========================================
-  Widget _buildTrajetSection() {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: pSurface,
-        borderRadius: BorderRadius.circular(24),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.04), blurRadius: 20, offset: const Offset(0, 10))],
-      ),
-      child: Column(
+  Widget _buildPlanificationCard(BuildContext context, EtatDemandeExpedition etat, DemandeExpeditionNotifier notifier) {
+    return _buildCard(
+      child: Row(
         children: [
-          _buildAddressField("Point de départ", Iconsax.location_copy, _depart, isDest: false),
-          Padding(
-            padding: const EdgeInsets.only(left: 22),
-            child: Align(
-              alignment: Alignment.centerLeft,
-              child: Container(width: 2, height: 25, color: pBlue.withOpacity(0.3)),
+          Expanded(
+            child: GestureDetector(
+              onTap: () async {
+                final date = await showDatePicker(
+                  context: context,
+                  initialDate: DateTime.now(),
+                  firstDate: DateTime.now(),
+                  lastDate: DateTime(2035),
+                );
+                if (date != null) notifier.setDateTransport(date);
+              },
+              child: _buildDateTimePickerBox(
+                icon: Iconsax.calendar_1_copy,
+                label: "Date",
+                value: etat.dateTransport != null ? DateFormat('dd/MM/yyyy').format(etat.dateTransport!) : "Sélectionner",
+              ),
             ),
           ),
-          _buildAddressField("Destination", Iconsax.location_tick_copy, _destination, isDest: true),
+          const SizedBox(width: 16),
+          Expanded(
+            child: GestureDetector(
+              onTap: () async {
+                final time = await showTimePicker(
+                  context: context,
+                  initialTime: TimeOfDay.now(),
+                );
+                if (time != null) notifier.setHeureTransport(time);
+              },
+              child: _buildDateTimePickerBox(
+                icon: Iconsax.clock_copy,
+                label: "Heure",
+                value: etat.heureTransport != null ? etat.heureTransport!.format(context) : "Sélectionner",
+              ),
+            ),
+          ),
         ],
       ),
-    ).animate().fadeIn(delay: 300.ms).slideX(begin: 0.1);
-  }
-
-  Widget _buildAddressField(String hint, IconData icon, TextEditingController controller, {required bool isDest}) {
-    return Focus(
-      onFocusChange: (hasFocus) {
-        if (!hasFocus) _simulerCalculIA();
-      },
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 5),
-        decoration: BoxDecoration(
-          color: pBg,
-          borderRadius: BorderRadius.circular(15),
-          border: Border.all(color: Colors.transparent),
-        ),
-        child: Row(
-          children: [
-            Icon(icon, color: isDest ? pBlue : pDarkBlue, size: 22),
-            const SizedBox(width: 15),
-            Expanded(
-              child: TextField(
-                controller: controller,
-                decoration: InputDecoration(
-                  hintText: hint,
-                  hintStyle: const TextStyle(color: pTextMuted, fontSize: 14),
-                  border: InputBorder.none,
-                ),
-              ),
-            ),
-            if (!isDest)
-              IconButton(
-                icon: const Icon(Iconsax.gps_copy, color: pBlue, size: 20),
-                onPressed: () {
-                  controller.text = "Position Actuelle (Douala, Akwa)";
-                  _simulerCalculIA();
-                },
-              )
-          ],
-        ),
-      ),
-    );
-  }
-
-  // ==========================================
-  // SECTION MARCHANDISE
-  // ==========================================
-  Widget _buildMarchandiseSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text("Type de Colis", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: pTextMain)),
-        const SizedBox(height: 15),
-        Row(
-          children: [
-            _buildCategoryChip("Lourd", Iconsax.truck_fast_copy),
-            const SizedBox(width: 15),
-            _buildCategoryChip("Léger", Iconsax.box_copy),
-          ],
-        ),
-        const SizedBox(height: 20),
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 15),
-          decoration: BoxDecoration(color: pSurface, borderRadius: BorderRadius.circular(20), boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 10, offset: const Offset(0, 5))]),
-          child: TextField(
-            controller: _description,
-            maxLines: 3,
-            decoration: const InputDecoration(
-              hintText: "Décrivez ce que vous transportez...",
-              hintStyle: TextStyle(color: pTextMuted, fontSize: 14),
-              border: InputBorder.none,
-            ),
-          ),
-        ),
-      ],
     ).animate().fadeIn(delay: 400.ms).slideY(begin: 0.1);
   }
 
-  Widget _buildCategoryChip(String title, IconData icon) {
-    bool isSelected = _categorie == title;
-    return Expanded(
-      child: GestureDetector(
-        onTap: () => setState(() => _categorie = title),
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 300),
-          padding: const EdgeInsets.symmetric(vertical: 15),
-          decoration: BoxDecoration(
-            color: isSelected ? pBlue : pSurface,
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: isSelected ? pBlue : pBg, width: 2),
-            boxShadow: isSelected ? [BoxShadow(color: pBlue.withOpacity(0.3), blurRadius: 15, offset: const Offset(0, 5))] : [],
+  Widget _buildDateTimePickerBox({required IconData icon, required String label, required String value}) {
+    return Container(
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: Colors.grey.shade100,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        children: [
+          Icon(icon, color: Colors.black54, size: 20),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(label, style: const TextStyle(fontSize: 12, color: Colors.black54)),
+                const SizedBox(height: 2),
+                Text(value, style: const TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Colors.black87)),
+              ],
+            ),
           ),
-          child: Column(
-            children: [
-              Icon(icon, color: isSelected ? Colors.white : pDarkBlue, size: 28),
-              const SizedBox(height: 8),
-              Text(title, style: TextStyle(color: isSelected ? Colors.white : pTextMain, fontWeight: FontWeight.bold)),
-            ],
-          ),
-        ),
+        ],
       ),
     );
   }
 
-  // ==========================================
-  // SECTION IA (ESTIMATION)
-  // ==========================================
-  Widget _buildAISection() {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(colors: [pDarkBlue, pDarkBlue.withOpacity(0.8)]),
-        borderRadius: BorderRadius.circular(24),
-        boxShadow: [BoxShadow(color: pDarkBlue.withOpacity(0.4), blurRadius: 20, offset: const Offset(0, 10))],
-      ),
-      child: _calculIA
-          ? Column(
+  Widget _buildDetailsCard(BuildContext context, EtatDemandeExpedition etat, DemandeExpeditionNotifier notifier) {
+    return _buildCard(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          TextFormField(
+            initialValue: etat.description,
+            onChanged: notifier.setDescription,
+            maxLines: 3,
+            decoration: InputDecoration(
+              hintText: "Instructions spécifiques, informations sur le lieu...",
+              hintStyle: const TextStyle(fontSize: 14, color: Colors.black38),
+              filled: true,
+              fillColor: Colors.grey.shade100,
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+            ),
+          ),
+          const SizedBox(height: 16),
+          const Text("Photos de la marchandise", style: TextStyle(fontWeight: FontWeight.w600, color: Colors.black87)),
+          const SizedBox(height: 12),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
               children: [
-                const Icon(Iconsax.magic_star_copy, color: Colors.white, size: 30).animate(onPlay: (c) => c.repeat()).shake(),
-                const SizedBox(height: 15),
-                const Text("L'IA analyse le meilleur trajet...", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                const SizedBox(height: 15),
-                Container(height: 10, width: 150, decoration: BoxDecoration(color: Colors.white.withOpacity(0.2), borderRadius: BorderRadius.circular(10)))
-                    .animate(onPlay: (c) => c.repeat())
-                    .shimmer(duration: 1.seconds, color: Colors.white),
-              ],
-            )
-          : Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    const Icon(Iconsax.magic_star_copy, color: pBlue),
-                    const SizedBox(width: 10),
-                    const Text("Estimation Intelligente", style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
-                  ],
-                ),
-                const SizedBox(height: 20),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    _buildAIValue("Volume", "12 m³"),
-                    _buildAIValue("Poids", "800 Kg"),
-                    _buildAIValue("Recommandé", "Camion 10t"),
-                  ],
-                ),
-                const SizedBox(height: 20),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 10),
-                  decoration: BoxDecoration(color: Colors.white.withOpacity(0.1), borderRadius: BorderRadius.circular(15)),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text("Prix Estimé", style: TextStyle(color: Colors.white, fontSize: 16)),
-                      const Text("45 000 FCFA", style: TextStyle(color: pBlue, fontSize: 22, fontWeight: FontWeight.bold)),
-                    ],
+                GestureDetector(
+                  onTap: () => notifier.ajouterPhotos(),
+                  child: Container(
+                    width: 80,
+                    height: 80,
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade100,
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.grey.shade300, style: BorderStyle.solid),
+                    ),
+                    child: const Icon(Icons.add_a_photo, color: Colors.black54),
                   ),
-                )
+                ),
+                const SizedBox(width: 12),
+                ...List.generate(etat.photos.length, (index) {
+                  return Stack(
+                    children: [
+                      Container(
+                        width: 80,
+                        height: 80,
+                        margin: const EdgeInsets.only(right: 12),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(12),
+                          image: DecorationImage(
+                            image: FileImage(File(etat.photos[index].path)),
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      ),
+                      Positioned(
+                        top: 4,
+                        right: 16,
+                        child: GestureDetector(
+                          onTap: () => notifier.supprimerPhoto(index),
+                          child: Container(
+                            padding: const EdgeInsets.all(4),
+                            decoration: const BoxDecoration(color: Colors.black54, shape: BoxShape.circle),
+                            child: const Icon(Icons.close, color: Colors.white, size: 14),
+                          ),
+                        ),
+                      ),
+                    ],
+                  );
+                }),
               ],
             ),
+          )
+        ],
+      ),
     ).animate().fadeIn(delay: 500.ms).slideY(begin: 0.1);
   }
 
-  Widget _buildAIValue(String label, String value) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(label, style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 12)),
-        const SizedBox(height: 5),
-        Text(value, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14)),
-      ],
+  Widget _buildTextField({required String hint, required IconData icon, required Color iconColor, required String initialValue, required Function(String) onChanged}) {
+    return TextFormField(
+      initialValue: initialValue,
+      onChanged: onChanged,
+      decoration: InputDecoration(
+        hintText: hint,
+        hintStyle: const TextStyle(fontSize: 14, color: Colors.black38),
+        prefixIcon: Icon(icon, color: iconColor, size: 20),
+        filled: true,
+        fillColor: Colors.grey.shade100,
+        contentPadding: const EdgeInsets.symmetric(vertical: 14),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+      ),
     );
   }
 
-  // ==========================================
-  // SECTION DATE & HEURE
-  // ==========================================
-  Widget _buildDateSection() {
-    return GestureDetector(
-      onTap: _choisirDate,
-      child: Container(
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          color: pSurface,
-          borderRadius: BorderRadius.circular(20),
-          boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 10, offset: const Offset(0, 5))],
-        ),
-        child: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(color: pBlue.withOpacity(0.1), borderRadius: BorderRadius.circular(15)),
-              child: const Icon(Iconsax.calendar_1_copy, color: pBlue),
-            ),
-            const SizedBox(width: 15),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text("Date de Départ", style: TextStyle(color: pTextMuted, fontSize: 13)),
-                const SizedBox(height: 5),
-                Text(
-                  _dateTransport == null ? "Dès que possible" : "${_dateTransport!.day}/${_dateTransport!.month}/${_dateTransport!.year}",
-                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: pTextMain),
-                ),
-              ],
-            ),
-            const Spacer(),
-            const Icon(Icons.arrow_forward_ios, size: 15, color: pTextMuted),
-          ],
-        ),
-      ),
-    ).animate().fadeIn(delay: 600.ms).slideY(begin: 0.1);
-  }
-
-  // ==========================================
-  // SECTION PHOTOS
-  // ==========================================
-  Widget _buildPhotoSection() {
+  Widget _buildSubmitButton(BuildContext context, EtatDemandeExpedition etat) {
     return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(25),
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: pBlue.withOpacity(0.05),
-        borderRadius: BorderRadius.circular(24),
+        color: Colors.white,
+        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(0, -4))],
       ),
-      child: Column(
-        children: [
-          const Icon(Iconsax.camera_copy, size: 40, color: pBlue),
-          const SizedBox(height: 10),
-          const Text("Ajouter des photos du colis", style: TextStyle(color: pBlue, fontWeight: FontWeight.bold)),
-          const SizedBox(height: 5),
-          const Text("(Facultatif mais recommandé)", style: TextStyle(color: pTextMuted, fontSize: 12)),
-        ],
-      ),
-    ).animate().fadeIn(delay: 700.ms).slideY(begin: 0.1);
-  }
-
-  // ==========================================
-  // BOUTON ACTION (FAB)
-  // ==========================================
-  Widget _buildSubmitFAB() {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: SizedBox(
-        width: double.infinity,
-        height: 60,
-        child: ElevatedButton(
-          onPressed: () {
-            if (_depart.text.isEmpty || _destination.text.isEmpty) {
-              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Veuillez remplir les adresses.")));
-              return;
-            }
-            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Recherche de camions en cours...")));
-          },
-          style: ElevatedButton.styleFrom(
-            backgroundColor: pBlue,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-            elevation: 10,
-            shadowColor: pBlue.withOpacity(0.5),
-          ),
-          child: const Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text("Rechercher un transporteur", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
-              SizedBox(width: 10),
-              Icon(Icons.arrow_forward, color: Colors.white),
-            ],
+      child: SafeArea(
+        child: SizedBox(
+          width: double.infinity,
+          height: 55,
+          child: ElevatedButton(
+            onPressed: etat.estValide
+                ? () {
+                    showModalBottomSheet(
+                      context: context,
+                      isScrollControlled: true,
+                      backgroundColor: Colors.transparent,
+                      builder: (context) => const ResumeExpeditionBottomSheet(),
+                    );
+                  }
+                : null,
+            style: ElevatedButton.styleFrom(
+              backgroundColor: Colors.black87,
+              disabledBackgroundColor: Colors.grey.shade300,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            ),
+            child: const Text("Continuer", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
           ),
         ),
-      ).animate().scale(delay: 900.ms, curve: Curves.easeOutBack),
-    );
+      ),
+    ).animate().slideY(begin: 1.0, delay: 600.ms, duration: 400.ms, curve: Curves.easeOutBack);
   }
 }

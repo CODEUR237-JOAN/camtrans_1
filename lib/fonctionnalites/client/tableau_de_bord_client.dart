@@ -1,3 +1,4 @@
+
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -12,6 +13,11 @@ import '../../coeur/routes/routes.dart';
 import '../../modeles/course.dart';
 import '../../services/service_authentification.dart';
 import '../../services/service_firestore.dart';
+
+import 'historique.dart';
+import 'suivi_transport.dart';
+import '../notifications/notifications.dart';
+import 'profil.dart';
 
 // ==========================================
 // PALETTE PREMIUM
@@ -43,51 +49,100 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
 
     return Scaffold(
       backgroundColor: pBg,
-      floatingActionButton: _buildIAAssistantFAB(),
+      floatingActionButton: _bottomNavIndex == 0 ? _buildIAAssistantFAB() : null,
       bottomNavigationBar: _buildBottomNav(),
       body: SafeArea(
-        child: RefreshIndicator(
-          color: pBlue,
-          onRefresh: () async {
-            // Recharger le provider
-            ref.invalidate(coursesClientProvider);
-          },
-          child: CustomScrollView(
-            physics: const BouncingScrollPhysics(),
-            slivers: [
-              SliverToBoxAdapter(child: _buildHeader()),
-              SliverToBoxAdapter(child: _buildSearchBar()),
-              SliverToBoxAdapter(child: _buildMainAction(context)),
-              SliverToBoxAdapter(child: _buildQuickServices()),
-              SliverToBoxAdapter(child: _buildStats()),
-              
-              // ==========================================
-              // GESTION DES ETATS FIRESTORE
-              // ==========================================
-              coursesAsync.when(
-                loading: () => SliverToBoxAdapter(child: _buildLoadingState()),
-                error: (err, stack) => SliverToBoxAdapter(child: _buildErrorState(err.toString())),
-                data: (courses) {
-                  if (courses.isEmpty) {
-                    return SliverToBoxAdapter(child: _buildEmptyState());
-                  }
-
-                  final enCours = courses.where((c) => c.statut != "Livré" && c.statut != "Annulé").toList();
-                  final historique = courses.where((c) => c.statut == "Livré" || c.statut == "Annulé").toList();
-
-                  return SliverList(
-                    delegate: SliverChildListDelegate([
-                      if (enCours.isNotEmpty) _buildActiveShipment(enCours.first),
-                      if (enCours.isNotEmpty) _buildMiniMap(enCours.first),
-                      if (historique.isNotEmpty) _buildHistoryList(historique),
-                      const SizedBox(height: 100), // Espace pour le FAB
-                    ]),
+        child: IndexedStack(
+          index: _bottomNavIndex,
+          children: [
+            // Onglet 0: Accueil (Tableau de bord dynamique)
+            _buildDashboardAccueil(coursesAsync),
+            
+            // Onglet 1: Demandes (Historique)
+            const Historique(),
+            
+            // Onglet 2: Suivi
+            coursesAsync.when(
+              data: (courses) {
+                final enCours = courses.where((c) => c.statut != "Livré" && c.statut != "Annulé").toList();
+                if (enCours.isEmpty) {
+                  return Container(
+                    color: Colors.white,
+                    child: Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Icon(Iconsax.location_copy, size: 80, color: Colors.grey),
+                          const SizedBox(height: 20),
+                          const Text("Aucune course en cours à suivre", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                          const SizedBox(height: 10),
+                          ElevatedButton(
+                            onPressed: () => setState(() => _bottomNavIndex = 0),
+                            style: ElevatedButton.styleFrom(backgroundColor: pBlue, foregroundColor: Colors.white),
+                            child: const Text("Retour à l'accueil"),
+                          )
+                        ],
+                      ),
+                    ),
                   );
-                },
-              ),
-            ],
-          ),
+                }
+                return SuiviTransport(courseId: enCours.first.id);
+              },
+              loading: () => const Scaffold(body: Center(child: CircularProgressIndicator())),
+              error: (err, stack) => Scaffold(body: Center(child: Text("Erreur: $err"))),
+            ),
+            
+            // Onglet 3: Notifications
+            const NotificationsPage(),
+            
+            // Onglet 4: Profil
+            const Profil(),
+          ],
         ),
+      ),
+    );
+  }
+
+  // Contenu du Tableau de Bord Principal
+  Widget _buildDashboardAccueil(AsyncValue<List<Course>> coursesAsync) {
+    return RefreshIndicator(
+      color: pBlue,
+      onRefresh: () async {
+        ref.invalidate(coursesClientProvider);
+      },
+      child: CustomScrollView(
+        physics: const BouncingScrollPhysics(),
+        slivers: [
+          SliverToBoxAdapter(child: _buildHeader()),
+          SliverToBoxAdapter(child: _buildSearchBar()),
+          SliverToBoxAdapter(child: _buildMainAction(context)),
+          SliverToBoxAdapter(child: _buildQuickServices()),
+          
+          coursesAsync.when(
+            loading: () => SliverToBoxAdapter(child: _buildLoadingState()),
+            error: (err, stack) => SliverToBoxAdapter(child: _buildErrorState(err.toString())),
+            data: (courses) {
+              final enCours = courses.where((c) => c.statut != "Livré" && c.statut != "Annulé").toList();
+              final livrees = courses.where((c) => c.statut == "Livré").toList();
+              
+              double depenses = livrees.fold(0, (sum, c) => sum + c.prixFinal);
+              if (depenses == 0) {
+                 depenses = livrees.fold(0, (sum, c) => sum + c.prixEstime);
+              }
+
+              return SliverList(
+                delegate: SliverChildListDelegate(<Widget>[
+                  _buildStats(livraisons: livrees.length, depenses: depenses, enCours: enCours.length),
+                  if (courses.isEmpty) _buildEmptyState(),
+                  if (enCours.isNotEmpty) _buildActiveShipment(enCours.first),
+                  if (enCours.isNotEmpty) _buildMiniMap(enCours.first),
+                  if (courses.isNotEmpty) _buildHistoryList(courses.where((c) => c.statut == "Livré" || c.statut == "Annulé").toList()),
+                  const SizedBox(height: 100),
+                ]),
+              );
+            },
+          ),
+        ],
       ),
     );
   }
@@ -96,6 +151,9 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
   // HEADER PREMIUM
   // ==========================================
   Widget _buildHeader() {
+    final utilisateur = ref.watch(serviceAuthentificationProvider).utilisateur;
+    final String nomAffichage = utilisateur?.displayName ?? "Client";
+
     return Padding(
       padding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
       child: Row(
@@ -107,7 +165,7 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   boxShadow: [
-                    BoxShadow(color: pBlue.withOpacity(0.2), blurRadius: 15, offset: const Offset(0, 5))
+                    BoxShadow(color: pBlue.withValues(alpha: 0.2), blurRadius: 15, offset: const Offset(0, 5))
                   ],
                 ),
                 child: const CircleAvatar(
@@ -120,11 +178,11 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
-                    "Bonjour, Client",
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: pTextMain),
-                  ).animate().fadeIn(delay: 200.ms).slideX(),
                   Text(
+                    "Bonjour, $nomAffichage",
+                    style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: pTextMain),
+                  ).animate().fadeIn(delay: 200.ms).slideX(),
+                  const Text(
                     "Prêt à expédier aujourd'hui ?",
                     style: TextStyle(fontSize: 13, color: pTextMuted),
                   ).animate().fadeIn(delay: 300.ms),
@@ -140,7 +198,7 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
                 decoration: BoxDecoration(
                   color: pSurface,
                   borderRadius: BorderRadius.circular(15),
-                  boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 10)],
+                  boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 10)],
                 ),
                 child: const Icon(Iconsax.notification_bing_copy, color: pTextMain),
               ),
@@ -151,7 +209,7 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
                   padding: const EdgeInsets.all(5),
                   decoration: const BoxDecoration(color: pError, shape: BoxShape.circle),
                   child: const Text("3", style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
-                ).animate().scale(delay: 400.ms),
+                ).animate().scale(delay: 400.ms).shake(),
               )
             ],
           ).animate().fadeIn(delay: 300.ms)
@@ -168,11 +226,11 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.8),
+          color: Colors.white.withValues(alpha: 0.8),
           borderRadius: BorderRadius.circular(20),
           border: Border.all(color: Colors.white, width: 2),
           boxShadow: [
-            BoxShadow(color: pDarkBlue.withOpacity(0.05), blurRadius: 20, offset: const Offset(0, 10))
+            BoxShadow(color: pDarkBlue.withValues(alpha: 0.05), blurRadius: 20, offset: const Offset(0, 10))
           ],
         ),
         child: ClipRRect(
@@ -182,7 +240,7 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
             child: TextField(
               decoration: InputDecoration(
                 hintText: "Où souhaitez-vous expédier ?",
-                hintStyle: TextStyle(color: pTextMuted.withOpacity(0.7)),
+                hintStyle: TextStyle(color: pTextMuted.withValues(alpha: 0.7)),
                 prefixIcon: const Icon(Iconsax.location_copy, color: pBlue),
                 suffixIcon: Container(
                   margin: const EdgeInsets.all(6),
@@ -210,7 +268,11 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       child: Material(
         color: Colors.transparent,
-        child: InkWell(
+        child: Semantics(
+          button: true,
+          label: "Créer une nouvelle expédition",
+          hint: "Double tapez pour réserver un camion",
+          child: InkWell(
           onTap: () => context.push(RoutesApplication.creerDemande),
           borderRadius: BorderRadius.circular(24),
           child: Ink(
@@ -223,7 +285,7 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
               ),
               borderRadius: BorderRadius.circular(24),
               boxShadow: [
-                BoxShadow(color: pBlue.withOpacity(0.4), blurRadius: 20, offset: const Offset(0, 10))
+                BoxShadow(color: pBlue.withValues(alpha: 0.4), blurRadius: 20, offset: const Offset(0, 10))
               ]
             ),
             child: Row(
@@ -240,7 +302,7 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.2),
+                        color: Colors.white.withValues(alpha: 0.2),
                         borderRadius: BorderRadius.circular(10),
                       ),
                       child: const Text(
@@ -253,7 +315,7 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
                 Container(
                   padding: const EdgeInsets.all(15),
                   decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
+                    color: Colors.white.withValues(alpha: 0.2),
                     shape: BoxShape.circle,
                   ),
                   child: const Icon(Iconsax.truck_fast_copy, color: Colors.white, size: 30),
@@ -261,7 +323,8 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
               ],
             ),
           ),
-        ),
+          ), // Fermeture InkWell
+        ), // Fermeture Semantics
       ).animate().scale(delay: 500.ms, curve: Curves.easeOutBack),
     );
   }
@@ -271,10 +334,10 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
   // ==========================================
   Widget _buildQuickServices() {
     final services = [
-      {"icon": Iconsax.box_time_copy, "title": "Mes Colis", "color": pWarning},
-      {"icon": Iconsax.wallet_3_copy, "title": "Paiements", "color": pSuccess},
-      {"icon": Iconsax.document_text_copy, "title": "Factures", "color": pBlue},
-      {"icon": Iconsax.support_copy, "title": "Support", "color": pError},
+      {"icon": Iconsax.box_time_copy, "title": "Mes Colis", "color": pWarning, "action": () => setState(() => _bottomNavIndex = 1)},
+      {"icon": Iconsax.wallet_3_copy, "title": "Paiements", "color": pSuccess, "action": () => context.push(RoutesApplication.factures)},
+      {"icon": Iconsax.document_text_copy, "title": "Factures", "color": pBlue, "action": () => context.push(RoutesApplication.factures)},
+      {"icon": Iconsax.support_copy, "title": "Support", "color": pError, "action": () => context.push(RoutesApplication.assistantIA)},
     ];
 
     return Padding(
@@ -282,20 +345,23 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: services.map((s) {
-          return Column(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(15),
-                decoration: BoxDecoration(
-                  color: pSurface,
-                  borderRadius: BorderRadius.circular(18),
-                  boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.03), blurRadius: 10, offset: const Offset(0, 5))],
-                ),
-                child: Icon(s['icon'] as IconData, color: s['color'] as Color, size: 28),
-              ).animate().scale(delay: 600.ms),
-              const SizedBox(height: 8),
-              Text(s['title'] as String, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 12, color: pTextMain))
-            ],
+          return GestureDetector(
+            onTap: s['action'] as VoidCallback,
+            child: Column(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(15),
+                  decoration: BoxDecoration(
+                    color: pSurface,
+                    borderRadius: BorderRadius.circular(18),
+                    boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 10, offset: const Offset(0, 5))],
+                  ),
+                  child: Icon(s['icon'] as IconData, color: s['color'] as Color, size: 28),
+                ).animate(onPlay: (controller) => controller.repeat(reverse: true)).moveY(begin: 0, end: -3, duration: 1.5.seconds).scale(delay: 600.ms),
+                const SizedBox(height: 8),
+                Text(s['title'] as String, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 12, color: pTextMain))
+              ],
+            ),
           );
         }).toList(),
       ),
@@ -305,18 +371,21 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
   // ==========================================
   // STATISTIQUES ANIMÉES
   // ==========================================
-  Widget _buildStats() {
+  Widget _buildStats({required int livraisons, required double depenses, required int enCours}) {
+    // Format des dépenses (k si > 1000)
+    String depensesText = depenses >= 1000 ? "${(depenses / 1000).toStringAsFixed(1)}k" : depenses.toStringAsFixed(0);
+
     return SizedBox(
       height: 100,
       child: ListView(
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 20),
         children: [
-          _buildStatCard("Livraisons", "12", Iconsax.box_tick_copy, pSuccess),
+          _buildStatCard("Livraisons", livraisons.toString(), Iconsax.box_tick_copy, pSuccess),
           const SizedBox(width: 15),
-          _buildStatCard("Dépenses", "450k", Iconsax.coin_copy, pWarning),
+          _buildStatCard("Dépenses", depensesText, Iconsax.coin_copy, pWarning),
           const SizedBox(width: 15),
-          _buildStatCard("En cours", "2", Iconsax.truck_copy, pBlue),
+          _buildStatCard("En cours", enCours.toString(), Iconsax.truck_copy, pBlue),
         ],
       ),
     ).animate().fadeIn(delay: 700.ms).slideX(begin: 0.1);
@@ -329,8 +398,8 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
       decoration: BoxDecoration(
         color: pSurface,
         borderRadius: BorderRadius.circular(20),
-        boxShadow: [BoxShadow(color: color.withOpacity(0.1), blurRadius: 15, offset: const Offset(0, 5))],
-        border: Border.all(color: color.withOpacity(0.1)),
+        boxShadow: [BoxShadow(color: color.withValues(alpha: 0.1), blurRadius: 15, offset: const Offset(0, 5))],
+        border: Border.all(color: color.withValues(alpha: 0.1)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -362,7 +431,7 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
         decoration: BoxDecoration(
           color: pSurface,
           borderRadius: BorderRadius.circular(24),
-          boxShadow: [BoxShadow(color: pDarkBlue.withOpacity(0.06), blurRadius: 20, offset: const Offset(0, 10))],
+          boxShadow: [BoxShadow(color: pDarkBlue.withValues(alpha: 0.06), blurRadius: 20, offset: const Offset(0, 10))],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -373,7 +442,7 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
                 const Text("Expédition Active", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: pTextMain)),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  decoration: BoxDecoration(color: pWarning.withOpacity(0.1), borderRadius: BorderRadius.circular(20)),
+                  decoration: BoxDecoration(color: pWarning.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(20)),
                   child: Text(course.statut, style: const TextStyle(color: pWarning, fontWeight: FontWeight.bold, fontSize: 12)),
                 )
               ],
@@ -420,7 +489,7 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
       decoration: BoxDecoration(
         color: active ? pBlue : pBg,
         shape: BoxShape.circle,
-        border: isCurrent ? Border.all(color: pBlue.withOpacity(0.3), width: 4) : null,
+        border: isCurrent ? Border.all(color: pBlue.withValues(alpha: 0.3), width: 4) : null,
       ),
       child: active && !isCurrent ? const Icon(Icons.check, size: 8, color: Colors.white) : null,
     );
@@ -442,7 +511,7 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
         height: 150,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(24),
-          boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 15, offset: const Offset(0, 5))],
+          boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 15, offset: const Offset(0, 5))],
         ),
         clipBehavior: Clip.antiAlias,
         child: Stack(
@@ -498,7 +567,7 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
               TextButton(onPressed: () {}, child: const Text("Voir tout", style: TextStyle(color: pBlue))),
             ],
           ),
-          ...courses.take(3).map((course) {
+          ...courses.take(3).map<Widget>((course) {
             Color statusColor = course.statut == "Livré" ? pSuccess : pError;
             return Container(
               margin: const EdgeInsets.only(bottom: 15),
@@ -506,7 +575,7 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
               decoration: BoxDecoration(
                 color: pSurface,
                 borderRadius: BorderRadius.circular(20),
-                boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.02), blurRadius: 10, offset: const Offset(0, 5))],
+                boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.02), blurRadius: 10, offset: const Offset(0, 5))],
               ),
               child: Row(
                 children: [
@@ -533,7 +602,7 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
                       const SizedBox(height: 5),
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                        decoration: BoxDecoration(color: statusColor.withOpacity(0.1), borderRadius: BorderRadius.circular(8)),
+                        decoration: BoxDecoration(color: statusColor.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(8)),
                         child: Text(course.statut, style: TextStyle(color: statusColor, fontSize: 10, fontWeight: FontWeight.bold)),
                       )
                     ],
@@ -558,7 +627,7 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
           height: 100,
           margin: const EdgeInsets.only(bottom: 15),
           decoration: BoxDecoration(color: pSurface, borderRadius: BorderRadius.circular(20)),
-        ).animate(onPlay: (controller) => controller.repeat()).shimmer(duration: 1.5.seconds, color: pBg.withOpacity(0.5))),
+        ).animate(onPlay: (controller) => controller.repeat()).shimmer(duration: 1.5.seconds, color: pBg.withValues(alpha: 0.5))).cast<Widget>(),
       ),
     );
   }
@@ -569,9 +638,9 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
       child: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: pError.withOpacity(0.1),
+          color: pError.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(24),
-          border: Border.all(color: pError.withOpacity(0.3)),
+          border: Border.all(color: pError.withValues(alpha: 0.3)),
         ),
         child: Column(
           children: [
@@ -637,51 +706,15 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
     return FloatingActionButton.extended(
       heroTag: "fab_ia",
       onPressed: () {
-        showModalBottomSheet(
-          context: context,
-          backgroundColor: Colors.transparent,
-          isScrollControlled: true,
-          builder: (context) => _buildIABottomSheet(),
-        );
+        context.push(RoutesApplication.assistantIA);
       },
       backgroundColor: pDarkBlue,
+      tooltip: "Discuter avec l'assistant d'Intelligence Artificielle",
       icon: const Icon(Iconsax.message_text_copy, color: Colors.white),
       label: const Text("Assistant IA", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
     ).animate().slideY(begin: 2, delay: 1200.ms, curve: Curves.easeOutBack);
   }
 
-  Widget _buildIABottomSheet() {
-    return Container(
-      height: MediaQuery.of(context).size.height * 0.7,
-      decoration: const BoxDecoration(
-        color: pSurface,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(30)),
-      ),
-      child: Column(
-        children: [
-          const SizedBox(height: 15),
-          Container(width: 50, height: 5, decoration: BoxDecoration(color: pBg, borderRadius: BorderRadius.circular(10))),
-          const SizedBox(height: 20),
-          const Icon(Iconsax.message_text_copy, size: 50, color: pBlue),
-          const SizedBox(height: 15),
-          const Text("Assistant IA Gemini", style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: pTextMain)),
-          const Padding(
-            padding: EdgeInsets.all(20),
-            child: Text("Bientôt, vous pourrez discuter avec notre IA pour estimer des prix, trouver des camions et suivre vos colis en langage naturel !", textAlign: TextAlign.center, style: TextStyle(color: pTextMuted, fontSize: 16)),
-          ),
-          const Spacer(),
-          Padding(
-            padding: const EdgeInsets.all(20),
-            child: ElevatedButton(
-              onPressed: () => Navigator.pop(context),
-              style: ElevatedButton.styleFrom(minimumSize: const Size(double.infinity, 55), backgroundColor: pBlue, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15))),
-              child: const Text("Fermer", style: TextStyle(color: Colors.white, fontSize: 16)),
-            ),
-          )
-        ],
-      ),
-    );
-  }
 
   // ==========================================
   // BOTTOM NAVIGATION
@@ -690,7 +723,7 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
     return Container(
       decoration: BoxDecoration(
         color: pSurface,
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 20, offset: const Offset(0, -5))],
+        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 20, offset: const Offset(0, -5))],
       ),
       child: BottomNavigationBar(
         currentIndex: _bottomNavIndex,
@@ -704,11 +737,11 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
         unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 11),
         elevation: 0,
         items: const [
-          BottomNavigationBarItem(icon: Icon(Iconsax.home_2_copy), activeIcon: Icon(Iconsax.home_2), label: "Accueil"),
-          BottomNavigationBarItem(icon: Icon(Iconsax.truck_copy), activeIcon: Icon(Iconsax.truck), label: "Demandes"),
-          BottomNavigationBarItem(icon: Icon(Iconsax.location_copy), activeIcon: Icon(Iconsax.location), label: "Suivi"),
-          BottomNavigationBarItem(icon: Icon(Iconsax.notification_copy), activeIcon: Icon(Iconsax.notification), label: "Alerte"),
-          BottomNavigationBarItem(icon: Icon(Iconsax.user_copy), activeIcon: Icon(Iconsax.user), label: "Profil"),
+          BottomNavigationBarItem(icon: Icon(Iconsax.home_2_copy), activeIcon: Icon(Iconsax.home_2), label: "Accueil", tooltip: "Retourner à l'accueil"),
+          BottomNavigationBarItem(icon: Icon(Iconsax.truck_copy), activeIcon: Icon(Iconsax.truck), label: "Demandes", tooltip: "Gérer vos expéditions"),
+          BottomNavigationBarItem(icon: Icon(Iconsax.location_copy), activeIcon: Icon(Iconsax.location), label: "Suivi", tooltip: "Suivre vos colis sur la carte"),
+          BottomNavigationBarItem(icon: Icon(Iconsax.notification_copy), activeIcon: Icon(Iconsax.notification), label: "Alerte", tooltip: "Voir les notifications"),
+          BottomNavigationBarItem(icon: Icon(Iconsax.user_copy), activeIcon: Icon(Iconsax.user), label: "Profil", tooltip: "Paramètres du profil"),
         ],
       ),
     ).animate().slideY(begin: 1, delay: 1000.ms, curve: Curves.easeOutBack);

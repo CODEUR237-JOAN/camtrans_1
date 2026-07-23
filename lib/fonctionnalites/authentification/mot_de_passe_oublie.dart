@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
 import '../../coeur/constantes/couleurs.dart';
-import '../../coeur/constantes/images.dart';
 import '../../coeur/constantes/tailles.dart';
 import '../../coeur/routes/routes.dart';
 import '../../coeur/utilitaires/validateurs.dart';

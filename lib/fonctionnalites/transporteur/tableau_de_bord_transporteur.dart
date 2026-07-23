@@ -6,20 +6,31 @@ import '../../coeur/constantes/couleurs.dart';
 import '../../coeur/constantes/tailles.dart';
 import '../../coeur/widgets/barre_navigation.dart';
 import '../../coeur/widgets/carte_information.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../coeur/etat/transporteur_provider.dart';
+import '../../services/service_authentification.dart';
+import '../../modeles/course.dart';
+import 'courses_disponibles.dart';
+import 'navigation.dart';
+import '../notifications/notifications.dart';
+import 'profil.dart';
 
-class TableauDeBordTransporteur extends StatefulWidget {
+class TableauDeBordTransporteur extends ConsumerStatefulWidget {
   const TableauDeBordTransporteur({super.key});
 
   @override
-  State<TableauDeBordTransporteur> createState() => _TableauDeBordTransporteurState();
+  ConsumerState<TableauDeBordTransporteur> createState() => _TableauDeBordTransporteurState();
 }
 
-class _TableauDeBordTransporteurState extends State<TableauDeBordTransporteur> {
+class _TableauDeBordTransporteurState extends ConsumerState<TableauDeBordTransporteur> {
   int indexNavigation = 0;
   bool estDisponible = true;
 
   @override
   Widget build(BuildContext context) {
+    final statsRevenus = ref.watch(statsRevenusProvider);
+    final mesCoursesAsync = ref.watch(fluxMesCoursesProvider);
+
     return Scaffold(
       backgroundColor: CouleursApp.fond,
       bottomNavigationBar: BarreNavigation(
@@ -31,12 +42,35 @@ class _TableauDeBordTransporteurState extends State<TableauDeBordTransporteur> {
         },
       ).animate().slideY(begin: 1, end: 0, delay: 500.ms, duration: 400.ms),
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(TaillesApp.margePage),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // HEADER
+        child: IndexedStack(
+          index: indexNavigation,
+          children: [
+            // 0: Accueil
+            _buildDashboardAccueil(statsRevenus, mesCoursesAsync),
+            // 1: Demandes
+            const CoursesDisponibles(),
+            // 2: Suivi
+            const NavigationTransporteur(),
+            // 3: Notifications
+            const NotificationsPage(),
+            // 4: Profil
+            const ProfilTransporteur(),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildDashboardAccueil(Map<String, double> statsRevenus, AsyncValue<List<Course>> mesCoursesAsync) {
+    final utilisateur = ref.watch(serviceAuthentificationProvider).utilisateur;
+    final nomAffichage = utilisateur?.displayName ?? "Transporteur";
+
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(TaillesApp.margePage),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // HEADER
               Row(
                 children: [
                   Container(
@@ -66,16 +100,16 @@ class _TableauDeBordTransporteurState extends State<TableauDeBordTransporteur> {
                           style: TextStyle(color: CouleursApp.texteSecondaire, fontSize: 14),
                         ),
                         const SizedBox(height: 2),
-                        const Text(
-                          "Jean Mvondo",
-                          style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, letterSpacing: -0.5),
+                        Text(
+                          nomAffichage,
+                          style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, letterSpacing: -0.5),
                         ),
                       ],
                     ),
                   ).animate().fadeIn(delay: 200.ms).slideX(begin: -0.1),
                   Switch(
                     value: estDisponible,
-                    activeColor: Colors.white,
+                    activeThumbColor: Colors.white,
                     activeTrackColor: Colors.green,
                     inactiveThumbColor: Colors.white,
                     inactiveTrackColor: Colors.grey.shade300,
@@ -112,9 +146,9 @@ class _TableauDeBordTransporteurState extends State<TableauDeBordTransporteur> {
                       style: TextStyle(color: Colors.white70, fontSize: 16),
                     ),
                     const SizedBox(height: 8),
-                    const Text(
-                      "75 000 FCFA",
-                      style: TextStyle(color: Colors.white, fontSize: 34, fontWeight: FontWeight.w900, letterSpacing: -1),
+                    Text(
+                      "${statsRevenus['total']?.toStringAsFixed(0)} FCFA",
+                      style: const TextStyle(color: Colors.white, fontSize: 34, fontWeight: FontWeight.w900, letterSpacing: -1),
                     ),
                     const SizedBox(height: 15),
                     Container(
@@ -152,28 +186,46 @@ class _TableauDeBordTransporteurState extends State<TableauDeBordTransporteur> {
               ).animate().fadeIn(delay: 500.ms),
               const SizedBox(height: 15),
 
-              Row(
-                children: [
-                  Expanded(
-                    child: CarteInformation(titre: "Courses", valeur: "18", icone: Icons.local_shipping),
-                  ).animate().slideX(begin: -0.1, delay: 600.ms),
-                  const SizedBox(width: 15),
-                  Expanded(
-                    child: CarteInformation(titre: "Livrées", valeur: "15", icone: Icons.check_circle, couleurIcone: Colors.green, couleurValeur: Colors.green),
-                  ).animate().slideX(begin: 0.1, delay: 600.ms),
-                ],
-              ),
-              const SizedBox(height: 15),
-              Row(
-                children: [
-                  Expanded(
-                    child: CarteInformation(titre: "En attente", valeur: "05", icone: Icons.schedule, couleurIcone: Colors.orange, couleurValeur: Colors.orange),
-                  ).animate().slideX(begin: -0.1, delay: 700.ms),
-                  const SizedBox(width: 15),
-                  Expanded(
-                    child: CarteInformation(titre: "Note", valeur: "4.9 ★", icone: Icons.star, couleurIcone: Colors.amber, couleurValeur: Colors.amber),
-                  ).animate().slideX(begin: 0.1, delay: 700.ms),
-                ],
+              mesCoursesAsync.when(
+                loading: () => Column(
+                  children: List.generate(2, (index) => Container(
+                    height: 100, margin: const EdgeInsets.only(bottom: 10),
+                    decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20)),
+                  ).animate(onPlay: (controller) => controller.repeat()).shimmer(color: Colors.grey.shade200, duration: 1.5.seconds)).cast<Widget>(),
+                ),
+                error: (err, _) => const SizedBox.shrink(),
+                data: (courses) {
+                  int livrees = courses.where((c) => c.statut == 'Livré').length;
+                  int enAttente = courses.where((c) => c.statut != 'Livré' && c.statut != 'Annulé').length;
+                  
+                  return Column(
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: CarteInformation(titre: "Courses", valeur: "${courses.length}", icone: Icons.local_shipping),
+                          ).animate().slideX(begin: -0.1, delay: 600.ms),
+                          const SizedBox(width: 15),
+                          Expanded(
+                            child: CarteInformation(titre: "Livrées", valeur: "$livrees", icone: Icons.check_circle, couleurIcone: Colors.green, couleurValeur: Colors.green),
+                          ).animate().slideX(begin: 0.1, delay: 600.ms),
+                        ],
+                      ),
+                      const SizedBox(height: 15),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: CarteInformation(titre: "En cours", valeur: "$enAttente", icone: Icons.schedule, couleurIcone: Colors.orange, couleurValeur: Colors.orange),
+                          ).animate().slideX(begin: -0.1, delay: 700.ms),
+                          const SizedBox(width: 15),
+                          Expanded(
+                            child: CarteInformation(titre: "Note", valeur: "4.9 ★", icone: Icons.star, couleurIcone: Colors.amber, couleurValeur: Colors.amber),
+                          ).animate().slideX(begin: 0.1, delay: 700.ms),
+                        ],
+                      ),
+                    ],
+                  );
+                }
               ),
 
               const SizedBox(height: 35),
@@ -196,31 +248,23 @@ class _TableauDeBordTransporteurState extends State<TableauDeBordTransporteur> {
                   CarteInformation(
                     titre: "Courses\ndisponibles",
                     icone: Icons.map,
-                    auClic: () {
-                      context.push("/courses-disponibles");
-                    },
-                  ).animate().scale(delay: 900.ms, curve: Curves.easeOutBack),
+                    auClic: () => setState(() => indexNavigation = 1),
+                  ).animate(onPlay: (controller) => controller.repeat(reverse: true)).moveY(begin: -2, end: 2, duration: 2.seconds).scale(delay: 900.ms, curve: Curves.easeOutBack),
                   CarteInformation(
                     titre: "Revenus",
                     icone: Icons.account_balance_wallet,
-                    auClic: () {
-                      context.push("/revenus");
-                    },
-                  ).animate().scale(delay: 1000.ms, curve: Curves.easeOutBack),
+                    auClic: () => context.push("/revenus"),
+                  ).animate(onPlay: (controller) => controller.repeat(reverse: true)).moveY(begin: 2, end: -2, duration: 2.seconds).scale(delay: 1000.ms, curve: Curves.easeOutBack),
                   CarteInformation(
                     titre: "Portefeuille",
                     icone: Icons.wallet,
-                    auClic: () {
-                      context.push("/portefeuille");
-                    },
-                  ).animate().scale(delay: 1100.ms, curve: Curves.easeOutBack),
+                    auClic: () => context.push("/portefeuille"),
+                  ).animate(onPlay: (controller) => controller.repeat(reverse: true)).moveY(begin: -2, end: 2, duration: 2.seconds).scale(delay: 1100.ms, curve: Curves.easeOutBack),
                   CarteInformation(
                     titre: "Documents",
                     icone: Icons.description,
-                    auClic: () {
-                      context.push("/documents");
-                    },
-                  ).animate().scale(delay: 1200.ms, curve: Curves.easeOutBack),
+                    auClic: () => context.push("/documents"),
+                  ).animate(onPlay: (controller) => controller.repeat(reverse: true)).moveY(begin: 2, end: -2, duration: 2.seconds).scale(delay: 1200.ms, curve: Curves.easeOutBack),
                 ],
               ),
 
@@ -236,23 +280,39 @@ class _TableauDeBordTransporteurState extends State<TableauDeBordTransporteur> {
               ).animate().fadeIn(delay: 1300.ms),
               const SizedBox(height: 15),
 
-              _creationCarteTrajet(
-                "Douala → Yaoundé", "Mobilier", "30 000 FCFA", Icons.local_shipping, Colors.blue
-              ).animate().fadeIn(delay: 1400.ms).slideY(begin: 0.1),
-              const SizedBox(height: 10),
-              _creationCarteTrajet(
-                "Kribi → Douala", "Poissons", "18 000 FCFA", Icons.local_shipping, Colors.blue
-              ).animate().fadeIn(delay: 1500.ms).slideY(begin: 0.1),
-              const SizedBox(height: 10),
-              _creationCarteTrajet(
-                "Bafoussam → Douala", "Cacao", "55 000 FCFA", Icons.local_shipping, Colors.blue
-              ).animate().fadeIn(delay: 1600.ms).slideY(begin: 0.1),
+              mesCoursesAsync.when(
+                loading: () => Column(
+                  children: List.generate(3, (index) => Container(
+                    height: 80, margin: const EdgeInsets.only(bottom: 10),
+                    decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20)),
+                  ).animate(onPlay: (controller) => controller.repeat()).shimmer(color: Colors.grey.shade200, duration: 1.5.seconds)).cast<Widget>(),
+                ),
+                error: (err, _) => Text("Erreur: $err"),
+                data: (courses) {
+                  if (courses.isEmpty) {
+                    return const Padding(
+                      padding: EdgeInsets.all(20.0),
+                      child: Text("Aucune course assignée.", style: TextStyle(color: Colors.grey)),
+                    );
+                  }
+                  
+                  return Column(
+                    children: courses.take(3).map<Widget>((course) {
+                      return _creationCarteTrajet(
+                        "${course.adresseDepart} → ${course.adresseArrivee}", 
+                        course.typeMarchandise, 
+                        "${course.prixEstime.toStringAsFixed(0)} FCFA", 
+                        Icons.local_shipping, 
+                        Colors.blue
+                      ).animate().fadeIn().slideY(begin: 0.1);
+                    }).toList(),
+                  );
+                }
+              ),
 
               const SizedBox(height: 30),
             ],
           ),
-        ),
-      ),
     );
   }
 
