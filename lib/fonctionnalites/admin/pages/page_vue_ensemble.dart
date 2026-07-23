@@ -3,9 +3,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:intl/intl.dart';
 
 import '../../../coeur/etat/admin_provider.dart';
 import '../../../coeur/constantes/couleurs.dart';
+import '../../../modeles/transporteur.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import 'package:iconsax_flutter/iconsax_flutter.dart';
 
 class PageVueEnsemble extends ConsumerWidget {
   const PageVueEnsemble({super.key});
@@ -13,11 +17,13 @@ class PageVueEnsemble extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final statsAsync = ref.watch(adminStatsProvider);
+    final weeklyRevenuesAsync = ref.watch(adminWeeklyRevenuesProvider);
+    final transporteursAsync = ref.watch(adminTransporteursProvider);
 
     return Scaffold(
       backgroundColor: const Color(0xFFF4F7FB),
       body: statsAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
+        loading: () => const _SkeletonVueEnsemble(),
         error: (err, _) => Center(child: Text("Erreur: $err")),
         data: (stats) {
           return SingleChildScrollView(
@@ -26,8 +32,13 @@ class PageVueEnsemble extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 const Text(
-                  "Vue d'ensemble",
-                  style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.black87),
+                  "Bienvenue, Admin",
+                  style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: CouleursApp.textePrincipal),
+                ),
+                const SizedBox(height: 5),
+                const Text(
+                  "Voici l'état de la plateforme aujourd'hui.",
+                  style: TextStyle(fontSize: 16, color: CouleursApp.texteSecondaire),
                 ),
                 const SizedBox(height: 24),
                 
@@ -43,10 +54,10 @@ class PageVueEnsemble extends ConsumerWidget {
                       mainAxisSpacing: 16,
                       childAspectRatio: 2.5,
                       children: [
-                        _KpiCard(titre: "Revenus (FCFA)", valeur: stats.revenusTotaux.toStringAsFixed(0), icone: Icons.monetization_on, couleur: Colors.green),
-                        _KpiCard(titre: "Clients Actifs", valeur: stats.totalClients.toString(), icone: Icons.person, couleur: Colors.blue),
-                        _KpiCard(titre: "Transporteurs", valeur: stats.totalTransporteurs.toString(), icone: Icons.local_shipping, couleur: Colors.orange),
-                        _KpiCard(titre: "Courses Totales", valeur: stats.totalCourses.toString(), icone: Icons.map, couleur: CouleursApp.primaire),
+                        _KpiCard(titre: "Revenus (FCFA)", valeur: NumberFormat.compact().format(stats.revenusTotaux), icone: Iconsax.wallet_3, couleur: CouleursApp.succes).animate().fadeIn(duration: 400.ms).slideY(begin: 0.1),
+                        _KpiCard(titre: "Clients Actifs", valeur: stats.totalClients.toString(), icone: Iconsax.user_copy, couleur: CouleursApp.secondaire).animate().fadeIn(duration: 400.ms, delay: 100.ms).slideY(begin: 0.1),
+                        _KpiCard(titre: "Transporteurs", valeur: stats.totalTransporteurs.toString(), icone: Iconsax.truck_fast_copy, couleur: CouleursApp.avertissement).animate().fadeIn(duration: 400.ms, delay: 200.ms).slideY(begin: 0.1),
+                        _KpiCard(titre: "Courses Totales", valeur: stats.totalCourses.toString(), icone: Iconsax.map, couleur: CouleursApp.primaire).animate().fadeIn(duration: 400.ms, delay: 300.ms).slideY(begin: 0.1),
                       ],
                     );
                   },
@@ -61,17 +72,17 @@ class PageVueEnsemble extends ConsumerWidget {
                       return Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Expanded(flex: 2, child: _buildGraphiqueRevenus()),
+                          Expanded(flex: 2, child: _buildGraphiqueRevenus(weeklyRevenuesAsync).animate().fadeIn(duration: 600.ms).scale(begin: const Offset(0.95, 0.95))),
                           const SizedBox(width: 24),
-                          Expanded(flex: 1, child: _buildCarteTransporteurs()),
+                          Expanded(flex: 1, child: _buildCarteTransporteurs(transporteursAsync).animate().fadeIn(duration: 600.ms, delay: 200.ms).scale(begin: const Offset(0.95, 0.95))),
                         ],
                       );
                     } else {
                       return Column(
                         children: [
-                          _buildGraphiqueRevenus(),
+                          _buildGraphiqueRevenus(weeklyRevenuesAsync),
                           const SizedBox(height: 24),
-                          _buildCarteTransporteurs(),
+                          _buildCarteTransporteurs(transporteursAsync),
                         ],
                       );
                     }
@@ -85,13 +96,13 @@ class PageVueEnsemble extends ConsumerWidget {
     );
   }
 
-  Widget _buildGraphiqueRevenus() {
+  Widget _buildGraphiqueRevenus(AsyncValue<List<double>> weeklyRevenuesAsync) {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10)],
+        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10)],
       ),
       height: 400,
       child: Column(
@@ -100,48 +111,50 @@ class PageVueEnsemble extends ConsumerWidget {
           const Text("Évolution des Revenus (7 derniers jours)", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
           const SizedBox(height: 24),
           Expanded(
-            child: LineChart(
-              LineChartData(
-                gridData: FlGridData(show: true, drawVerticalLine: false),
-                titlesData: FlTitlesData(
-                  rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                  topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                  bottomTitles: AxisTitles(
-                    sideTitles: SideTitles(
-                      showTitles: true,
-                      getTitlesWidget: (value, meta) {
-                        const jours = ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'];
-                        if (value.toInt() >= 0 && value.toInt() < jours.length) {
-                          return Text(jours[value.toInt()], style: const TextStyle(color: Colors.grey, fontSize: 12));
-                        }
-                        return const Text('');
-                      },
+            child: weeklyRevenuesAsync.when(
+              loading: () => Container(
+                color: Colors.grey.shade100,
+              ).animate(onPlay: (controller) => controller.repeat()).shimmer(color: Colors.grey.shade300, duration: 1.5.seconds),
+              error: (err, _) => Center(child: Text("Erreur chart: $err")),
+              data: (data) {
+                final spots = data.asMap().entries.map((e) => FlSpot(e.key.toDouble(), e.value)).toList();
+                
+                return LineChart(
+                  LineChartData(
+                    gridData: FlGridData(show: true, drawVerticalLine: false),
+                    titlesData: FlTitlesData(
+                      rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                      topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                      bottomTitles: AxisTitles(
+                        sideTitles: SideTitles(
+                          showTitles: true,
+                          getTitlesWidget: (value, meta) {
+                            const jours = ['J-6', 'J-5', 'J-4', 'J-3', 'J-2', 'Hier', 'Auj'];
+                            if (value.toInt() >= 0 && value.toInt() < jours.length) {
+                              return Text(jours[value.toInt()], style: const TextStyle(color: Colors.grey, fontSize: 10));
+                            }
+                            return const Text('');
+                          },
+                        ),
+                      ),
                     ),
-                  ),
-                ),
-                borderData: FlBorderData(show: false),
-                lineBarsData: [
-                  LineChartBarData(
-                    spots: const [
-                      FlSpot(0, 15000),
-                      FlSpot(1, 20000),
-                      FlSpot(2, 18000),
-                      FlSpot(3, 35000),
-                      FlSpot(4, 25000),
-                      FlSpot(5, 45000),
-                      FlSpot(6, 40000),
+                    borderData: FlBorderData(show: false),
+                    lineBarsData: [
+                      LineChartBarData(
+                        spots: spots,
+                        isCurved: true,
+                        color: CouleursApp.primaire,
+                        barWidth: 4,
+                        belowBarData: BarAreaData(
+                          show: true,
+                          color: CouleursApp.primaire.withOpacity(0.1),
+                        ),
+                        dotData: const FlDotData(show: true),
+                      ),
                     ],
-                    isCurved: true,
-                    color: CouleursApp.primaire,
-                    barWidth: 4,
-                    belowBarData: BarAreaData(
-                      show: true,
-                      color: CouleursApp.primaire.withValues(alpha: 0.1),
-                    ),
-                    dotData: FlDotData(show: true),
                   ),
-                ],
-              ),
+                );
+              },
             ),
           ),
         ],
@@ -149,12 +162,12 @@ class PageVueEnsemble extends ConsumerWidget {
     );
   }
 
-  Widget _buildCarteTransporteurs() {
+  Widget _buildCarteTransporteurs(AsyncValue<List<Transporteur>> transporteursAsync) {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10)],
+        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10)],
       ),
       height: 400,
       clipBehavior: Clip.hardEdge,
@@ -166,29 +179,34 @@ class PageVueEnsemble extends ConsumerWidget {
             child: Text("Activité en temps réel", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
           ),
           Expanded(
-            child: FlutterMap(
-              options: MapOptions(
-                initialCenter: const LatLng(4.0511, 9.7679), // Douala
-                initialZoom: 12,
-              ),
-              children: [
-                TileLayer(
-                  urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                  userAgentPackageName: 'com.camtrans.app',
-                ),
-                MarkerLayer(
-                  markers: [
-                    Marker(
-                      point: const LatLng(4.0511, 9.7679),
-                      child: const Icon(Icons.local_shipping, color: CouleursApp.primaire, size: 30),
+            child: transporteursAsync.when(
+              loading: () => Container(
+                color: Colors.grey.shade100,
+              ).animate(onPlay: (controller) => controller.repeat()).shimmer(color: Colors.grey.shade300, duration: 1.5.seconds),
+              error: (err, _) => Center(child: Text("Erreur map: $err")),
+              data: (transporteurs) {
+                final markers = transporteurs
+                    .where((t) => t.latitude != 0 && t.longitude != 0)
+                    .map<Marker>((t) => Marker(
+                          point: LatLng(t.latitude, t.longitude),
+                          child: Icon(Icons.local_shipping, color: t.disponible ? Colors.green : Colors.orange, size: 24),
+                        ))
+                    .toList();
+
+                return FlutterMap(
+                  options: const MapOptions(
+                    initialCenter: LatLng(4.0511, 9.7679), // Douala
+                    initialZoom: 11,
+                  ),
+                  children: [
+                    TileLayer(
+                      urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                      userAgentPackageName: 'com.joan.update_camtrans',
                     ),
-                    Marker(
-                      point: const LatLng(4.0611, 9.7579),
-                      child: const Icon(Icons.local_shipping, color: CouleursApp.primaire, size: 30),
-                    ),
+                    MarkerLayer(markers: markers),
                   ],
-                ),
-              ],
+                );
+              },
             ),
           ),
         ],
@@ -219,10 +237,10 @@ class _KpiCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: couleur.withValues(alpha: 0.1),
+              color: couleur.withOpacity(0.1),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Icon(icone, color: couleur, size: 32),
+            child: Icon(icone, color: couleur, size: 28),
           ),
           const SizedBox(width: 16),
           Expanded(
@@ -230,12 +248,48 @@ class _KpiCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text(titre, style: const TextStyle(color: Colors.grey, fontSize: 14, fontWeight: FontWeight.bold)),
-                const SizedBox(height: 8),
-                Text(valeur, style: const TextStyle(color: Colors.black87, fontSize: 24, fontWeight: FontWeight.bold)),
+                Text(titre, style: const TextStyle(color: Colors.grey, fontSize: 13, fontWeight: FontWeight.bold), overflow: TextOverflow.ellipsis),
+                const SizedBox(height: 4),
+                FittedBox(fit: BoxFit.scaleDown, child: Text(valeur, style: const TextStyle(color: Colors.black87, fontSize: 22, fontWeight: FontWeight.bold))),
               ],
             ),
           )
+        ],
+      ),
+    );
+  }
+}
+
+class _SkeletonVueEnsemble extends StatelessWidget {
+  const _SkeletonVueEnsemble();
+
+  @override
+  Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(24.0),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(height: 30, width: 250, color: Colors.grey.shade200).animate(onPlay: (controller) => controller.repeat()).shimmer(color: Colors.grey.shade300, duration: 1.5.seconds),
+          const SizedBox(height: 10),
+          Container(height: 20, width: 350, color: Colors.grey.shade200).animate(onPlay: (controller) => controller.repeat()).shimmer(color: Colors.grey.shade300, duration: 1.5.seconds),
+          const SizedBox(height: 24),
+          LayoutBuilder(
+            builder: (context, constraints) {
+              int crossAxisCount = constraints.maxWidth > 1200 ? 4 : constraints.maxWidth > 800 ? 2 : 1;
+              return GridView.count(
+                crossAxisCount: crossAxisCount,
+                shrinkWrap: true,
+                physics: const NeverScrollableScrollPhysics(),
+                crossAxisSpacing: 16,
+                mainAxisSpacing: 16,
+                childAspectRatio: 2.5,
+                children: List.generate(4, (index) => Container(
+                  decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16)),
+                ).animate(onPlay: (controller) => controller.repeat()).shimmer(color: Colors.grey.shade300, duration: 1.5.seconds)),
+              );
+            },
+          ),
         ],
       ),
     );

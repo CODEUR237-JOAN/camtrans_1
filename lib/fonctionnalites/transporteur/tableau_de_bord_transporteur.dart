@@ -1,10 +1,12 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 
+import 'package:iconsax_flutter/iconsax_flutter.dart';
+
 import '../../coeur/constantes/couleurs.dart';
 import '../../coeur/constantes/tailles.dart';
-import '../../coeur/widgets/barre_navigation.dart';
 import '../../coeur/widgets/carte_information.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../coeur/etat/transporteur_provider.dart';
@@ -33,20 +35,19 @@ class _TableauDeBordTransporteurState extends ConsumerState<TableauDeBordTranspo
 
     return Scaffold(
       backgroundColor: CouleursApp.fond,
-      bottomNavigationBar: BarreNavigation(
-        indexSelectionne: indexNavigation,
-        lorsDuChangement: (index) {
-          setState(() {
-            indexNavigation = index;
-          });
-        },
-      ).animate().slideY(begin: 1, end: 0, delay: 500.ms, duration: 400.ms),
+      bottomNavigationBar: _buildBottomNav().animate().slideY(begin: 1, end: 0, delay: 500.ms, duration: 400.ms),
       body: SafeArea(
         child: IndexedStack(
           index: indexNavigation,
           children: [
             // 0: Accueil
-            _buildDashboardAccueil(statsRevenus, mesCoursesAsync),
+            RefreshIndicator(
+              onRefresh: () async {
+                ref.invalidate(fluxMesCoursesProvider);
+                ref.invalidate(fluxMesRevenusProvider);
+              },
+              child: _buildDashboardAccueil(statsRevenus, mesCoursesAsync),
+            ),
             // 1: Demandes
             const CoursesDisponibles(),
             // 2: Suivi
@@ -84,10 +85,11 @@ class _TableauDeBordTransporteurState extends ConsumerState<TableauDeBordTranspo
                         )
                       ]
                     ),
-                    child: const CircleAvatar(
+                    child: CircleAvatar(
                       radius: 28,
-                      backgroundColor: Colors.orange,
-                      child: Icon(Icons.local_shipping, color: Colors.white, size: 28),
+                      backgroundColor: Colors.orange.withOpacity(0.1),
+                      backgroundImage: utilisateur?.photoURL != null ? NetworkImage(utilisateur!.photoURL!) : null,
+                      child: utilisateur?.photoURL == null ? const Icon(Iconsax.truck_fast_copy, color: Colors.orange, size: 28) : null,
                     ),
                   ).animate().scale(delay: 100.ms, curve: Curves.easeOutBack),
                   const SizedBox(width: 15),
@@ -188,10 +190,12 @@ class _TableauDeBordTransporteurState extends ConsumerState<TableauDeBordTranspo
 
               mesCoursesAsync.when(
                 loading: () => Column(
-                  children: List.generate(2, (index) => Container(
-                    height: 100, margin: const EdgeInsets.only(bottom: 10),
-                    decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20)),
-                  ).animate(onPlay: (controller) => controller.repeat()).shimmer(color: Colors.grey.shade200, duration: 1.5.seconds)).cast<Widget>(),
+                  children: <Widget>[
+                    ...List.generate(2, (index) => Container(
+                      height: 100, margin: const EdgeInsets.only(bottom: 10),
+                      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20)),
+                    ).animate(onPlay: (controller) => controller.repeat()).shimmer(color: Colors.grey.shade200, duration: 1.5.seconds)),
+                  ],
                 ),
                 error: (err, _) => const SizedBox.shrink(),
                 data: (courses) {
@@ -282,10 +286,12 @@ class _TableauDeBordTransporteurState extends ConsumerState<TableauDeBordTranspo
 
               mesCoursesAsync.when(
                 loading: () => Column(
-                  children: List.generate(3, (index) => Container(
-                    height: 80, margin: const EdgeInsets.only(bottom: 10),
-                    decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20)),
-                  ).animate(onPlay: (controller) => controller.repeat()).shimmer(color: Colors.grey.shade200, duration: 1.5.seconds)).cast<Widget>(),
+                  children: <Widget>[
+                    ...List.generate(3, (index) => Container(
+                      height: 80, margin: const EdgeInsets.only(bottom: 10),
+                      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20)),
+                    ).animate(onPlay: (controller) => controller.repeat()).shimmer(color: Colors.grey.shade200, duration: 1.5.seconds)),
+                  ],
                 ),
                 error: (err, _) => Text("Erreur: $err"),
                 data: (courses) {
@@ -297,15 +303,17 @@ class _TableauDeBordTransporteurState extends ConsumerState<TableauDeBordTranspo
                   }
                   
                   return Column(
-                    children: courses.take(3).map<Widget>((course) {
-                      return _creationCarteTrajet(
-                        "${course.adresseDepart} → ${course.adresseArrivee}", 
-                        course.typeMarchandise, 
-                        "${course.prixEstime.toStringAsFixed(0)} FCFA", 
-                        Icons.local_shipping, 
-                        Colors.blue
-                      ).animate().fadeIn().slideY(begin: 0.1);
-                    }).toList(),
+                    children: <Widget>[
+                      ...courses.take(3).map<Widget>((course) {
+                        return _creationCarteTrajet(
+                          "${course.adresseDepart} → ${course.adresseArrivee}", 
+                          course.typeMarchandise, 
+                          "${course.prixEstime.toStringAsFixed(0)} FCFA", 
+                          Icons.local_shipping, 
+                          Colors.blue
+                        ).animate().fadeIn().slideY(begin: 0.1);
+                      }),
+                    ],
                   );
                 }
               ),
@@ -354,6 +362,42 @@ class _TableauDeBordTransporteurState extends ConsumerState<TableauDeBordTranspo
           ),
           Text(prix, style: const TextStyle(fontWeight: FontWeight.w900, color: CouleursApp.primaire, fontSize: 15)),
         ],
+      ),
+    );
+  }
+
+  // ==========================================
+  // BOTTOM NAVIGATION
+  // ==========================================
+  Widget _buildBottomNav() {
+    return Container(
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.8),
+        boxShadow: [BoxShadow(color: CouleursApp.ombre, blurRadius: 30, offset: const Offset(0, -10))],
+      ),
+      child: ClipRRect(
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+          child: BottomNavigationBar(
+            currentIndex: indexNavigation,
+            onTap: (index) => setState(() => indexNavigation = index),
+            type: BottomNavigationBarType.fixed,
+            backgroundColor: Colors.transparent,
+            selectedItemColor: CouleursApp.primaire,
+            unselectedItemColor: CouleursApp.texteSecondaire,
+            showUnselectedLabels: true,
+            selectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+            unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 11),
+            elevation: 0,
+            items: const [
+              BottomNavigationBarItem(icon: Icon(Iconsax.home_2_copy), activeIcon: Icon(Iconsax.home_2), label: "Accueil"),
+              BottomNavigationBarItem(icon: Icon(Iconsax.box_search_copy), activeIcon: Icon(Iconsax.box_search), label: "Marché"),
+              BottomNavigationBarItem(icon: Icon(Iconsax.routing_copy), activeIcon: Icon(Iconsax.routing), label: "En Cours"),
+              BottomNavigationBarItem(icon: Icon(Iconsax.notification_bing_copy), activeIcon: Icon(Iconsax.notification_bing), label: "Alertes"),
+              BottomNavigationBarItem(icon: Icon(Iconsax.user_copy), activeIcon: Icon(Iconsax.user), label: "Profil"),
+            ],
+          ),
+        ),
       ),
     );
   }

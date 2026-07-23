@@ -1,83 +1,46 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:intl/intl.dart';
 
 import '../../coeur/constantes/couleurs.dart';
 import '../../coeur/constantes/tailles.dart';
+import '../../coeur/etat/notification_provider.dart';
+import '../../modeles/notification.dart';
 
-class NotificationsPage extends StatefulWidget {
+class NotificationsPage extends ConsumerStatefulWidget {
   const NotificationsPage({super.key});
 
   @override
-  State<NotificationsPage> createState() =>
-      _NotificationsPageState();
+  ConsumerState<NotificationsPage> createState() => _NotificationsPageState();
 }
 
-class _NotificationsPageState
-    extends State<NotificationsPage> {
+class _NotificationsPageState extends ConsumerState<NotificationsPage> {
   String filtre = "Toutes";
-
-  final List<Map<String, dynamic>> notifications = [
-    {
-      "titre": "Nouvelle course",
-      "message":
-      "Une nouvelle course est disponible à Douala.",
-      "heure": "Il y a 5 min",
-      "categorie": "Courses",
-      "lue": false,
-      "icone": Icons.local_shipping,
-      "couleur": Colors.blue,
-    },
-    {
-      "titre": "Paiement reçu",
-      "message":
-      "Votre paiement de 30 000 FCFA a été effectué.",
-      "heure": "Il y a 1 h",
-      "categorie": "Paiements",
-      "lue": true,
-      "icone": Icons.payments,
-      "couleur": Colors.green,
-    },
-    {
-      "titre": "Compte validé",
-      "message":
-      "Votre compte transporteur a été validé.",
-      "heure": "Hier",
-      "categorie": "Système",
-      "lue": false,
-      "icone": Icons.verified,
-      "couleur": Colors.orange,
-    },
-    {
-      "titre": "Nouveau message",
-      "message":
-      "Le client vous a envoyé un message.",
-      "heure": "Hier",
-      "categorie": "Messages",
-      "lue": true,
-      "icone": Icons.message,
-      "couleur": Colors.purple,
-    },
-  ];
 
   @override
   Widget build(BuildContext context) {
+    final notificationsAsync = ref.watch(fluxNotificationsProvider);
+
     return Scaffold(
       backgroundColor: CouleursApp.fond,
-
       appBar: AppBar(
-        title: const Text("Notifications"),
+        title: const Text("Notifications", style: TextStyle(fontWeight: FontWeight.bold)),
+        backgroundColor: CouleursApp.fond,
+        elevation: 0,
+        automaticallyImplyLeading: false,
         actions: [
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.done_all),
-            tooltip: "Tout marquer comme lu",
+          notificationsAsync.maybeWhen(
+            data: (list) => IconButton(
+              onPressed: () => ref.read(notificationActionsProvider).toutMarquerCommeLu(list),
+              icon: const Icon(Icons.done_all),
+              tooltip: "Tout marquer comme lu",
+            ),
+            orElse: () => const SizedBox.shrink(),
           ),
         ],
       ),
-
       body: Padding(
-        padding: const EdgeInsets.all(
-          TaillesApp.margePage,
-        ),
+        padding: const EdgeInsets.all(TaillesApp.margePage),
         child: Column(
           children: [
             SizedBox(
@@ -94,144 +57,37 @@ class _NotificationsPageState
                 ],
               ),
             ),
-
             const SizedBox(height: 20),
-
             Expanded(
-              child: ListView.builder(
-                itemCount: notifications.length,
-                itemBuilder: (context, index) {
-                  final notification =
-                  notifications[index];
+              child: notificationsAsync.when(
+                loading: () => const Center(child: CircularProgressIndicator()),
+                error: (err, stack) => Center(child: Text("Erreur: $err")),
+                data: (notifications) {
+                  final notificationsFiltrees = notifications.where((n) {
+                    if (filtre == "Toutes") return true;
+                    if (filtre == "Non lues") return !n.lue;
+                    return n.categorie == filtre;
+                  }).toList();
 
-                  return Card(
-                    margin:
-                    const EdgeInsets.only(
-                      bottom: 15,
-                    ),
-                    shape:
-                    RoundedRectangleBorder(
-                      borderRadius:
-                      BorderRadius.circular(
-                          18),
-                    ),
-                    child: ListTile(
-                      leading: CircleAvatar(
-                        backgroundColor:
-                        (notification[
-                        "couleur"]
-                        as Color)
-                            .withValues(alpha: .15),
-                        child: Icon(
-                          notification["icone"],
-                          color:
-                          notification["couleur"],
-                        ),
-                      ),
-
-                      title: Text(
-                        notification["titre"],
-                        style: TextStyle(
-                          fontWeight:
-                          notification["lue"]
-                              ? FontWeight.normal
-                              : FontWeight.bold,
-                        ),
-                      ),
-
-                      subtitle: Column(
-                        crossAxisAlignment:
-                        CrossAxisAlignment
-                            .start,
+                  if (notificationsFiltrees.isEmpty) {
+                    return Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          const SizedBox(height: 5),
-                          Text(
-                              notification["message"]),
-                          const SizedBox(height: 6),
-                          Row(
-                            children: [
-                              Container(
-                                padding:
-                                const EdgeInsets.symmetric(
-                                  horizontal: 10,
-                                  vertical: 4,
-                                ),
-                                decoration:
-                                BoxDecoration(
-                                  color: (notification[
-                                  "couleur"]
-                                  as Color)
-                                      .withValues(
-                                      alpha: .15),
-                                  borderRadius:
-                                  BorderRadius
-                                      .circular(
-                                      20),
-                                ),
-                                child: Text(
-                                  notification[
-                                  "categorie"],
-                                  style:
-                                  TextStyle(
-                                    color: notification[
-                                    "couleur"],
-                                    fontSize: 12,
-                                    fontWeight:
-                                    FontWeight
-                                        .bold,
-                                  ),
-                                ),
-                              ),
-                              const Spacer(),
-                              Text(
-                                notification[
-                                "heure"],
-                                style:
-                                const TextStyle(
-                                  fontSize: 12,
-                                  color:
-                                  Colors.grey,
-                                ),
-                              ),
-                            ],
-                          ),
+                          Icon(Icons.notifications_none, size: 80, color: Colors.grey.shade300),
+                          const SizedBox(height: 16),
+                          const Text("Aucune notification", style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold)),
                         ],
                       ),
+                    );
+                  }
 
-                      trailing:
-                      PopupMenuButton<String>(
-                        onSelected: (value) {
-                          if (value ==
-                              "Supprimer") {
-                            setState(() {
-                              notifications
-                                  .removeAt(
-                                  index);
-                            });
-                          } else if (value ==
-                              "Marquer comme lu") {
-                            setState(() {
-                              notification[
-                              "lue"] = true;
-                            });
-                          }
-                        },
-                        itemBuilder: (context) =>
-                        const [
-                          PopupMenuItem(
-                            value:
-                            "Marquer comme lu",
-                            child: Text(
-                                "Marquer comme lu"),
-                          ),
-                          PopupMenuItem(
-                            value: "Supprimer",
-                            child:
-                            Text("Supprimer"),
-                          ),
-                        ],
-                      ),
-                    ),
+                  return ListView.builder(
+                    itemCount: notificationsFiltrees.length,
+                    itemBuilder: (context, index) {
+                      final notification = notificationsFiltrees[index];
+                      return _buildNotificationCard(notification);
+                    },
                   );
                 },
               ),
@@ -242,18 +98,104 @@ class _NotificationsPageState
     );
   }
 
+  Widget _buildNotificationCard(NotificationApp notification) {
+    Color couleur = Colors.blue;
+    IconData icone = Icons.notifications;
+
+    switch (notification.categorie) {
+      case 'Courses':
+        couleur = Colors.blue;
+        icone = Icons.local_shipping;
+        break;
+      case 'Paiements':
+        couleur = Colors.green;
+        icone = Icons.payments;
+        break;
+      case 'Messages':
+        couleur = Colors.purple;
+        icone = Icons.message;
+        break;
+      case 'Système':
+        couleur = Colors.orange;
+        icone = Icons.verified;
+        break;
+    }
+
+    final timeStr = DateFormat('HH:mm').format(notification.dateCreation);
+    final dateStr = DateFormat('dd/MM').format(notification.dateCreation);
+
+    return Card(
+      margin: const EdgeInsets.only(bottom: 15),
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(18),
+        side: BorderSide(color: notification.lue ? Colors.grey.shade100 : couleur.withOpacity(0.2)),
+      ),
+      child: ListTile(
+        leading: CircleAvatar(
+          backgroundColor: couleur.withOpacity(0.1),
+          child: Icon(icone, color: couleur, size: 20),
+        ),
+        title: Text(
+          notification.titre,
+          style: TextStyle(
+            fontWeight: notification.lue ? FontWeight.normal : FontWeight.bold,
+            fontSize: 15,
+          ),
+        ),
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 4),
+            Text(notification.message, style: TextStyle(color: Colors.grey.shade700, fontSize: 13)),
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                Text("$dateStr à $timeStr", style: const TextStyle(fontSize: 11, color: Colors.grey)),
+                const Spacer(),
+                if (!notification.lue)
+                  Container(
+                    width: 8,
+                    height: 8,
+                    decoration: BoxDecoration(color: couleur, shape: BoxShape.circle),
+                  ),
+              ],
+            ),
+          ],
+        ),
+        trailing: PopupMenuButton<String>(
+          onSelected: (value) {
+            if (value == "Supprimer") {
+              ref.read(notificationActionsProvider).supprimer(notification.id);
+            } else if (value == "Marquer comme lu") {
+              ref.read(notificationActionsProvider).marquerCommeLue(notification.id);
+            }
+          },
+          itemBuilder: (context) => [
+            if (!notification.lue)
+              const PopupMenuItem(value: "Marquer comme lu", child: Text("Marquer comme lu")),
+            const PopupMenuItem(value: "Supprimer", child: Text("Supprimer")),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _filtre(String valeur) {
     return Padding(
-      padding:
-      const EdgeInsets.only(right: 8),
+      padding: const EdgeInsets.only(right: 8),
       child: ChoiceChip(
         label: Text(valeur),
         selected: filtre == valeur,
-        onSelected: (_) {
-          setState(() {
-            filtre = valeur;
-          });
+        onSelected: (selected) {
+          if (selected) {
+            setState(() {
+              filtre = valeur;
+            });
+          }
         },
+        selectedColor: CouleursApp.primaire,
+        labelStyle: TextStyle(color: filtre == valeur ? Colors.white : Colors.black87),
       ),
     );
   }

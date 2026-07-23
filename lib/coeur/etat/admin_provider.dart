@@ -9,21 +9,33 @@ import '../../modeles/course.dart';
 final adminClientsProvider = StreamProvider.autoDispose<List<Client>>((ref) {
   final firestore = ref.watch(serviceFirestoreProvider);
   return firestore.fluxCollection(collection: 'clients').map((snapshot) {
-    return snapshot.docs.map((doc) => Client.fromMap(doc.data())).toList();
+    return snapshot.docs.map((doc) {
+      final data = doc.data();
+      data['id'] = doc.id;
+      return Client.fromMap(data);
+    }).toList();
   });
 });
 
 final adminTransporteursProvider = StreamProvider.autoDispose<List<Transporteur>>((ref) {
   final firestore = ref.watch(serviceFirestoreProvider);
   return firestore.fluxCollection(collection: 'transporteurs').map((snapshot) {
-    return snapshot.docs.map((doc) => Transporteur.fromMap(doc.data())).toList();
+    return snapshot.docs.map((doc) {
+      final data = doc.data();
+      data['id'] = doc.id;
+      return Transporteur.fromMap(data);
+    }).toList();
   });
 });
 
 final adminCoursesProvider = StreamProvider.autoDispose<List<Course>>((ref) {
   final firestore = ref.watch(serviceFirestoreProvider);
   return firestore.fluxCollection(collection: 'courses').map((snapshot) {
-    return snapshot.docs.map((doc) => Course.fromMap(doc.data())).toList();
+    return snapshot.docs.map((doc) {
+      final data = doc.data();
+      data['id'] = doc.id;
+      return Course.fromMap(data);
+    }).toList();
   });
 });
 
@@ -59,27 +71,46 @@ final adminStatsProvider = Provider.autoDispose<AsyncValue<AdminStats>>((ref) {
   final transporteurs = transporteursAsync.value ?? [];
   final courses = coursesAsync.value ?? [];
 
-  // Calcul factice pour les revenus (ex: 2000 FCFA par course réussie)
+  // Calcul des revenus réels à partir des courses livrées
   double revenus = 0;
   for (var course in courses) {
-    if (course.statut == 'livree') {
-      revenus += 2000;
+    if (course.statut == 'Livré' || course.statut == 'livree') {
+      revenus += course.prixFinal > 0 ? course.prixFinal : course.prixEstime;
     }
   }
-  
-  // S'il n'y a pas encore de données, on ajoute des données fictives pour l'UI
-  if (revenus == 0) revenus = 1450000;
-  int tc = clients.isEmpty ? 1240 : clients.length;
-  int tt = transporteurs.isEmpty ? 315 : transporteurs.length;
-  int tco = courses.isEmpty ? 5642 : courses.length;
 
   return AsyncValue.data(AdminStats(
-    totalClients: tc,
-    totalTransporteurs: tt,
-    totalCourses: tco,
+    totalClients: clients.length,
+    totalTransporteurs: transporteurs.length,
+    totalCourses: courses.length,
     revenusTotaux: revenus,
   ));
 });
 
 // Gère la navigation de l'administration
 final adminMenuIndexProvider = StateProvider<int>((ref) => 0);
+
+// Revenus hebdomadaires (pour le graphique)
+final adminWeeklyRevenuesProvider = Provider.autoDispose<AsyncValue<List<double>>>((ref) {
+  final coursesAsync = ref.watch(adminCoursesProvider);
+
+  return coursesAsync.maybeWhen(
+    data: (courses) {
+      final List<double> weeklyData = List.filled(7, 0.0);
+      final now = DateTime.now();
+
+      for (var course in courses) {
+        if (course.statut == 'Livré' || course.statut == 'livree') {
+          final diff = now.difference(course.dateCreation).inDays;
+          if (diff >= 0 && diff < 7) {
+            // Index 6 = aujourd'hui, 0 = il y a 6 jours
+            final index = 6 - diff;
+            weeklyData[index] += course.prixFinal > 0 ? course.prixFinal : course.prixEstime;
+          }
+        }
+      }
+      return AsyncValue.data(weeklyData);
+    },
+    orElse: () => const AsyncValue.loading(),
+  );
+});

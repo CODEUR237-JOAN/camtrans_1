@@ -18,19 +18,9 @@ import 'historique.dart';
 import 'suivi_transport.dart';
 import '../notifications/notifications.dart';
 import 'profil.dart';
+import '../../coeur/etat/notification_provider.dart';
 
-// ==========================================
-// PALETTE PREMIUM
-// ==========================================
-const Color pBlue = Color(0xFF2697FF);
-const Color pDarkBlue = Color(0xFF1E3A8A);
-const Color pBg = Color(0xFFF4F7FB);
-const Color pSurface = Colors.white;
-const Color pSuccess = Color(0xFF16A34A);
-const Color pWarning = Color(0xFFF59E0B);
-const Color pError = Color(0xFFDC2626);
-const Color pTextMain = Color(0xFF1E293B);
-const Color pTextMuted = Color(0xFF64748B);
+import '../../coeur/constantes/couleurs.dart';
 
 class TableauDeBordClient extends ConsumerStatefulWidget {
   const TableauDeBordClient({super.key});
@@ -48,7 +38,7 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
     final coursesAsync = ref.watch(coursesClientProvider);
 
     return Scaffold(
-      backgroundColor: pBg,
+      backgroundColor: CouleursApp.fond,
       floatingActionButton: _bottomNavIndex == 0 ? _buildIAAssistantFAB() : null,
       bottomNavigationBar: _buildBottomNav(),
       body: SafeArea(
@@ -78,7 +68,7 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
                           const SizedBox(height: 10),
                           ElevatedButton(
                             onPressed: () => setState(() => _bottomNavIndex = 0),
-                            style: ElevatedButton.styleFrom(backgroundColor: pBlue, foregroundColor: Colors.white),
+                            style: ElevatedButton.styleFrom(backgroundColor: CouleursApp.primaire, foregroundColor: Colors.white),
                             child: const Text("Retour à l'accueil"),
                           )
                         ],
@@ -106,7 +96,7 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
   // Contenu du Tableau de Bord Principal
   Widget _buildDashboardAccueil(AsyncValue<List<Course>> coursesAsync) {
     return RefreshIndicator(
-      color: pBlue,
+      color: CouleursApp.primaire,
       onRefresh: () async {
         ref.invalidate(coursesClientProvider);
       },
@@ -165,12 +155,12 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   boxShadow: [
-                    BoxShadow(color: pBlue.withValues(alpha: 0.2), blurRadius: 15, offset: const Offset(0, 5))
+                    BoxShadow(color: CouleursApp.primaire.withValues(alpha: 0.2), blurRadius: 15, offset: const Offset(0, 5))
                   ],
                 ),
                 child: const CircleAvatar(
                   radius: 25,
-                  backgroundColor: pBlue,
+                  backgroundColor: CouleursApp.primaire,
                   child: Icon(Iconsax.user_copy, color: Colors.white),
                 ),
               ).animate().scale(delay: 100.ms),
@@ -179,40 +169,50 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    "Bonjour, $nomAffichage",
-                    style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: pTextMain),
+                    "Bienvenue, $nomAffichage",
+                    style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: CouleursApp.textePrincipal),
                   ).animate().fadeIn(delay: 200.ms).slideX(),
                   const Text(
                     "Prêt à expédier aujourd'hui ?",
-                    style: TextStyle(fontSize: 13, color: pTextMuted),
+                    style: TextStyle(fontSize: 13, color: CouleursApp.texteSecondaire),
                   ).animate().fadeIn(delay: 300.ms),
                 ],
               ),
             ],
           ),
-          Stack(
-            clipBehavior: Clip.none,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(10),
-                decoration: BoxDecoration(
-                  color: pSurface,
-                  borderRadius: BorderRadius.circular(15),
-                  boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 10)],
-                ),
-                child: const Icon(Iconsax.notification_bing_copy, color: pTextMain),
-              ),
-              Positioned(
-                top: -5,
-                right: -5,
-                child: Container(
-                  padding: const EdgeInsets.all(5),
-                  decoration: const BoxDecoration(color: pError, shape: BoxShape.circle),
-                  child: const Text("3", style: TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold)),
-                ).animate().scale(delay: 400.ms).shake(),
-              )
-            ],
-          ).animate().fadeIn(delay: 300.ms)
+        Builder(builder: (context) {
+            final badgeCount = ref.watch(badgeNotificationsProvider);
+            return GestureDetector(
+              onTap: () => setState(() => _bottomNavIndex = 3),
+              child: Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: CouleursApp.surface,
+                      borderRadius: BorderRadius.circular(15),
+                      boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 10)],
+                    ),
+                    child: const Icon(Iconsax.notification_bing_copy, color: CouleursApp.textePrincipal),
+                  ),
+                  if (badgeCount > 0)
+                    Positioned(
+                      top: -5,
+                      right: -5,
+                      child: Container(
+                        padding: const EdgeInsets.all(5),
+                        decoration: const BoxDecoration(color: CouleursApp.erreur, shape: BoxShape.circle),
+                        child: Text(
+                          badgeCount > 9 ? "9+" : "$badgeCount",
+                          style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+                        ),
+                      ).animate().scale(delay: 400.ms).shake(),
+                    )
+                ],
+              ).animate().fadeIn(delay: 300.ms),
+            );
+          })
         ],
       ),
     );
@@ -230,7 +230,7 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
           borderRadius: BorderRadius.circular(20),
           border: Border.all(color: Colors.white, width: 2),
           boxShadow: [
-            BoxShadow(color: pDarkBlue.withValues(alpha: 0.05), blurRadius: 20, offset: const Offset(0, 10))
+            BoxShadow(color: CouleursApp.primaireFonce.withValues(alpha: 0.05), blurRadius: 20, offset: const Offset(0, 10))
           ],
         ),
         child: ClipRRect(
@@ -240,12 +240,12 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
             child: TextField(
               decoration: InputDecoration(
                 hintText: "Où souhaitez-vous expédier ?",
-                hintStyle: TextStyle(color: pTextMuted.withValues(alpha: 0.7)),
-                prefixIcon: const Icon(Iconsax.location_copy, color: pBlue),
+                hintStyle: TextStyle(color: CouleursApp.texteSecondaire.withValues(alpha: 0.7)),
+                prefixIcon: const Icon(Iconsax.location_copy, color: CouleursApp.primaire),
                 suffixIcon: Container(
                   margin: const EdgeInsets.all(6),
                   decoration: BoxDecoration(
-                    color: pDarkBlue,
+                    color: CouleursApp.primaireFonce,
                     borderRadius: BorderRadius.circular(14),
                   ),
                   child: const Icon(Iconsax.setting_4_copy, color: Colors.white, size: 18),
@@ -279,13 +279,13 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
             padding: const EdgeInsets.symmetric(vertical: 25, horizontal: 20),
             decoration: BoxDecoration(
               gradient: const LinearGradient(
-                colors: [pBlue, pDarkBlue],
+                colors: [CouleursApp.primaire, CouleursApp.primaireFonce],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
               borderRadius: BorderRadius.circular(24),
               boxShadow: [
-                BoxShadow(color: pBlue.withValues(alpha: 0.4), blurRadius: 20, offset: const Offset(0, 10))
+                BoxShadow(color: CouleursApp.primaire.withValues(alpha: 0.4), blurRadius: 20, offset: const Offset(0, 10))
               ]
             ),
             child: Row(
@@ -334,10 +334,10 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
   // ==========================================
   Widget _buildQuickServices() {
     final services = [
-      {"icon": Iconsax.box_time_copy, "title": "Mes Colis", "color": pWarning, "action": () => setState(() => _bottomNavIndex = 1)},
-      {"icon": Iconsax.wallet_3_copy, "title": "Paiements", "color": pSuccess, "action": () => context.push(RoutesApplication.factures)},
-      {"icon": Iconsax.document_text_copy, "title": "Factures", "color": pBlue, "action": () => context.push(RoutesApplication.factures)},
-      {"icon": Iconsax.support_copy, "title": "Support", "color": pError, "action": () => context.push(RoutesApplication.assistantIA)},
+      {"icon": Iconsax.box_time_copy, "title": "Mes Colis", "color": CouleursApp.avertissement, "action": () => setState(() => _bottomNavIndex = 1)},
+      {"icon": Iconsax.wallet_3_copy, "title": "Paiements", "color": CouleursApp.succes, "action": () => context.push(RoutesApplication.factures)},
+      {"icon": Iconsax.document_text_copy, "title": "Factures", "color": CouleursApp.primaire, "action": () => context.push(RoutesApplication.factures)},
+      {"icon": Iconsax.support_copy, "title": "Support", "color": CouleursApp.erreur, "action": () => context.push(RoutesApplication.assistantIA)},
     ];
 
     return Padding(
@@ -352,14 +352,14 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
                 Container(
                   padding: const EdgeInsets.all(15),
                   decoration: BoxDecoration(
-                    color: pSurface,
+                    color: CouleursApp.surface,
                     borderRadius: BorderRadius.circular(18),
                     boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 10, offset: const Offset(0, 5))],
                   ),
                   child: Icon(s['icon'] as IconData, color: s['color'] as Color, size: 28),
                 ).animate(onPlay: (controller) => controller.repeat(reverse: true)).moveY(begin: 0, end: -3, duration: 1.5.seconds).scale(delay: 600.ms),
                 const SizedBox(height: 8),
-                Text(s['title'] as String, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 12, color: pTextMain))
+                Text(s['title'] as String, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 12, color: CouleursApp.textePrincipal))
               ],
             ),
           );
@@ -381,11 +381,11 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
         scrollDirection: Axis.horizontal,
         padding: const EdgeInsets.symmetric(horizontal: 20),
         children: [
-          _buildStatCard("Livraisons", livraisons.toString(), Iconsax.box_tick_copy, pSuccess),
+          _buildStatCard("Livraisons", livraisons.toString(), Iconsax.box_tick_copy, CouleursApp.succes),
           const SizedBox(width: 15),
-          _buildStatCard("Dépenses", depensesText, Iconsax.coin_copy, pWarning),
+          _buildStatCard("Dépenses", depensesText, Iconsax.coin_copy, CouleursApp.avertissement),
           const SizedBox(width: 15),
-          _buildStatCard("En cours", enCours.toString(), Iconsax.truck_copy, pBlue),
+          _buildStatCard("En cours", enCours.toString(), Iconsax.truck_copy, CouleursApp.primaire),
         ],
       ),
     ).animate().fadeIn(delay: 700.ms).slideX(begin: 0.1);
@@ -396,7 +396,7 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
       width: 140,
       padding: const EdgeInsets.all(15),
       decoration: BoxDecoration(
-        color: pSurface,
+        color: CouleursApp.surface,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [BoxShadow(color: color.withValues(alpha: 0.1), blurRadius: 15, offset: const Offset(0, 5))],
         border: Border.all(color: color.withValues(alpha: 0.1)),
@@ -413,7 +413,7 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
             ],
           ),
           const Spacer(),
-          Text(title, style: const TextStyle(fontSize: 13, color: pTextMuted, fontWeight: FontWeight.w600)),
+          Text(title, style: const TextStyle(fontSize: 13, color: CouleursApp.texteSecondaire, fontWeight: FontWeight.w600)),
         ],
       ),
     );
@@ -429,9 +429,9 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
       child: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: pSurface,
+          color: CouleursApp.surface,
           borderRadius: BorderRadius.circular(24),
-          boxShadow: [BoxShadow(color: pDarkBlue.withValues(alpha: 0.06), blurRadius: 20, offset: const Offset(0, 10))],
+          boxShadow: [BoxShadow(color: CouleursApp.primaireFonce.withValues(alpha: 0.06), blurRadius: 20, offset: const Offset(0, 10))],
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -439,11 +439,11 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text("Expédition Active", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: pTextMain)),
+                const Text("Expédition Active", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: CouleursApp.textePrincipal)),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                  decoration: BoxDecoration(color: pWarning.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(20)),
-                  child: Text(course.statut, style: const TextStyle(color: pWarning, fontWeight: FontWeight.bold, fontSize: 12)),
+                  decoration: BoxDecoration(color: CouleursApp.avertissement.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(20)),
+                  child: Text(course.statut, style: const TextStyle(color: CouleursApp.avertissement, fontWeight: FontWeight.bold, fontSize: 12)),
                 )
               ],
             ),
@@ -463,14 +463,14 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text("Départ", style: TextStyle(color: pTextMuted, fontSize: 12)),
+                    const Text("Départ", style: TextStyle(color: CouleursApp.texteSecondaire, fontSize: 12)),
                     Text(course.adresseDepart.isNotEmpty ? course.adresseDepart : "Inconnu", style: const TextStyle(fontWeight: FontWeight.bold)),
                   ],
                 ),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    const Text("Arrivée", style: TextStyle(color: pTextMuted, fontSize: 12)),
+                    const Text("Arrivée", style: TextStyle(color: CouleursApp.texteSecondaire, fontSize: 12)),
                     Text(course.adresseArrivee.isNotEmpty ? course.adresseArrivee : "Inconnu", style: const TextStyle(fontWeight: FontWeight.bold)),
                   ],
                 ),
@@ -487,9 +487,9 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
       width: isCurrent ? 20 : 12,
       height: isCurrent ? 20 : 12,
       decoration: BoxDecoration(
-        color: active ? pBlue : pBg,
+        color: active ? CouleursApp.primaire : CouleursApp.fond,
         shape: BoxShape.circle,
-        border: isCurrent ? Border.all(color: pBlue.withValues(alpha: 0.3), width: 4) : null,
+        border: isCurrent ? Border.all(color: CouleursApp.primaire.withValues(alpha: 0.3), width: 4) : null,
       ),
       child: active && !isCurrent ? const Icon(Icons.check, size: 8, color: Colors.white) : null,
     );
@@ -497,7 +497,7 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
 
   Widget _buildTimelineLine(bool active) {
     return Expanded(
-      child: Container(height: 3, color: active ? pBlue : pBg),
+      child: Container(height: 3, color: active ? CouleursApp.primaire : CouleursApp.fond),
     );
   }
 
@@ -529,8 +529,8 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
           ),
                 const MarkerLayer(
                   markers: [
-                    Marker(point: LatLng(4.0511, 9.7679), child: Icon(Icons.local_shipping, color: pBlue, size: 30)),
-                    Marker(point: LatLng(3.8480, 11.5021), child: Icon(Icons.location_on, color: pError, size: 30)),
+                    Marker(point: LatLng(4.0511, 9.7679), child: Icon(Icons.local_shipping, color: CouleursApp.primaire, size: 30)),
+                    Marker(point: LatLng(3.8480, 11.5021), child: Icon(Icons.location_on, color: CouleursApp.erreur, size: 30)),
                   ],
                 )
               ],
@@ -540,9 +540,9 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
               top: 10,
               child: FloatingActionButton.small(
                 heroTag: "btn_map",
-                backgroundColor: pSurface,
+                backgroundColor: CouleursApp.surface,
                 onPressed: () => context.push(RoutesApplication.suivi),
-                child: const Icon(Iconsax.maximize_circle_copy, color: pDarkBlue),
+                child: const Icon(Iconsax.maximize_circle_copy, color: CouleursApp.primaireFonce),
               ),
             )
           ],
@@ -563,17 +563,17 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text("Historique Récent", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: pTextMain)),
-              TextButton(onPressed: () {}, child: const Text("Voir tout", style: TextStyle(color: pBlue))),
+              const Text("Historique Récent", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: CouleursApp.textePrincipal)),
+              TextButton(onPressed: () {}, child: const Text("Voir tout", style: TextStyle(color: CouleursApp.primaire))),
             ],
           ),
           ...courses.take(3).map<Widget>((course) {
-            Color statusColor = course.statut == "Livré" ? pSuccess : pError;
+            Color statusColor = course.statut == "Livré" ? CouleursApp.succes : CouleursApp.erreur;
             return Container(
               margin: const EdgeInsets.only(bottom: 15),
               padding: const EdgeInsets.all(15),
               decoration: BoxDecoration(
-                color: pSurface,
+                color: CouleursApp.surface,
                 borderRadius: BorderRadius.circular(20),
                 boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.02), blurRadius: 10, offset: const Offset(0, 5))],
               ),
@@ -581,8 +581,8 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
                 children: [
                   Container(
                     padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(color: pBg, borderRadius: BorderRadius.circular(15)),
-                    child: const Icon(Iconsax.box_copy, color: pTextMuted),
+                    decoration: BoxDecoration(color: CouleursApp.fond, borderRadius: BorderRadius.circular(15)),
+                    child: const Icon(Iconsax.box_copy, color: CouleursApp.texteSecondaire),
                   ),
                   const SizedBox(width: 15),
                   Expanded(
@@ -591,14 +591,14 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
                       children: [
                         Text(course.description.isNotEmpty ? course.description : "Marchandise", style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
                         const SizedBox(height: 4),
-                        Text("${course.adresseDepart} ➔ ${course.adresseArrivee}", style: const TextStyle(fontSize: 12, color: pTextMuted), overflow: TextOverflow.ellipsis),
+                        Text("${course.adresseDepart} ➔ ${course.adresseArrivee}", style: const TextStyle(fontSize: 12, color: CouleursApp.texteSecondaire), overflow: TextOverflow.ellipsis),
                       ],
                     ),
                   ),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
-                      Text("${course.prixEstime} FCFA", style: const TextStyle(fontWeight: FontWeight.bold, color: pTextMain)),
+                      Text("${course.prixEstime} FCFA", style: const TextStyle(fontWeight: FontWeight.bold, color: CouleursApp.textePrincipal)),
                       const SizedBox(height: 5),
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
@@ -626,8 +626,8 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
         children: List.generate(3, (index) => Container(
           height: 100,
           margin: const EdgeInsets.only(bottom: 15),
-          decoration: BoxDecoration(color: pSurface, borderRadius: BorderRadius.circular(20)),
-        ).animate(onPlay: (controller) => controller.repeat()).shimmer(duration: 1.5.seconds, color: pBg.withValues(alpha: 0.5))).cast<Widget>(),
+          decoration: BoxDecoration(color: CouleursApp.surface, borderRadius: BorderRadius.circular(20)),
+        ).animate(onPlay: (controller) => controller.repeat()).shimmer(duration: 1.5.seconds, color: CouleursApp.fond.withValues(alpha: 0.5))).cast<Widget>(),
       ),
     );
   }
@@ -638,23 +638,23 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
       child: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: pError.withValues(alpha: 0.1),
+          color: CouleursApp.erreur.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(24),
-          border: Border.all(color: pError.withValues(alpha: 0.3)),
+          border: Border.all(color: CouleursApp.erreur.withValues(alpha: 0.3)),
         ),
         child: Column(
           children: [
-            const Icon(Iconsax.warning_2_copy, color: pError, size: 40),
+            const Icon(Iconsax.warning_2_copy, color: CouleursApp.erreur, size: 40),
             const SizedBox(height: 15),
-            const Text("Impossible de charger vos données", style: TextStyle(fontWeight: FontWeight.bold, color: pError, fontSize: 16)),
+            const Text("Impossible de charger vos données", style: TextStyle(fontWeight: FontWeight.bold, color: CouleursApp.erreur, fontSize: 16)),
             const SizedBox(height: 10),
-            Text(error, style: const TextStyle(color: pError, fontSize: 12), textAlign: TextAlign.center),
+            Text(error, style: const TextStyle(color: CouleursApp.erreur, fontSize: 12), textAlign: TextAlign.center),
             const SizedBox(height: 15),
             ElevatedButton.icon(
               onPressed: () => ref.invalidate(coursesClientProvider),
               icon: const Icon(Icons.refresh),
               label: const Text("Réessayer"),
-              style: ElevatedButton.styleFrom(backgroundColor: pError, foregroundColor: Colors.white, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15))),
+              style: ElevatedButton.styleFrom(backgroundColor: CouleursApp.erreur, foregroundColor: Colors.white, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15))),
             )
           ],
         ),
@@ -670,13 +670,13 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
         children: [
           Container(
             padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(color: pBg, shape: BoxShape.circle),
-            child: const Icon(Iconsax.box_add_copy, size: 50, color: pTextMuted),
+            decoration: BoxDecoration(color: CouleursApp.fond, shape: BoxShape.circle),
+            child: const Icon(Iconsax.box_add_copy, size: 50, color: CouleursApp.texteSecondaire),
           ),
           const SizedBox(height: 20),
-          const Text("Aucune expédition en cours", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: pTextMain)),
+          const Text("Aucune expédition en cours", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: CouleursApp.textePrincipal)),
           const SizedBox(height: 10),
-          const Text("Lancez votre première demande de transport dès maintenant.", textAlign: TextAlign.center, style: TextStyle(color: pTextMuted)),
+          const Text("Lancez votre première demande de transport dès maintenant.", textAlign: TextAlign.center, style: TextStyle(color: CouleursApp.texteSecondaire)),
           
           const SizedBox(height: 20),
           
@@ -687,12 +687,12 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
               final firestore = ref.read(serviceFirestoreProvider);
               final userId = auth.utilisateur?.uid;
               if (userId != null) {
-                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Génération en cours...", style: TextStyle(color: Colors.white)), backgroundColor: pDarkBlue));
+                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Génération en cours...", style: TextStyle(color: Colors.white)), backgroundColor: CouleursApp.primaireFonce));
                 await firestore.genererCoursesTest(userId);
               }
             },
-            icon: const Icon(Icons.bug_report, color: pBlue),
-            label: const Text("Générer des données de test", style: TextStyle(color: pBlue)),
+            icon: const Icon(Icons.bug_report, color: CouleursApp.primaire),
+            label: const Text("Générer des données de test", style: TextStyle(color: CouleursApp.primaire)),
           )
         ],
       ),
@@ -708,7 +708,7 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
       onPressed: () {
         context.push(RoutesApplication.assistantIA);
       },
-      backgroundColor: pDarkBlue,
+      backgroundColor: CouleursApp.primaireFonce,
       tooltip: "Discuter avec l'assistant d'Intelligence Artificielle",
       icon: const Icon(Iconsax.message_text_copy, color: Colors.white),
       label: const Text("Assistant IA", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
@@ -722,27 +722,32 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
   Widget _buildBottomNav() {
     return Container(
       decoration: BoxDecoration(
-        color: pSurface,
-        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 20, offset: const Offset(0, -5))],
+        color: Colors.white.withValues(alpha: 0.8),
+        boxShadow: [BoxShadow(color: CouleursApp.ombre, blurRadius: 30, offset: const Offset(0, -10))],
       ),
-      child: BottomNavigationBar(
-        currentIndex: _bottomNavIndex,
-        onTap: (index) => setState(() => _bottomNavIndex = index),
-        type: BottomNavigationBarType.fixed,
-        backgroundColor: pSurface,
-        selectedItemColor: pBlue,
-        unselectedItemColor: pTextMuted,
-        showUnselectedLabels: true,
-        selectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
-        unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 11),
-        elevation: 0,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Iconsax.home_2_copy), activeIcon: Icon(Iconsax.home_2), label: "Accueil", tooltip: "Retourner à l'accueil"),
-          BottomNavigationBarItem(icon: Icon(Iconsax.truck_copy), activeIcon: Icon(Iconsax.truck), label: "Demandes", tooltip: "Gérer vos expéditions"),
-          BottomNavigationBarItem(icon: Icon(Iconsax.location_copy), activeIcon: Icon(Iconsax.location), label: "Suivi", tooltip: "Suivre vos colis sur la carte"),
-          BottomNavigationBarItem(icon: Icon(Iconsax.notification_copy), activeIcon: Icon(Iconsax.notification), label: "Alerte", tooltip: "Voir les notifications"),
-          BottomNavigationBarItem(icon: Icon(Iconsax.user_copy), activeIcon: Icon(Iconsax.user), label: "Profil", tooltip: "Paramètres du profil"),
-        ],
+      child: ClipRRect(
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+          child: BottomNavigationBar(
+            currentIndex: _bottomNavIndex,
+            onTap: (index) => setState(() => _bottomNavIndex = index),
+            type: BottomNavigationBarType.fixed,
+            backgroundColor: Colors.transparent,
+            selectedItemColor: CouleursApp.primaire,
+            unselectedItemColor: CouleursApp.texteSecondaire,
+            showUnselectedLabels: true,
+            selectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+            unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 11),
+            elevation: 0,
+            items: const [
+              BottomNavigationBarItem(icon: Icon(Iconsax.home_2_copy), activeIcon: Icon(Iconsax.home_2), label: "Accueil", tooltip: "Retourner à l'accueil"),
+              BottomNavigationBarItem(icon: Icon(Iconsax.truck_copy), activeIcon: Icon(Iconsax.truck), label: "Demandes", tooltip: "Gérer vos expéditions"),
+              BottomNavigationBarItem(icon: Icon(Iconsax.location_copy), activeIcon: Icon(Iconsax.location), label: "Suivi", tooltip: "Suivre vos colis sur la carte"),
+              BottomNavigationBarItem(icon: Icon(Iconsax.notification_copy), activeIcon: Icon(Iconsax.notification), label: "Alerte", tooltip: "Voir les notifications"),
+              BottomNavigationBarItem(icon: Icon(Iconsax.user_copy), activeIcon: Icon(Iconsax.user), label: "Profil", tooltip: "Paramètres du profil"),
+            ],
+          ),
+        ),
       ),
     ).animate().slideY(begin: 1, delay: 1000.ms, curve: Curves.easeOutBack);
   }

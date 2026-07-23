@@ -7,6 +7,7 @@ import 'widgets/sidebar_admin.dart';
 import 'pages/page_vue_ensemble.dart';
 import 'pages/page_utilisateurs.dart';
 import 'pages/page_moderation.dart';
+import 'pages/page_activites.dart';
 
 class TableauDeBordAdmin extends ConsumerStatefulWidget {
   const TableauDeBordAdmin({super.key});
@@ -72,7 +73,7 @@ class _TableauDeBordAdminState extends ConsumerState<TableauDeBordAdmin> {
                 const PageVueEnsemble().animate().fadeIn(duration: 400.ms).slideY(begin: 0.05),
                 const PageUtilisateurs().animate().fadeIn(duration: 400.ms).slideY(begin: 0.05),
                 const PageModeration().animate().fadeIn(duration: 400.ms).slideY(begin: 0.05),
-                // Les futures pages (Courses, Signalements) iront ici
+                const PageActivites().animate().fadeIn(duration: 400.ms).slideY(begin: 0.05),
               ],
             ),
           ),

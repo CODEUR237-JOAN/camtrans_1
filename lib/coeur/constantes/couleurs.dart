@@ -13,11 +13,11 @@ class CouleursApp {
   CouleursApp._();
 
   // ==========================
-  // Couleurs principales
+  // Couleurs principales (Premium)
   // ==========================
 
-  static const Color primaire = Color(0xFF4DA6FF);
-  static const Color primaireFonce = Color(0xFF1D3557);
+  static const Color primaire = Color(0xFF2697FF);
+  static const Color primaireFonce = Color(0xFF1E3A8A);
   static const Color primaireClair = Color(0xFFEAF5FF);
 
   // ==========================
@@ -31,15 +31,16 @@ class CouleursApp {
   // Couleurs de fond
   // ==========================
 
-  static const Color fond = Color(0xFFF8FAFC);
+  static const Color fond = Color(0xFFF4F7FB);
   static const Color fondSecondaire = Color(0xFFF1F5F9);
 
   // ==========================
-  // Cartes
+  // Cartes & Surfaces
   // ==========================
 
   static const Color carte = Colors.white;
   static const Color carteSecondaire = Color(0xFFFDFDFD);
+  static const Color surface = Colors.white;
 
   // ==========================
   // Texte
@@ -53,8 +54,8 @@ class CouleursApp {
   // Boutons
   // ==========================
 
-  static const Color boutonPrincipal = primaire;
-  static const Color boutonSecondaire = secondaire;
+  static const Color boutonPrincipal = primaireFonce;
+  static const Color boutonSecondaire = primaire;
 
   // ==========================
   // Etats
@@ -80,10 +81,10 @@ class CouleursApp {
   static const Color iconeActive = primaire;
 
   // ==========================
-  // Ombres
+  // Ombres (Très diffuses pour moderniser)
   // ==========================
 
-  static const Color ombre = Color.fromRGBO(15, 23, 42, 0.08);
+  static const Color ombre = Color.fromRGBO(30, 58, 138, 0.06); // Ombre bleutée premium
 
   // ==========================
   // Dégradé principal
@@ -93,8 +94,8 @@ class CouleursApp {
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
     colors: [
+      primaireFonce,
       primaire,
-      secondaire,
     ],
   );
 

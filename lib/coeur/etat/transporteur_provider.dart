@@ -1,10 +1,28 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../services/service_firestore.dart';
+import '../../services/service_authentification.dart';
+import '../../modeles/transporteur.dart';
 import '../../modeles/course.dart';
 import '../../modeles/paiement.dart';
 
-// Identifiant simulé du transporteur actuel (À remplacer par l'auth Provider)
-final currentTransporteurIdProvider = Provider<String>((ref) => "transp_456");
+// ID du transporteur actuellement connecté (lié à Firebase Auth)
+final currentTransporteurIdProvider = Provider<String>((ref) {
+  final auth = ref.watch(serviceAuthentificationProvider);
+  return auth.utilisateur?.uid ?? "";
+});
+
+// Transporteur connecté (objet complet)
+final currentTransporteurProvider = StreamProvider.autoDispose<Transporteur?>((ref) {
+  final firestore = ref.watch(serviceFirestoreProvider);
+  final transporteurId = ref.watch(currentTransporteurIdProvider);
+  
+  if (transporteurId.isEmpty) return Stream.value(null);
+
+  return firestore.fluxDocument(collection: 'transporteurs', id: transporteurId).map((doc) {
+    if (!doc.exists) return null;
+    return Transporteur.fromMap(doc.data()!);
+  });
+});
 
 // ==========================================
 // 1. GESTION DES COURSES
@@ -35,6 +53,21 @@ final fluxMesCoursesProvider = StreamProvider.autoDispose<List<Course>>((ref) {
     courses.sort((a, b) => b.dateCreation.compareTo(a.dateCreation));
     return courses;
   });
+});
+
+// Course active (celle en cours de livraison)
+final activeCourseProvider = Provider.autoDispose<Course?>((ref) {
+  final coursesAsync = ref.watch(fluxMesCoursesProvider);
+  return coursesAsync.maybeWhen(
+    data: (courses) {
+      try {
+        return courses.firstWhere((c) => c.statut == 'acceptee' || c.statut == 'en_transit');
+      } catch (_) {
+        return null;
+      }
+    },
+    orElse: () => null,
+  );
 });
 
 // Actions sur les courses

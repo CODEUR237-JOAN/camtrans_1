@@ -46,20 +46,39 @@ class _ConnexionState extends ConsumerState<Connexion> {
       if (!mounted) return;
 
       if (userCred.user != null) {
-        // Déterminer si c'est un client ou un transporteur
-        final docClient = await serviceDb.lireDocument(
-          collection: 'clients', 
-          id: userCred.user!.uid
-        );
+        final uid = userCred.user!.uid;
 
+        // Vérification de l'Admin
+        if (_email.text.trim().toLowerCase() == 'admintrans@gmail.com') {
+          context.go(RoutesApplication.admin);
+          return;
+        }
+        
+        final docAdmin = await serviceDb.lireDocument(collection: 'admin', id: uid);
         if (!mounted) return;
+        if (docAdmin.exists) {
+          context.go(RoutesApplication.admin);
+          return;
+        }
 
+        // Vérification du Client
+        final docClient = await serviceDb.lireDocument(collection: 'clients', id: uid);
+        if (!mounted) return;
         if (docClient.exists) {
           context.go(RoutesApplication.tableauBordClient);
-        } else {
-          // Si ce n'est pas un client, on suppose que c'est un transporteur
-          context.go(RoutesApplication.tableauBordTransporteur);
+          return;
         }
+        
+        // Vérification du Transporteur
+        final docTransp = await serviceDb.lireDocument(collection: 'transporteurs', id: uid);
+        if (!mounted) return;
+        if (docTransp.exists) {
+          context.go(RoutesApplication.tableauBordTransporteur);
+          return;
+        }
+
+        // Par défaut (fallback si aucune collection n'est trouvée, ce qui ne devrait pas arriver)
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Type de compte non reconnu."), backgroundColor: Colors.red));
       }
 
     } catch (e) {

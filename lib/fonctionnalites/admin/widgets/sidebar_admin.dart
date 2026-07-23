@@ -92,6 +92,16 @@ class SidebarAdmin extends ConsumerWidget {
                   currentIndex: indexSelectionne,
                   onTap: () => ref.read(adminMenuIndexProvider.notifier).state = 2,
                 ),
+                const SizedBox(height: 20),
+
+                _SectionTitle(titre: "ACTIVITÉS"),
+                _MenuItem(
+                  titre: "Toutes les courses",
+                  icone: Icons.history,
+                  index: 3,
+                  currentIndex: indexSelectionne,
+                  onTap: () => ref.read(adminMenuIndexProvider.notifier).state = 3,
+                ),
                 
                 // Add more items like signalements, paiements here in the future
               ],

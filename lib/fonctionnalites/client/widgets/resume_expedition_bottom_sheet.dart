@@ -9,6 +9,7 @@ import '../../../coeur/etat/estimation_provider.dart';
 import '../../../coeur/constantes/couleurs.dart';
 import '../../../services/service_firestore.dart';
 import '../../../services/service_authentification.dart';
+import '../../../services/service_gps.dart';
 import '../../../modeles/course.dart';
 import 'package:uuid/uuid.dart';
 import 'carte_estimation.dart';
@@ -174,6 +175,26 @@ class _ResumeExpeditionBottomSheetState extends ConsumerState<ResumeExpeditionBo
                   // Récupération des URL des photos (ici simulé car pas de storage pour l'instant)
                   final List<String> photosUrl = [];
                   
+                  // Géocodage des adresses et calcul de distance
+                  final serviceGps = ref.read(serviceGpsProvider);
+                  final locDepart = await serviceGps.obtenirCoordonnees(etat.depart);
+                  final locArrivee = await serviceGps.obtenirCoordonnees(etat.destination);
+                  
+                  final double latDepart = locDepart?.latitude ?? 0.0;
+                  final double lngDepart = locDepart?.longitude ?? 0.0;
+                  final double latArrivee = locArrivee?.latitude ?? 0.0;
+                  final double lngArrivee = locArrivee?.longitude ?? 0.0;
+                  
+                  double distanceKm = 0.0;
+                  if (latDepart != 0 && latArrivee != 0) {
+                    distanceKm = serviceGps.calculerDistance(
+                      latitudeDepart: latDepart,
+                      longitudeDepart: lngDepart,
+                      latitudeArrivee: latArrivee,
+                      longitudeArrivee: lngArrivee,
+                    );
+                  }
+                  
                   final course = Course(
                     id: courseId,
                     clientId: user.uid,
@@ -184,11 +205,11 @@ class _ResumeExpeditionBottomSheetState extends ConsumerState<ResumeExpeditionBo
                     telephoneTransporteur: '',
                     adresseDepart: etat.depart,
                     adresseArrivee: etat.destination,
-                    latitudeDepart: 0.0,
-                    longitudeDepart: 0.0,
-                    latitudeArrivee: 0.0,
-                    longitudeArrivee: 0.0,
-                    distanceKm: 0.0,
+                    latitudeDepart: latDepart,
+                    longitudeDepart: lngDepart,
+                    latitudeArrivee: latArrivee,
+                    longitudeArrivee: lngArrivee,
+                    distanceKm: distanceKm,
                     volumeM3: etatEstimation.resultat?.volumeM3 ?? 0.0,
                     poidsKg: 0.0,
                     typeVehicule: etatEstimation.resultat?.vehiculeRecommande ?? etat.categorieVehicule,

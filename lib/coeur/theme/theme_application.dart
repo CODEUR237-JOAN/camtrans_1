@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import '../constantes/couleurs.dart';
 
@@ -33,10 +34,10 @@ class ThemeApplication {
 
       cardTheme: CardThemeData(
         color: Colors.white,
-        elevation: 3,
+        elevation: 8,
         shadowColor: CouleursApp.ombre,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(24),
         ),
       ),
 
@@ -47,7 +48,7 @@ class ThemeApplication {
           minimumSize: const Size(double.infinity, 56),
           elevation: 0,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(20),
           ),
         ),
       ),
@@ -127,44 +128,46 @@ class ThemeApplication {
         thickness: 1,
       ),
 
-      textTheme: const TextTheme(
-        headlineLarge: TextStyle(
-          fontSize: 32,
-          fontWeight: FontWeight.bold,
-          color: CouleursApp.textePrincipal,
-        ),
-        headlineMedium: TextStyle(
-          fontSize: 26,
-          fontWeight: FontWeight.bold,
-          color: CouleursApp.textePrincipal,
-        ),
-        headlineSmall: TextStyle(
-          fontSize: 22,
-          fontWeight: FontWeight.w600,
-          color: CouleursApp.textePrincipal,
-        ),
-        titleLarge: TextStyle(
-          fontSize: 20,
-          fontWeight: FontWeight.w600,
-          color: CouleursApp.textePrincipal,
-        ),
-        titleMedium: TextStyle(
-          fontSize: 18,
-          fontWeight: FontWeight.w500,
-          color: CouleursApp.textePrincipal,
-        ),
-        bodyLarge: TextStyle(
-          fontSize: 16,
-          color: CouleursApp.textePrincipal,
-        ),
-        bodyMedium: TextStyle(
-          fontSize: 14,
-          color: CouleursApp.texteSecondaire,
-        ),
-        labelLarge: TextStyle(
-          fontSize: 16,
-          fontWeight: FontWeight.w600,
-          color: Colors.white,
+      textTheme: GoogleFonts.poppinsTextTheme(
+        const TextTheme(
+          headlineLarge: TextStyle(
+            fontSize: 32,
+            fontWeight: FontWeight.bold,
+            color: CouleursApp.textePrincipal,
+          ),
+          headlineMedium: TextStyle(
+            fontSize: 26,
+            fontWeight: FontWeight.bold,
+            color: CouleursApp.textePrincipal,
+          ),
+          headlineSmall: TextStyle(
+            fontSize: 22,
+            fontWeight: FontWeight.w600,
+            color: CouleursApp.textePrincipal,
+          ),
+          titleLarge: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.w600,
+            color: CouleursApp.textePrincipal,
+          ),
+          titleMedium: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.w500,
+            color: CouleursApp.textePrincipal,
+          ),
+          bodyLarge: TextStyle(
+            fontSize: 16,
+            color: CouleursApp.textePrincipal,
+          ),
+          bodyMedium: TextStyle(
+            fontSize: 14,
+            color: CouleursApp.texteSecondaire,
+          ),
+          labelLarge: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+            color: Colors.white,
+          ),
         ),
       ),
     );
@@ -233,13 +236,18 @@ class ThemeApplication {
         type: BottomNavigationBarType.fixed,
         elevation: 10,
       ),
-      textTheme: const TextTheme(
-        headlineLarge: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: Colors.white),
-        headlineMedium: TextStyle(fontSize: 26, fontWeight: FontWeight.bold, color: Colors.white),
-        headlineSmall: TextStyle(fontSize: 22, fontWeight: FontWeight.w600, color: Colors.white),
-        titleLarge: TextStyle(fontSize: 20, fontWeight: FontWeight.w600, color: Colors.white),
-        bodyLarge: TextStyle(fontSize: 16, color: Colors.white70),
-        bodyMedium: TextStyle(fontSize: 14, color: Colors.white70),
+      textTheme: GoogleFonts.poppinsTextTheme(
+        const TextTheme(
+          headlineLarge: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: Colors.white),
+          headlineMedium: TextStyle(fontSize: 26, fontWeight: FontWeight.bold, color: Colors.white),
+          headlineSmall: TextStyle(fontSize: 22, fontWeight: FontWeight.w600, color: Colors.white),
+          titleLarge: TextStyle(fontSize: 20, fontWeight: FontWeight.w600, color: Colors.white),
+          bodyLarge: TextStyle(fontSize: 16, color: Colors.white70),
+          bodyMedium: TextStyle(fontSize: 14, color: Colors.white70),
+        ),
+      ).apply(
+        bodyColor: Colors.white,
+        displayColor: Colors.white,
       ),
     );
   }

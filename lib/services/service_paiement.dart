@@ -118,7 +118,7 @@ class ServicePaiement {
       facturePdf: "https://camtrans.com/facture/$id.pdf", // Lien factice
     );
 
-    // Enregistrement dans Firestore pour simuler l'historique
+    // Enregistrer le paiement
     await _firestore.ajouterDocument(
       collection: 'paiements',
       id: paiement.id,
