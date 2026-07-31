@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 
 import '../../../coeur/etat/admin_provider.dart';
 import '../../../coeur/constantes/couleurs.dart';
+import '../../../coeur/constantes/statuts.dart';
 import '../../../coeur/widgets/etats_ui.dart';
 import '../../../modeles/course.dart';
 
@@ -89,23 +90,14 @@ class _CourseCard extends StatelessWidget {
   const _CourseCard({required this.course});
 
   Color _getStatutColor(String statut) {
-    switch (statut.toLowerCase()) {
-      case 'en_attente':
-      case 'en attente':
-        return Colors.orange;
-      case 'en_cours':
-      case 'en cours':
-        return Colors.blue;
-      case 'livree':
-      case 'livré':
-      case 'terminee':
-        return Colors.green;
-      case 'annulee':
-      case 'annulé':
-        return Colors.red;
-      default:
-        return Colors.grey;
-    }
+    if (statut == StatutCourse.enAttente) return Colors.orange;
+    if (statut == StatutCourse.acceptee) return Colors.blue.shade300;
+    if (statut == StatutCourse.enRoute) return Colors.blue;
+    if (statut == StatutCourse.enTransit) return Colors.indigo;
+    if (statut == StatutCourse.arrive) return Colors.purple;
+    if (statut == StatutCourse.livre || statut == StatutCourse.termine) return Colors.green;
+    if (statut == StatutCourse.annulee) return Colors.red;
+    return Colors.grey;
   }
 
   @override
@@ -133,7 +125,7 @@ class _CourseCard extends StatelessWidget {
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
-                    course.statut.toUpperCase(),
+                    StatutCourse.libelle(course.statut).toUpperCase(),
                     style: TextStyle(color: color, fontWeight: FontWeight.bold, fontSize: 12),
                   ),
                 ),

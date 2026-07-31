@@ -52,7 +52,7 @@ class HistoriqueLivraisons extends StatelessWidget {
         title: const Text("Historique des livraisons"),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(
+        padding: EdgeInsets.all(
           TaillesApp.margePage,
         ),
         child: Column(

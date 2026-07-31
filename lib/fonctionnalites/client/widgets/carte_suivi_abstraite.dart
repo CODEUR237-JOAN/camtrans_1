@@ -8,6 +8,7 @@ class CarteSuiviAbstraite extends StatefulWidget {
   final LatLng depart;
   final LatLng arrivee;
   final LatLng? transporteur;
+  final List<LatLng>? route;
   final Function(MapController)? onMapCreated;
 
   const CarteSuiviAbstraite({
@@ -15,6 +16,7 @@ class CarteSuiviAbstraite extends StatefulWidget {
     required this.depart,
     required this.arrivee,
     this.transporteur,
+    this.route,
     this.onMapCreated,
   });
 
@@ -52,15 +54,17 @@ class _CarteSuiviAbstraiteState extends State<CarteSuiviAbstraite> {
       children: [
         TileLayer(
           urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-          userAgentPackageName: 'com.camtrans.app',
+          userAgentPackageName: 'com.joan.update_camtrans',
         ),
         // Tracé
         PolylineLayer(
           polylines: [
             Polyline(
-              points: [widget.depart, widget.arrivee], // Ligne droite simplifiée
-              color: CouleursApp.primaire.withValues(alpha: 0.5),
-              strokeWidth: 4,
+              points: widget.route != null && widget.route!.isNotEmpty 
+                  ? widget.route! 
+                  : [widget.depart, widget.arrivee],
+              color: CouleursApp.primaire.withValues(alpha: 0.8),
+              strokeWidth: 5,
             ),
           ],
         ),

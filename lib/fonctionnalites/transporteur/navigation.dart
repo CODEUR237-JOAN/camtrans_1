@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../coeur/constantes/couleurs.dart';
 import '../../coeur/widgets/bouton_principal.dart';
 import '../../coeur/etat/transporteur_provider.dart';
+import '../../coeur/constantes/statuts.dart';
 import '../../modeles/course.dart';
 
 class NavigationTransporteur extends ConsumerStatefulWidget {
@@ -81,7 +82,7 @@ class _NavigationTransporteurState extends ConsumerState<NavigationTransporteur>
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        activeCourse.statut == 'acceptee' ? "En route vers le client" : "Livraison en cours",
+                        activeCourse.statut == StatutCourse.acceptee ? "En route vers le client" : "Livraison en cours",
                         style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 12),
@@ -109,7 +110,7 @@ class _NavigationTransporteurState extends ConsumerState<NavigationTransporteur>
               return Container(
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 20)],
+                  boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 20)],
                   borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
                 ),
                 child: ListView(
@@ -129,12 +130,12 @@ class _NavigationTransporteurState extends ConsumerState<NavigationTransporteur>
                           IconButton(
                             onPressed: () => _appelerClient(activeCourse.telephoneClient),
                             icon: const Icon(Icons.phone, color: Colors.green),
-                            style: IconButton.styleFrom(backgroundColor: Colors.green.withOpacity(0.1)),
+                            style: IconButton.styleFrom(backgroundColor: Colors.green.withValues(alpha: 0.1)),
                           ),
                           IconButton(
                             onPressed: () {},
                             icon: const Icon(Icons.chat, color: Colors.blue),
-                            style: IconButton.styleFrom(backgroundColor: Colors.blue.withOpacity(0.1)),
+                            style: IconButton.styleFrom(backgroundColor: Colors.blue.withValues(alpha: 0.1)),
                           ),
                         ],
                       ),
@@ -147,7 +148,7 @@ class _NavigationTransporteurState extends ConsumerState<NavigationTransporteur>
                     _buildStepInfo(Icons.inventory_2, "Marchandise", activeCourse.description, Colors.orange),
                     const SizedBox(height: 30),
                     BoutonPrincipal(
-                      texte: activeCourse.statut == 'acceptee' ? "Arrivé au départ" : "Livraison terminée",
+                      texte: activeCourse.statut == StatutCourse.acceptee ? "Arrivé au départ" : "Livraison terminée",
                       icone: Icons.check_circle,
                       auClic: () => _validerEtape(activeCourse),
                     ),
@@ -207,12 +208,12 @@ class _NavigationTransporteurState extends ConsumerState<NavigationTransporteur>
 
   void _validerEtape(Course course) async {
     final actions = ref.read(transporteurActionsProvider);
-    final nouveauStatut = course.statut == 'acceptee' ? 'en_transit' : 'livree';
+    final nouveauStatut = course.statut == StatutCourse.acceptee ? StatutCourse.enTransit : StatutCourse.livre;
     
     try {
       await actions.changerStatutCourse(course.id, nouveauStatut);
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(nouveauStatut == 'en_transit' ? "Étape validée : En transit !" : "Course terminée !")));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(nouveauStatut == StatutCourse.enTransit ? "Étape validée : En transit !" : "Course terminée !")));
       }
     } catch (e) {
       if (mounted) {

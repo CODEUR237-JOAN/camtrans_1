@@ -6,6 +6,7 @@ import '../../coeur/routes/routes.dart';
 import '../../coeur/utilitaires/validateurs.dart';
 import '../../coeur/widgets/bouton_principal.dart';
 import '../../coeur/widgets/champ_texte.dart';
+import '../../coeur/widgets/page_responsive.dart';
 
 class MotDePasseOublie extends StatefulWidget {
   const MotDePasseOublie({super.key});
@@ -71,8 +72,9 @@ class _MotDePasseOublieState
         ),
       ),
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(
+        child: PageResponsive(
+          child: SingleChildScrollView(
+          padding: EdgeInsets.all(
             TaillesApp.margePage,
           ),
           child: Form(
@@ -152,6 +154,7 @@ class _MotDePasseOublieState
                   ),
                 ),
               ],
+            ),
             ),
           ),
         ),

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../coeur/animations/animations_avancees.dart';
 import '../../coeur/constantes/couleurs.dart';
 import '../../coeur/constantes/tailles.dart';
 import '../../coeur/constantes/textes.dart';
@@ -10,6 +10,7 @@ import '../../coeur/routes/routes.dart';
 import '../../coeur/utilitaires/validateurs.dart';
 import '../../coeur/widgets/bouton_principal.dart';
 import '../../coeur/widgets/champ_texte.dart';
+import '../../coeur/widgets/effets_visuels.dart';
 
 import '../../services/service_authentification.dart';
 import '../../services/service_firestore.dart';
@@ -30,9 +31,7 @@ class _ConnexionState extends ConsumerState<Connexion> {
   void _connexion() async {
     if (!_cleFormulaire.currentState!.validate()) return;
 
-    setState(() {
-      _chargement = true;
-    });
+    setState(() => _chargement = true);
 
     try {
       final serviceAuth = ref.read(serviceAuthentificationProvider);
@@ -48,12 +47,14 @@ class _ConnexionState extends ConsumerState<Connexion> {
       if (userCred.user != null) {
         final uid = userCred.user!.uid;
 
-        // Vérification de l'Admin
+        // 1. Priorité absolue : Admin par email hardcodé
         if (_email.text.trim().toLowerCase() == 'admintrans@gmail.com') {
           context.go(RoutesApplication.admin);
           return;
         }
-        
+
+        // 2. Recherche dans Firestore par rôle
+        // On vérifie d'abord si c'est un Admin en base
         final docAdmin = await serviceDb.lireDocument(collection: 'admin', id: uid);
         if (!mounted) return;
         if (docAdmin.exists) {
@@ -61,15 +62,15 @@ class _ConnexionState extends ConsumerState<Connexion> {
           return;
         }
 
-        // Vérification du Client
+        // Ensuite Client
         final docClient = await serviceDb.lireDocument(collection: 'clients', id: uid);
         if (!mounted) return;
         if (docClient.exists) {
           context.go(RoutesApplication.tableauBordClient);
           return;
         }
-        
-        // Vérification du Transporteur
+
+        // Puis Transporteur
         final docTransp = await serviceDb.lireDocument(collection: 'transporteurs', id: uid);
         if (!mounted) return;
         if (docTransp.exists) {
@@ -77,24 +78,19 @@ class _ConnexionState extends ConsumerState<Connexion> {
           return;
         }
 
-        // Par défaut (fallback si aucune collection n'est trouvée, ce qui ne devrait pas arriver)
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Type de compte non reconnu."), backgroundColor: Colors.red));
+        // Fallback : Redirection vers le choix de profil si aucun rôle n'est trouvé
+        context.go(RoutesApplication.choixProfil);
       }
-
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
+        const SnackBar(
           content: Text("Oups, la connexion a échoué. Vérifiez vos identifiants !"),
           backgroundColor: Colors.red,
         ),
       );
     } finally {
-      if (mounted) {
-        setState(() {
-          _chargement = false;
-        });
-      }
+      if (mounted) setState(() => _chargement = false);
     }
   }
 
@@ -107,165 +103,217 @@ class _ConnexionState extends ConsumerState<Connexion> {
 
   @override
   Widget build(BuildContext context) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     return Scaffold(
-      backgroundColor: CouleursApp.fond,
-      body: SafeArea(
+      body: FondPremiumAnime(
+        safeArea: true,
         child: Center(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.symmetric(horizontal: TaillesApp.margePage),
-            child: Form(
-              key: _cleFormulaire,
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const SizedBox(height: 20),
+            padding: EdgeInsets.symmetric(horizontal: TaillesApp.margePage),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 520),
+              child: Form(
+                key: _cleFormulaire,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const SizedBox(height: 20),
 
-                  // Logo
-                  Container(
-                    padding: const EdgeInsets.all(15),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color: CouleursApp.primaire.withValues(alpha: 0.1),
-                          blurRadius: 20,
-                          offset: const Offset(0, 10),
+                    // Logo avec glow
+                    AnimationScaleBounce(
+                      delay: const Duration(milliseconds: 100),
+                      child: Container(
+                        padding: const EdgeInsets.all(18),
+                        decoration: BoxDecoration(
+                          gradient: CouleursApp.degradePrincipal,
+                          shape: BoxShape.circle,
+                          boxShadow: [
+                            CouleursApp.ombreNeon(blurRadius: 25),
+                            BoxShadow(
+                              color: CouleursApp.primaire.withValues(alpha: 0.2),
+                              blurRadius: 40,
+                              spreadRadius: 4,
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
-                    child: const Icon(
-                      Icons.local_shipping,
-                      size: 60,
-                      color: CouleursApp.primaire,
-                    ),
-                  ).animate().scale(duration: 600.ms, curve: Curves.easeOutBack).fadeIn(),
-
-                  const SizedBox(height: 30),
-
-                  // Titre
-                  const Text(
-                    TextesApp.bienvenue,
-                    style: TextStyle(
-                      fontSize: 32,
-                      fontWeight: FontWeight.w900,
-                      color: CouleursApp.textePrincipal,
-                      letterSpacing: -0.5,
-                    ),
-                  ).animate().fadeIn(delay: 200.ms).slideY(begin: 0.3, end: 0),
-
-                  const SizedBox(height: 8),
-
-                  const Text(
-                    "Connectez-vous pour continuer",
-                    style: TextStyle(
-                      color: CouleursApp.texteSecondaire,
-                      fontSize: 16,
-                    ),
-                  ).animate().fadeIn(delay: 300.ms).slideY(begin: 0.3, end: 0),
-
-                  const SizedBox(height: 40),
-
-                  // Formulaire (Glassmorphism look)
-                  Container(
-                    padding: const EdgeInsets.all(25),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(25),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.04),
-                          blurRadius: 24,
-                          offset: const Offset(0, 8),
+                        child: const Icon(
+                          Icons.local_shipping,
+                          size: 56,
+                          color: Colors.white,
                         ),
-                      ],
+                      ),
                     ),
-                    child: Column(
-                      children: [
-                        ChampTexte(
-                          controleur: _email,
-                          libelle: TextesApp.adresseEmail,
-                          icone: Icons.email_outlined,
-                          typeClavier: TextInputType.emailAddress,
-                          validateur: Validateurs.email,
-                        ).animate().fadeIn(delay: 400.ms).slideX(begin: 0.1, end: 0),
 
-                        const SizedBox(height: 20),
+                    const SizedBox(height: 32),
 
-                        ChampTexte(
-                          controleur: _motDePasse,
-                          libelle: TextesApp.motDePasse,
-                          icone: Icons.lock_outline,
-                          estMotDePasse: true,
-                          validateur: Validateurs.motDePasse,
-                        ).animate().fadeIn(delay: 500.ms).slideX(begin: 0.1, end: 0),
+                    // Titre
+                    AnimationSlideFade(
+                      delay: const Duration(milliseconds: 200),
+                      child: Text(
+                        TextesApp.bienvenue,
+                        style: TextStyle(
+                          fontSize: 34,
+                          fontWeight: FontWeight.w900,
+                          color: isDark ? Colors.white : CouleursApp.textePrincipal,
+                          letterSpacing: -0.5,
+                        ),
+                      ),
+                    ),
 
-                        Align(
-                          alignment: Alignment.centerRight,
-                          child: TextButton(
-                            onPressed: () => context.push(RoutesApplication.motDePasseOublie),
-                            child: const Text(
-                              TextesApp.motDePasseOublie,
-                              style: TextStyle(fontWeight: FontWeight.w600),
+                    const SizedBox(height: 8),
+
+                    AnimationSlideFade(
+                      delay: const Duration(milliseconds: 300),
+                      child: Text(
+                        "Connectez-vous pour continuer",
+                        style: TextStyle(
+                          color: isDark ? const Color(0xFFCBD5E1) : CouleursApp.texteSecondaire,
+                          fontSize: 17,
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 40),
+
+                    // Formulaire Glassmorphism
+                    AnimationSlideFade(
+                      delay: const Duration(milliseconds: 400),
+                      child: GlassCard(
+                        padding: const EdgeInsets.all(28),
+                        blur: 25,
+                        child: Column(
+                          children: [
+                            ChampTexte(
+                              controleur: _email,
+                              libelle: TextesApp.adresseEmail,
+                              icone: Icons.email_outlined,
+                              typeClavier: TextInputType.emailAddress,
+                              validateur: Validateurs.email,
+                              glassmorphism: true,
+                            ),
+
+                            const SizedBox(height: 20),
+
+                            ChampTexte(
+                              controleur: _motDePasse,
+                              libelle: TextesApp.motDePasse,
+                              icone: Icons.lock_outline,
+                              estMotDePasse: true,
+                              validateur: Validateurs.motDePasse,
+                              glassmorphism: true,
+                            ),
+
+                            const SizedBox(height: 12),
+
+                            Align(
+                              alignment: Alignment.centerRight,
+                              child: TextButton(
+                                onPressed: () => context.push(RoutesApplication.motDePasseOublie),
+                                child: Text(
+                                  TextesApp.motDePasseOublie,
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.w600,
+                                    color: CouleursApp.primaire,
+                                  ),
+                                ),
+                              ),
+                            ),
+
+                            const SizedBox(height: 8),
+
+                            BoutonPrincipal(
+                              texte: TextesApp.connexion,
+                              icone: Icons.login,
+                              chargement: _chargement,
+                              auClic: _connexion,
+                              gradient: CouleursApp.degradePrincipal,
+                              glow: true,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+
+                    const SizedBox(height: 28),
+
+                    // Pas de compte ?
+                    AnimationSlideFade(
+                      delay: const Duration(milliseconds: 600),
+                      child: Wrap(
+                        alignment: WrapAlignment.center,
+                        crossAxisAlignment: WrapCrossAlignment.center,
+                        children: [
+                          Text(
+                            "Vous n'avez pas de compte ?",
+                            style: TextStyle(
+                              color: isDark ? const Color(0xFFCBD5E1) : CouleursApp.texteSecondaire,
+                              fontSize: 15,
                             ),
                           ),
-                        ).animate().fadeIn(delay: 600.ms),
-
-                        const SizedBox(height: 15),
-
-                        BoutonPrincipal(
-                          texte: TextesApp.connexion,
-                          icone: Icons.login,
-                          chargement: _chargement,
-                          auClic: _connexion,
-                        ).animate().fadeIn(delay: 700.ms).scale(begin: const Offset(0.9, 0.9)),
-                      ],
+                          TextButton(
+                            onPressed: () => context.push(RoutesApplication.choixProfil),
+                            child: const Text(
+                              "S'inscrire",
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
 
-                  const SizedBox(height: 25),
+                    const SizedBox(height: 20),
 
-                  // Pas de compte ?
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      const Text("Vous n'avez pas de compte ?", style: TextStyle(color: CouleursApp.texteSecondaire)),
-                      TextButton(
-                        onPressed: () => context.push(RoutesApplication.choixProfil),
-                        child: const Text("S'inscrire", style: TextStyle(fontWeight: FontWeight.bold)),
+                    // Séparateur
+                    AnimationSlideFade(
+                      delay: const Duration(milliseconds: 700),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Divider(
+                              color: isDark ? Colors.white12 : Colors.grey.shade300,
+                            ),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 14),
+                            child: Text(
+                              "Ou avec",
+                              style: TextStyle(
+                                color: isDark ? const Color(0xFF94A3B8) : Colors.grey.shade500,
+                                fontWeight: FontWeight.w500,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ),
+                          Expanded(
+                            child: Divider(
+                              color: isDark ? Colors.white12 : Colors.grey.shade300,
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
-                  ).animate().fadeIn(delay: 800.ms),
+                    ),
 
-                  const SizedBox(height: 20),
-                  
-                  // Connexion rapide
-                  Row(
-                    children: [
-                      Expanded(child: Divider(color: Colors.grey.shade300)),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 10),
-                        child: Text("Ou avec", style: TextStyle(color: Colors.grey.shade500, fontWeight: FontWeight.w500)),
+                    const SizedBox(height: 20),
+
+                    // Boutons sociaux
+                    AnimationSlideFade(
+                      delay: const Duration(milliseconds: 800),
+                      child: Wrap(
+                        alignment: WrapAlignment.center,
+                        spacing: 16,
+                        runSpacing: 16,
+                        children: [
+                          _boutonSocial(Icons.g_mobiledata, const Color(0xFFEA4335)),
+                          _boutonSocial(Icons.facebook, const Color(0xFF1877F2)),
+                          _boutonSocial(Icons.apple, isDark ? Colors.white : Colors.black),
+                        ],
                       ),
-                      Expanded(child: Divider(color: Colors.grey.shade300)),
-                    ],
-                  ).animate().fadeIn(delay: 900.ms),
+                    ),
 
-                  const SizedBox(height: 20),
-
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      _boutonSocial(Icons.g_mobiledata, Colors.red, Colors.red.shade50),
-                      const SizedBox(width: 20),
-                      _boutonSocial(Icons.facebook, Colors.blue, Colors.blue.shade50),
-                      const SizedBox(width: 20),
-                      _boutonSocial(Icons.apple, Colors.black, Colors.black12),
-                    ],
-                  ).animate().fadeIn(delay: 1000.ms).slideY(begin: 0.2, end: 0),
-
-                  const SizedBox(height: 30),
-                ],
+                    const SizedBox(height: 30),
+                  ],
+                ),
               ),
             ),
           ),
@@ -274,18 +322,12 @@ class _ConnexionState extends ConsumerState<Connexion> {
     );
   }
 
-  Widget _boutonSocial(IconData icone, Color couleur, Color fond) {
-    return Container(
-      decoration: BoxDecoration(
-        color: fond,
-        shape: BoxShape.circle,
-      ),
-      child: IconButton(
-        iconSize: 32,
-        padding: const EdgeInsets.all(12),
-        onPressed: () {},
-        icon: Icon(icone, color: couleur),
-      ),
+  Widget _boutonSocial(IconData icone, Color couleur) {
+    return AnimatedShadowCard(
+      onTap: () {},
+      padding: const EdgeInsets.all(14),
+      borderRadius: 20,
+      child: Icon(icone, color: couleur, size: 28),
     );
   }
 }

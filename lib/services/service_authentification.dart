@@ -5,6 +5,10 @@ final serviceAuthentificationProvider = Provider<ServiceAuthentification>((ref) 
   return ServiceAuthentification();
 });
 
+final authStateProvider = StreamProvider<User?>((ref) {
+  return ref.watch(serviceAuthentificationProvider).changementsAuthentification;
+});
+
 class ServiceAuthentification {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 

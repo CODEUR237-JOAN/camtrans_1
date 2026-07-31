@@ -32,12 +32,12 @@ class ProfilTransporteur extends ConsumerWidget {
           }
 
           return SingleChildScrollView(
-            padding: const EdgeInsets.all(TaillesApp.margePage),
+            padding: EdgeInsets.all(TaillesApp.margePage),
             child: Column(
               children: [
                 CircleAvatar(
                   radius: 60,
-                  backgroundColor: CouleursApp.primaire.withOpacity(0.1),
+                  backgroundColor: CouleursApp.primaire.withValues(alpha: 0.1),
                   backgroundImage: transporteur.photo.isNotEmpty ? NetworkImage(transporteur.photo) : null,
                   child: transporteur.photo.isEmpty 
                     ? const Icon(Icons.person, size: 60, color: CouleursApp.primaire)

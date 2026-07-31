@@ -3,11 +3,11 @@ import '../../modeles/course.dart';
 import '../../services/service_authentification.dart';
 import '../../services/service_firestore.dart';
 
-final coursesClientProvider = StreamProvider<List<Course>>((ref) {
-  final authService = ref.watch(serviceAuthentificationProvider);
+final coursesClientProvider = StreamProvider.autoDispose<List<Course>>((ref) {
+  final authState = ref.watch(authStateProvider);
   final firestoreService = ref.watch(serviceFirestoreProvider);
   
-  final userId = authService.utilisateur?.uid;
+  final userId = authState.value?.uid;
   if (userId == null) {
     return Stream.value([]);
   }

@@ -36,7 +36,7 @@ class _HistoriqueState extends ConsumerState<Historique> {
       body: Column(
         children: [
           Padding(
-            padding: const EdgeInsets.all(TaillesApp.margePage),
+            padding: EdgeInsets.all(TaillesApp.margePage),
             child: TextField(
               controller: _recherche,
               onChanged: (v) => setState(() {}),
@@ -62,7 +62,7 @@ class _HistoriqueState extends ConsumerState<Historique> {
             height: 40,
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
-              padding: const EdgeInsets.symmetric(horizontal: TaillesApp.margePage),
+              padding: EdgeInsets.symmetric(horizontal: TaillesApp.margePage),
               itemCount: _filtres.length,
               itemBuilder: (context, index) {
                 return _creerFiltre(index, _filtres[index]);
@@ -101,7 +101,7 @@ class _HistoriqueState extends ConsumerState<Historique> {
                 }
 
                 return ListView.builder(
-                  padding: const EdgeInsets.all(TaillesApp.margePage),
+                  padding: EdgeInsets.all(TaillesApp.margePage),
                   itemCount: coursesFiltrees.length,
                   itemBuilder: (context, index) {
                     final course = coursesFiltrees[index];

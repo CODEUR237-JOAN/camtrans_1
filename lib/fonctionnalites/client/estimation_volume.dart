@@ -102,7 +102,7 @@ class _EstimationVolumeState
         ),
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(
+        padding: EdgeInsets.all(
           TaillesApp.margePage,
         ),
         child: Column(

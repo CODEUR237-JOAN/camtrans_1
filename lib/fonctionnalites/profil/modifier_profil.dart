@@ -72,7 +72,7 @@ class _ModifierProfilState extends State<ModifierProfil> {
         title: const Text("Modifier mon profil"),
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(
+        padding: EdgeInsets.all(
           TaillesApp.margePage,
         ),
         child: Form(

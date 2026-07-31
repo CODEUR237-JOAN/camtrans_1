@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
@@ -23,7 +24,7 @@ class ServiceIA {
     }
 
     _modele = GenerativeModel(
-      model: 'gemini-1.5-flash',
+      model: 'gemini-2.0-flash',
       apiKey: apiKey,
       systemInstruction: Content.system(
         "Tu es l'assistant IA officiel de CamTrans, une application de logistique et de transport de marchandises. "
@@ -70,7 +71,69 @@ class ServiceIA {
         }
       }
     } catch (e) {
-      yield "\n[Erreur de connexion avec l'IA. Veuillez réessayer.]";
+      yield "\n[Erreur de connexion avec l'IA. Veuillez réessayer. Détails: $e]";
+    }
+  }
+
+  /// Estime les détails d'une expédition et renvoie un dictionnaire structuré.
+  Future<Map<String, String>> estimerExpedition({
+    required String marchandise,
+    required String description,
+    required String depart,
+    required String destination,
+    List<String>? cheminsImages,
+  }) async {
+    if (_modele == null) {
+      _initialiserModele();
+      if (_modele == null) {
+        throw Exception("Clé API manquante");
+      }
+    }
+
+    final prompt = """
+Tu es un expert en logistique pour CamTrans. Estime cette expédition :
+- Départ : ${depart.isEmpty ? 'Non précisé' : depart}
+- Destination : ${destination.isEmpty ? 'Non précisé' : destination}
+- Catégorie : ${marchandise.isEmpty ? 'Non précisé' : marchandise}
+- Détails du colis : ${description.isEmpty ? 'Non précisé' : description}
+- Photos fournies : ${cheminsImages != null && cheminsImages.isNotEmpty ? 'Oui (Analyse attentivement les images pour déduire le volume et le type de colis)' : 'Non'}
+
+Réponds UNIQUEMENT au format JSON strict avec les clés suivantes :
+- "vehicule" : le véhicule idéal parmi (Moto, Voiture, Camionnette, Camion léger, Camion lourd).
+- "volume" : estimation du volume en m³ (ex: "2.5 m³") basé sur les images et la description.
+- "prix" : estimation du prix en FCFA selon la distance et le véhicule (ex: "15 000 FCFA", ou "Sur devis" si les lieux manquent).
+- "conseil" : un court conseil de 1 à 2 phrases pour l'emballage ou le transport de ce colis spécifique.
+
+Ne rajoute aucun autre texte, pas de blocs markdown, juste l'objet JSON.
+""";
+
+    try {
+      final List<Part> parts = [TextPart(prompt)];
+
+      if (cheminsImages != null && cheminsImages.isNotEmpty) {
+        for (var chemin in cheminsImages) {
+          final bytes = await File(chemin).readAsBytes();
+          String mimeType = 'image/jpeg';
+          if (chemin.toLowerCase().endsWith('.png')) mimeType = 'image/png';
+          if (chemin.toLowerCase().endsWith('.webp')) mimeType = 'image/webp';
+          parts.add(DataPart(mimeType, bytes));
+        }
+      }
+
+      final response = await _modele!.generateContent([Content.multi(parts)]);
+      final texte = response.text ?? "";
+      // Nettoyer d'éventuels backticks markdown
+      final jsonTexte = texte.replaceAll("```json", "").replaceAll("```", "").trim();
+      
+      final Map<String, dynamic> data = json.decode(jsonTexte);
+      return {
+        "vehicule": data["vehicule"]?.toString() ?? "Camionnette",
+        "volume": data["volume"]?.toString() ?? "Inconnu",
+        "prix": data["prix"]?.toString() ?? "Sur devis",
+        "conseil": data["conseil"]?.toString() ?? "Emballez soigneusement vos articles.",
+      };
+    } catch (e) {
+      throw Exception("Impossible d'estimer avec l'IA : $e");
     }
   }
 }

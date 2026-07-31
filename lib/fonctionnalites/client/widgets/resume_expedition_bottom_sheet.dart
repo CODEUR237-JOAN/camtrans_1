@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:intl/intl.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../coeur/etat/demande_expedition_provider.dart';
 import '../../../coeur/etat/estimation_provider.dart';
@@ -11,6 +12,7 @@ import '../../../services/service_firestore.dart';
 import '../../../services/service_authentification.dart';
 import '../../../services/service_gps.dart';
 import '../../../modeles/course.dart';
+import '../../../coeur/constantes/statuts.dart';
 import 'package:uuid/uuid.dart';
 import 'carte_estimation.dart';
 
@@ -218,7 +220,7 @@ class _ResumeExpeditionBottomSheetState extends ConsumerState<ResumeExpeditionBo
                     prixFinal: 0.0,
                     modePaiement: '',
                     paiementEffectue: false,
-                    statut: 'en_attente',
+                    statut: StatutCourse.enAttente, // ✅ statut normalisé
                     description: etat.description,
                     photos: photosUrl,
                     dateCreation: DateTime.now(),
@@ -226,7 +228,7 @@ class _ResumeExpeditionBottomSheetState extends ConsumerState<ResumeExpeditionBo
                     fragile: false,
                     aideChargement: false,
                     aideDechargement: false,
-                    codeSuivi: 'TRK-${DateTime.now().millisecondsSinceEpoch.toString().substring(7)}',
+                    codeSuivi: 'CMR-${DateTime.now().millisecondsSinceEpoch.toString().substring(5)}', // Code unique lisible
                     noteClient: 0.0,
                     noteTransporteur: 0.0,
                     commentaireClient: '',
@@ -246,11 +248,22 @@ class _ResumeExpeditionBottomSheetState extends ConsumerState<ResumeExpeditionBo
                   if (context.mounted) {
                     Navigator.pop(context); // Fermer le loader
                     Navigator.pop(context); // Fermer le bottom sheet
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text("Expédition créée avec succès !")),
-                    );
+                    final codeSuivi = course.codeSuivi;
                     ref.read(demandeExpeditionProvider.notifier).reinitialiser();
-                    Navigator.pop(context); // Retourner au dashboard client
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Row(
+                          children: [
+                            const Icon(Icons.check_circle, color: Colors.white),
+                            const SizedBox(width: 8),
+                            Expanded(child: Text("Expédition créée ! Code : $codeSuivi")),
+                          ],
+                        ),
+                        backgroundColor: CouleursApp.succes,
+                        duration: const Duration(seconds: 4),
+                      ),
+                    );
+                    context.push('/suivi');
                   }
                 } catch (e) {
                   if (context.mounted) {

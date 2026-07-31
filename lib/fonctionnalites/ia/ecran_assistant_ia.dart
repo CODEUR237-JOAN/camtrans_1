@@ -5,9 +5,11 @@ import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
+import 'package:flutter_markdown/flutter_markdown.dart';
 import '../../coeur/etat/ia_provider.dart';
 import '../../coeur/constantes/couleurs.dart';
 import '../../modeles/message_ia.dart';
+import '../../coeur/widgets/page_responsive.dart';
 
 class EcranAssistantIA extends ConsumerStatefulWidget {
   const EcranAssistantIA({super.key});
@@ -63,6 +65,7 @@ class _EcranAssistantIAState extends ConsumerState<EcranAssistantIA> {
   @override
   Widget build(BuildContext context) {
     final iaState = ref.watch(iaProvider);
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     // Faire défiler automatiquement quand de nouveaux messages arrivent
     ref.listen(iaProvider, (previous, next) {
@@ -72,20 +75,20 @@ class _EcranAssistantIAState extends ConsumerState<EcranAssistantIA> {
     });
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         elevation: 0,
         centerTitle: true,
-        title: const Row(
+        title: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Iconsax.magic_star_copy, color: CouleursApp.primaire),
-            SizedBox(width: 8),
-            Text("Assistant CamTrans", style: TextStyle(color: Colors.black87, fontWeight: FontWeight.bold, fontSize: 18)),
+            const Icon(Iconsax.magic_star_copy, color: CouleursApp.primaire),
+            const SizedBox(width: 8),
+            Text("Assistant CamTrans", style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color, fontWeight: FontWeight.bold, fontSize: 18)),
           ],
         ),
-        iconTheme: const IconThemeData(color: Colors.black87),
+        iconTheme: IconThemeData(color: Theme.of(context).textTheme.bodyLarge?.color),
         actions: [
           IconButton(
             icon: const Icon(Icons.delete_outline),
@@ -95,28 +98,30 @@ class _EcranAssistantIAState extends ConsumerState<EcranAssistantIA> {
           )
         ],
       ),
-      body: Column(
-        children: [
-          Expanded(
-            child: iaState.messages.isEmpty
-                ? _buildEcranVide()
-                : ListView.builder(
-                    controller: _scrollController,
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-                    itemCount: iaState.messages.length,
-                    itemBuilder: (context, index) {
-                      final msg = iaState.messages[index];
-                      return _buildBulleMessage(msg);
-                    },
-                  ),
-          ),
-          _buildZoneSaisie(iaState.enReponse),
-        ],
+      body: PageResponsive(
+        child: Column(
+          children: [
+            Expanded(
+              child: iaState.messages.isEmpty
+                  ? _buildEcranVide(isDark)
+                  : ListView.builder(
+                      controller: _scrollController,
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+                      itemCount: iaState.messages.length,
+                      itemBuilder: (context, index) {
+                        final msg = iaState.messages[index];
+                        return _buildBulleMessage(msg, isDark);
+                      },
+                    ),
+            ),
+            _buildZoneSaisie(iaState.enReponse, isDark),
+          ],
+        ),
       ),
     );
   }
 
-  Widget _buildEcranVide() {
+  Widget _buildEcranVide(bool isDark) {
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -130,9 +135,9 @@ class _EcranAssistantIAState extends ConsumerState<EcranAssistantIA> {
             child: const Icon(Iconsax.message_text_copy, size: 60, color: CouleursApp.primaire),
           ).animate().scale(duration: 500.ms, curve: Curves.easeOutBack),
           const SizedBox(height: 20),
-          const Text(
+          Text(
             "Comment puis-je vous aider ?",
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.black87),
+            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Theme.of(context).textTheme.bodyLarge?.color),
           ).animate().fadeIn(delay: 200.ms),
           const SizedBox(height: 30),
           Padding(
@@ -142,10 +147,10 @@ class _EcranAssistantIAState extends ConsumerState<EcranAssistantIA> {
               runSpacing: 10,
               alignment: WrapAlignment.center,
               children: [
-                _buildSuggestion("Estimer un prix de livraison"),
-                _buildSuggestion("Quel véhicule choisir ?"),
-                _buildSuggestion("Conseils d'emballage"),
-                _buildSuggestion("Estimer le volume de mes biens"),
+                _buildSuggestion("Estimer un prix de livraison", isDark),
+                _buildSuggestion("Quel véhicule choisir ?", isDark),
+                _buildSuggestion("Conseils d'emballage", isDark),
+                _buildSuggestion("Estimer le volume de mes biens", isDark),
               ],
             ).animate().fadeIn(delay: 400.ms).slideY(begin: 0.2),
           )
@@ -154,7 +159,7 @@ class _EcranAssistantIAState extends ConsumerState<EcranAssistantIA> {
     );
   }
 
-  Widget _buildSuggestion(String texte) {
+  Widget _buildSuggestion(String texte, bool isDark) {
     return GestureDetector(
       onTap: () {
         _controller.text = texte;
@@ -163,16 +168,16 @@ class _EcranAssistantIAState extends ConsumerState<EcranAssistantIA> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
-          color: Colors.grey.shade100,
+          color: isDark ? Theme.of(context).cardColor : Colors.grey.shade100,
           borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: Colors.grey.shade300),
+          border: Border.all(color: isDark ? Colors.grey.shade800 : Colors.grey.shade300),
         ),
-        child: Text(texte, style: const TextStyle(color: Colors.black87, fontSize: 13)),
+        child: Text(texte, style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color, fontSize: 13)),
       ),
     );
   }
 
-  Widget _buildBulleMessage(MessageIA msg) {
+  Widget _buildBulleMessage(MessageIA msg, bool isDark) {
     return Align(
       alignment: msg.estUtilisateur ? Alignment.centerRight : Alignment.centerLeft,
       child: Container(
@@ -194,7 +199,7 @@ class _EcranAssistantIAState extends ConsumerState<EcranAssistantIA> {
               child: Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 decoration: BoxDecoration(
-                  color: msg.estUtilisateur ? CouleursApp.primaire : Colors.grey.shade100,
+                  color: msg.estUtilisateur ? CouleursApp.primaire : (isDark ? Theme.of(context).cardColor : Colors.grey.shade100),
                   borderRadius: BorderRadius.circular(16).copyWith(
                     bottomRight: msg.estUtilisateur ? const Radius.circular(0) : const Radius.circular(16),
                     bottomLeft: !msg.estUtilisateur ? const Radius.circular(0) : const Radius.circular(16),
@@ -223,14 +228,22 @@ class _EcranAssistantIAState extends ConsumerState<EcranAssistantIA> {
                           )
                         : Semantics(
                             label: msg.estUtilisateur ? "Votre message : ${msg.texte}" : "Message de l'assistant : ${msg.texte}",
-                            child: Text(
-                              msg.texte,
-                              style: TextStyle(
-                                color: msg.estUtilisateur ? Colors.white : Colors.black87,
-                                fontSize: 15,
-                                height: 1.4,
-                              ),
-                            ),
+                            child: msg.estUtilisateur
+                                ? Text(
+                                    msg.texte,
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 15,
+                                      height: 1.4,
+                                    ),
+                                  )
+                                : MarkdownBody(
+                                    data: msg.texte,
+                                    styleSheet: MarkdownStyleSheet(
+                                      p: TextStyle(fontSize: 15, height: 1.4, color: Theme.of(context).textTheme.bodyLarge?.color),
+                                      listBullet: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color),
+                                    ),
+                                  ),
                           ),
                   ],
                 ),
@@ -242,12 +255,12 @@ class _EcranAssistantIAState extends ConsumerState<EcranAssistantIA> {
     ).animate().fadeIn(duration: 300.ms).slideY(begin: 0.1);
   }
 
-  Widget _buildZoneSaisie(bool enReponse) {
+  Widget _buildZoneSaisie(bool enReponse, bool isDark) {
     return Container(
       padding: const EdgeInsets.all(16).copyWith(bottom: 24),
       decoration: BoxDecoration(
-        color: Colors.white,
-        border: Border(top: BorderSide(color: Colors.grey.shade200)),
+        color: Theme.of(context).scaffoldBackgroundColor,
+        border: Border(top: BorderSide(color: isDark ? Colors.grey.shade800 : Colors.grey.shade200)),
       ),
       child: Column(
         children: [
@@ -305,16 +318,18 @@ class _EcranAssistantIAState extends ConsumerState<EcranAssistantIA> {
                   constraints: const BoxConstraints(maxHeight: 120),
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   decoration: BoxDecoration(
-                    color: Colors.grey.shade100,
+                    color: isDark ? Theme.of(context).cardColor : Colors.grey.shade100,
                     borderRadius: BorderRadius.circular(24),
                   ),
                   child: TextField(
                     controller: _controller,
                     maxLines: null,
+                    style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color),
                     textInputAction: TextInputAction.send,
                     onSubmitted: (_) => _envoyerMessage(),
-                    decoration: const InputDecoration(
+                    decoration: InputDecoration(
                       hintText: "Écrivez un message...",
+                      hintStyle: TextStyle(color: Theme.of(context).textTheme.bodyMedium?.color),
                       border: InputBorder.none,
                     ),
                   ),

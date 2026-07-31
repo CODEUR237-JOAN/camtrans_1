@@ -10,6 +10,7 @@ import '../../coeur/routes/routes.dart';
 import '../../coeur/utilitaires/validateurs.dart';
 import '../../coeur/widgets/bouton_principal.dart';
 import '../../coeur/widgets/champ_texte.dart';
+import '../../coeur/widgets/page_responsive.dart';
 
 import '../../services/service_authentification.dart';
 import '../../services/service_firestore.dart';
@@ -139,8 +140,9 @@ class _InscriptionClientState extends ConsumerState<InscriptionClient> {
         elevation: 0,
       ),
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(TaillesApp.margePage),
+        child: PageResponsive(
+          child: SingleChildScrollView(
+          padding: EdgeInsets.all(TaillesApp.margePage),
           child: Form(
             key: _cleFormulaire,
             child: Column(
@@ -279,8 +281,9 @@ class _InscriptionClientState extends ConsumerState<InscriptionClient> {
 
                 const SizedBox(height: 20),
 
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                Wrap(
+                  alignment: WrapAlignment.center,
+                  crossAxisAlignment: WrapCrossAlignment.center,
                   children: [
                     const Text("Vous avez déjà un compte ?", style: TextStyle(color: CouleursApp.texteSecondaire)),
                     TextButton(
@@ -294,6 +297,7 @@ class _InscriptionClientState extends ConsumerState<InscriptionClient> {
                 
                 const SizedBox(height: 30),
               ],
+            ),
             ),
           ),
         ),

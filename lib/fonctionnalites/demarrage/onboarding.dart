@@ -2,11 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 
-
 import '../../coeur/constantes/couleurs.dart';
 import '../../coeur/constantes/images.dart';
+import '../../coeur/constantes/tailles.dart';
 import '../../coeur/constantes/textes.dart';
 import '../../coeur/routes/routes.dart';
+import '../../coeur/widgets/effets_visuels.dart';
 
 class Onboarding extends StatefulWidget {
   const Onboarding({super.key});
@@ -24,28 +25,34 @@ class _OnboardingState extends State<Onboarding> {
       image: ImagesApp.onboarding1,
       titre: TextesApp.titreOnboarding1,
       description: TextesApp.descriptionOnboarding1,
+      couleur: CouleursApp.primaire,
+      icone: Icons.local_shipping_outlined,
     ),
     _PageOnboarding(
       image: ImagesApp.onboarding2,
       titre: TextesApp.titreOnboarding2,
       description: TextesApp.descriptionOnboarding2,
+      couleur: CouleursApp.secondaire,
+      icone: Icons.location_on_outlined,
     ),
     _PageOnboarding(
       image: ImagesApp.onboarding3,
       titre: TextesApp.titreOnboarding3,
       description: TextesApp.descriptionOnboarding3,
+      couleur: CouleursApp.accentRose,
+      icone: Icons.auto_awesome_outlined,
     ),
   ];
 
   void _pageSuivante() {
     if (_pageActuelle < _pages.length - 1) {
       _controleurPage.nextPage(
-        duration: const Duration(milliseconds: 500),
-        curve: Curves.easeInOutCubic,
+        duration: const Duration(milliseconds: 520),
+        curve: Curves.easeOutCubic,
       );
-    } else {
-      context.go(RoutesApplication.connexion);
+      return;
     }
+    context.go(RoutesApplication.connexion);
   }
 
   @override
@@ -56,195 +63,289 @@ class _OnboardingState extends State<Onboarding> {
 
   @override
   Widget build(BuildContext context) {
+    final size = MediaQuery.sizeOf(context);
+    final isCompact = size.height < 720;
+    final panelHeight = size.height * (isCompact ? 0.48 : 0.43);
+
     return Scaffold(
       backgroundColor: CouleursApp.fond,
-      body: Stack(
-        children: [
-          // 1. PageView for images and texts
-          PageView.builder(
-            controller: _controleurPage,
-            itemCount: _pages.length,
-            onPageChanged: (index) {
-              setState(() {
-                _pageActuelle = index;
-              });
-            },
-            itemBuilder: (context, index) {
-              final page = _pages[index];
-              return Stack(
-                fit: StackFit.expand,
-                children: [
-                  // Image (Top half)
-                  Positioned(
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    height: MediaQuery.of(context).size.height * 0.65,
-                    child: Image.asset(
-                      page.image,
-                      fit: BoxFit.cover,
-                    ).animate(key: ValueKey(index)).fadeIn(duration: 600.ms).scale(begin: const Offset(1.1, 1.1), end: const Offset(1, 1)),
+      body: FondPremiumAnime(
+        child: Stack(
+          children: [
+            PageView.builder(
+              controller: _controleurPage,
+              itemCount: _pages.length,
+              onPageChanged: (index) => setState(() => _pageActuelle = index),
+              itemBuilder: (context, index) {
+                return _OnboardingSlide(
+                  page: _pages[index],
+                  index: index,
+                  panelHeight: panelHeight,
+                  isCompact: isCompact,
+                );
+              },
+            ),
+            Positioned(
+              top: MediaQuery.paddingOf(context).top + 12,
+              right: 20,
+              child: BadgeVerre(
+                color: Colors.white.withValues(alpha: 0.78),
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(TaillesApp.rayonPill),
+                  onTap: () => context.go(RoutesApplication.connexion),
+                  child: const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                    child: Text(
+                      'Passer',
+                      style: TextStyle(
+                        color: CouleursApp.textePrincipal,
+                        fontWeight: FontWeight.w800,
+                      ),
+                    ),
                   ),
-                  // Gradient to blend image into the white background
-                  Positioned(
-                    top: MediaQuery.of(context).size.height * 0.4,
-                    left: 0,
-                    right: 0,
-                    height: MediaQuery.of(context).size.height * 0.25,
-                    child: Container(
-                      decoration: BoxDecoration(
-                        gradient: LinearGradient(
-                          begin: Alignment.topCenter,
-                          end: Alignment.bottomCenter,
-                          colors: [
-                            CouleursApp.fond.withValues(alpha: 0.0),
-                            CouleursApp.fond,
-                          ],
+                ),
+              ).animate().fadeIn(delay: 500.ms).slideY(begin: -0.2),
+            ),
+            Positioned(
+              left: TaillesApp.margePage,
+              right: TaillesApp.margePage,
+              bottom: 28,
+              child: Wrap(
+                alignment: WrapAlignment.spaceBetween,
+                crossAxisAlignment: WrapCrossAlignment.center,
+                spacing: 20,
+                runSpacing: 12,
+                children: [
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: List.generate(
+                      _pages.length,
+                      (index) => AnimatedContainer(
+                        duration: const Duration(milliseconds: 280),
+                        curve: Curves.easeOutCubic,
+                        margin: const EdgeInsets.only(right: 8),
+                        width: _pageActuelle == index ? 30 : 9,
+                        height: 9,
+                        decoration: BoxDecoration(
+                          gradient: _pageActuelle == index
+                              ? CouleursApp.degradeNeon
+                              : null,
+                          color: _pageActuelle == index
+                              ? null
+                              : CouleursApp.primaire.withValues(alpha: 0.18),
+                          borderRadius: BorderRadius.circular(99),
                         ),
                       ),
                     ),
                   ),
-                  // Text Area (Glassmorphism look)
-                  Positioned(
-                    bottom: 0,
-                    left: 0,
-                    right: 0,
-                    height: MediaQuery.of(context).size.height * 0.45,
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 30),
+                  GestureDetector(
+                    onTap: _pageSuivante,
+                    child: AnimatedContainer(
+                      duration: const Duration(milliseconds: 280),
+                      curve: Curves.easeOutCubic,
+                      height: 58,
+                      width: _pageActuelle == _pages.length - 1 ? 168 : 58,
                       decoration: BoxDecoration(
-                        color: CouleursApp.fond,
-                        borderRadius: const BorderRadius.only(
-                          topLeft: Radius.circular(40),
-                          topRight: Radius.circular(40),
-                        ),
+                        gradient: CouleursApp.degradePrincipal,
+                        borderRadius: BorderRadius.circular(99),
                         boxShadow: [
                           BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.03),
-                            blurRadius: 30,
-                            offset: const Offset(0, -10),
-                          )
+                            color: CouleursApp.primaire.withValues(alpha: 0.28),
+                            blurRadius: 22,
+                            offset: const Offset(0, 10),
+                          ),
                         ],
                       ),
-                      child: Column(
-                        children: [
-                          const SizedBox(height: 40),
-                          Text(
-                            page.titre,
-                            textAlign: TextAlign.center,
-                            style: const TextStyle(
-                              fontSize: 28,
-                              fontWeight: FontWeight.w900,
-                              color: CouleursApp.textePrincipal,
-                              letterSpacing: -0.5,
-                              height: 1.2,
-                            ),
-                          ).animate(key: ValueKey("t_$index")).fadeIn(delay: 200.ms).slideY(begin: 0.2, end: 0, curve: Curves.easeOutBack),
-                          const SizedBox(height: 20),
-                          Text(
-                            page.description,
-                            textAlign: TextAlign.center,
-                            style: const TextStyle(
-                              fontSize: 16,
-                              height: 1.6,
-                              color: CouleursApp.texteSecondaire,
-                            ),
-                          ).animate(key: ValueKey("d_$index")).fadeIn(delay: 400.ms).slideY(begin: 0.2, end: 0, curve: Curves.easeOutBack),
-                        ],
+                      child: Center(
+                        child: AnimatedSwitcher(
+                          duration: const Duration(milliseconds: 180),
+                          child: _pageActuelle == _pages.length - 1
+                              ? const Text(
+                                  'Commencer',
+                                  key: ValueKey('start'),
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w800,
+                                  ),
+                                )
+                              : const Icon(
+                                  Icons.arrow_forward_rounded,
+                                  key: ValueKey('next'),
+                                  color: Colors.white,
+                                ),
+                        ),
                       ),
                     ),
                   ),
                 ],
-              );
-            },
-          ),
+              ).animate().fadeIn(delay: 700.ms).slideY(begin: 0.25),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
 
-          // 2. Skip Button
-          Positioned(
-            top: MediaQuery.of(context).padding.top + 10,
-            right: 20,
-            child: TextButton(
-              onPressed: () => context.go(RoutesApplication.connexion),
-              style: TextButton.styleFrom(
-                backgroundColor: Colors.white.withValues(alpha: 0.8),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20),
-                ),
-              ),
-              child: const Text(
-                "Passer",
-                style: TextStyle(fontWeight: FontWeight.bold, color: CouleursApp.textePrincipal),
-              ),
-            ).animate().fadeIn(delay: 1.seconds),
-          ),
+class _OnboardingSlide extends StatelessWidget {
+  final _PageOnboarding page;
+  final int index;
+  final double panelHeight;
+  final bool isCompact;
 
-          // 3. Dots and Next Button
-          Positioned(
-            bottom: 40,
-            left: 30,
-            right: 30,
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                // Dots
-                Row(
-                  children: List.generate(
-                    _pages.length,
-                    (index) => AnimatedContainer(
-                      duration: const Duration(milliseconds: 300),
-                      margin: const EdgeInsets.only(right: 8),
-                      width: _pageActuelle == index ? 24 : 8,
-                      height: 8,
-                      decoration: BoxDecoration(
-                        color: _pageActuelle == index
-                            ? CouleursApp.primaire
-                            : CouleursApp.primaire.withValues(alpha: 0.2),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
+  const _OnboardingSlide({
+    required this.page,
+    required this.index,
+    required this.panelHeight,
+    required this.isCompact,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final size = MediaQuery.sizeOf(context);
+    final imageHeight = size.height - panelHeight + 52;
+
+    return Stack(
+      fit: StackFit.expand,
+      children: [
+        Positioned(
+          top: 0,
+          left: 0,
+          right: 0,
+          height: imageHeight,
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              Image.asset(
+                page.image,
+                fit: BoxFit.cover,
+                alignment: Alignment.topCenter,
+              )
+                  .animate(key: ValueKey('image_$index'))
+                  .fadeIn(duration: 500.ms)
+                  .scale(begin: const Offset(1.04, 1.04), end: const Offset(1, 1)),
+              DecoratedBox(
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                    colors: [
+                      Colors.black.withValues(alpha: 0.08),
+                      Colors.black.withValues(alpha: 0.08),
+                      CouleursApp.fond.withValues(alpha: 0.98),
+                    ],
+                    stops: const [0, 0.58, 1],
                   ),
                 ),
-
-                // Next Button
-                GestureDetector(
-                  onTap: _pageSuivante,
-                  child: AnimatedContainer(
-                    duration: const Duration(milliseconds: 300),
-                    height: 60,
-                    width: _pageActuelle == _pages.length - 1 ? 160 : 60,
-                    decoration: BoxDecoration(
-                      color: CouleursApp.primaire,
-                      borderRadius: BorderRadius.circular(30),
-                      boxShadow: [
-                        BoxShadow(
-                          color: CouleursApp.primaire.withValues(alpha: 0.4),
-                          blurRadius: 15,
-                          offset: const Offset(0, 8),
-                        ),
-                      ],
-                    ),
-                    child: Center(
-                      child: _pageActuelle == _pages.length - 1
-                          ? const Text(
-                              "Commencer",
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            )
-                          : const Icon(
-                              Icons.arrow_forward_ios,
-                              color: Colors.white,
-                            ),
-                    ),
-                  ),
+              ),
+            ],
+          ),
+        ),
+        Positioned(
+          left: 0,
+          right: 0,
+          bottom: 0,
+          height: panelHeight,
+          child: Container(
+            padding: EdgeInsets.fromLTRB(24, isCompact ? 24 : 32, 24, 112),
+            decoration: BoxDecoration(
+              color: CouleursApp.fond.withValues(alpha: 0.96),
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(34)),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.82)),
+              boxShadow: [
+                BoxShadow(
+                  color: CouleursApp.ombre.withValues(alpha: 0.18),
+                  blurRadius: 34,
+                  offset: const Offset(0, -14),
                 ),
               ],
             ),
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 560),
+              child: SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Wrap(
+                      crossAxisAlignment: WrapCrossAlignment.center,
+                      spacing: 12,
+                      runSpacing: 8,
+                      children: [
+                        Container(
+                          width: 48,
+                          height: 48,
+                          decoration: BoxDecoration(
+                            gradient: LinearGradient(
+                              colors: [
+                                page.couleur,
+                                page.couleur.withValues(alpha: 0.68),
+                              ],
+                              begin: Alignment.topLeft,
+                              end: Alignment.bottomRight,
+                            ),
+                            borderRadius: BorderRadius.circular(16),
+                            boxShadow: [
+                              BoxShadow(
+                                color: page.couleur.withValues(alpha: 0.22),
+                                blurRadius: 18,
+                                offset: const Offset(0, 8),
+                              ),
+                            ],
+                          ),
+                          child: Icon(page.icone, color: Colors.white),
+                        ),
+                        BadgeVerre(
+                          color: Colors.white.withValues(alpha: 0.72),
+                          child: Text(
+                            'Etape ${index + 1} / 3',
+                            style: TextStyle(
+                              color: page.couleur,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w800,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ).animate(key: ValueKey('badge_$index')).fadeIn().slideX(begin: -0.12),
+                    SizedBox(height: isCompact ? 18 : 24),
+                    Text(
+                      page.titre,
+                      maxLines: 3,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: isCompact ? 25 : 29,
+                        fontWeight: FontWeight.w900,
+                        color: CouleursApp.textePrincipal,
+                        height: 1.13,
+                      ),
+                    )
+                        .animate(key: ValueKey('titre_$index'))
+                        .fadeIn(delay: 120.ms)
+                        .slideY(begin: 0.18, curve: Curves.easeOutCubic),
+                    const SizedBox(height: 14),
+                    Text(
+                      page.description,
+                      maxLines: 4,
+                      overflow: TextOverflow.ellipsis,
+                      style: const TextStyle(
+                        fontSize: 15,
+                        height: 1.58,
+                        color: CouleursApp.texteSecondaire,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    )
+                        .animate(key: ValueKey('desc_$index'))
+                        .fadeIn(delay: 230.ms)
+                        .slideY(begin: 0.14, curve: Curves.easeOutCubic),
+                  ],
+                ),
+              ),
+            ),
           ),
-        ],
-      ),
+        ),
+      ],
     );
   }
 }
@@ -253,10 +354,14 @@ class _PageOnboarding {
   final String image;
   final String titre;
   final String description;
+  final Color couleur;
+  final IconData icone;
 
   _PageOnboarding({
     required this.image,
     required this.titre,
     required this.description,
+    required this.couleur,
+    required this.icone,
   });
 }

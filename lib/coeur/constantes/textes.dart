@@ -1,11 +1,11 @@
-/// =======================================================
-///
-/// FICHIER : textes.dart
-/// PROJET : TransConnect Cameroun
-///
-/// Tous les textes statiques de l'application.
-///
-/// =======================================================
+// =======================================================
+//
+// FICHIER : textes.dart
+// PROJET : TransConnect Cameroun
+//
+// Tous les textes statiques de l'application.
+//
+// =======================================================
 
 class TextesApp {
   TextesApp._();

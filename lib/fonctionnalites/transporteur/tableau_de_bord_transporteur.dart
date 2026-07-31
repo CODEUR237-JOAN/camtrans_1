@@ -2,13 +2,16 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 
 import '../../coeur/constantes/couleurs.dart';
 import '../../coeur/constantes/tailles.dart';
 import '../../coeur/widgets/carte_information.dart';
+import '../../coeur/widgets/effets_visuels.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../coeur/constantes/statuts.dart';
 import '../../coeur/etat/transporteur_provider.dart';
 import '../../services/service_authentification.dart';
 import '../../modeles/course.dart';
@@ -16,6 +19,7 @@ import 'courses_disponibles.dart';
 import 'navigation.dart';
 import '../notifications/notifications.dart';
 import 'profil.dart';
+import '../../coeur/widgets/page_responsive.dart';
 
 class TableauDeBordTransporteur extends ConsumerStatefulWidget {
   const TableauDeBordTransporteur({super.key});
@@ -27,26 +31,45 @@ class TableauDeBordTransporteur extends ConsumerStatefulWidget {
 class _TableauDeBordTransporteurState extends ConsumerState<TableauDeBordTransporteur> {
   int indexNavigation = 0;
   bool estDisponible = true;
+  bool _chargementDisponibilite = false;
+
+  @override
+  void initState() {
+    super.initState();
+    // Charger la disponibilité depuis Firestore au démarrage
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final transporteurAsync = ref.read(currentTransporteurProvider);
+      transporteurAsync.whenData((t) {
+        if (t != null && mounted) {
+          setState(() => estDisponible = t.disponible);
+        }
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     final statsRevenus = ref.watch(statsRevenusProvider);
     final mesCoursesAsync = ref.watch(fluxMesCoursesProvider);
+    final transporteurAsync = ref.watch(currentTransporteurProvider);
+    final documentsValides = transporteurAsync.valueOrNull?.documentsValides ?? false;
 
     return Scaffold(
       backgroundColor: CouleursApp.fond,
       bottomNavigationBar: _buildBottomNav().animate().slideY(begin: 1, end: 0, delay: 500.ms, duration: 400.ms),
-      body: SafeArea(
-        child: IndexedStack(
-          index: indexNavigation,
-          children: [
+      body: FondPremiumAnime(
+        safeArea: true,
+        child: PageResponsive(
+          child: IndexedStack(
+            index: indexNavigation,
+            children: [
             // 0: Accueil
             RefreshIndicator(
               onRefresh: () async {
                 ref.invalidate(fluxMesCoursesProvider);
                 ref.invalidate(fluxMesRevenusProvider);
               },
-              child: _buildDashboardAccueil(statsRevenus, mesCoursesAsync),
+              child: _buildDashboardAccueil(statsRevenus, mesCoursesAsync, documentsValides),
             ),
             // 1: Demandes
             const CoursesDisponibles(),
@@ -58,19 +81,51 @@ class _TableauDeBordTransporteurState extends ConsumerState<TableauDeBordTranspo
             const ProfilTransporteur(),
           ],
         ),
+        ),
       ),
     );
   }
 
-  Widget _buildDashboardAccueil(Map<String, double> statsRevenus, AsyncValue<List<Course>> mesCoursesAsync) {
+  Widget _buildDashboardAccueil(Map<String, double> statsRevenus, AsyncValue<List<Course>> mesCoursesAsync, bool documentsValides) {
     final utilisateur = ref.watch(serviceAuthentificationProvider).utilisateur;
     final nomAffichage = utilisateur?.displayName ?? "Transporteur";
 
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(TaillesApp.margePage),
+      padding: EdgeInsets.all(TaillesApp.margePage),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          // BANNIERE DE VALIDATION
+          if (!documentsValides)
+            Container(
+              margin: const EdgeInsets.only(bottom: 20),
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                color: Colors.red.shade50,
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: Colors.red.shade200),
+              ),
+              child: Row(
+                children: [
+                  Icon(Icons.warning_amber_rounded, color: Colors.red.shade700, size: 32),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text("Compte en attente de validation", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.red.shade900)),
+                        const SizedBox(height: 4),
+                        Text(
+                          "Vos documents sont en cours d'examen par l'administration. Vous ne pouvez pas encore accepter de courses.",
+                          style: TextStyle(fontSize: 12, color: Colors.red.shade700),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ).animate().fadeIn().slideY(begin: -0.2),
+
           // HEADER
               Row(
                 children: [
@@ -87,7 +142,7 @@ class _TableauDeBordTransporteurState extends ConsumerState<TableauDeBordTranspo
                     ),
                     child: CircleAvatar(
                       radius: 28,
-                      backgroundColor: Colors.orange.withOpacity(0.1),
+                      backgroundColor: Colors.orange.withValues(alpha: 0.1),
                       backgroundImage: utilisateur?.photoURL != null ? NetworkImage(utilisateur!.photoURL!) : null,
                       child: utilisateur?.photoURL == null ? const Icon(Iconsax.truck_fast_copy, color: Colors.orange, size: 28) : null,
                     ),
@@ -97,29 +152,48 @@ class _TableauDeBordTransporteurState extends ConsumerState<TableauDeBordTranspo
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text(
+                        Text(
                           "Bienvenue,",
-                          style: TextStyle(color: CouleursApp.texteSecondaire, fontSize: 14),
+                          style: GoogleFonts.inter(color: CouleursApp.texteSecondaire, fontSize: 14),
                         ),
                         const SizedBox(height: 2),
                         Text(
                           nomAffichage,
-                          style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, letterSpacing: -0.5),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: GoogleFonts.inter(fontSize: 22, fontWeight: FontWeight.w700, letterSpacing: -0.5, color: Theme.of(context).brightness == Brightness.dark ? Colors.white : CouleursApp.textePrincipal),
                         ),
                       ],
                     ),
                   ).animate().fadeIn(delay: 200.ms).slideX(begin: -0.1),
                   Switch(
-                    value: estDisponible,
+                    value: documentsValides ? estDisponible : false,
                     activeThumbColor: Colors.white,
                     activeTrackColor: Colors.green,
                     inactiveThumbColor: Colors.white,
                     inactiveTrackColor: Colors.grey.shade300,
-                    onChanged: (value) {
-                      setState(() {
-                        estDisponible = value;
-                      });
-                    },
+                    onChanged: (_chargementDisponibilite || !documentsValides)
+                        ? null
+                        : (value) async {
+                            setState(() {
+                              estDisponible = value;
+                              _chargementDisponibilite = true;
+                            });
+                            try {
+                              await ref
+                                  .read(transporteurActionsProvider)
+                                  .changerDisponibilite(value);
+                            } catch (_) {
+                              // Rollback si l'appel Firestore échoue
+                              if (mounted) {
+                                setState(() => estDisponible = !value);
+                              }
+                            } finally {
+                              if (mounted) {
+                                setState(() => _chargementDisponibilite = false);
+                              }
+                            }
+                          },
                   ).animate().scale(delay: 300.ms),
                 ],
               ),
@@ -143,14 +217,16 @@ class _TableauDeBordTransporteurState extends ConsumerState<TableauDeBordTranspo
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
+                    Text(
                       "Revenus du jour",
-                      style: TextStyle(color: Colors.white70, fontSize: 16),
+                      style: GoogleFonts.inter(color: Colors.white70, fontSize: 16, fontWeight: FontWeight.w500),
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      "${statsRevenus['total']?.toStringAsFixed(0)} FCFA",
-                      style: const TextStyle(color: Colors.white, fontSize: 34, fontWeight: FontWeight.w900, letterSpacing: -1),
+                      "${(statsRevenus['ceJour'] ?? 0).toStringAsFixed(0)} FCFA",
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: GoogleFonts.inter(color: Colors.white, fontSize: 34, fontWeight: FontWeight.w800, letterSpacing: -1.0),
                     ),
                     const SizedBox(height: 15),
                     Container(
@@ -170,7 +246,7 @@ class _TableauDeBordTransporteurState extends ConsumerState<TableauDeBordTranspo
                           const SizedBox(width: 8),
                           Text(
                             estDisponible ? "En ligne et disponible" : "Hors ligne",
-                            style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13),
+                            style: GoogleFonts.inter(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 13),
                           ),
                         ],
                       ),
@@ -182,9 +258,9 @@ class _TableauDeBordTransporteurState extends ConsumerState<TableauDeBordTranspo
               const SizedBox(height: 35),
 
               // STATISTIQUES
-              const Text(
+              Text(
                 "Statistiques",
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                style: GoogleFonts.inter(fontSize: 20, fontWeight: FontWeight.w700, letterSpacing: -0.5, color: Theme.of(context).brightness == Brightness.dark ? Colors.white : CouleursApp.textePrincipal),
               ).animate().fadeIn(delay: 500.ms),
               const SizedBox(height: 15),
 
@@ -199,8 +275,8 @@ class _TableauDeBordTransporteurState extends ConsumerState<TableauDeBordTranspo
                 ),
                 error: (err, _) => const SizedBox.shrink(),
                 data: (courses) {
-                  int livrees = courses.where((c) => c.statut == 'Livré').length;
-                  int enAttente = courses.where((c) => c.statut != 'Livré' && c.statut != 'Annulé').length;
+                  int livrees = courses.where((c) => c.statut == StatutCourse.livre || c.statut == StatutCourse.termine).length;
+                  int enAttente = courses.where((c) => StatutCourse.estActive(c.statut)).length;
                   
                   return Column(
                     children: [
@@ -235,9 +311,9 @@ class _TableauDeBordTransporteurState extends ConsumerState<TableauDeBordTranspo
               const SizedBox(height: 35),
 
               // ACTIONS RAPIDES
-              const Text(
+              Text(
                 "Actions rapides",
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                style: GoogleFonts.inter(fontSize: 20, fontWeight: FontWeight.w700, letterSpacing: -0.5, color: Theme.of(context).brightness == Brightness.dark ? Colors.white : CouleursApp.textePrincipal),
               ).animate().fadeIn(delay: 800.ms),
               const SizedBox(height: 15),
 
@@ -278,8 +354,8 @@ class _TableauDeBordTransporteurState extends ConsumerState<TableauDeBordTranspo
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const Text("Dernières courses", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-                  TextButton(onPressed: () {}, child: const Text("Voir tout", style: TextStyle(fontWeight: FontWeight.bold))),
+                  Text("Dernières courses", style: GoogleFonts.inter(fontSize: 20, fontWeight: FontWeight.w700, letterSpacing: -0.5, color: Theme.of(context).brightness == Brightness.dark ? Colors.white : CouleursApp.textePrincipal)),
+                  TextButton(onPressed: () {}, child: Text("Voir tout", style: GoogleFonts.inter(fontWeight: FontWeight.w600))),
                 ],
               ).animate().fadeIn(delay: 1300.ms),
               const SizedBox(height: 15),
@@ -402,3 +478,4 @@ class _TableauDeBordTransporteurState extends ConsumerState<TableauDeBordTranspo
     );
   }
 }
+

@@ -26,7 +26,7 @@ class _ParametresState extends State<Parametres> {
         title: const Text("Paramètres"),
       ),
       body: ListView(
-        padding: const EdgeInsets.all(
+        padding: EdgeInsets.all(
           TaillesApp.margePage,
         ),
         children: [

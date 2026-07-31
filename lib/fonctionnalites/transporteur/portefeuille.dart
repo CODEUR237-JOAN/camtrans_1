@@ -20,7 +20,7 @@ class Portefeuille extends ConsumerWidget {
         title: const Text("Mon portefeuille"),
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(TaillesApp.margePage),
+        padding: EdgeInsets.all(TaillesApp.margePage),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

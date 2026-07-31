@@ -5,9 +5,9 @@ import '../../services/service_firestore.dart';
 
 /// Stream des notifications de l'utilisateur connecté depuis Firestore
 final fluxNotificationsProvider = StreamProvider.autoDispose<List<NotificationApp>>((ref) {
-  final auth = ref.watch(serviceAuthentificationProvider);
+  final authState = ref.watch(authStateProvider);
   final firestore = ref.watch(serviceFirestoreProvider);
-  final userId = auth.utilisateur?.uid;
+  final userId = authState.value?.uid;
 
   if (userId == null) return Stream.value([]);
 

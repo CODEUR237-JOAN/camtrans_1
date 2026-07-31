@@ -34,7 +34,7 @@ class IndicateurChargement extends StatelessWidget {
         ),
 
         if (message != null) ...[
-          const SizedBox(
+          SizedBox(
             height: TaillesApp.espaceGrand,
           ),
           Text(
@@ -58,7 +58,7 @@ class IndicateurChargement extends StatelessWidget {
 
     return Center(
       child: Container(
-        padding: const EdgeInsets.all(
+        padding: EdgeInsets.all(
           TaillesApp.espaceGrand,
         ),
         decoration: BoxDecoration(

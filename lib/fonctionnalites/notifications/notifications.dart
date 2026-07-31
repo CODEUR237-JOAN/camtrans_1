@@ -40,7 +40,7 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
         ],
       ),
       body: Padding(
-        padding: const EdgeInsets.all(TaillesApp.margePage),
+        padding: EdgeInsets.all(TaillesApp.margePage),
         child: Column(
           children: [
             SizedBox(
@@ -129,11 +129,11 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(18),
-        side: BorderSide(color: notification.lue ? Colors.grey.shade100 : couleur.withOpacity(0.2)),
+        side: BorderSide(color: notification.lue ? Colors.grey.shade100 : couleur.withValues(alpha: 0.2)),
       ),
       child: ListTile(
         leading: CircleAvatar(
-          backgroundColor: couleur.withOpacity(0.1),
+          backgroundColor: couleur.withValues(alpha: 0.1),
           child: Icon(icone, color: couleur, size: 20),
         ),
         title: Text(

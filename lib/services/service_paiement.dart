@@ -1,3 +1,4 @@
+import '../../coeur/constantes/statuts.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../modeles/paiement.dart';
 import 'service_firestore.dart';
@@ -104,7 +105,7 @@ class ServicePaiement {
       devise: "FCFA",
       methodePaiement: methode,
       numeroTransaction: transaction,
-      statut: "Succès",
+      statut: StatutPaiement.succes,
       datePaiement: DateTime.now(),
       paiementConfirme: true,
       reference: "Ref-$courseId",

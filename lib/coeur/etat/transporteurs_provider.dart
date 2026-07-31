@@ -2,7 +2,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../modeles/transporteur.dart';
 import '../../services/service_firestore.dart';
 
-final transporteursDisponiblesProvider = StreamProvider<List<Transporteur>>((ref) {
+final transporteursDisponiblesProvider = StreamProvider.autoDispose<List<Transporteur>>((ref) {
   final firestoreService = ref.watch(serviceFirestoreProvider);
   
   return firestoreService.fluxTransporteursDisponibles().map((snapshot) {

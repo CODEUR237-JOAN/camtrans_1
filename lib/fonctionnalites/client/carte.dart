@@ -7,7 +7,6 @@ import 'package:flutter_animate/flutter_animate.dart';
 
 import '../../coeur/constantes/couleurs.dart';
 import '../../coeur/etat/carte_provider.dart';
-import '../../services/cache_tile_provider.dart';
 import '../../services/service_gps.dart';
 import 'widgets/couche_transporteurs.dart';
 
@@ -138,8 +137,8 @@ class _VueCarteState extends ConsumerState<VueCarte> with TickerProviderStateMix
                     children: [
                       TileLayer(
                         urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                        userAgentPackageName: 'com.camtrans.update_camtrans',
-                        tileProvider: CachedTileProvider(),
+                        userAgentPackageName: 'com.joan.update_camtrans',
+                        // Utilisation du provider par défaut pour éviter l'erreur "Client already closed"
                       ),
                       const CoucheTransporteurs(),
                       if (etatCarte.positionActuelle != null)

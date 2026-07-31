@@ -50,12 +50,11 @@ class _SuiviTransportState extends ConsumerState<SuiviTransport> {
     final LatLng depart = LatLng(course.latitudeDepart, course.longitudeDepart);
     final LatLng arrivee = LatLng(course.latitudeArrivee, course.longitudeArrivee);
     
-    LatLng? posTransporteur;
-    if (transporteur != null && transporteur.latitude != 0 && transporteur.longitude != 0) {
+    LatLng posTransporteur = depart;
+    if (etatSuivi.positionTransporteurSimule != null) {
+      posTransporteur = etatSuivi.positionTransporteurSimule!;
+    } else if (transporteur != null && transporteur.latitude != 0 && transporteur.longitude != 0) {
       posTransporteur = LatLng(transporteur.latitude, transporteur.longitude);
-    } else {
-      // Mockup de la position si le transporteur n'a pas mis à jour ses coordonnées
-      posTransporteur = depart;
     }
 
     return Scaffold(
@@ -66,6 +65,7 @@ class _SuiviTransportState extends ConsumerState<SuiviTransport> {
             depart: depart,
             arrivee: arrivee,
             transporteur: posTransporteur,
+            route: etatSuivi.infoTrajet?.points,
             onMapCreated: (ctrl) => _mapController = ctrl,
           ),
 
@@ -89,7 +89,15 @@ class _SuiviTransportState extends ConsumerState<SuiviTransport> {
               top: MediaQuery.of(context).padding.top + 70,
               left: 20,
               right: 20,
-              child: _buildTransporteurInfo(transporteur.nom, transporteur.typeVehicule),
+              child: Column(
+                children: [
+                  _buildTransporteurInfo(transporteur.nom, transporteur.typeVehicule),
+                  if (etatSuivi.distanceRestante > 0)
+                    const SizedBox(height: 12),
+                  if (etatSuivi.distanceRestante > 0)
+                    _buildInfosTrajet(etatSuivi.distanceRestante, etatSuivi.tempsRestantSeconds),
+                ],
+              ),
             ),
 
           // 5. BOTTOM SHEET TIMELINE
@@ -134,6 +142,40 @@ class _SuiviTransportState extends ConsumerState<SuiviTransport> {
         child: const Icon(Iconsax.location_copy, color: CouleursApp.primaire),
       ),
     );
+  }
+
+  Widget _buildInfosTrajet(double distanceMetres, double tempsSecondes) {
+    final distKm = (distanceMetres / 1000).toStringAsFixed(1);
+    final min = (tempsSecondes / 60).ceil();
+    
+    return Container(
+      padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+      decoration: BoxDecoration(
+        color: CouleursApp.primaire.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: CouleursApp.primaire.withValues(alpha: 0.3)),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          Row(
+            children: [
+              const Icon(Icons.route, color: CouleursApp.primaire, size: 20),
+              const SizedBox(width: 8),
+              Text("$distKm km", style: const TextStyle(fontWeight: FontWeight.bold, color: CouleursApp.primaire)),
+            ],
+          ),
+          Container(width: 1, height: 24, color: CouleursApp.primaire.withValues(alpha: 0.3)),
+          Row(
+            children: [
+              const Icon(Icons.timer, color: CouleursApp.succes, size: 20),
+              const SizedBox(width: 8),
+              Text("$min min", style: const TextStyle(fontWeight: FontWeight.bold, color: CouleursApp.succes)),
+            ],
+          ),
+        ],
+      ),
+    ).animate().fadeIn();
   }
 
   Widget _buildTransporteurInfo(String nom, String vehicule) {

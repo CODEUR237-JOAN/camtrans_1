@@ -21,6 +21,8 @@ import 'profil.dart';
 import '../../coeur/etat/notification_provider.dart';
 
 import '../../coeur/constantes/couleurs.dart';
+import '../../coeur/constantes/statuts.dart';
+import '../../coeur/widgets/page_responsive.dart';
 
 class TableauDeBordClient extends ConsumerStatefulWidget {
   const TableauDeBordClient({super.key});
@@ -42,8 +44,9 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
       floatingActionButton: _bottomNavIndex == 0 ? _buildIAAssistantFAB() : null,
       bottomNavigationBar: _buildBottomNav(),
       body: SafeArea(
-        child: IndexedStack(
-          index: _bottomNavIndex,
+        child: PageResponsive(
+          child: IndexedStack(
+            index: _bottomNavIndex,
           children: [
             // Onglet 0: Accueil (Tableau de bord dynamique)
             _buildDashboardAccueil(coursesAsync),
@@ -54,7 +57,7 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
             // Onglet 2: Suivi
             coursesAsync.when(
               data: (courses) {
-                final enCours = courses.where((c) => c.statut != "Livré" && c.statut != "Annulé").toList();
+                final enCours = courses.where((c) => !StatutCourse.estTerminee(c.statut)).toList();
                 if (enCours.isEmpty) {
                   return Container(
                     color: Colors.white,
@@ -89,6 +92,7 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
             const Profil(),
           ],
         ),
+        ),
       ),
     );
   }
@@ -112,8 +116,8 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
             loading: () => SliverToBoxAdapter(child: _buildLoadingState()),
             error: (err, stack) => SliverToBoxAdapter(child: _buildErrorState(err.toString())),
             data: (courses) {
-              final enCours = courses.where((c) => c.statut != "Livré" && c.statut != "Annulé").toList();
-              final livrees = courses.where((c) => c.statut == "Livré").toList();
+              final enCours = courses.where((c) => !StatutCourse.estTerminee(c.statut)).toList();
+              final livrees = courses.where((c) => c.statut == StatutCourse.livre || c.statut == StatutCourse.termine).toList();
               
               double depenses = livrees.fold(0, (sum, c) => sum + c.prixFinal);
               if (depenses == 0) {
@@ -126,7 +130,7 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
                   if (courses.isEmpty) _buildEmptyState(),
                   if (enCours.isNotEmpty) _buildActiveShipment(enCours.first),
                   if (enCours.isNotEmpty) _buildMiniMap(enCours.first),
-                  if (courses.isNotEmpty) _buildHistoryList(courses.where((c) => c.statut == "Livré" || c.statut == "Annulé").toList()),
+                  if (courses.isNotEmpty) _buildHistoryList(courses.where((c) => StatutCourse.estTerminee(c.statut)).toList()),
                   const SizedBox(height: 100),
                 ]),
               );
@@ -170,11 +174,11 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
                 children: [
                   Text(
                     "Bienvenue, $nomAffichage",
-                    style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: CouleursApp.textePrincipal),
+                    style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: CouleursApp.textePrincipal),
                   ).animate().fadeIn(delay: 200.ms).slideX(),
                   const Text(
                     "Prêt à expédier aujourd'hui ?",
-                    style: TextStyle(fontSize: 13, color: CouleursApp.texteSecondaire),
+                    style: TextStyle(fontSize: 14, color: CouleursApp.texteSecondaire),
                   ).animate().fadeIn(delay: 300.ms),
                 ],
               ),
@@ -240,7 +244,7 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
             child: TextField(
               decoration: InputDecoration(
                 hintText: "Où souhaitez-vous expédier ?",
-                hintStyle: TextStyle(color: CouleursApp.texteSecondaire.withValues(alpha: 0.7)),
+                hintStyle: TextStyle(color: CouleursApp.texteSecondaire.withValues(alpha: 0.8), fontSize: 15),
                 prefixIcon: const Icon(Iconsax.location_copy, color: CouleursApp.primaire),
                 suffixIcon: Container(
                   margin: const EdgeInsets.all(6),
@@ -307,7 +311,7 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
                       ),
                       child: const Text(
                         "Réservez un camion en 2 min",
-                        style: TextStyle(color: Colors.white, fontSize: 12),
+                        style: TextStyle(color: Colors.white, fontSize: 13),
                       ),
                     ),
                   ],
@@ -359,7 +363,7 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
                   child: Icon(s['icon'] as IconData, color: s['color'] as Color, size: 28),
                 ).animate(onPlay: (controller) => controller.repeat(reverse: true)).moveY(begin: 0, end: -3, duration: 1.5.seconds).scale(delay: 600.ms),
                 const SizedBox(height: 8),
-                Text(s['title'] as String, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 12, color: CouleursApp.textePrincipal))
+                Text(s['title'] as String, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13, color: CouleursApp.textePrincipal))
               ],
             ),
           );
@@ -393,7 +397,7 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
 
   Widget _buildStatCard(String title, String value, IconData icon, Color color) {
     return Container(
-      width: 140,
+      width: 155,
       padding: const EdgeInsets.all(15),
       decoration: BoxDecoration(
         color: CouleursApp.surface,
@@ -408,12 +412,12 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Icon(icon, color: color, size: 22),
-              Text(value, style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: color)),
+              Icon(icon, color: color, size: 24),
+              Text(value, style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: color)),
             ],
           ),
           const Spacer(),
-          Text(title, style: const TextStyle(fontSize: 13, color: CouleursApp.texteSecondaire, fontWeight: FontWeight.w600)),
+          Text(title, style: const TextStyle(fontSize: 14, color: CouleursApp.texteSecondaire, fontWeight: FontWeight.w600)),
         ],
       ),
     );
@@ -423,7 +427,7 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
   // LIVRAISON EN COURS (TIMELINE)
   // ==========================================
   Widget _buildActiveShipment(Course course) {
-    bool isTransit = course.statut == "En Transit" || course.statut == "En cours";
+    bool isTransit = StatutCourse.estActive(course.statut);
     return Padding(
       padding: const EdgeInsets.all(20),
       child: Container(
@@ -439,11 +443,11 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                const Text("Expédition Active", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: CouleursApp.textePrincipal)),
+                const Text("Expédition Active", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: CouleursApp.textePrincipal)),
                 Container(
                   padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(color: CouleursApp.avertissement.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(20)),
-                  child: Text(course.statut, style: const TextStyle(color: CouleursApp.avertissement, fontWeight: FontWeight.bold, fontSize: 12)),
+                  child: Text(course.statut, style: const TextStyle(color: CouleursApp.avertissement, fontWeight: FontWeight.bold, fontSize: 13)),
                 )
               ],
             ),
@@ -463,15 +467,15 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text("Départ", style: TextStyle(color: CouleursApp.texteSecondaire, fontSize: 12)),
-                    Text(course.adresseDepart.isNotEmpty ? course.adresseDepart : "Inconnu", style: const TextStyle(fontWeight: FontWeight.bold)),
+                    const Text("Départ", style: TextStyle(color: CouleursApp.texteSecondaire, fontSize: 13)),
+                    Text(course.adresseDepart.isNotEmpty ? course.adresseDepart : "Inconnu", style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
                   ],
                 ),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    const Text("Arrivée", style: TextStyle(color: CouleursApp.texteSecondaire, fontSize: 12)),
-                    Text(course.adresseArrivee.isNotEmpty ? course.adresseArrivee : "Inconnu", style: const TextStyle(fontWeight: FontWeight.bold)),
+                    const Text("Arrivée", style: TextStyle(color: CouleursApp.texteSecondaire, fontSize: 13)),
+                    Text(course.adresseArrivee.isNotEmpty ? course.adresseArrivee : "Inconnu", style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
                   ],
                 ),
               ],
@@ -563,12 +567,16 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text("Historique Récent", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: CouleursApp.textePrincipal)),
-              TextButton(onPressed: () {}, child: const Text("Voir tout", style: TextStyle(color: CouleursApp.primaire))),
+              const Text("Historique Récent", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: CouleursApp.textePrincipal)),
+              TextButton(onPressed: () {}, child: const Text("Voir tout", style: TextStyle(color: CouleursApp.primaire, fontSize: 14))),
             ],
           ),
           ...courses.take(3).map<Widget>((course) {
-            Color statusColor = course.statut == "Livré" ? CouleursApp.succes : CouleursApp.erreur;
+            Color statusColor = (course.statut == StatutCourse.livre || course.statut == StatutCourse.termine)
+                ? CouleursApp.succes
+                : course.statut == StatutCourse.annulee
+                    ? CouleursApp.erreur
+                    : CouleursApp.avertissement;
             return Container(
               margin: const EdgeInsets.only(bottom: 15),
               padding: const EdgeInsets.all(15),
@@ -589,21 +597,21 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(course.description.isNotEmpty ? course.description : "Marchandise", style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+                        Text(course.description.isNotEmpty ? course.description : "Marchandise", style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                         const SizedBox(height: 4),
-                        Text("${course.adresseDepart} ➔ ${course.adresseArrivee}", style: const TextStyle(fontSize: 12, color: CouleursApp.texteSecondaire), overflow: TextOverflow.ellipsis),
+                        Text("${course.adresseDepart} ➔ ${course.adresseArrivee}", style: const TextStyle(fontSize: 13, color: CouleursApp.texteSecondaire), overflow: TextOverflow.ellipsis),
                       ],
                     ),
                   ),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
-                      Text("${course.prixEstime} FCFA", style: const TextStyle(fontWeight: FontWeight.bold, color: CouleursApp.textePrincipal)),
+                      Text("${course.prixEstime} FCFA", style: const TextStyle(fontWeight: FontWeight.bold, color: CouleursApp.textePrincipal, fontSize: 14)),
                       const SizedBox(height: 5),
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                         decoration: BoxDecoration(color: statusColor.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(8)),
-                        child: Text(course.statut, style: TextStyle(color: statusColor, fontSize: 10, fontWeight: FontWeight.bold)),
+                        child: Text(StatutCourse.libelle(course.statut), style: TextStyle(color: statusColor, fontSize: 12, fontWeight: FontWeight.bold)),
                       )
                     ],
                   )
@@ -736,8 +744,8 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
             selectedItemColor: CouleursApp.primaire,
             unselectedItemColor: CouleursApp.texteSecondaire,
             showUnselectedLabels: true,
-            selectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
-            unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 11),
+            selectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+            unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 12),
             elevation: 0,
             items: const [
               BottomNavigationBarItem(icon: Icon(Iconsax.home_2_copy), activeIcon: Icon(Iconsax.home_2), label: "Accueil", tooltip: "Retourner à l'accueil"),

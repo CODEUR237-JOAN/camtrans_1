@@ -1,4 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../../coeur/constantes/statuts.dart';
 import '../../services/service_firestore.dart';
 import '../../modeles/client.dart';
 import '../../modeles/transporteur.dart';
@@ -74,7 +75,7 @@ final adminStatsProvider = Provider.autoDispose<AsyncValue<AdminStats>>((ref) {
   // Calcul des revenus réels à partir des courses livrées
   double revenus = 0;
   for (var course in courses) {
-    if (course.statut == 'Livré' || course.statut == 'livree') {
+    if (StatutCourse.estTerminee(course.statut) && course.statut != StatutCourse.annulee) {
       revenus += course.prixFinal > 0 ? course.prixFinal : course.prixEstime;
     }
   }
@@ -85,6 +86,34 @@ final adminStatsProvider = Provider.autoDispose<AsyncValue<AdminStats>>((ref) {
     totalCourses: courses.length,
     revenusTotaux: revenus,
   ));
+});
+
+// Répartition des courses par statut
+final adminCourseDistributionProvider = Provider.autoDispose<AsyncValue<Map<String, int>>>((ref) {
+  final coursesAsync = ref.watch(adminCoursesProvider);
+  return coursesAsync.whenData((courses) {
+    final Map<String, int> distribution = {};
+    for (var c in courses) {
+      distribution[c.statut] = (distribution[c.statut] ?? 0) + 1;
+    }
+    return distribution;
+  });
+});
+
+// Activités très récentes (5 dernières)
+final adminRecentActivitiesProvider = Provider.autoDispose<AsyncValue<List<Course>>>((ref) {
+  final coursesAsync = ref.watch(adminCoursesProvider);
+  return coursesAsync.whenData((courses) {
+    final sorted = List<Course>.from(courses);
+    sorted.sort((a, b) => b.dateCreation.compareTo(a.dateCreation));
+    return sorted.take(5).toList();
+  });
+});
+
+// Compteur de modération en attente
+final adminPendingApprovalsCountProvider = Provider.autoDispose<AsyncValue<int>>((ref) {
+  final transporteursAsync = ref.watch(adminTransporteursProvider);
+  return transporteursAsync.whenData((list) => list.where((t) => !t.documentsValides).length);
 });
 
 // Gère la navigation de l'administration
@@ -100,7 +129,7 @@ final adminWeeklyRevenuesProvider = Provider.autoDispose<AsyncValue<List<double>
       final now = DateTime.now();
 
       for (var course in courses) {
-        if (course.statut == 'Livré' || course.statut == 'livree') {
+        if (StatutCourse.estTerminee(course.statut) && course.statut != StatutCourse.annulee) {
           final diff = now.difference(course.dateCreation).inDays;
           if (diff >= 0 && diff < 7) {
             // Index 6 = aujourd'hui, 0 = il y a 6 jours

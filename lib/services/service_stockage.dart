@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -16,14 +17,14 @@ class ServiceStockage {
   }) async {
     try {
       final extensionFichier = fichier.path.split('.').last;
-      final ref = _storage.ref().child('$dossier/${nomFichier}.$extensionFichier');
+      final ref = _storage.ref().child('$dossier/$nomFichier.$extensionFichier');
       
       final uploadTask = await ref.putFile(fichier);
       final url = await uploadTask.ref.getDownloadURL();
       
       return url;
     } catch (e) {
-      print("Erreur lors de l'upload du fichier: $e");
+      debugPrint("Erreur lors de l'upload du fichier: $e");
       return null;
     }
   }
@@ -33,7 +34,7 @@ class ServiceStockage {
       final ref = _storage.refFromURL(url);
       await ref.delete();
     } catch (e) {
-      print("Erreur lors de la suppression du fichier: $e");
+      debugPrint("Erreur lors de la suppression du fichier: $e");
     }
   }
 }

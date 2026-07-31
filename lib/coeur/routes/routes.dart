@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../animations/transitions_page.dart';
+import '../constantes/couleurs.dart';
+import '../widgets/effets_visuels.dart';
+
 import '../../fonctionnalites/authentification/choix_profil.dart';
 import '../../fonctionnalites/authentification/connexion.dart';
 import '../../fonctionnalites/authentification/inscription_client.dart';
@@ -28,36 +32,21 @@ class RoutesApplication {
   // ===========================
 
   static const String splash = "/";
-
   static const String onboarding = "/onboarding";
-
   static const String connexion = "/connexion";
-
   static const String choixProfil = "/choix-profil";
-
   static const String inscriptionClient = "/inscription-client";
-
-  static const String inscriptionTransporteur =
-      "/inscription-transporteur";
-
-  static const String motDePasseOublie =
-      "/mot-de-passe-oublie";
-
-  static const String verificationEmail =
-      "/verification-email";
-
-  static const String tableauBordClient =
-      "/tableau-bord-client";
-
+  static const String inscriptionTransporteur = "/inscription-transporteur";
+  static const String motDePasseOublie = "/mot-de-passe-oublie";
+  static const String verificationEmail = "/verification-email";
+  static const String tableauBordClient = "/tableau-bord-client";
   static const String creerDemande = "/creer-demande";
   static const String carte = "/carte";
   static const String suivi = "/suivi";
+  static const String suiviAvecId = "/suivi/:courseId"; // Route paramétrée
   static const String historique = "/historique";
   static const String factures = "/factures";
-
-  static const String tableauBordTransporteur =
-      "/tableau-bord-transporteur";
-
+  static const String tableauBordTransporteur = "/tableau-bord-transporteur";
   static const String assistantIA = "/assistant-ia";
   static const String paiement = "/paiement";
   static const String admin = "/admin";
@@ -67,13 +56,10 @@ class RoutesApplication {
   // ===========================
 
   static CustomTransitionPage _page(Widget child, LocalKey? key) {
-    return CustomTransitionPage(
+    return SharedAxisTransition(
       key: key,
+      type: SharedAxisTransitionType.scaled,
       child: child,
-      transitionsBuilder: (context, animation, secondaryAnimation, child) {
-        return FadeTransition(opacity: animation, child: child);
-      },
-      transitionDuration: const Duration(milliseconds: 350),
     );
   }
 
@@ -128,9 +114,21 @@ class RoutesApplication {
         path: carte,
         pageBuilder: (context, state) => _page(const VueCarte(), state.pageKey),
       ),
+      // Route de suivi sans ID (mode démo)
       GoRoute(
         path: suivi,
-        pageBuilder: (context, state) => _page(const SuiviTransport(courseId: ""), state.pageKey),
+        pageBuilder: (context, state) => _page(
+          const SuiviTransport(courseId: ""),
+          state.pageKey,
+        ),
+      ),
+      // Route de suivi avec l'ID réel de la course ✅
+      GoRoute(
+        path: suiviAvecId,
+        pageBuilder: (context, state) => _page(
+          SuiviTransport(courseId: state.pathParameters['courseId'] ?? ""),
+          state.pageKey,
+        ),
       ),
       GoRoute(
         path: historique,
@@ -148,11 +146,14 @@ class RoutesApplication {
         path: paiement,
         pageBuilder: (context, state) {
           final args = state.extra as Map<String, dynamic>? ?? {};
-          return _page(EcranPaiement(
-            courseId: args['courseId'] ?? 'demo_course_123',
-            montant: args['montant'] ?? 15000.0,
-            transporteurId: args['transporteurId'] ?? 'transp_456',
-          ), state.pageKey);
+          return _page(
+            EcranPaiement(
+              courseId: args['courseId'] ?? 'demo_course_123',
+              montant: (args['montant'] as num?)?.toDouble() ?? 15000.0,
+              transporteurId: args['transporteurId'] ?? 'transp_456',
+            ),
+            state.pageKey,
+          );
         },
       ),
       GoRoute(
@@ -161,8 +162,47 @@ class RoutesApplication {
       ),
     ],
     errorBuilder: (context, state) => Scaffold(
-      appBar: AppBar(title: const Text("Erreur")),
-      body: const Center(child: Text("Cette page n'existe pas.")),
+      body: FondPremiumAnime(
+        safeArea: true,
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(24),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    gradient: CouleursApp.degradeErreur,
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(
+                        color: CouleursApp.erreur.withValues(alpha: 0.24),
+                        blurRadius: 24,
+                        spreadRadius: 2,
+                      ),
+                    ],
+                  ),
+                  child: const Icon(Icons.route_outlined, color: Colors.white, size: 42),
+                ),
+                const SizedBox(height: 24),
+                const Text(
+                  "Page introuvable",
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.w800),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  "Cette destination n'existe pas encore.",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: CouleursApp.texteSecondaire.withValues(alpha: 0.9),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
     ),
   );
 }

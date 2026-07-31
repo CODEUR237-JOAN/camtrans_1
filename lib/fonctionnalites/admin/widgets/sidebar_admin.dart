@@ -12,13 +12,12 @@ class SidebarAdmin extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final indexSelectionne = ref.watch(adminMenuIndexProvider);
+    final pendingCount = ref.watch(adminPendingApprovalsCountProvider).valueOrNull ?? 0;
     final width = MediaQuery.of(context).size.width;
     final isDesktop = width > 900;
 
-    if (!isDesktop) {
-      return const SizedBox.shrink(); // Géré par un Drawer sur mobile
-    }
-
+    // La gestion Desktop/Mobile est faite dans le parent (TableauDeBordAdmin)
+    // Nous retournons toujours le contenu du menu ici.
     return Container(
       width: 250,
       decoration: BoxDecoration(
@@ -90,6 +89,7 @@ class SidebarAdmin extends ConsumerWidget {
                   icone: Icons.verified_user_outlined,
                   index: 2,
                   currentIndex: indexSelectionne,
+                  badge: pendingCount > 0 ? "$pendingCount" : null,
                   onTap: () => ref.read(adminMenuIndexProvider.notifier).state = 2,
                 ),
                 const SizedBox(height: 20),
@@ -152,6 +152,7 @@ class _MenuItem extends StatelessWidget {
   final IconData icone;
   final int index;
   final int currentIndex;
+  final String? badge;
   final VoidCallback onTap;
 
   const _MenuItem({
@@ -159,6 +160,7 @@ class _MenuItem extends StatelessWidget {
     required this.icone,
     required this.index,
     required this.currentIndex,
+    this.badge,
     required this.onTap,
   });
 
@@ -186,6 +188,19 @@ class _MenuItem extends StatelessWidget {
             fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
           ),
         ),
+        trailing: badge != null
+            ? Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                decoration: BoxDecoration(
+                  color: Colors.red,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Text(
+                  badge!,
+                  style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+                ),
+              )
+            : null,
         onTap: onTap,
       ),
     );

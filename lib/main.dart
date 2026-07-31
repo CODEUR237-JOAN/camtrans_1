@@ -9,23 +9,41 @@ import 'firebase_options.dart';
 import 'principal.dart';
 
 Future<void> main() async {
-  WidgetsFlutterBinding.ensureInitialized();
+  try {
+    WidgetsFlutterBinding.ensureInitialized();
+    debugPrint("🚀 Initialisation de l'application...");
 
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+    debugPrint("✅ Firebase initialisé");
 
-  await ServiceNotification.initialiser();
+    await ServiceNotification.initialiser();
+    debugPrint("✅ Notifications initialisées");
 
-  ServiceNotification.ecouterMessages();
+    ServiceNotification.ecouterMessages();
+    ServiceNotification.ecouterOuverture();
 
-  ServiceNotification.ecouterOuverture();
+    await dotenv.load(fileName: ".env");
+    debugPrint("✅ Configuration .env chargée");
 
-  await dotenv.load(fileName: ".env");
-
-  runApp(
-    const ProviderScope(
-      child: MonApplication(),
-    ),
-  );
+    runApp(
+      const ProviderScope(
+        child: MonApplication(),
+      ),
+    );
+  } catch (e, stack) {
+    debugPrint("❌ ERREUR FATALE LORS DU DÉMARRAGE:");
+    debugPrint(e.toString());
+    debugPrint(stack.toString());
+    
+    // Afficher une interface d'erreur minimale si l'app crash au démarrage
+    runApp(MaterialApp(
+      home: Scaffold(
+        body: Center(
+          child: Text("Erreur de démarrage : $e"),
+        ),
+      ),
+    ));
+  }
 }

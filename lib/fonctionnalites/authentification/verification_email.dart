@@ -5,6 +5,7 @@ import '../../coeur/constantes/couleurs.dart';
 import '../../coeur/constantes/tailles.dart';
 import '../../coeur/routes/routes.dart';
 import '../../coeur/widgets/bouton_principal.dart';
+import '../../coeur/widgets/page_responsive.dart';
 
 class VerificationEmail extends StatefulWidget {
   const VerificationEmail({super.key});
@@ -56,8 +57,9 @@ class _VerificationEmailState
         ),
       ),
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(
+        child: PageResponsive(
+          child: SingleChildScrollView(
+          padding: EdgeInsets.all(
             TaillesApp.margePage,
           ),
           child: Column(
@@ -178,6 +180,7 @@ class _VerificationEmailState
                 ),
               ),
             ],
+            ),
           ),
         ),
       ),

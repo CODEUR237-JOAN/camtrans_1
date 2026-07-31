@@ -90,7 +90,7 @@ class _ChoixVehiculeState extends State<ChoixVehicule> {
         children: [
           const SizedBox(height: 15),
 
-          const Padding(
+          Padding(
             padding: EdgeInsets.symmetric(
               horizontal: TaillesApp.margePage,
             ),
@@ -107,7 +107,7 @@ class _ChoixVehiculeState extends State<ChoixVehicule> {
 
           Expanded(
             child: ListView.builder(
-              padding: const EdgeInsets.all(
+              padding: EdgeInsets.all(
                 TaillesApp.margePage,
               ),
               itemCount: _vehicules.length,
@@ -239,7 +239,7 @@ class _ChoixVehiculeState extends State<ChoixVehicule> {
           ),
 
           Padding(
-            padding: const EdgeInsets.all(
+            padding: EdgeInsets.all(
               TaillesApp.margePage,
             ),
             child: BoutonPrincipal(

@@ -26,7 +26,7 @@ class Profil extends ConsumerWidget {
         automaticallyImplyLeading: false,
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(TaillesApp.margePage),
+        padding: EdgeInsets.all(TaillesApp.margePage),
         child: Column(
           children: [
             const SizedBox(height: 10),

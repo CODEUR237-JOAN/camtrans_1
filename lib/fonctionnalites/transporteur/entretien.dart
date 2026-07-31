@@ -64,7 +64,7 @@ class _EntretienState extends State<Entretien> {
         },
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(
+        padding: EdgeInsets.all(
           TaillesApp.margePage,
         ),
         child: Column(

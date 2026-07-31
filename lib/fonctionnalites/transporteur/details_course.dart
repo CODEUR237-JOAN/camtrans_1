@@ -16,7 +16,7 @@ class DetailsCourse extends StatelessWidget {
         title: const Text("Détails de la course"),
       ),
       body: SingleChildScrollView(
-        padding: const EdgeInsets.all(
+        padding: EdgeInsets.all(
           TaillesApp.margePage,
         ),
         child: Column(

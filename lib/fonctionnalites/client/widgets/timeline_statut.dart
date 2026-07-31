@@ -1,20 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import '../../../coeur/constantes/couleurs.dart';
+import '../../../coeur/constantes/statuts.dart';
 
 class TimelineStatut extends StatelessWidget {
   final String statutActuel;
 
   const TimelineStatut({super.key, required this.statutActuel});
 
-  // Liste ordonnée des statuts possibles
+  // Liste ordonnée des statuts possibles (correspond aux constantes StatutCourse)
   final List<String> _etapes = const [
-    "En attente",
-    "Acceptée",
-    "Chargement",
-    "En route",
-    "Arrivée",
-    "Livrée"
+    StatutCourse.enAttente,
+    StatutCourse.acceptee,
+    StatutCourse.enRoute,
+    StatutCourse.enTransit,
+    StatutCourse.livre,
+    StatutCourse.termine,
   ];
 
   @override
@@ -71,7 +72,7 @@ class TimelineStatut extends StatelessWidget {
               child: Padding(
                 padding: const EdgeInsets.only(top: 1),
                 child: Text(
-                  etape,
+                  StatutCourse.libelle(etape),
                   style: TextStyle(
                     fontSize: 15,
                     fontWeight: estActuel ? FontWeight.bold : FontWeight.normal,

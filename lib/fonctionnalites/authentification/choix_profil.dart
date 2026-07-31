@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../coeur/constantes/couleurs.dart';
 import '../../coeur/constantes/tailles.dart';
 import '../../coeur/routes/routes.dart';
+import '../../coeur/widgets/effets_visuels.dart';
 
 class ChoixProfil extends StatelessWidget {
   const ChoixProfil({super.key});
@@ -13,80 +14,132 @@ class ChoixProfil extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: CouleursApp.fond,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: CouleursApp.textePrincipal),
-          onPressed: () => context.pop(),
-        ),
-      ),
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: TaillesApp.margePage),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 10),
-              const Text(
-                "Comment souhaitez-vous\nutiliser Camtrans ?",
-                style: TextStyle(
-                  fontSize: 28,
-                  fontWeight: FontWeight.w900,
-                  color: CouleursApp.textePrincipal,
-                  height: 1.2,
-                  letterSpacing: -0.5,
-                ),
-              ).animate().fadeIn(delay: 100.ms).slideY(begin: 0.2, end: 0),
-              
-              const SizedBox(height: 15),
-              
-              const Text(
-                "Choisissez le profil qui correspond à vos besoins.",
-                style: TextStyle(
-                  fontSize: 16,
-                  color: CouleursApp.texteSecondaire,
-                ),
-              ).animate().fadeIn(delay: 200.ms).slideY(begin: 0.2, end: 0),
-
-              const SizedBox(height: 40),
-
-              // Carte Client
-              _creerCarteProfil(
-                context,
-                titre: "Client / Expéditeur",
-                description: "Je veux expédier des colis, meubles ou marchandises à travers le pays.",
-                icone: Icons.inventory_2_outlined,
-                couleur: CouleursApp.primaire,
-                routeDest: RoutesApplication.inscriptionClient,
-                delay: 300,
+      body: FondPremiumAnime(
+        safeArea: true,
+        child: Column(
+          children: [
+            Padding(
+              padding: const EdgeInsets.fromLTRB(8, 4, 20, 0),
+              child: Row(
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.arrow_back_rounded),
+                    color: CouleursApp.textePrincipal,
+                    onPressed: () => context.pop(),
+                    tooltip: 'Retour',
+                  ),
+                  const Spacer(),
+                  BadgeVerre(
+                    color: Colors.white.withValues(alpha: 0.72),
+                    child: const Text(
+                      'Inscription',
+                      style: TextStyle(
+                        color: CouleursApp.textePrincipal,
+                        fontWeight: FontWeight.w800,
+                        fontSize: 12,
+                      ),
+                    ),
+                  ),
+                ],
               ),
-
-              const SizedBox(height: 25),
-
-              // Carte Transporteur
-              _creerCarteProfil(
-                context,
-                titre: "Transporteur / Chauffeur",
-                description: "Je possède un véhicule et je souhaite trouver des courses et rentabiliser mes trajets.",
-                icone: Icons.local_shipping_outlined,
-                couleur: Colors.orange,
-                routeDest: RoutesApplication.inscriptionTransporteur,
-                delay: 400,
-              ),
-              
-              const Spacer(),
-              
-              Center(
-                child: TextButton(
-                  onPressed: () => context.go(RoutesApplication.connexion),
-                  child: const Text("J'ai déjà un compte. Se connecter", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+            ),
+            Expanded(
+              child: SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
+                padding: EdgeInsets.fromLTRB(
+                  TaillesApp.margePage,
+                  16,
+                  TaillesApp.margePage,
+                  24,
                 ),
-              ).animate().fadeIn(delay: 600.ms),
-              
-              const SizedBox(height: 20),
-            ],
-          ),
+                child: Center(
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(maxWidth: 620),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        BadgeVerre(
+                          color: CouleursApp.primaire.withValues(alpha: 0.10),
+                          borderRadius: 18,
+                          child: const Wrap(
+                            crossAxisAlignment: WrapCrossAlignment.center,
+                            spacing: 8,
+                            runSpacing: 4,
+                            children: [
+                              Icon(Icons.auto_awesome_rounded,
+                                  size: 16, color: CouleursApp.primaire),
+                              Text(
+                                'Experience personnalisee',
+                                style: TextStyle(
+                                  color: CouleursApp.primaire,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.w800,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ).animate().fadeIn(delay: 80.ms).slideY(begin: 0.16),
+                        const SizedBox(height: 18),
+                        const Text(
+                          'Comment souhaitez-vous utiliser Camtrans ?',
+                          style: TextStyle(
+                            fontSize: 31,
+                            fontWeight: FontWeight.w900,
+                            color: CouleursApp.textePrincipal,
+                            height: 1.08,
+                          ),
+                        ).animate().fadeIn(delay: 140.ms).slideY(begin: 0.18),
+                        const SizedBox(height: 12),
+                        const Text(
+                          'Choisissez votre espace pour obtenir les bons outils, les bons indicateurs et les bonnes actions des le depart.',
+                          style: TextStyle(
+                            fontSize: 15,
+                            color: CouleursApp.texteSecondaire,
+                            height: 1.55,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ).animate().fadeIn(delay: 220.ms).slideY(begin: 0.14),
+                        const SizedBox(height: 34),
+                        _creerCarteProfil(
+                          context,
+                          titre: 'Client / Expediteur',
+                          description:
+                              'Expediez des colis, meubles ou marchandises et suivez chaque trajet en temps reel.',
+                          badge: 'Je reserve un transport',
+                          icone: Icons.inventory_2_outlined,
+                          couleur: CouleursApp.primaire,
+                          routeDest: RoutesApplication.inscriptionClient,
+                          delay: 300,
+                        ),
+                        const SizedBox(height: 18),
+                        _creerCarteProfil(
+                          context,
+                          titre: 'Transporteur / Chauffeur',
+                          description:
+                              'Recevez des courses, optimisez vos trajets et pilotez vos revenus depuis un espace dedie.',
+                          badge: 'Je trouve des courses',
+                          icone: Icons.local_shipping_outlined,
+                          couleur: CouleursApp.accentOrange,
+                          routeDest: RoutesApplication.inscriptionTransporteur,
+                          delay: 400,
+                        ),
+                        const SizedBox(height: 28),
+                        Center(
+                          child: TextButton(
+                            onPressed: () => context.go(RoutesApplication.connexion),
+                            child: const Text(
+                              'J\'ai deja un compte. Se connecter',
+                              style: TextStyle(fontWeight: FontWeight.w800),
+                            ),
+                          ),
+                        ).animate().fadeIn(delay: 520.ms),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -96,67 +149,123 @@ class ChoixProfil extends StatelessWidget {
     BuildContext context, {
     required String titre,
     required String description,
+    required String badge,
     required IconData icone,
     required Color couleur,
     required String routeDest,
     required int delay,
   }) {
-    return GestureDetector(
+    return AnimatedShadowCard(
       onTap: () => context.push(routeDest),
+      borderRadius: 26,
+      padding: EdgeInsets.zero,
+      backgroundColor: Colors.white.withValues(alpha: 0.9),
       child: Container(
-        padding: const EdgeInsets.all(25),
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(25),
-          border: Border.all(color: couleur.withValues(alpha: 0.3), width: 1.5),
-          boxShadow: [
-            BoxShadow(
-              color: couleur.withValues(alpha: 0.05),
-              blurRadius: 20,
-              offset: const Offset(0, 10),
-            )
-          ],
+          borderRadius: BorderRadius.circular(26),
+          border: Border.all(color: couleur.withValues(alpha: 0.18)),
         ),
-        child: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(15),
-              decoration: BoxDecoration(
-                color: couleur.withValues(alpha: 0.1),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(icone, color: couleur, size: 35),
-            ),
-            const SizedBox(width: 20),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    titre,
-                    style: const TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      color: CouleursApp.textePrincipal,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(26),
+          child: Stack(
+            children: [
+              Positioned.fill(
+                child: DecoratedBox(
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        couleur.withValues(alpha: 0.10),
+                        Colors.white.withValues(alpha: 0.0),
+                      ],
                     ),
                   ),
-                  const SizedBox(height: 8),
-                  Text(
-                    description,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      color: CouleursApp.texteSecondaire,
-                      height: 1.4,
-                    ),
-                  ),
-                ],
+                ),
               ),
-            ),
-            const SizedBox(width: 10),
-            Icon(Icons.arrow_forward_ios, color: couleur.withValues(alpha: 0.5), size: 20),
-          ],
+              Padding(
+                padding: const EdgeInsets.all(22),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 64,
+                      height: 64,
+                      decoration: BoxDecoration(
+                        gradient: LinearGradient(
+                          colors: [couleur, couleur.withValues(alpha: 0.68)],
+                          begin: Alignment.topLeft,
+                          end: Alignment.bottomRight,
+                        ),
+                        borderRadius: BorderRadius.circular(20),
+                        boxShadow: [
+                          BoxShadow(
+                            color: couleur.withValues(alpha: 0.26),
+                            blurRadius: 20,
+                            offset: const Offset(0, 10),
+                          ),
+                        ],
+                      ),
+                      child: Icon(icone, color: Colors.white, size: 32),
+                    ),
+                    const SizedBox(width: 18),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            titre,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w900,
+                              color: CouleursApp.textePrincipal,
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            description,
+                            maxLines: 3,
+                            overflow: TextOverflow.ellipsis,
+                            style: const TextStyle(
+                              fontSize: 13,
+                              color: CouleursApp.texteSecondaire,
+                              height: 1.45,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                          const SizedBox(height: 14),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                            decoration: BoxDecoration(
+                              color: couleur.withValues(alpha: 0.10),
+                              borderRadius: BorderRadius.circular(99),
+                            ),
+                            child: Text(
+                              badge,
+                              style: TextStyle(
+                                color: couleur,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w800,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Icon(
+                      Icons.arrow_forward_rounded,
+                      color: couleur,
+                      size: 24,
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
-      ).animate().fadeIn(delay: delay.ms).slideX(begin: 0.1, end: 0, curve: Curves.easeOutBack),
-    );
+      ),
+    ).animate().fadeIn(delay: delay.ms).slideY(begin: 0.12, curve: Curves.easeOutCubic);
   }
 }

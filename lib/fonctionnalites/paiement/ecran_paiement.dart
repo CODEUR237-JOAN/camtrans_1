@@ -5,6 +5,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 
 import '../../coeur/etat/paiement_provider.dart';
 import '../../coeur/constantes/couleurs.dart';
+import '../../services/service_authentification.dart';
 import 'widgets/ticket_recu.dart';
 
 class EcranPaiement extends ConsumerStatefulWidget {
@@ -42,9 +43,8 @@ class _EcranPaiementState extends ConsumerState<EcranPaiement> {
     }
 
     final provider = ref.read(paiementProvider.notifier);
-    // On simule que l'ID du client est récupéré depuis un provider global d'authentification
-    // Pour l'instant, on met une valeur factice.
-    const clientId = "client_actuel_123";
+    final authService = ref.read(serviceAuthentificationProvider);
+    final clientId = authService.utilisateur?.uid ?? "client_anonyme";
 
     if (_methodeSelectionnee == "om") {
       provider.payerParOM(

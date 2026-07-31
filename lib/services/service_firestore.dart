@@ -1,3 +1,4 @@
+import '../coeur/constantes/statuts.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -190,7 +191,7 @@ class ServiceFirestore {
       "codeSuivi": "CMR-${DateTime.now().millisecondsSinceEpoch.toString().substring(8)}",
       "adresseDepart": "Douala, Akwa",
       "adresseArrivee": "Yaoundé, Bastos",
-      "statut": "En cours",
+      "statut": StatutCourse.enTransit,
       "typeVehicule": "Camionnette",
       "description": "Mobilier de bureau",
       "poidsKg": 120.5,
@@ -209,7 +210,7 @@ class ServiceFirestore {
       "codeSuivi": "CMR-${(DateTime.now().millisecondsSinceEpoch - 100000).toString().substring(8)}",
       "adresseDepart": "Kribi, Port",
       "adresseArrivee": "Douala, Bonanjo",
-      "statut": "Livré",
+      "statut": StatutCourse.livre,
       "typeVehicule": "Camion lourd",
       "description": "Matériel de construction",
       "poidsKg": 850.0,

@@ -1,12 +1,12 @@
-/// =======================================================
-///
-/// FICHIER : images.dart
-/// PROJET : TransConnect Cameroun
-///
-/// Toutes les images, logos, icônes et animations utilisées
-/// dans l'application.
-///
-/// =======================================================
+// =======================================================
+//
+// FICHIER : images.dart
+// PROJET : TransConnect Cameroun
+//
+// Toutes les images, logos, icônes et animations utilisées
+// dans l'application.
+//
+// =======================================================
 
 class ImagesApp {
   ImagesApp._();

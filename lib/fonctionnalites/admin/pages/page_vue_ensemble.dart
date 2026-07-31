@@ -8,6 +8,7 @@ import 'package:intl/intl.dart';
 import '../../../coeur/etat/admin_provider.dart';
 import '../../../coeur/constantes/couleurs.dart';
 import '../../../modeles/transporteur.dart';
+import '../../../modeles/course.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 
@@ -19,6 +20,9 @@ class PageVueEnsemble extends ConsumerWidget {
     final statsAsync = ref.watch(adminStatsProvider);
     final weeklyRevenuesAsync = ref.watch(adminWeeklyRevenuesProvider);
     final transporteursAsync = ref.watch(adminTransporteursProvider);
+    final distributionAsync = ref.watch(adminCourseDistributionProvider);
+    final activitiesAsync = ref.watch(adminRecentActivitiesProvider);
+    final pendingApprovalsAsync = ref.watch(adminPendingApprovalsCountProvider);
 
     return Scaffold(
       backgroundColor: const Color(0xFFF4F7FB),
@@ -31,18 +35,29 @@ class PageVueEnsemble extends ConsumerWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  "Bienvenue, Admin",
-                  style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: CouleursApp.textePrincipal),
-                ),
-                const SizedBox(height: 5),
-                const Text(
-                  "Voici l'état de la plateforme aujourd'hui.",
-                  style: TextStyle(fontSize: 16, color: CouleursApp.texteSecondaire),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          "Bienvenue, Admin",
+                          style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: CouleursApp.textePrincipal),
+                        ),
+                        const SizedBox(height: 5),
+                        const Text(
+                          "Voici l'état de la plateforme aujourd'hui.",
+                          style: TextStyle(fontSize: 16, color: CouleursApp.texteSecondaire),
+                        ),
+                      ],
+                    ),
+                    _buildPendingBadge(pendingApprovalsAsync, ref),
+                  ],
                 ),
                 const SizedBox(height: 24),
                 
-                // Cartes KPI (Responsives)
+                // Cartes KPI
                 LayoutBuilder(
                   builder: (context, constraints) {
                     int crossAxisCount = constraints.maxWidth > 1200 ? 4 : constraints.maxWidth > 800 ? 2 : 1;
@@ -65,22 +80,48 @@ class PageVueEnsemble extends ConsumerWidget {
                 
                 const SizedBox(height: 32),
                 
-                // Section Graphique et Carte
+                // Section Graphiques
                 LayoutBuilder(
                   builder: (context, constraints) {
-                    if (constraints.maxWidth > 1000) {
+                    if (constraints.maxWidth > 1100) {
                       return Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Expanded(flex: 2, child: _buildGraphiqueRevenus(weeklyRevenuesAsync).animate().fadeIn(duration: 600.ms).scale(begin: const Offset(0.95, 0.95))),
+                          Expanded(flex: 2, child: _buildGraphiqueRevenus(weeklyRevenuesAsync).animate().fadeIn(duration: 600.ms)),
                           const SizedBox(width: 24),
-                          Expanded(flex: 1, child: _buildCarteTransporteurs(transporteursAsync).animate().fadeIn(duration: 600.ms, delay: 200.ms).scale(begin: const Offset(0.95, 0.95))),
+                          Expanded(flex: 1, child: _buildPieDistribution(distributionAsync).animate().fadeIn(duration: 600.ms, delay: 200.ms)),
                         ],
                       );
                     } else {
                       return Column(
                         children: [
                           _buildGraphiqueRevenus(weeklyRevenuesAsync),
+                          const SizedBox(height: 24),
+                          _buildPieDistribution(distributionAsync),
+                        ],
+                      );
+                    }
+                  }
+                ),
+
+                const SizedBox(height: 32),
+
+                // Section Activités et Carte
+                LayoutBuilder(
+                  builder: (context, constraints) {
+                    if (constraints.maxWidth > 1100) {
+                      return Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(flex: 1, child: _buildRecentActivities(activitiesAsync).animate().fadeIn(duration: 600.ms)),
+                          const SizedBox(width: 24),
+                          Expanded(flex: 1, child: _buildCarteTransporteurs(transporteursAsync).animate().fadeIn(duration: 600.ms, delay: 200.ms)),
+                        ],
+                      );
+                    } else {
+                      return Column(
+                        children: [
+                          _buildRecentActivities(activitiesAsync),
                           const SizedBox(height: 24),
                           _buildCarteTransporteurs(transporteursAsync),
                         ],
@@ -96,13 +137,145 @@ class PageVueEnsemble extends ConsumerWidget {
     );
   }
 
+  Widget _buildPendingBadge(AsyncValue<int> pendingAsync, WidgetRef ref) {
+    return pendingAsync.maybeWhen(
+      data: (count) => count > 0 ? GestureDetector(
+        onTap: () => ref.read(adminMenuIndexProvider.notifier).state = 2,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          decoration: BoxDecoration(
+            color: Colors.red.shade50,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: Colors.red.shade200),
+          ),
+          child: Row(
+            children: [
+              const Icon(Icons.warning_amber_rounded, color: Colors.red, size: 20),
+              const SizedBox(width: 8),
+              Text("$count dossiers à valider", style: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
+            ],
+          ),
+        ),
+      ).animate().shake() : const SizedBox.shrink(),
+      orElse: () => const SizedBox.shrink(),
+    );
+  }
+
+  Widget _buildPieDistribution(AsyncValue<Map<String, int>> distributionAsync) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10)],
+      ),
+      height: 400,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text("Répartition des Courses", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+          const SizedBox(height: 24),
+          Expanded(
+            child: distributionAsync.when(
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (err, _) => Center(child: Text("Erreur: $err")),
+              data: (data) {
+                if (data.isEmpty) return const Center(child: Text("Pas de données"));
+                
+                final List<PieChartSectionData> sections = [];
+                final colors = [CouleursApp.primaire, CouleursApp.succes, CouleursApp.secondaire, CouleursApp.erreur, CouleursApp.avertissement];
+                int i = 0;
+                
+                data.forEach((key, value) {
+                  sections.add(PieChartSectionData(
+                    value: value.toDouble(),
+                    title: "$value",
+                    color: colors[i % colors.length],
+                    radius: 50,
+                    titleStyle: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+                  ));
+                  i++;
+                });
+
+                return Column(
+                  children: [
+                    Expanded(child: PieChart(PieChartData(sections: sections, centerSpaceRadius: 40))),
+                    const SizedBox(height: 20),
+                    Wrap(
+                      spacing: 12,
+                      children: data.keys.toList().asMap().entries.map((e) {
+                        return Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Container(width: 12, height: 12, decoration: BoxDecoration(color: colors[e.key % colors.length], shape: BoxShape.circle)),
+                            const SizedBox(width: 4),
+                            Text(e.value, style: const TextStyle(fontSize: 11, color: Colors.grey)),
+                          ],
+                        );
+                      }).toList(),
+                    ),
+                  ],
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildRecentActivities(AsyncValue<List<Course>> activitiesAsync) {
+    return Container(
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10)],
+      ),
+      height: 400,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text("Activités Récentes", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+          const SizedBox(height: 16),
+          Expanded(
+            child: activitiesAsync.when(
+              loading: () => const Center(child: CircularProgressIndicator()),
+              error: (err, _) => Center(child: Text("Erreur: $err")),
+              data: (list) {
+                if (list.isEmpty) return const Center(child: Text("Aucune activité"));
+                return ListView.builder(
+                  itemCount: list.length,
+                  itemBuilder: (context, index) {
+                    final c = list[index];
+                    return ListTile(
+                      contentPadding: EdgeInsets.zero,
+                      leading: Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(color: CouleursApp.primaire.withValues(alpha: 0.1), shape: BoxShape.circle),
+                        child: const Icon(Icons.shopping_bag_outlined, size: 18, color: CouleursApp.primaire),
+                      ),
+                      title: Text(c.adresseArrivee, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13), overflow: TextOverflow.ellipsis),
+                      subtitle: Text(DateFormat('HH:mm').format(c.dateCreation), style: const TextStyle(fontSize: 11)),
+                      trailing: Text("${c.prixFinal > 0 ? c.prixFinal : c.prixEstime} F", style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
+                    );
+                  },
+                );
+              },
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildGraphiqueRevenus(AsyncValue<List<double>> weeklyRevenuesAsync) {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10)],
+        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10)],
       ),
       height: 400,
       child: Column(
@@ -147,7 +320,7 @@ class PageVueEnsemble extends ConsumerWidget {
                         barWidth: 4,
                         belowBarData: BarAreaData(
                           show: true,
-                          color: CouleursApp.primaire.withOpacity(0.1),
+                          color: CouleursApp.primaire.withValues(alpha: 0.1),
                         ),
                         dotData: const FlDotData(show: true),
                       ),
@@ -167,7 +340,7 @@ class PageVueEnsemble extends ConsumerWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 10)],
+        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10)],
       ),
       height: 400,
       clipBehavior: Clip.hardEdge,
@@ -237,7 +410,7 @@ class _KpiCard extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
-              color: couleur.withOpacity(0.1),
+              color: couleur.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(icone, color: couleur, size: 28),
