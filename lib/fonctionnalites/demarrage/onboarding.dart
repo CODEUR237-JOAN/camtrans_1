@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../coeur/constantes/couleurs.dart';
-import '../../coeur/constantes/images.dart';
-import '../../coeur/constantes/tailles.dart';
-import '../../coeur/constantes/textes.dart';
-import '../../coeur/routes/routes.dart';
-import '../../coeur/widgets/effets_visuels.dart';
+import 'package:update_camtrans/coeur/constantes/couleurs.dart';
+import 'package:update_camtrans/coeur/constantes/images.dart';
+import 'package:update_camtrans/coeur/constantes/tailles.dart';
+import 'package:update_camtrans/coeur/constantes/textes.dart';
+import 'package:update_camtrans/coeur/routes/routes.dart';
+import 'package:update_camtrans/coeur/widgets/effets_visuels.dart';
 
 class Onboarding extends StatefulWidget {
   const Onboarding({super.key});

@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
-import '../../../coeur/constantes/couleurs.dart';
+import 'package:update_camtrans/coeur/constantes/couleurs.dart';
 
 /// Abstraction de la carte. Prêt pour migration vers Google Maps si besoin.
 class CarteSuiviAbstraite extends StatefulWidget {
@@ -10,6 +11,7 @@ class CarteSuiviAbstraite extends StatefulWidget {
   final LatLng? transporteur;
   final List<LatLng>? route;
   final Function(MapController)? onMapCreated;
+  final bool isRemorque;
 
   const CarteSuiviAbstraite({
     super.key,
@@ -18,21 +20,30 @@ class CarteSuiviAbstraite extends StatefulWidget {
     this.transporteur,
     this.route,
     this.onMapCreated,
+    this.isRemorque = false,
   });
 
   @override
   State<CarteSuiviAbstraite> createState() => _CarteSuiviAbstraiteState();
 }
 
-class _CarteSuiviAbstraiteState extends State<CarteSuiviAbstraite> {
+class _CarteSuiviAbstraiteState extends State<CarteSuiviAbstraite> with SingleTickerProviderStateMixin {
   final MapController _mapController = MapController();
+  late AnimationController _polyAnimation;
 
   @override
   void initState() {
     super.initState();
+    _polyAnimation = AnimationController(vsync: this, duration: const Duration(seconds: 3))..forward();
     if (widget.onMapCreated != null) {
       widget.onMapCreated!(_mapController);
     }
+  }
+
+  @override
+  void dispose() {
+    _polyAnimation.dispose();
+    super.dispose();
   }
 
   @override
@@ -53,20 +64,32 @@ class _CarteSuiviAbstraiteState extends State<CarteSuiviAbstraite> {
       ),
       children: [
         TileLayer(
-          urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+          urlTemplate: widget.isRemorque 
+              ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
+              : 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+          subdomains: widget.isRemorque ? const ['a', 'b', 'c', 'd'] : const [],
           userAgentPackageName: 'com.joan.update_camtrans',
         ),
         // Tracé
-        PolylineLayer(
-          polylines: [
-            Polyline(
-              points: widget.route != null && widget.route!.isNotEmpty 
-                  ? widget.route! 
-                  : [widget.depart, widget.arrivee],
-              color: CouleursApp.primaire.withValues(alpha: 0.8),
-              strokeWidth: 5,
-            ),
-          ],
+        AnimatedBuilder(
+          animation: _polyAnimation,
+          builder: (context, child) {
+            final points = widget.route != null && widget.route!.isNotEmpty 
+                ? widget.route! 
+                : [widget.depart, widget.arrivee];
+            
+            final animatedPoints = points.take((points.length * _polyAnimation.value).ceil()).toList();
+            
+            return PolylineLayer(
+              polylines: [
+                Polyline(
+                  points: animatedPoints,
+                  color: widget.isRemorque ? const Color(0xFF3B82F6) : CouleursApp.primaire.withValues(alpha: 0.8),
+                  strokeWidth: 5,
+                ),
+              ],
+            );
+          },
         ),
         // Marqueurs
         MarkerLayer(
@@ -89,13 +112,17 @@ class _CarteSuiviAbstraiteState extends State<CarteSuiviAbstraite> {
                 width: 60,
                 height: 60,
                 child: Container(
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
+                  decoration: BoxDecoration(
+                    color: widget.isRemorque ? const Color(0xFF0F172A) : Colors.white,
                     shape: BoxShape.circle,
-                    boxShadow: [BoxShadow(color: Colors.black26, blurRadius: 8)],
+                    boxShadow: [BoxShadow(color: widget.isRemorque ? const Color(0xFF3B82F6).withValues(alpha: 0.5) : Colors.black26, blurRadius: 8)],
                   ),
                   child: Center(
-                    child: Icon(Icons.local_shipping, color: CouleursApp.primaire, size: 30),
+                    child: Icon(
+                      widget.isRemorque ? Icons.build_circle : Icons.local_shipping, 
+                      color: widget.isRemorque ? const Color(0xFF3B82F6) : CouleursApp.primaire, 
+                      size: 30
+                    ).animate(onPlay: (controller) => controller.repeat()).shimmer(duration: 1500.ms),
                   ),
                 ),
               ),

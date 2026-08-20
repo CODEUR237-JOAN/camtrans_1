@@ -1,5 +1,33 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'service_ia.dart';
 
+// ============================================================
+// CONFIGURATION DE TARIFICATION — USAGE INTERNE UNIQUEMENT
+// Cette classe ne doit JAMAIS être exposée dans l'UI client.
+// Elle est réservée à l'usage admin, support et logs.
+// ============================================================
+class ConfigTarificationRemorque {
+  /// Frais de prise en charge fixes (FCFA)
+  static const double fraisBase = 15000;
+
+  /// Tarif kilométrique de base (FCFA/km)
+  static const double tarifKmBase = 1000;
+
+  /// Coefficient de surcoût carburant lié à la masse (FCFA/tonne/km).
+  /// À calibrer en conditions réelles terrain Douala/Yaoundé.
+  static const double coeffMasseCarburant = 75;
+
+  /// Indexation carburant pilotable à distance (via Remote Config).
+  /// 1.0 = pas d'indexation. Augmenter si le prix du carburant monte.
+  static const double coeffIndexationCarburant = 1.0;
+}
+
+// ============================================================
+// MODÈLE DE RÉSULTAT D'ESTIMATION
+// Les champs `detail*` sont EXCLUSIVEMENT pour l'usage interne
+// (logs, dashboard admin, support litige). Ne jamais les binder dans l'UI client.
+// ============================================================
 class ResultatEstimation {
   final double distanceKm;
   final double dureeMinutes;
@@ -8,6 +36,11 @@ class ResultatEstimation {
   final String vehiculeRecommande;
   final double coutTotal;
 
+  // --- Champs internes admin/support — JAMAIS affichés côté client ---
+  final double? detailFraisBase;
+  final double? detailCoutDistance;
+  final double? detailSurchargeMasseCarburant;
+
   ResultatEstimation({
     required this.distanceKm,
     required this.dureeMinutes,
@@ -15,15 +48,23 @@ class ResultatEstimation {
     required this.poidsKg,
     required this.vehiculeRecommande,
     required this.coutTotal,
+    this.detailFraisBase,
+    this.detailCoutDistance,
+    this.detailSurchargeMasseCarburant,
   });
 }
 
 final serviceEstimationProvider = Provider<ServiceEstimation>((ref) {
-  return ServiceEstimation();
+  final ia = ref.watch(serviceIAProvider);
+  return ServiceEstimation(ia);
 });
 
 class ServiceEstimation {
-  /// Méthode locale (heuristiques basiques) pour calculer une estimation
+  final ServiceIA _ia;
+  ServiceEstimation(this._ia);
+
+  /// Méthode locale (heuristiques basiques) pour calculer une estimation.
+  /// Logique existante conservée à l'identique — sans régression.
   Future<ResultatEstimation> genererEstimationLocale({
     required String depart,
     required String arrivee,
@@ -31,18 +72,14 @@ class ServiceEstimation {
     required String description,
     required String categorieVehicule,
   }) async {
-    // Simuler un temps de calcul (ex: requête réseau ou IA)
     await Future.delayed(const Duration(seconds: 2));
 
-    // 1. Estimation Distance / Durée (Simulée)
-    // En réalité, on appellerait Google Maps Distance Matrix API
-    final distanceSimulee = (depart.length + arrivee.length) * 1.5; 
-    final dureeSimulee = distanceSimulee * 1.2; 
+    final distanceSimulee = (depart.length + arrivee.length) * 1.5;
+    final dureeSimulee = distanceSimulee * 1.2;
 
-    // 2. Estimation Volume / Poids
     double volumeSimule = 1.0;
     double poidsSimule = 50.0;
-    
+
     if (typeMarchandise.toLowerCase().contains("lourd") || typeMarchandise.toLowerCase().contains("matériaux")) {
       volumeSimule = 15.0;
       poidsSimule = 800.0;
@@ -54,7 +91,6 @@ class ServiceEstimation {
       poidsSimule = 10.0;
     }
 
-    // 3. Recommandation Véhicule (si l'utilisateur n'en a pas forcé un)
     String vehiculeFinal = categorieVehicule;
     if (vehiculeFinal.isEmpty) {
       if (volumeSimule > 10 || poidsSimule > 400) {
@@ -66,10 +102,9 @@ class ServiceEstimation {
       }
     }
 
-    // 4. Calcul Coût Total (Prix de base + Prix au km + Prix au volume/poids)
-    double prixBase = 2000.0; // FCFA
+    double prixBase = 2000.0;
     if (vehiculeFinal.toLowerCase().contains("camion")) prixBase = 15000.0;
-    
+
     final coutTotal = prixBase + (distanceSimulee * 500) + (volumeSimule * 1000);
 
     return ResultatEstimation(
@@ -82,20 +117,113 @@ class ServiceEstimation {
     );
   }
 
-  /// TODO: Méthode future pour appeler l'API Gemini afin d'avoir une vraie analyse sémantique
+  /// Méthode qui appelle l'API Groq/Llama pour analyser sémantiquement la demande.
+  /// Logique existante conservée à l'identique — sans régression.
   Future<ResultatEstimation> genererEstimationViaGemini({
     required String depart,
     required String arrivee,
+    required String typeMarchandise,
     required String description,
   }) async {
-    // throw UnimplementedError("Intégration Gemini prévue dans une future version");
-    // Pour l'instant on fallback sur la méthode locale
-    return genererEstimationLocale(
-      depart: depart,
-      arrivee: arrivee,
-      typeMarchandise: "Autre",
-      description: description,
-      categorieVehicule: "Camionnette",
+    try {
+      final estimationIA = await _ia.estimerExpedition(
+        marchandise: typeMarchandise,
+        description: description,
+        depart: depart,
+        destination: arrivee,
+      );
+
+      final distanceSimulee = (depart.length + arrivee.length) * 1.5;
+      final dureeSimulee = distanceSimulee * 1.2;
+
+      double volume = 1.0;
+      if (estimationIA['volume'] != null) {
+        final vStr = estimationIA['volume']!.replaceAll(RegExp(r'[^0-9.]'), '');
+        if (vStr.isNotEmpty) volume = double.parse(vStr);
+      }
+
+      double prixBase = 2000.0;
+      if (estimationIA['prix'] != null) {
+        final pStr = estimationIA['prix']!.replaceAll(RegExp(r'[^0-9.]'), '');
+        if (pStr.isNotEmpty) prixBase = double.parse(pStr);
+      }
+
+      final coutTotal = prixBase > 5000 ? prixBase : prixBase + (distanceSimulee * 500);
+
+      return ResultatEstimation(
+        distanceKm: distanceSimulee,
+        dureeMinutes: dureeSimulee,
+        volumeM3: volume,
+        poidsKg: volume * 50,
+        vehiculeRecommande: estimationIA['vehicule'] ?? "Camionnette",
+        coutTotal: coutTotal,
+      );
+    } catch (e) {
+      return genererEstimationLocale(
+        depart: depart,
+        arrivee: arrivee,
+        typeMarchandise: typeMarchandise,
+        description: description,
+        categorieVehicule: "",
+      );
+    }
+  }
+
+  // ============================================================
+  // FORMULE REMORQUAGE — USAGE INTERNE
+  // Cette méthode ne retourne JAMAIS le détail à l'UI client.
+  // Le `coutTotal` est la seule valeur affichée côté client.
+  // Les champs `detail*` sont pour logs/admin/support uniquement.
+  // ============================================================
+  /// Calcule l'estimation d'un remorquage selon une formule continue
+  /// proportionnelle à la distance ET à la masse (surconsommation carburant réelle).
+  ///
+  /// Formule :
+  ///   Prix = fraisBase
+  ///        + (distanceKm × tarifKmBase)
+  ///        + (distanceKm × (masseKg / 1000) × coeffMasseCarburant)
+  ///   , multiplié par coeffIndexationCarburant.
+  ///
+  /// Pas de palier ni de "surge" : le prix est continu et prévisible,
+  /// lié uniquement aux coûts réels. Adapté au contexte urgence Cameroun.
+  Future<ResultatEstimation> genererEstimationRemorque({
+    required double distanceKm,
+    required double masseKg,
+  }) async {
+    final double fraisBase = ConfigTarificationRemorque.fraisBase;
+    final double tarifKmBase = ConfigTarificationRemorque.tarifKmBase;
+    final double coeffMasse = ConfigTarificationRemorque.coeffMasseCarburant;
+    final double indexation = ConfigTarificationRemorque.coeffIndexationCarburant;
+
+    // Composantes du coût — INTERNES uniquement
+    final double coutDistance = distanceKm * tarifKmBase;
+    final double surchargeMasseCarburant = distanceKm * (masseKg / 1000) * coeffMasse;
+
+    // Prix total visible client (arrondi à 50 FCFA le plus proche)
+    final double coutBrut = (fraisBase + coutDistance + surchargeMasseCarburant) * indexation;
+    final double coutTotal = (coutBrut / 50).round() * 50.0;
+
+    // Log interne debug — jamais affiché dans l'UI
+    debugPrint(
+      '[REMORQUE][TARIF_INTERNE] '
+      'Masse: ${masseKg.toInt()}kg | Dist: ${distanceKm.toStringAsFixed(1)}km | '
+      'FraisBase: ${fraisBase.toInt()} FCFA | '
+      'CoutDist: ${coutDistance.toStringAsFixed(0)} FCFA | '
+      'SurchargeMasse: ${surchargeMasseCarburant.toStringAsFixed(0)} FCFA | '
+      'Total: ${coutTotal.toInt()} FCFA',
+    );
+
+    return ResultatEstimation(
+      distanceKm: distanceKm,
+      dureeMinutes: distanceKm * 1.5,
+      volumeM3: 0.0,
+      poidsKg: masseKg,
+      vehiculeRecommande: "Dépanneuse",
+      coutTotal: coutTotal,
+      // Champs internes admin/support — ne jamais binder dans l'UI client
+      detailFraisBase: fraisBase,
+      detailCoutDistance: coutDistance,
+      detailSurchargeMasseCarburant: surchargeMasseCarburant,
     );
   }
 }

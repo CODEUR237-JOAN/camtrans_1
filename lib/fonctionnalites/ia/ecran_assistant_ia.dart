@@ -1,15 +1,13 @@
-import 'dart:io';
+import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:iconsax_flutter/iconsax_flutter.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-
-import 'package:flutter_markdown/flutter_markdown.dart';
-import '../../coeur/etat/ia_provider.dart';
-import '../../coeur/constantes/couleurs.dart';
-import '../../modeles/message_ia.dart';
-import '../../coeur/widgets/page_responsive.dart';
+import 'package:iconsax_flutter/iconsax_flutter.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:go_router/go_router.dart';
+import 'package:update_camtrans/coeur/widgets/page_responsive.dart';
+import 'package:update_camtrans/services/service_ia.dart';
 
 class EcranAssistantIA extends ConsumerStatefulWidget {
   const EcranAssistantIA({super.key});
@@ -19,32 +17,55 @@ class EcranAssistantIA extends ConsumerStatefulWidget {
 }
 
 class _EcranAssistantIAState extends ConsumerState<EcranAssistantIA> {
-  final TextEditingController _controller = TextEditingController();
+  final TextEditingController _messageController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
-  List<String> _cheminsImagesEnAttente = [];
+  final List<Map<String, dynamic>> _messages = [
+    {
+      "isUser": false,
+      "text": "Bonjour ! Je suis l'Assistant CamTrans. Décrivez-moi votre marchandise ou prenez-la en photo pour une estimation du volume et du prix !",
+      "type": "welcome"
+    }
+  ];
 
-  void _envoyerMessage() {
-    final texte = _controller.text.trim();
-    if (texte.isEmpty && _cheminsImagesEnAttente.isEmpty) return;
-
-    ref.read(iaProvider.notifier).ajouterMessageUtilisateur(
-      texte,
-      cheminsImages: _cheminsImagesEnAttente,
-    );
-
-    _controller.clear();
+  void _envoyerMessage() async {
+    final prompt = _messageController.text.trim();
+    if (prompt.isEmpty) return;
+    
     setState(() {
-      _cheminsImagesEnAttente = [];
+      _messages.add({"isUser": true, "text": prompt, "type": "text"});
+      // On ajoute une bulle vide pour la réponse de l'IA
+      _messages.add({"isUser": false, "text": "", "type": "text"});
     });
-
-    _faireDefilerEnBas();
+    
+    final iaIndex = _messages.length - 1;
+    _messageController.clear();
+    _scrollToBottom();
+    
+    try {
+      final stream = ref.read(serviceIAProvider).envoyerMessageStream(prompt, fichiersImages: null);
+      
+      await for (final chunk in stream) {
+        if (mounted) {
+          setState(() {
+            _messages[iaIndex]["text"] = (_messages[iaIndex]["text"] as String) + chunk;
+          });
+          _scrollToBottom();
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _messages[iaIndex]["text"] = "Désolé, une erreur est survenue : $e";
+        });
+      }
+    }
   }
 
-  void _faireDefilerEnBas() {
-    Future.delayed(const Duration(milliseconds: 100), () {
+  void _scrollToBottom() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_scrollController.hasClients) {
         _scrollController.animateTo(
-          _scrollController.position.maxScrollExtent,
+          _scrollController.position.maxScrollExtent + 100,
           duration: const Duration(milliseconds: 300),
           curve: Curves.easeOut,
         );
@@ -52,317 +73,300 @@ class _EcranAssistantIAState extends ConsumerState<EcranAssistantIA> {
     });
   }
 
-  Future<void> _choisirImage() async {
-    final picker = ImagePicker();
-    final image = await picker.pickImage(source: ImageSource.gallery);
-    if (image != null) {
-      setState(() {
-        _cheminsImagesEnAttente.add(image.path);
-      });
-    }
+  @override
+  void dispose() {
+    _messageController.dispose();
+    _scrollController.dispose();
+    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    final iaState = ref.watch(iaProvider);
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
-    // Faire défiler automatiquement quand de nouveaux messages arrivent
-    ref.listen(iaProvider, (previous, next) {
-      if (previous?.messages.length != next.messages.length || next.enReponse) {
-        _faireDefilerEnBas();
-      }
-    });
-
     return Scaffold(
-      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+      extendBodyBehindAppBar: true,
+      backgroundColor: const Color(0xFF08111F),
       appBar: AppBar(
-        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
+        backgroundColor: Colors.transparent,
         elevation: 0,
-        centerTitle: true,
-        title: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Icon(Iconsax.magic_star_copy, color: CouleursApp.primaire),
-            const SizedBox(width: 8),
-            Text("Assistant CamTrans", style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color, fontWeight: FontWeight.bold, fontSize: 18)),
-          ],
+        systemOverlayStyle: SystemUiOverlayStyle.light,
+        leading: Padding(
+          padding: const EdgeInsets.only(left: 16.0, top: 8.0, bottom: 8.0),
+          child: _GlassButton(
+            icon: Iconsax.arrow_left_2_copy,
+            onTap: () => context.pop(),
+          ),
         ),
-        iconTheme: IconThemeData(color: Theme.of(context).textTheme.bodyLarge?.color),
+        title: Text(
+          "Assistant Intelligent",
+          style: GoogleFonts.poppins(fontWeight: FontWeight.w600, fontSize: 18, color: Colors.white),
+        ).animate().fadeIn().slideY(begin: -0.2),
+        centerTitle: true,
         actions: [
-          IconButton(
-            icon: const Icon(Icons.delete_outline),
-            onPressed: () {
-              ref.read(iaProvider.notifier).effacerHistorique();
-            },
-          )
+          Padding(
+            padding: const EdgeInsets.only(right: 16.0),
+            child: Icon(Iconsax.info_circle_copy, color: const Color(0xFF94A3B8).withValues(alpha: 0.8)),
+          ).animate().fadeIn().slideX(begin: 0.2),
         ],
       ),
-      body: PageResponsive(
-        child: Column(
-          children: [
-            Expanded(
-              child: iaState.messages.isEmpty
-                  ? _buildEcranVide(isDark)
-                  : ListView.builder(
+      body: Stack(
+        children: [
+          // Background Gradient Sombre (Neo Premium Dark)
+          Container(
+            decoration: const BoxDecoration(
+              gradient: LinearGradient(
+                colors: [Color(0xFF08111F), Color(0xFF111827)],
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+              ),
+            ),
+          ),
+          
+          // Blob lumineux IA
+          Positioned(
+            top: 50,
+            right: -50,
+            child: Container(
+              width: 250,
+              height: 250,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: const Color(0xFF10B981).withValues(alpha: 0.15), // Emerald Green
+              ),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 80, sigmaY: 80),
+                child: const SizedBox(),
+              ),
+            ).animate(onPlay: (c) => c.repeat(reverse: true)).scaleXY(end: 1.1, duration: 4.seconds),
+          ),
+          
+          Positioned(
+            bottom: -50,
+            left: -50,
+            child: Container(
+              width: 300,
+              height: 300,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: const Color(0xFF3B82F6).withValues(alpha: 0.1), // Neon Blue
+              ),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 80, sigmaY: 80),
+                child: const SizedBox(),
+              ),
+            ).animate(onPlay: (c) => c.repeat(reverse: true)).scaleXY(end: 1.2, duration: 5.seconds),
+          ),
+
+          SafeArea(
+            child: Column(
+              children: [
+                Expanded(
+                  child: PageResponsive(
+                    child: ListView.builder(
                       controller: _scrollController,
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-                      itemCount: iaState.messages.length,
+                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+                      itemCount: _messages.length,
                       itemBuilder: (context, index) {
-                        final msg = iaState.messages[index];
-                        return _buildBulleMessage(msg, isDark);
+                        final msg = _messages[index];
+                        return _MessageBubble(message: msg)
+                            .animate()
+                            .fadeIn(duration: 400.ms, curve: Curves.easeOut)
+                            .slideY(begin: 0.2, end: 0);
                       },
                     ),
-            ),
-            _buildZoneSaisie(iaState.enReponse, isDark),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildEcranVide(bool isDark) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: CouleursApp.primaire.withValues(alpha: 0.1),
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(Iconsax.message_text_copy, size: 60, color: CouleursApp.primaire),
-          ).animate().scale(duration: 500.ms, curve: Curves.easeOutBack),
-          const SizedBox(height: 20),
-          Text(
-            "Comment puis-je vous aider ?",
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Theme.of(context).textTheme.bodyLarge?.color),
-          ).animate().fadeIn(delay: 200.ms),
-          const SizedBox(height: 30),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 30),
-            child: Wrap(
-              spacing: 10,
-              runSpacing: 10,
-              alignment: WrapAlignment.center,
-              children: [
-                _buildSuggestion("Estimer un prix de livraison", isDark),
-                _buildSuggestion("Quel véhicule choisir ?", isDark),
-                _buildSuggestion("Conseils d'emballage", isDark),
-                _buildSuggestion("Estimer le volume de mes biens", isDark),
+                  ),
+                ),
+                _buildInputArea(),
               ],
-            ).animate().fadeIn(delay: 400.ms).slideY(begin: 0.2),
-          )
+            ),
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildSuggestion(String texte, bool isDark) {
-    return GestureDetector(
-      onTap: () {
-        _controller.text = texte;
-        _envoyerMessage();
-      },
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        decoration: BoxDecoration(
-          color: isDark ? Theme.of(context).cardColor : Colors.grey.shade100,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: isDark ? Colors.grey.shade800 : Colors.grey.shade300),
-        ),
-        child: Text(texte, style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color, fontSize: 13)),
-      ),
-    );
-  }
-
-  Widget _buildBulleMessage(MessageIA msg, bool isDark) {
-    return Align(
-      alignment: msg.estUtilisateur ? Alignment.centerRight : Alignment.centerLeft,
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 20),
-        constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.8),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            if (!msg.estUtilisateur) ...[
-              const CircleAvatar(
-                radius: 16,
-                backgroundColor: CouleursApp.primaire,
-                child: Icon(Iconsax.magic_star_copy, size: 16, color: Colors.white),
-              ),
-              const SizedBox(width: 8),
-            ],
-            Flexible(
-              child: Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                decoration: BoxDecoration(
-                  color: msg.estUtilisateur ? CouleursApp.primaire : (isDark ? Theme.of(context).cardColor : Colors.grey.shade100),
-                  borderRadius: BorderRadius.circular(16).copyWith(
-                    bottomRight: msg.estUtilisateur ? const Radius.circular(0) : const Radius.circular(16),
-                    bottomLeft: !msg.estUtilisateur ? const Radius.circular(0) : const Radius.circular(16),
-                  ),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    if (msg.piecesJointes.isNotEmpty) ...[
-                      Wrap(
-                        spacing: 8,
-                        children: msg.piecesJointes.map((chemin) {
-                          return ClipRRect(
-                            borderRadius: BorderRadius.circular(8),
-                            child: Image.file(File(chemin), width: 100, height: 100, fit: BoxFit.cover),
-                          );
-                        }).toList(),
-                      ),
-                      const SizedBox(height: 8),
-                    ],
-                    msg.estEnChargement && msg.texte.isEmpty
-                        ? const SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: CircularProgressIndicator(strokeWidth: 2, color: Colors.black54),
-                          )
-                        : Semantics(
-                            label: msg.estUtilisateur ? "Votre message : ${msg.texte}" : "Message de l'assistant : ${msg.texte}",
-                            child: msg.estUtilisateur
-                                ? Text(
-                                    msg.texte,
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 15,
-                                      height: 1.4,
-                                    ),
-                                  )
-                                : MarkdownBody(
-                                    data: msg.texte,
-                                    styleSheet: MarkdownStyleSheet(
-                                      p: TextStyle(fontSize: 15, height: 1.4, color: Theme.of(context).textTheme.bodyLarge?.color),
-                                      listBullet: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color),
-                                    ),
-                                  ),
-                          ),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    ).animate().fadeIn(duration: 300.ms).slideY(begin: 0.1);
-  }
-
-  Widget _buildZoneSaisie(bool enReponse, bool isDark) {
+  Widget _buildInputArea() {
     return Container(
-      padding: const EdgeInsets.all(16).copyWith(bottom: 24),
+      padding: const EdgeInsets.only(left: 20, right: 20, top: 16, bottom: 32),
       decoration: BoxDecoration(
-        color: Theme.of(context).scaffoldBackgroundColor,
-        border: Border(top: BorderSide(color: isDark ? Colors.grey.shade800 : Colors.grey.shade200)),
+        color: const Color(0xFF0F172A).withValues(alpha: 0.8),
+        borderRadius: const BorderRadius.only(topLeft: Radius.circular(36), topRight: Radius.circular(36)),
+        border: Border(top: BorderSide(color: Colors.white.withValues(alpha: 0.05))),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.3),
+            blurRadius: 20,
+            offset: const Offset(0, -10),
+          )
+        ],
       ),
-      child: Column(
-        children: [
-          if (_cheminsImagesEnAttente.isNotEmpty)
-            SizedBox(
-              height: 60,
-              child: ListView.builder(
-                scrollDirection: Axis.horizontal,
-                itemCount: _cheminsImagesEnAttente.length,
-                itemBuilder: (context, index) {
-                  return Stack(
-                    children: [
-                      Container(
-                        margin: const EdgeInsets.only(right: 8, top: 8),
-                        width: 50,
-                        height: 50,
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(8),
-                          image: DecorationImage(
-                            image: FileImage(File(_cheminsImagesEnAttente[index])),
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                      ),
-                      Positioned(
-                        right: 0,
-                        top: 0,
-                        child: GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              _cheminsImagesEnAttente.removeAt(index);
-                            });
-                          },
-                          child: Container(
-                            decoration: const BoxDecoration(color: Colors.black54, shape: BoxShape.circle),
-                            child: const Icon(Icons.close, color: Colors.white, size: 14),
-                          ),
-                        ),
-                      )
-                    ],
-                  );
-                },
-              ),
-            ),
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.end,
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(36),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+          child: Row(
             children: [
-              IconButton(
-                icon: const Icon(Iconsax.add_square_copy, color: Colors.grey),
-                onPressed: _choisirImage,
-                tooltip: "Ajouter une image",
+              GestureDetector(
+                onTap: () {
+                  HapticFeedback.lightImpact();
+                  // Action pour ajouter une photo
+                },
+                child: Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF1E293B).withValues(alpha: 0.5),
+                    shape: BoxShape.circle,
+                    border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+                  ),
+                  child: const Icon(Iconsax.camera_copy, color: Color(0xFF94A3B8), size: 22),
+                ),
               ),
+              const SizedBox(width: 12),
               Expanded(
                 child: Container(
-                  constraints: const BoxConstraints(maxHeight: 120),
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
                   decoration: BoxDecoration(
-                    color: isDark ? Theme.of(context).cardColor : Colors.grey.shade100,
+                    color: const Color(0xFF1E293B).withValues(alpha: 0.4),
                     borderRadius: BorderRadius.circular(24),
+                    border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
                   ),
                   child: TextField(
-                    controller: _controller,
-                    maxLines: null,
-                    style: TextStyle(color: Theme.of(context).textTheme.bodyLarge?.color),
-                    textInputAction: TextInputAction.send,
-                    onSubmitted: (_) => _envoyerMessage(),
+                    controller: _messageController,
+                    style: GoogleFonts.poppins(color: Colors.white, fontSize: 14),
                     decoration: InputDecoration(
-                      hintText: "Écrivez un message...",
-                      hintStyle: TextStyle(color: Theme.of(context).textTheme.bodyMedium?.color),
+                      hintText: "Décrivez vos objets...",
+                      hintStyle: GoogleFonts.poppins(color: const Color(0xFF64748B), fontSize: 14),
                       border: InputBorder.none,
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
                     ),
+                    onSubmitted: (_) => _envoyerMessage(),
                   ),
                 ),
               ),
-              const SizedBox(width: 8),
-              if (!enReponse)
-                IconButton(
-                  icon: const Icon(Iconsax.microphone_2_copy, color: Colors.grey),
-                  tooltip: "Dicter au microphone",
-                  onPressed: () {
-                    // TODO: Implémenter dictée vocale
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Bouton micro (à venir)")));
-                  },
-                ),
-              Semantics(
-                button: true,
-                label: "Envoyer le message",
-                child: GestureDetector(
-                  onTap: enReponse ? null : _envoyerMessage,
-                  child: Container(
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: enReponse ? Colors.grey : CouleursApp.primaire,
-                      shape: BoxShape.circle,
-                    ),
-                    child: const Icon(Iconsax.send_2_copy, color: Colors.white, size: 20),
+              const SizedBox(width: 12),
+              GestureDetector(
+                onTap: () {
+                  HapticFeedback.heavyImpact();
+                  _envoyerMessage();
+                },
+                child: Container(
+                  padding: const EdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    gradient: const LinearGradient(colors: [Color(0xFF10B981), Color(0xFF059669)]),
+                    shape: BoxShape.circle,
+                    boxShadow: [
+                      BoxShadow(color: const Color(0xFF10B981).withValues(alpha: 0.4), blurRadius: 12, offset: const Offset(0, 4))
+                    ],
                   ),
+                  child: const Icon(Iconsax.send_2_copy, color: Colors.white, size: 20),
                 ),
               ),
             ],
           ),
+        ),
+      ),
+    ).animate().slideY(begin: 1.0, duration: 600.ms, curve: Curves.easeOutExpo);
+  }
+}
+
+class _MessageBubble extends StatelessWidget {
+  final Map<String, dynamic> message;
+
+  const _MessageBubble({required this.message});
+
+  @override
+  Widget build(BuildContext context) {
+    final isUser = message["isUser"] == true;
+    final type = message["type"] ?? "text";
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 20),
+      child: Row(
+        mainAxisAlignment: isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          if (!isUser) ...[
+            Container(
+              margin: const EdgeInsets.only(right: 12),
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: const Color(0xFF3B82F6).withValues(alpha: 0.15),
+                shape: BoxShape.circle,
+                border: Border.all(color: const Color(0xFF3B82F6).withValues(alpha: 0.3)),
+              ),
+              child: const Icon(Iconsax.magic_star_copy, color: Color(0xFF60A5FA), size: 16),
+            ),
+          ],
+          Flexible(
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+              decoration: BoxDecoration(
+                color: isUser ? const Color(0xFF3B82F6) : const Color(0xFF1E293B).withValues(alpha: 0.6),
+                borderRadius: BorderRadius.only(
+                  topLeft: const Radius.circular(24),
+                  topRight: const Radius.circular(24),
+                  bottomLeft: isUser ? const Radius.circular(24) : const Radius.circular(4),
+                  bottomRight: isUser ? const Radius.circular(4) : const Radius.circular(24),
+                ),
+                border: isUser ? null : Border.all(color: Colors.white.withValues(alpha: 0.05)),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (type == "estimation")
+                    Container(
+                      margin: const EdgeInsets.only(bottom: 8),
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF10B981).withValues(alpha: 0.2),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        "Devis IA Généré",
+                        style: GoogleFonts.poppins(color: const Color(0xFF34D399), fontSize: 10, fontWeight: FontWeight.bold),
+                      ).animate(onPlay: (c) => c.repeat(reverse: true)).shimmer(duration: 2.seconds),
+                    ),
+                  Text(
+                    message["text"],
+                    style: GoogleFonts.poppins(
+                      color: isUser ? Colors.white : const Color(0xFFE2E8F0),
+                      fontSize: 14,
+                      height: 1.5,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          if (isUser) const SizedBox(width: 32),
         ],
+      ),
+    );
+  }
+}
+
+class _GlassButton extends StatelessWidget {
+  final IconData icon;
+  final VoidCallback onTap;
+
+  const _GlassButton({required this.icon, required this.onTap});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 44,
+        height: 44,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          color: Colors.white.withValues(alpha: 0.05),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+        ),
+        child: ClipOval(
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+            child: Icon(icon, color: Colors.white, size: 20),
+          ),
+        ),
       ),
     );
   }

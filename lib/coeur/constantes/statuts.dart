@@ -12,29 +12,32 @@ class StatutCourse {
   StatutCourse._();
 
   // ============================
-  // Statuts du cycle de vie
+  // Statuts du cycle de vie (Sprint 13)
   // ============================
 
-  /// Course créée par le client, en attente d'un transporteur
-  static const String enAttente = 'en_attente';
+  /// Commande créée, recherche en cours
+  static const String recherche = 'recherche';
 
-  /// Un transporteur a accepté la course
-  static const String acceptee = 'acceptee';
+  /// Un transporteur a été attribué
+  static const String attribue = 'attribue';
 
-  /// Le transporteur est en route vers le client (pickup)
-  static const String enRoute = 'en_route';
+  /// Le transporteur est en route vers le point de départ
+  static const String enRouteDepart = 'en_route_depart';
 
-  /// Le transporteur est arrivé chez le client
-  static const String arrive = 'arrive';
+  /// Le transporteur est arrivé au point de départ
+  static const String arriveDepart = 'arrive_depart';
 
-  /// Marchandise chargée, en cours de livraison
+  /// La marchandise est chargée dans le véhicule
+  static const String charge = 'charge';
+
+  /// Le transport est en cours vers la destination
   static const String enTransit = 'en_transit';
 
-  /// Livraison effectuée, en attente de confirmation
-  static const String livre = 'livre';
+  /// Le transporteur est arrivé à la destination
+  static const String arriveDestination = 'arrive_destination';
 
-  /// Course confirmée et notée par le client
-  static const String termine = 'termine';
+  /// La course est clôturée et payée/validée
+  static const String terminee = 'terminee';
 
   /// Course annulée (par le client ou le système)
   static const String annulee = 'annulee';
@@ -45,25 +48,29 @@ class StatutCourse {
 
   /// Retourne true si la course est "active" (en cours de traitement)
   static bool estActive(String statut) {
-    return statut == acceptee ||
-        statut == enRoute ||
-        statut == arrive ||
-        statut == enTransit;
+    return statut == attribue ||
+        statut == enRouteDepart ||
+        statut == arriveDepart ||
+        statut == charge ||
+        statut == enTransit ||
+        statut == arriveDestination;
   }
 
   /// Retourne true si la course est terminée (succès ou échec)
   static bool estTerminee(String statut) {
-    return statut == livre || statut == termine || statut == annulee;
+    return statut == terminee || statut == annulee;
   }
 
   /// Retourne true si le transporteur peut modifier le statut
   static bool peutTransitionnerVers(String actuel, String suivant) {
     const transitions = {
-      acceptee: [enRoute, annulee],
-      enRoute: [arrive, annulee],
-      arrive: [enTransit],
-      enTransit: [livre],
-      livre: [termine],
+      recherche: [attribue, annulee],
+      attribue: [enRouteDepart, annulee],
+      enRouteDepart: [arriveDepart, annulee],
+      arriveDepart: [charge],
+      charge: [enTransit],
+      enTransit: [arriveDestination],
+      arriveDestination: [terminee],
     };
     return transitions[actuel]?.contains(suivant) ?? false;
   }
@@ -71,20 +78,22 @@ class StatutCourse {
   /// Libellé lisible par l'humain
   static String libelle(String statut) {
     switch (statut) {
-      case enAttente:
-        return 'En attente';
-      case acceptee:
-        return 'Acceptée';
-      case enRoute:
+      case recherche:
+        return 'Recherche...';
+      case attribue:
+        return 'Attribué';
+      case enRouteDepart:
         return 'En route';
-      case arrive:
-        return 'Arrivé';
+      case arriveDepart:
+        return 'Arrivé (Départ)';
+      case charge:
+        return 'Chargé';
       case enTransit:
         return 'En transit';
-      case livre:
-        return 'Livré';
-      case termine:
-        return 'Terminé';
+      case arriveDestination:
+        return 'À destination';
+      case terminee:
+        return 'Terminée';
       case annulee:
         return 'Annulée';
       default:

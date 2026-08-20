@@ -1,83 +1,55 @@
-import '../../coeur/utilitaires/parseur.dart';
+import 'package:update_camtrans/coeur/utilitaires/parseur.dart';
 
 class Course {
   final String id;
-
   final String clientId;
   final String transporteurId;
-
   final String nomClient;
   final String nomTransporteur;
-
   final String telephoneClient;
   final String telephoneTransporteur;
-
   final String adresseDepart;
   final String adresseArrivee;
-
   final double latitudeDepart;
   final double longitudeDepart;
-
   final double latitudeArrivee;
   final double longitudeArrivee;
-
   final double distanceKm;
-
   final double volumeM3;
-
   final double poidsKg;
-
   final String typeVehicule;
-
   final String typeMarchandise;
-
   final double prixEstime;
-
   final double prixFinal;
-
   final String modePaiement;
-
   final bool paiementEffectue;
-
   final String statut;
-
   final String description;
-
   final List<String> photos;
-
   final DateTime dateCreation;
-
   final DateTime? dateDebut;
-
   final DateTime? dateFin;
-
   final bool fragile;
-
   final bool aideChargement;
-
   final bool aideDechargement;
-
   final String codeSuivi;
-
   final double noteClient;
-
   final double noteTransporteur;
-
   final String commentaireClient;
-
   final String commentaireTransporteur;
 
   //---------------- IA ----------------//
-
   final double scoreIA;
-
   final String vehiculeRecommandeIA;
-
   final double volumeEstimeIA;
-
   final String conseilIA;
 
-  //-----------------------------------//
+  //---------------- Sprint 10 ---------//
+  final String categorieService;
+  final String optionGamme;
+  final String detailsSpecifiques;
+  final double distanceApprocheKm;
+  final int tempsApprocheMin;
 
   const Course({
     required this.id,
@@ -120,6 +92,11 @@ class Course {
     required this.vehiculeRecommandeIA,
     required this.volumeEstimeIA,
     required this.conseilIA,
+    this.categorieService = "",
+    this.optionGamme = "",
+    this.detailsSpecifiques = "",
+    this.distanceApprocheKm = 0.0,
+    this.tempsApprocheMin = 0,
   });
 
   Map<String, dynamic> toMap() {
@@ -164,6 +141,11 @@ class Course {
       "vehiculeRecommandeIA": vehiculeRecommandeIA,
       "volumeEstimeIA": volumeEstimeIA,
       "conseilIA": conseilIA,
+      "categorieService": categorieService,
+      "optionGamme": optionGamme,
+      "detailsSpecifiques": detailsSpecifiques,
+      "distanceApprocheKm": distanceApprocheKm,
+      "tempsApprocheMin": tempsApprocheMin,
     };
   }
 
@@ -195,12 +177,8 @@ class Course {
       description: map["description"] ?? "",
       photos: List<String>.from(map["photos"] ?? []),
       dateCreation: Parseur.toDateTime(map["dateCreation"]),
-      dateDebut: map["dateDebut"] != null
-          ? Parseur.toDateTime(map["dateDebut"])
-          : null,
-      dateFin: map["dateFin"] != null
-          ? Parseur.toDateTime(map["dateFin"])
-          : null,
+      dateDebut: map["dateDebut"] != null ? Parseur.toDateTime(map["dateDebut"]) : null,
+      dateFin: map["dateFin"] != null ? Parseur.toDateTime(map["dateFin"]) : null,
       fragile: map["fragile"] ?? false,
       aideChargement: map["aideChargement"] ?? false,
       aideDechargement: map["aideDechargement"] ?? false,
@@ -213,11 +191,14 @@ class Course {
       vehiculeRecommandeIA: map["vehiculeRecommandeIA"] ?? "",
       volumeEstimeIA: Parseur.toDouble(map["volumeEstimeIA"]),
       conseilIA: map["conseilIA"] ?? "",
+      categorieService: map["categorieService"] ?? "",
+      optionGamme: map["optionGamme"] ?? "",
+      detailsSpecifiques: map["detailsSpecifiques"] ?? "",
+      distanceApprocheKm: Parseur.toDouble(map["distanceApprocheKm"]),
+      tempsApprocheMin: map["tempsApprocheMin"] ?? 0,
     );
   }
 
   Map<String, dynamic> toJson() => toMap();
-
-  factory Course.fromJson(Map<String, dynamic> json) =>
-      Course.fromMap(json);
+  factory Course.fromJson(Map<String, dynamic> json) => Course.fromMap(json);
 }

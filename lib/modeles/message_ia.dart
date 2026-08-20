@@ -1,11 +1,12 @@
 import 'package:uuid/uuid.dart';
+import 'package:image_picker/image_picker.dart';
 
 class MessageIA {
   final String id;
   final String texte;
   final bool estUtilisateur;
   final DateTime dateCreation;
-  final List<String> piecesJointes; // Chemins locaux des fichiers/images
+  final List<XFile> piecesJointes; // Fichiers/images (XFile pour compatibilité Web/Mobile)
   final bool estEnChargement;
 
   MessageIA({
@@ -21,7 +22,7 @@ class MessageIA {
   MessageIA copierAvec({
     String? texte,
     bool? estUtilisateur,
-    List<String>? piecesJointes,
+    List<XFile>? piecesJointes,
     bool? estEnChargement,
   }) {
     return MessageIA(

@@ -1,4 +1,4 @@
-import '../coeur/constantes/statuts.dart';
+import 'package:update_camtrans/coeur/constantes/statuts.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -62,10 +62,12 @@ class ServiceFirestore {
     required String id,
     required Map<String, dynamic> donnees,
   }) async {
+    // Utilisation de set avec merge: true au lieu de update
+    // Cela évite l'erreur "No document to update" si le document n'existe pas encore
     await _db
         .collection(collection)
         .doc(id)
-        .update(donnees);
+        .set(donnees, SetOptions(merge: true));
   }
 
   // ===========================
@@ -122,6 +124,26 @@ class ServiceFirestore {
   }) {
     return _db.collection(collection).snapshots();
   }
+
+  // ===========================
+  // Messagerie
+  // ===========================
+
+  Stream<QuerySnapshot<Map<String, dynamic>>> fluxMessages(String conversationId) {
+    return _db
+        .collection('messages')
+        .where('conversationId', isEqualTo: conversationId)
+        .orderBy('dateEnvoi', descending: true)
+        .snapshots();
+  }
+
+  Future<void> envoyerMessage(Map<String, dynamic> donneesMessage) async {
+    final ref = _db.collection('messages').doc();
+    donneesMessage['id'] = ref.id;
+    await ref.set(donneesMessage);
+  }
+
+
 
   // ===========================
   // Flux d'une collection avec condition
@@ -210,7 +232,7 @@ class ServiceFirestore {
       "codeSuivi": "CMR-${(DateTime.now().millisecondsSinceEpoch - 100000).toString().substring(8)}",
       "adresseDepart": "Kribi, Port",
       "adresseArrivee": "Douala, Bonanjo",
-      "statut": StatutCourse.livre,
+      "statut": StatutCourse.arriveDestination,
       "typeVehicule": "Camion lourd",
       "description": "Matériel de construction",
       "poidsKg": 850.0,

@@ -1,9 +1,9 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../coeur/constantes/statuts.dart';
-import '../../services/service_firestore.dart';
-import '../../modeles/client.dart';
-import '../../modeles/transporteur.dart';
-import '../../modeles/course.dart';
+import 'package:update_camtrans/coeur/constantes/statuts.dart';
+import 'package:update_camtrans/services/service_firestore.dart';
+import 'package:update_camtrans/modeles/client.dart';
+import 'package:update_camtrans/modeles/transporteur.dart';
+import 'package:update_camtrans/modeles/course.dart';
 
 // Providers pour lire toutes les données via Firebase (simulées ou réelles)
 

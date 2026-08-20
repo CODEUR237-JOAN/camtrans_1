@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:iconsax_flutter/iconsax_flutter.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 
-import '../../../coeur/etat/admin_provider.dart';
-import '../../../coeur/constantes/couleurs.dart';
-import '../../../modeles/transporteur.dart';
-import '../../../coeur/widgets/etats_ui.dart';
-import '../../../services/service_firestore.dart';
+import 'package:update_camtrans/coeur/etat/admin_provider.dart';
+import 'package:update_camtrans/coeur/constantes/couleurs.dart';
+import 'package:update_camtrans/modeles/transporteur.dart';
+import 'package:update_camtrans/coeur/widgets/etats_ui.dart';
+import 'package:update_camtrans/services/service_firestore.dart';
 
 class PageModeration extends ConsumerWidget {
   const PageModeration({super.key});
@@ -22,14 +25,15 @@ class PageModeration extends ConsumerWidget {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text(approuve ? "Dossier de ${transporteur.prenom} approuvé" : "Dossier de ${transporteur.prenom} rejeté"),
-            backgroundColor: approuve ? Colors.green : Colors.red,
+            backgroundColor: approuve ? CouleursApp.succes : CouleursApp.erreur,
+            behavior: SnackBarBehavior.floating,
           ),
         );
       }
     } catch (e) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Erreur: $e"), backgroundColor: Colors.red),
+          SnackBar(content: Text("Erreur: $e"), backgroundColor: CouleursApp.erreur, behavior: SnackBarBehavior.floating),
         );
       }
     }
@@ -40,72 +44,100 @@ class PageModeration extends ConsumerWidget {
     final transporteursAsync = ref.watch(adminTransporteursProvider);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF4F7FB),
-      body: transporteursAsync.when(
-        loading: () => const EtatChargement(message: "Chargement des dossiers..."),
-        error: (err, _) => EtatErreur(
-          erreur: err.toString(),
-          onRetry: () => ref.refresh(adminTransporteursProvider),
-        ),
-        data: (transporteurs) {
-          final enAttente = transporteurs.where((t) => !t.documentsValides).toList();
+      backgroundColor: Colors.transparent, // Sera géré par le parent
+      body: Stack(
+        children: [
+          Container(color: const Color(0xFF08111F)),
+          Positioned(
+            bottom: -100,
+            right: -100,
+            child: Container(
+              width: 300,
+              height: 300,
+              decoration: BoxDecoration(
+                color: CouleursApp.avertissement.withValues(alpha: 0.1),
+                shape: BoxShape.circle,
+              ),
+            ).animate(onPlay: (controller) => controller.repeat(reverse: true)).scale(duration: 5.seconds, begin: const Offset(1,1), end: const Offset(1.3,1.3)),
+          ),
+          
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildHeader(),
+              Expanded(
+                child: transporteursAsync.when(
+                  loading: () => const EtatChargement(message: "Chargement des dossiers..."),
+                  error: (err, _) => EtatErreur(erreur: err.toString(), onRetry: () => ref.refresh(adminTransporteursProvider)),
+                  data: (transporteurs) {
+                    final enAttente = transporteurs.where((t) => !t.documentsValides).toList();
 
-          return SingleChildScrollView(
-            padding: const EdgeInsets.all(24),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  "Modération des Documents",
-                  style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.black87),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  "${enAttente.length} dossiers en attente d'approbation",
-                  style: const TextStyle(color: Colors.grey, fontSize: 16),
-                ),
-                const SizedBox(height: 32),
+                    if (enAttente.isEmpty) {
+                      return Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(24),
+                              decoration: BoxDecoration(color: CouleursApp.succes.withValues(alpha: 0.1), shape: BoxShape.circle),
+                              child: const Icon(Iconsax.verify_copy, size: 64, color: CouleursApp.succes),
+                            ).animate().scale(delay: 200.ms, duration: 400.ms, curve: Curves.easeOutBack),
+                            const SizedBox(height: 24),
+                            Text("À jour !", style: GoogleFonts.inter(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white)),
+                            const SizedBox(height: 8),
+                            Text("Aucun dossier en attente de modération.", style: GoogleFonts.inter(color: Colors.white54)),
+                          ],
+                        ),
+                      );
+                    }
 
-                if (enAttente.isEmpty)
-                  _buildEmptyState()
-                else
-                  _buildGridDossiers(enAttente),
-              ],
-            ),
-          );
-        },
+                    return LayoutBuilder(
+                      builder: (context, constraints) {
+                        int crossAxisCount = constraints.maxWidth > 1000 ? 3 : constraints.maxWidth > 600 ? 2 : 1;
+                        
+                        return GridView.builder(
+                          padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: crossAxisCount,
+                            crossAxisSpacing: 24,
+                            mainAxisSpacing: 24,
+                            childAspectRatio: 0.75, // Ajusté pour le nouveau design
+                          ),
+                          itemCount: enAttente.length,
+                          itemBuilder: (context, index) {
+                            return _DossierCard(transporteur: enAttente[index])
+                                .animate().fadeIn(delay: Duration(milliseconds: 100 * index)).slideY(begin: 0.1);
+                          },
+                        );
+                      }
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
 
-  Widget _buildEmptyState() {
-    return const EtatVide(
-      titre: "Tout est à jour !",
-      message: "Aucun document en attente de validation.",
-      icone: Icons.check_circle_outline,
-    );
-  }
-
-  Widget _buildGridDossiers(List<Transporteur> enAttente) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        int crossAxisCount = constraints.maxWidth > 1000 ? 3 : constraints.maxWidth > 600 ? 2 : 1;
-        
-        return GridView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: crossAxisCount,
-            crossAxisSpacing: 16,
-            mainAxisSpacing: 16,
-            childAspectRatio: 0.85, // Ajusté pour le contenu
+  Widget _buildHeader() {
+    return Container(
+      padding: const EdgeInsets.only(left: 32, right: 32, top: 32, bottom: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            "Modération des Documents",
+            style: GoogleFonts.inter(fontSize: 32, fontWeight: FontWeight.bold, color: Colors.white, letterSpacing: -1),
           ),
-          itemCount: enAttente.length,
-          itemBuilder: (context, index) {
-            return _DossierCard(transporteur: enAttente[index]);
-          },
-        );
-      }
+          const SizedBox(height: 8),
+          Text(
+            "Vérifiez les nouveaux transporteurs avant leur activation.",
+            style: GoogleFonts.inter(fontSize: 16, color: Colors.white54),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -119,70 +151,101 @@ class _DossierCard extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10)],
+        color: Colors.white.withValues(alpha: 0.03),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
       ),
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             children: [
-              CircleAvatar(
-                backgroundColor: CouleursApp.primaire.withValues(alpha: 0.2),
-                radius: 25,
-                child: const Icon(Icons.person, color: CouleursApp.primaire),
+              Container(
+                width: 60, height: 60,
+                decoration: BoxDecoration(
+                  color: Colors.orange.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: const Icon(Iconsax.personalcard_copy, color: Colors.orange, size: 28),
               ),
-              const SizedBox(width: 12),
+              const SizedBox(width: 16),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text("${transporteur.prenom} ${transporteur.nom}", style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16), maxLines: 1, overflow: TextOverflow.ellipsis),
-                    Text(transporteur.telephone, style: const TextStyle(color: Colors.grey, fontSize: 13)),
+                    Text("${transporteur.prenom} ${transporteur.nom}", style: GoogleFonts.inter(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.white), maxLines: 1, overflow: TextOverflow.ellipsis),
+                    const SizedBox(height: 4),
+                    Text(transporteur.telephone, style: GoogleFonts.inter(color: Colors.white54, fontSize: 13)),
                   ],
                 ),
               )
             ],
           ),
-          const Divider(height: 32),
-          const Text("Documents soumis :", style: TextStyle(fontWeight: FontWeight.bold)),
+          const SizedBox(height: 24),
+          Divider(color: Colors.white.withValues(alpha: 0.1), height: 1),
+          const SizedBox(height: 24),
+          Text("Documents soumis :", style: GoogleFonts.inter(fontWeight: FontWeight.bold, color: Colors.white)),
           const SizedBox(height: 12),
           
-          _buildDocLigne(context, Icons.badge, "Photo de profil", transporteur.photo.isNotEmpty, transporteur.photo),
-          _buildDocLigne(context, Icons.drive_eta, "Permis de conduire", transporteur.photoPermis.isNotEmpty, transporteur.photoPermis),
-          _buildDocLigne(context, Icons.description, "Carte grise", transporteur.photoCarteGrise.isNotEmpty, transporteur.photoCarteGrise),
+          _buildDocLigne(context, Iconsax.image_copy, "Photo de profil", transporteur.photo.isNotEmpty, transporteur.photo),
+          _buildDocLigne(context, Iconsax.personalcard_copy, "Permis de conduire", transporteur.photoPermis.isNotEmpty, transporteur.photoPermis),
+          _buildDocLigne(context, Iconsax.document_copy, "Carte grise", transporteur.photoCarteGrise.isNotEmpty, transporteur.photoCarteGrise),
           
           const Spacer(),
           Row(
             children: [
               Expanded(
-                child: OutlinedButton(
-                  onPressed: () => PageModeration.modifierStatut(context, ref, transporteur, false),
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: Colors.red,
-                    side: const BorderSide(color: Colors.red),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                  ),
-                  child: const Text("Rejeter"),
+                child: _buildActionButton(
+                  icon: Iconsax.close_circle_copy,
+                  label: "Rejeter",
+                  color: CouleursApp.erreur,
+                  onTap: () => PageModeration.modifierStatut(context, ref, transporteur, false),
                 ),
               ),
               const SizedBox(width: 12),
               Expanded(
-                child: ElevatedButton(
-                  onPressed: () => PageModeration.modifierStatut(context, ref, transporteur, true),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green,
-                    foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                  ),
-                  child: const Text("Approuver"),
+                child: _buildActionButton(
+                  icon: Iconsax.tick_circle_copy,
+                  label: "Approuver",
+                  color: CouleursApp.succes,
+                  onTap: () => PageModeration.modifierStatut(context, ref, transporteur, true),
+                  isPrimary: true,
                 ),
               ),
             ],
           )
         ],
+      ),
+    );
+  }
+
+  Widget _buildActionButton({required IconData icon, required String label, required Color color, required VoidCallback onTap, bool isPrimary = false}) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.symmetric(vertical: 12),
+        decoration: BoxDecoration(
+          color: isPrimary ? color : Colors.transparent,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: color),
+        ),
+        alignment: Alignment.center,
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: 20, color: isPrimary ? Colors.white : color),
+            const SizedBox(width: 8),
+            Text(
+              label,
+              style: GoogleFonts.inter(
+                color: isPrimary ? Colors.white : color,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -195,12 +258,12 @@ class _DossierCard extends ConsumerWidget {
         padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 4.0),
         child: Row(
           children: [
-            Icon(icone, size: 20, color: Colors.grey.shade600),
-            const SizedBox(width: 8),
-            Expanded(child: Text(label, style: TextStyle(fontSize: 14, decoration: recu && imageUrl.isNotEmpty ? TextDecoration.underline : TextDecoration.none, color: recu && imageUrl.isNotEmpty ? CouleursApp.primaire : Colors.black87))),
+            Icon(icone, size: 20, color: Colors.white54),
+            const SizedBox(width: 12),
+            Expanded(child: Text(label, style: GoogleFonts.inter(fontSize: 14, decoration: recu && imageUrl.isNotEmpty ? TextDecoration.underline : TextDecoration.none, color: recu && imageUrl.isNotEmpty ? Colors.white : Colors.white54))),
             Icon(
-              recu ? Icons.check_circle : Icons.pending,
-              color: recu ? Colors.green : Colors.orange,
+              recu ? Iconsax.tick_circle_copy : Iconsax.clock_copy,
+              color: recu ? CouleursApp.succes : CouleursApp.avertissement,
               size: 20,
             ),
           ],
@@ -213,18 +276,29 @@ class _DossierCard extends ConsumerWidget {
     showDialog(
       context: context,
       builder: (context) => Dialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        backgroundColor: const Color(0xFF1E293B), // Dark Premium
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(24),
+          side: BorderSide(color: Colors.white.withValues(alpha: 0.1)),
+        ),
         clipBehavior: Clip.antiAlias,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            AppBar(
-              title: Text(titre, style: const TextStyle(fontSize: 16)),
-              automaticallyImplyLeading: false,
-              actions: [
-                IconButton(icon: const Icon(Icons.close), onPressed: () => Navigator.pop(context)),
-              ],
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(titre, style: GoogleFonts.inter(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
+                  IconButton(
+                    icon: const Icon(Iconsax.close_circle_copy, color: Colors.white54),
+                    onPressed: () => Navigator.pop(context),
+                  ),
+                ],
+              ),
             ),
+            Divider(color: Colors.white.withValues(alpha: 0.1), height: 1),
             InteractiveViewer(
               child: Image.network(
                 imageUrl,
@@ -233,13 +307,13 @@ class _DossierCard extends ConsumerWidget {
                   if (loadingProgress == null) return child;
                   return const SizedBox(
                     height: 300,
-                    child: Center(child: CircularProgressIndicator()),
+                    child: Center(child: CircularProgressIndicator(color: CouleursApp.primaire)),
                   );
                 },
                 errorBuilder: (context, error, stackTrace) {
-                  return const SizedBox(
+                  return SizedBox(
                     height: 200,
-                    child: Center(child: Text("Erreur de chargement de l'image")),
+                    child: Center(child: Text("Erreur de chargement de l'image", style: GoogleFonts.inter(color: Colors.white54))),
                   );
                 },
               ),

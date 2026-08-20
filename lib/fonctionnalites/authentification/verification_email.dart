@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../coeur/constantes/couleurs.dart';
-import '../../coeur/constantes/tailles.dart';
-import '../../coeur/routes/routes.dart';
-import '../../coeur/widgets/bouton_principal.dart';
-import '../../coeur/widgets/page_responsive.dart';
+import 'package:update_camtrans/coeur/constantes/couleurs.dart';
+import 'package:update_camtrans/coeur/constantes/tailles.dart';
+import 'package:update_camtrans/coeur/routes/routes.dart';
+import 'package:update_camtrans/coeur/widgets/bouton_principal.dart';
+import 'package:update_camtrans/coeur/widgets/page_responsive.dart';
 
 class VerificationEmail extends StatefulWidget {
   const VerificationEmail({super.key});

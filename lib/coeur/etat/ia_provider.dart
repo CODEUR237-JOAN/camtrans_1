@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../modeles/message_ia.dart';
-import '../../services/service_ia.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:update_camtrans/modeles/message_ia.dart';
+import 'package:update_camtrans/services/service_ia.dart';
 
 class IAState {
   final List<MessageIA> messages;
@@ -21,18 +22,18 @@ class IANotifier extends StateNotifier<IAState> {
 
   IANotifier(this._serviceIA) : super(IAState());
 
-  void ajouterMessageUtilisateur(String texte, {List<String>? cheminsImages}) {
+  void ajouterMessageUtilisateur(String texte, {List<XFile>? fichiersImages}) {
     final msgU = MessageIA(
       texte: texte,
       estUtilisateur: true,
-      piecesJointes: cheminsImages ?? [],
+      piecesJointes: fichiersImages ?? [],
     );
     state = state.copierAvec(messages: [...state.messages, msgU], enReponse: true);
 
-    _demanderReponseIA(texte, cheminsImages);
+    _demanderReponseIA(texte, fichiersImages);
   }
 
-  void _demanderReponseIA(String prompt, List<String>? cheminsImages) async {
+  void _demanderReponseIA(String prompt, List<XFile>? fichiersImages) async {
     // Créer une coquille vide pour le message de l'IA
     final msgIA = MessageIA(
       texte: "",
@@ -47,7 +48,7 @@ class IANotifier extends StateNotifier<IAState> {
     String texteAccumule = "";
 
     try {
-      final stream = _serviceIA.envoyerMessageStream(prompt, cheminsImages: cheminsImages);
+      final stream = _serviceIA.envoyerMessageStream(prompt, fichiersImages: fichiersImages);
 
       await for (final chunk in stream) {
         texteAccumule += chunk;

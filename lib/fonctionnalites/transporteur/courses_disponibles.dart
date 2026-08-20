@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../coeur/constantes/couleurs.dart';
-import '../../coeur/etat/transporteur_provider.dart';
-import '../../modeles/course.dart';
+import 'package:update_camtrans/coeur/constantes/couleurs.dart';
+import 'package:update_camtrans/coeur/etat/transporteur_provider.dart';
+import 'package:update_camtrans/modeles/course.dart';
 
 class CoursesDisponibles extends ConsumerStatefulWidget {
   const CoursesDisponibles({super.key});

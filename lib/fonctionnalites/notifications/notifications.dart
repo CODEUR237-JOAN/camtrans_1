@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
-import '../../coeur/constantes/couleurs.dart';
-import '../../coeur/constantes/tailles.dart';
-import '../../coeur/etat/notification_provider.dart';
-import '../../modeles/notification.dart';
+import 'package:update_camtrans/coeur/constantes/couleurs.dart';
+import 'package:update_camtrans/coeur/constantes/tailles.dart';
+import 'package:update_camtrans/coeur/etat/notification_provider.dart';
+import 'package:update_camtrans/modeles/notification.dart';
 
 class NotificationsPage extends ConsumerStatefulWidget {
   const NotificationsPage({super.key});

@@ -4,11 +4,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
-import '../../../coeur/etat/transporteurs_provider.dart';
-import '../../../coeur/etat/carte_provider.dart';
-import '../../../modeles/transporteur.dart';
+import 'package:update_camtrans/coeur/etat/transporteurs_provider.dart';
+import 'package:update_camtrans/coeur/etat/carte_provider.dart';
+import 'package:update_camtrans/modeles/transporteur.dart';
 import 'fiche_transporteur_bottom_sheet.dart';
-import '../../../coeur/constantes/couleurs.dart';
+import 'package:update_camtrans/coeur/constantes/couleurs.dart';
 
 class CoucheTransporteurs extends ConsumerWidget {
   const CoucheTransporteurs({super.key});

@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 
-import '../../coeur/constantes/couleurs.dart';
-import '../../coeur/constantes/tailles.dart';
+import 'package:update_camtrans/coeur/constantes/couleurs.dart';
+import 'package:update_camtrans/coeur/constantes/tailles.dart';
 
 class DetailsCourse extends StatelessWidget {
   const DetailsCourse({super.key});

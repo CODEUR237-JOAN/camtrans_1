@@ -131,7 +131,7 @@ class TextesApp {
       "Visualisez la position de votre transporteur grâce au GPS.";
 
   static const String titreOnboarding3 =
-      "L'intelligence artificielle à votre service";
+      "La technologie à votre service";
 
   static const String descriptionOnboarding3 =
       "Estimez automatiquement le volume de vos marchandises et choisissez le véhicule idéal.";

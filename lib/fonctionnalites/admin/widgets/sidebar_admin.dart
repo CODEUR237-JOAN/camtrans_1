@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../coeur/constantes/couleurs.dart';
-import '../../../coeur/etat/admin_provider.dart';
-import '../../../coeur/routes/routes.dart';
+import 'package:update_camtrans/coeur/constantes/couleurs.dart';
+import 'package:update_camtrans/coeur/etat/admin_provider.dart';
+import 'package:update_camtrans/coeur/routes/routes.dart';
 
 class SidebarAdmin extends ConsumerWidget {
   const SidebarAdmin({super.key});
@@ -13,22 +13,13 @@ class SidebarAdmin extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final indexSelectionne = ref.watch(adminMenuIndexProvider);
     final pendingCount = ref.watch(adminPendingApprovalsCountProvider).valueOrNull ?? 0;
-    final width = MediaQuery.of(context).size.width;
-    final isDesktop = width > 900;
-
     // La gestion Desktop/Mobile est faite dans le parent (TableauDeBordAdmin)
     // Nous retournons toujours le contenu du menu ici.
     return Container(
       width: 250,
       decoration: BoxDecoration(
-        color: Colors.white,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.05),
-            blurRadius: 10,
-            offset: const Offset(5, 0),
-          )
-        ],
+        color: const Color(0xFF0F172A), // Dark slate
+        border: Border(right: BorderSide(color: Colors.white.withValues(alpha: 0.1))),
       ),
       child: Column(
         children: [
@@ -50,7 +41,7 @@ class SidebarAdmin extends ConsumerWidget {
                 const Expanded(
                   child: Text(
                     "CamTrans\nConsole",
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.white),
                   ),
                 ),
               ],
@@ -96,11 +87,28 @@ class SidebarAdmin extends ConsumerWidget {
 
                 _SectionTitle(titre: "ACTIVITÉS"),
                 _MenuItem(
-                  titre: "Toutes les courses",
-                  icone: Icons.history,
+                  titre: "Carte Flotte (Temps réel)",
+                  icone: Icons.map_outlined,
                   index: 3,
                   currentIndex: indexSelectionne,
                   onTap: () => ref.read(adminMenuIndexProvider.notifier).state = 3,
+                ),
+                _MenuItem(
+                  titre: "Toutes les courses",
+                  icone: Icons.history,
+                  index: 4,
+                  currentIndex: indexSelectionne,
+                  onTap: () => ref.read(adminMenuIndexProvider.notifier).state = 4,
+                ),
+                const SizedBox(height: 20),
+
+                _SectionTitle(titre: "SYSTÈME"),
+                _MenuItem(
+                  titre: "Notifications Push",
+                  icone: Icons.campaign_outlined,
+                  index: 5,
+                  currentIndex: indexSelectionne,
+                  onTap: () => ref.read(adminMenuIndexProvider.notifier).state = 5,
                 ),
                 
                 // Add more items like signalements, paiements here in the future
@@ -136,8 +144,8 @@ class _SectionTitle extends StatelessWidget {
       padding: const EdgeInsets.only(left: 12, bottom: 8),
       child: Text(
         titre,
-        style: const TextStyle(
-          color: Colors.grey,
+        style: TextStyle(
+          color: Colors.white54,
           fontSize: 11,
           fontWeight: FontWeight.bold,
           letterSpacing: 1.2,
@@ -179,12 +187,12 @@ class _MenuItem extends StatelessWidget {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
         leading: Icon(
           icone,
-          color: isSelected ? CouleursApp.primaire : Colors.black54,
+          color: isSelected ? CouleursApp.secondaire : Colors.white54,
         ),
         title: Text(
           titre,
           style: TextStyle(
-            color: isSelected ? CouleursApp.primaire : Colors.black87,
+            color: isSelected ? CouleursApp.secondaire : Colors.white70,
             fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
           ),
         ),

@@ -68,6 +68,15 @@ class ServiceAuthentification {
     await _auth.currentUser?.reload();
   }
 
+  /// Mettre à jour le profil (nom et photo)
+  Future<void> mettreAJourProfil({String? nom, String? photoUrl}) async {
+    final user = _auth.currentUser;
+    if (user != null) {
+      if (nom != null) await user.updateDisplayName(nom);
+      if (photoUrl != null) await user.updatePhotoURL(photoUrl);
+    }
+  }
+
   /// Email vérifié ?
   bool get emailVerifie =>
       _auth.currentUser?.emailVerified ?? false;
@@ -91,5 +100,17 @@ class ServiceAuthentification {
   /// Supprimer le compte
   Future<void> supprimerCompte() async {
     await _auth.currentUser?.delete();
+  }
+
+  /// Ré-authentifier l'utilisateur
+  Future<void> reauthentifier(String email, String motDePasse) async {
+    final user = _auth.currentUser;
+    if (user != null && user.email != null) {
+      AuthCredential credential = EmailAuthProvider.credential(
+        email: email.trim(),
+        password: motDePasse,
+      );
+      await user.reauthenticateWithCredential(credential);
+    }
   }
 }

@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../coeur/constantes/couleurs.dart';
-import '../../coeur/constantes/tailles.dart';
-import '../../coeur/etat/transporteur_provider.dart';
-import '../../services/service_authentification.dart';
+import 'package:update_camtrans/coeur/constantes/couleurs.dart';
+import 'package:update_camtrans/coeur/constantes/tailles.dart';
+import 'package:update_camtrans/coeur/etat/transporteur_provider.dart';
+import 'package:update_camtrans/services/service_authentification.dart';
 
 class ProfilTransporteur extends ConsumerWidget {
   const ProfilTransporteur({super.key});
@@ -158,8 +158,8 @@ class ProfilTransporteur extends ConsumerWidget {
                 const SizedBox(height: 30),
 
                 _boutonOption(Icons.edit, "Modifier le profil", () => context.push("/modifier-profil")),
+                _boutonOption(Icons.lock, "Changer le mot de passe", () => context.push("/changer-mot-de-passe")),
                 _boutonOption(Icons.settings, "Paramètres", () {}),
-                _boutonOption(Icons.lock, "Sécurité", () {}),
                 _boutonOption(Icons.help, "Aide & Support", () {}),
 
                 const SizedBox(height: 25),

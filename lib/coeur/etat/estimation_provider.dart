@@ -1,5 +1,5 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../services/service_estimation.dart';
+import 'package:update_camtrans/services/service_estimation.dart';
 
 class EtatEstimation {
   final bool enCours;
@@ -28,17 +28,27 @@ class EstimationNotifier extends StateNotifier<EtatEstimation> {
     required String typeMarchandise,
     required String description,
     required String categorieVehicule,
+    bool isRemorque = false,
+    double masseRemorqueKg = 0.0,
+    double distanceKm = 10.0, // Default for simulation if not provided
   }) async {
     state = EtatEstimation(enCours: true);
     
     try {
-      final resultat = await _service.genererEstimationLocale(
-        depart: depart,
-        arrivee: arrivee,
-        typeMarchandise: typeMarchandise,
-        description: description,
-        categorieVehicule: categorieVehicule,
-      );
+      ResultatEstimation resultat;
+      if (isRemorque) {
+        resultat = await _service.genererEstimationRemorque(
+          distanceKm: distanceKm,
+          masseKg: masseRemorqueKg,
+        );
+      } else {
+        resultat = await _service.genererEstimationViaGemini(
+          depart: depart,
+          arrivee: arrivee,
+          typeMarchandise: typeMarchandise,
+          description: description,
+        );
+      }
       state = EtatEstimation(enCours: false, resultat: resultat);
     } catch (e) {
       state = EtatEstimation(enCours: false, erreur: e.toString());

@@ -3,18 +3,19 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../coeur/constantes/couleurs.dart';
-import '../../coeur/constantes/tailles.dart';
-import '../../coeur/constantes/textes.dart';
-import '../../coeur/routes/routes.dart';
-import '../../coeur/utilitaires/validateurs.dart';
-import '../../coeur/widgets/bouton_principal.dart';
-import '../../coeur/widgets/champ_texte.dart';
-import '../../coeur/widgets/page_responsive.dart';
+import 'package:update_camtrans/coeur/constantes/couleurs.dart';
+import 'package:update_camtrans/coeur/constantes/tailles.dart';
+import 'package:update_camtrans/coeur/constantes/textes.dart';
+import 'package:update_camtrans/coeur/routes/routes.dart';
+import 'package:update_camtrans/coeur/utilitaires/validateurs.dart';
+import 'package:update_camtrans/coeur/widgets/bouton_principal.dart';
+import 'package:update_camtrans/coeur/widgets/champ_texte.dart';
+import 'package:update_camtrans/coeur/widgets/page_responsive.dart';
 
-import '../../services/service_authentification.dart';
-import '../../services/service_firestore.dart';
-import '../../modeles/client.dart';
+import 'package:update_camtrans/services/service_authentification.dart';
+import 'package:update_camtrans/services/service_firestore.dart';
+import 'package:update_camtrans/services/service_notification.dart';
+import 'package:update_camtrans/modeles/client.dart';
 
 class InscriptionClient extends ConsumerStatefulWidget {
   const InscriptionClient({super.key});
@@ -65,10 +66,14 @@ class _InscriptionClientState extends ConsumerState<InscriptionClient> {
 
       // Création du document Client
       if (userCred.user != null) {
+        final nomComplet = _nom.text.trim().split(' ');
+        final prenom = nomComplet.length > 1 ? nomComplet.sublist(0, nomComplet.length - 1).join(' ') : "";
+        final nom = nomComplet.last;
+
         final client = Client(
           id: userCred.user!.uid,
-          nom: _nom.text.trim(),
-          prenom: "", 
+          nom: nom,
+          prenom: prenom, 
           email: _email.text.trim(),
           telephone: _telephone.text.trim(),
           photo: "",
@@ -90,7 +95,13 @@ class _InscriptionClientState extends ConsumerState<InscriptionClient> {
           throw Exception("Délai d'attente dépassé pour la base de données (Firestore injoignable).");
         });
 
-        debugPrint("4. Envoi de l'email de vérification...");
+        debugPrint("4. Enregistrement du Token FCM...");
+        await ServiceNotification.enregistrerTokenUtilisateur(client.id, 'client');
+
+        debugPrint("5. Mise à jour du profil Auth...");
+        await serviceAuth.mettreAJourProfil(nom: _nom.text.trim());
+
+        debugPrint("6. Envoi de l'email de vérification...");
         // Envoyer l'email de vérification
         await serviceAuth.envoyerVerificationEmail().timeout(const Duration(seconds: 10), onTimeout: () {
            debugPrint("Attention: L'envoi de l'e-mail a pris trop de temps, mais le compte est créé.");
@@ -98,8 +109,16 @@ class _InscriptionClientState extends ConsumerState<InscriptionClient> {
         debugPrint("--- FIN DE L'INSCRIPTION ---");
       }
 
+      await serviceAuth.deconnexion();
+
       if (!mounted) return;
-      context.go(RoutesApplication.tableauBordClient);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Inscription réussie. Veuillez vous connecter pour accéder à votre tableau de bord."),
+          backgroundColor: Colors.green,
+        ),
+      );
+      context.go(RoutesApplication.connexion);
 
     } catch (e) {
       if (!mounted) return;

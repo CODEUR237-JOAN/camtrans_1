@@ -1,7 +1,59 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../modeles/notification.dart';
-import '../../services/service_authentification.dart';
-import '../../services/service_firestore.dart';
+import 'package:update_camtrans/modeles/notification.dart';
+import 'package:update_camtrans/services/service_authentification.dart';
+import 'package:update_camtrans/services/service_firestore.dart';
+import 'package:update_camtrans/services/service_notification.dart';
+
+/// Provider pour initialiser l'écoute et l'enregistrement du token FCM
+final gestionTokenFCMProvider = Provider.autoDispose<void>((ref) {
+  final authState = ref.watch(authStateProvider);
+  final firestore = ref.watch(serviceFirestoreProvider);
+  final userId = authState.value?.uid;
+
+  if (userId != null) {
+    // 1. Obtenir le token actuel au démarrage
+    ServiceNotification.obtenirToken().then((token) {
+      if (token != null) {
+        firestore.modifierDocument(
+          collection: 'utilisateurs',
+          id: userId,
+          donnees: {'fcmToken': token},
+        ).catchError((_) {}); // Ignore si le doc utilisateur n'existe pas encore
+      }
+    }).catchError((_) {});
+
+    // 2. Détecter le rôle pour lancer l'écoute automatique (simulation push)
+    // On vérifie dans quelle collection l'utilisateur se trouve
+    firestore.lireDocument(collection: 'clients', id: userId).then((doc) {
+      if (doc.exists) {
+        ServiceNotification.demarrerEcouteAutomatique(userId, 'client');
+      } else {
+        firestore.lireDocument(collection: 'transporteurs', id: userId).then((docT) {
+          if (docT.exists) {
+            ServiceNotification.demarrerEcouteAutomatique(userId, 'transporteur');
+          }
+        }).catchError((_) {});
+      }
+    }).catchError((_) {});
+
+    // 3. Écouter les changements de token
+    final sub = ServiceNotification.changementToken().listen((token) {
+      firestore.modifierDocument(
+        collection: 'utilisateurs',
+        id: userId,
+        donnees: {'fcmToken': token},
+      ).catchError((_) {});
+    }, onError: (e) {
+      debugPrint("Erreur changementToken FCM: $e");
+    });
+
+    ref.onDispose(() {
+      sub.cancel();
+      ServiceNotification.arreterEcouteAutomatique();
+    });
+  }
+});
 
 /// Stream des notifications de l'utilisateur connecté depuis Firestore
 final fluxNotificationsProvider = StreamProvider.autoDispose<List<NotificationApp>>((ref) {

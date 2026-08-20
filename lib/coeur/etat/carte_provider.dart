@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:connectivity_plus/connectivity_plus.dart';
 
-import '../../services/service_gps.dart';
+import 'package:update_camtrans/services/service_gps.dart';
 
 // État de la carte
 class EtatCarte {

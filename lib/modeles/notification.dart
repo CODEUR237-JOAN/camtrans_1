@@ -1,4 +1,4 @@
-import '../../coeur/utilitaires/parseur.dart';
+import 'package:update_camtrans/coeur/utilitaires/parseur.dart';
 
 class NotificationApp {
   final String id;

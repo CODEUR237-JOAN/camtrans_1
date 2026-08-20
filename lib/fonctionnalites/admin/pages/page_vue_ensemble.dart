@@ -1,14 +1,16 @@
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:intl/intl.dart';
+import 'package:google_fonts/google_fonts.dart';
 
-import '../../../coeur/etat/admin_provider.dart';
-import '../../../coeur/constantes/couleurs.dart';
-import '../../../modeles/transporteur.dart';
-import '../../../modeles/course.dart';
+import 'package:update_camtrans/coeur/etat/admin_provider.dart';
+import 'package:update_camtrans/coeur/constantes/couleurs.dart';
+import 'package:update_camtrans/modeles/transporteur.dart';
+import 'package:update_camtrans/modeles/course.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 
@@ -25,115 +27,145 @@ class PageVueEnsemble extends ConsumerWidget {
     final pendingApprovalsAsync = ref.watch(adminPendingApprovalsCountProvider);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF4F7FB),
-      body: statsAsync.when(
-        loading: () => const _SkeletonVueEnsemble(),
-        error: (err, _) => Center(child: Text("Erreur: $err")),
-        data: (stats) {
-          return SingleChildScrollView(
-            padding: const EdgeInsets.all(24.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      backgroundColor: const Color(0xFF08111F),
+      body: Stack(
+        children: [
+          // Effets lumineux de fond (Blobs)
+          Positioned(
+            top: -100,
+            left: -100,
+            child: Container(
+              width: 300,
+              height: 300,
+              decoration: BoxDecoration(
+                color: CouleursApp.primaire.withValues(alpha: 0.15),
+                shape: BoxShape.circle,
+              ),
+            ).animate(onPlay: (controller) => controller.repeat(reverse: true)).scale(begin: const Offset(1, 1), end: const Offset(1.2, 1.2), duration: 4.seconds),
+          ),
+          Positioned(
+            bottom: -50,
+            right: -50,
+            child: Container(
+              width: 250,
+              height: 250,
+              decoration: BoxDecoration(
+                color: CouleursApp.secondaire.withValues(alpha: 0.15),
+                shape: BoxShape.circle,
+              ),
+            ).animate(onPlay: (controller) => controller.repeat(reverse: true)).scale(begin: const Offset(1, 1), end: const Offset(1.3, 1.3), duration: 5.seconds),
+          ),
+          
+          statsAsync.when(
+            loading: () => const _SkeletonVueEnsemble(),
+            error: (err, _) => Center(child: Text("Erreur: $err", style: const TextStyle(color: Colors.white))),
+            data: (stats) {
+              return SingleChildScrollView(
+                padding: const EdgeInsets.all(32.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        const Text(
-                          "Bienvenue, Admin",
-                          style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: CouleursApp.textePrincipal),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "Aperçu Global",
+                              style: GoogleFonts.inter(fontSize: 32, fontWeight: FontWeight.bold, color: Colors.white, letterSpacing: -1),
+                            ),
+                            const SizedBox(height: 5),
+                            Text(
+                              "Tableau de bord de gestion CamTrans",
+                              style: GoogleFonts.inter(fontSize: 16, color: Colors.white.withValues(alpha: 0.6)),
+                            ),
+                          ],
                         ),
-                        const SizedBox(height: 5),
-                        const Text(
-                          "Voici l'état de la plateforme aujourd'hui.",
-                          style: TextStyle(fontSize: 16, color: CouleursApp.texteSecondaire),
-                        ),
+                        _buildPendingBadge(pendingApprovalsAsync, ref),
                       ],
                     ),
-                    _buildPendingBadge(pendingApprovalsAsync, ref),
+                    const SizedBox(height: 32),
+                    
+                    // Cartes KPI
+                    LayoutBuilder(
+                      builder: (context, constraints) {
+                        int crossAxisCount = constraints.maxWidth > 1200 ? 4 : constraints.maxWidth > 800 ? 2 : 1;
+                        return GridView.count(
+                          crossAxisCount: crossAxisCount,
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          crossAxisSpacing: 24,
+                          mainAxisSpacing: 24,
+                          childAspectRatio: 2.2,
+                          children: [
+                            _KpiCard(titre: "Revenus", valeur: "${NumberFormat.compact().format(stats.revenusTotaux)} F", icone: Iconsax.wallet_3_copy, couleur: CouleursApp.succes).animate().fadeIn(duration: 400.ms).slideY(begin: 0.1),
+                            _KpiCard(titre: "Clients Actifs", valeur: stats.totalClients.toString(), icone: Iconsax.user_copy, couleur: CouleursApp.secondaire).animate().fadeIn(duration: 400.ms, delay: 100.ms).slideY(begin: 0.1),
+                            _KpiCard(titre: "Transporteurs", valeur: stats.totalTransporteurs.toString(), icone: Iconsax.truck_fast_copy, couleur: CouleursApp.avertissement).animate().fadeIn(duration: 400.ms, delay: 200.ms).slideY(begin: 0.1),
+                            _KpiCard(titre: "Courses Totales", valeur: stats.totalCourses.toString(), icone: Iconsax.route_square_copy, couleur: CouleursApp.primaire).animate().fadeIn(duration: 400.ms, delay: 300.ms).slideY(begin: 0.1),
+                          ],
+                        );
+                      },
+                    ),
+                    
+                    const SizedBox(height: 32),
+                    
+                    // Section Graphiques
+                    LayoutBuilder(
+                      builder: (context, constraints) {
+                        if (constraints.maxWidth > 1100) {
+                          return Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Expanded(flex: 2, child: _buildGraphiqueRevenus(weeklyRevenuesAsync).animate().fadeIn(duration: 600.ms)),
+                              const SizedBox(width: 24),
+                              Expanded(flex: 1, child: _buildPieDistribution(distributionAsync).animate().fadeIn(duration: 600.ms, delay: 200.ms)),
+                            ],
+                          );
+                        } else {
+                          return Column(
+                            children: [
+                              _buildGraphiqueRevenus(weeklyRevenuesAsync),
+                              const SizedBox(height: 24),
+                              _buildPieDistribution(distributionAsync),
+                            ],
+                          );
+                        }
+                      }
+                    ),
+
+                    const SizedBox(height: 32),
+
+                    // Section Activités et Carte
+                    LayoutBuilder(
+                      builder: (context, constraints) {
+                        if (constraints.maxWidth > 1100) {
+                          return Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Expanded(flex: 1, child: _buildRecentActivities(activitiesAsync).animate().fadeIn(duration: 600.ms)),
+                              const SizedBox(width: 24),
+                              Expanded(flex: 2, child: _buildCarteTransporteurs(transporteursAsync).animate().fadeIn(duration: 600.ms, delay: 200.ms)),
+                            ],
+                          );
+                        } else {
+                          return Column(
+                            children: [
+                              _buildRecentActivities(activitiesAsync),
+                              const SizedBox(height: 24),
+                              _buildCarteTransporteurs(transporteursAsync),
+                            ],
+                          );
+                        }
+                      }
+                    ),
                   ],
                 ),
-                const SizedBox(height: 24),
-                
-                // Cartes KPI
-                LayoutBuilder(
-                  builder: (context, constraints) {
-                    int crossAxisCount = constraints.maxWidth > 1200 ? 4 : constraints.maxWidth > 800 ? 2 : 1;
-                    return GridView.count(
-                      crossAxisCount: crossAxisCount,
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      crossAxisSpacing: 16,
-                      mainAxisSpacing: 16,
-                      childAspectRatio: 2.5,
-                      children: [
-                        _KpiCard(titre: "Revenus (FCFA)", valeur: NumberFormat.compact().format(stats.revenusTotaux), icone: Iconsax.wallet_3, couleur: CouleursApp.succes).animate().fadeIn(duration: 400.ms).slideY(begin: 0.1),
-                        _KpiCard(titre: "Clients Actifs", valeur: stats.totalClients.toString(), icone: Iconsax.user_copy, couleur: CouleursApp.secondaire).animate().fadeIn(duration: 400.ms, delay: 100.ms).slideY(begin: 0.1),
-                        _KpiCard(titre: "Transporteurs", valeur: stats.totalTransporteurs.toString(), icone: Iconsax.truck_fast_copy, couleur: CouleursApp.avertissement).animate().fadeIn(duration: 400.ms, delay: 200.ms).slideY(begin: 0.1),
-                        _KpiCard(titre: "Courses Totales", valeur: stats.totalCourses.toString(), icone: Iconsax.map, couleur: CouleursApp.primaire).animate().fadeIn(duration: 400.ms, delay: 300.ms).slideY(begin: 0.1),
-                      ],
-                    );
-                  },
-                ),
-                
-                const SizedBox(height: 32),
-                
-                // Section Graphiques
-                LayoutBuilder(
-                  builder: (context, constraints) {
-                    if (constraints.maxWidth > 1100) {
-                      return Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Expanded(flex: 2, child: _buildGraphiqueRevenus(weeklyRevenuesAsync).animate().fadeIn(duration: 600.ms)),
-                          const SizedBox(width: 24),
-                          Expanded(flex: 1, child: _buildPieDistribution(distributionAsync).animate().fadeIn(duration: 600.ms, delay: 200.ms)),
-                        ],
-                      );
-                    } else {
-                      return Column(
-                        children: [
-                          _buildGraphiqueRevenus(weeklyRevenuesAsync),
-                          const SizedBox(height: 24),
-                          _buildPieDistribution(distributionAsync),
-                        ],
-                      );
-                    }
-                  }
-                ),
-
-                const SizedBox(height: 32),
-
-                // Section Activités et Carte
-                LayoutBuilder(
-                  builder: (context, constraints) {
-                    if (constraints.maxWidth > 1100) {
-                      return Row(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Expanded(flex: 1, child: _buildRecentActivities(activitiesAsync).animate().fadeIn(duration: 600.ms)),
-                          const SizedBox(width: 24),
-                          Expanded(flex: 1, child: _buildCarteTransporteurs(transporteursAsync).animate().fadeIn(duration: 600.ms, delay: 200.ms)),
-                        ],
-                      );
-                    } else {
-                      return Column(
-                        children: [
-                          _buildRecentActivities(activitiesAsync),
-                          const SizedBox(height: 24),
-                          _buildCarteTransporteurs(transporteursAsync),
-                        ],
-                      );
-                    }
-                  }
-                ),
-              ],
-            ),
-          );
-        },
-      ),
+              );
+            },
+          ),
+        ],
+      )
     );
   }
 
@@ -142,195 +174,191 @@ class PageVueEnsemble extends ConsumerWidget {
       data: (count) => count > 0 ? GestureDetector(
         onTap: () => ref.read(adminMenuIndexProvider.notifier).state = 2,
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
           decoration: BoxDecoration(
-            color: Colors.red.shade50,
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.red.shade200),
+            color: Colors.red.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: Colors.red.withValues(alpha: 0.5)),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.red.withValues(alpha: 0.2),
+                blurRadius: 15,
+                spreadRadius: 2,
+              )
+            ]
           ),
           child: Row(
             children: [
-              const Icon(Icons.warning_amber_rounded, color: Colors.red, size: 20),
-              const SizedBox(width: 8),
-              Text("$count dossiers à valider", style: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
+              const Icon(Iconsax.warning_2_copy, color: Colors.redAccent, size: 20),
+              const SizedBox(width: 10),
+              Text("$count en attente", style: GoogleFonts.inter(color: Colors.redAccent, fontWeight: FontWeight.bold)),
             ],
           ),
         ),
-      ).animate().shake() : const SizedBox.shrink(),
+      ).animate().shake(delay: 2.seconds) : const SizedBox.shrink(),
       orElse: () => const SizedBox.shrink(),
     );
   }
 
   Widget _buildPieDistribution(AsyncValue<Map<String, int>> distributionAsync) {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10)],
-      ),
-      height: 400,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text("Répartition des Courses", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-          const SizedBox(height: 24),
-          Expanded(
-            child: distributionAsync.when(
-              loading: () => const Center(child: CircularProgressIndicator()),
-              error: (err, _) => Center(child: Text("Erreur: $err")),
-              data: (data) {
-                if (data.isEmpty) return const Center(child: Text("Pas de données"));
-                
-                final List<PieChartSectionData> sections = [];
-                final colors = [CouleursApp.primaire, CouleursApp.succes, CouleursApp.secondaire, CouleursApp.erreur, CouleursApp.avertissement];
-                int i = 0;
-                
-                data.forEach((key, value) {
-                  sections.add(PieChartSectionData(
-                    value: value.toDouble(),
-                    title: "$value",
-                    color: colors[i % colors.length],
-                    radius: 50,
-                    titleStyle: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
-                  ));
-                  i++;
-                });
+    return _CarteGlass(
+      titre: "Répartition des Courses",
+      hauteur: 420,
+      enfant: distributionAsync.when(
+        loading: () => const Center(child: CircularProgressIndicator(color: CouleursApp.primaire)),
+        error: (err, _) => Center(child: Text("Erreur: $err", style: const TextStyle(color: Colors.white))),
+        data: (data) {
+          if (data.isEmpty) return const Center(child: Text("Pas de données", style: TextStyle(color: Colors.white54)));
+          
+          final List<PieChartSectionData> sections = [];
+          final colors = [CouleursApp.secondaire, CouleursApp.primaire, CouleursApp.succes, CouleursApp.avertissement, CouleursApp.erreur];
+          int i = 0;
+          
+          data.forEach((key, value) {
+            sections.add(PieChartSectionData(
+              value: value.toDouble(),
+              title: "$value",
+              color: colors[i % colors.length],
+              radius: 60,
+              titleStyle: GoogleFonts.inter(fontWeight: FontWeight.bold, color: Colors.white, fontSize: 14),
+              badgeWidget: _Badge(key, colors[i % colors.length]),
+              badgePositionPercentageOffset: 1.3,
+            ));
+            i++;
+          });
 
-                return Column(
-                  children: [
-                    Expanded(child: PieChart(PieChartData(sections: sections, centerSpaceRadius: 40))),
-                    const SizedBox(height: 20),
-                    Wrap(
-                      spacing: 12,
-                      children: data.keys.toList().asMap().entries.map((e) {
-                        return Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Container(width: 12, height: 12, decoration: BoxDecoration(color: colors[e.key % colors.length], shape: BoxShape.circle)),
-                            const SizedBox(width: 4),
-                            Text(e.value, style: const TextStyle(fontSize: 11, color: Colors.grey)),
-                          ],
-                        );
-                      }).toList(),
-                    ),
-                  ],
-                );
-              },
-            ),
-          ),
-        ],
+          return PieChart(PieChartData(
+            sections: sections, 
+            centerSpaceRadius: 50,
+            sectionsSpace: 4,
+          )).animate().scale(delay: 300.ms, duration: 600.ms, curve: Curves.easeOutBack);
+        },
       ),
     );
   }
 
   Widget _buildRecentActivities(AsyncValue<List<Course>> activitiesAsync) {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10)],
-      ),
-      height: 400,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text("Activités Récentes", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-          const SizedBox(height: 16),
-          Expanded(
-            child: activitiesAsync.when(
-              loading: () => const Center(child: CircularProgressIndicator()),
-              error: (err, _) => Center(child: Text("Erreur: $err")),
-              data: (list) {
-                if (list.isEmpty) return const Center(child: Text("Aucune activité"));
-                return ListView.builder(
-                  itemCount: list.length,
-                  itemBuilder: (context, index) {
-                    final c = list[index];
-                    return ListTile(
-                      contentPadding: EdgeInsets.zero,
-                      leading: Container(
-                        padding: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(color: CouleursApp.primaire.withValues(alpha: 0.1), shape: BoxShape.circle),
-                        child: const Icon(Icons.shopping_bag_outlined, size: 18, color: CouleursApp.primaire),
+    return _CarteGlass(
+      titre: "Activités Récentes",
+      hauteur: 450,
+      enfant: activitiesAsync.when(
+        loading: () => const Center(child: CircularProgressIndicator(color: CouleursApp.primaire)),
+        error: (err, _) => Center(child: Text("Erreur: $err", style: const TextStyle(color: Colors.white))),
+        data: (list) {
+          if (list.isEmpty) return const Center(child: Text("Aucune activité", style: TextStyle(color: Colors.white54)));
+          return ListView.builder(
+            itemCount: list.length,
+            itemBuilder: (context, index) {
+              final c = list[index];
+              return Container(
+                margin: const EdgeInsets.only(bottom: 16),
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.03),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: CouleursApp.secondaire.withValues(alpha: 0.15),
+                        shape: BoxShape.circle,
                       ),
-                      title: Text(c.adresseArrivee, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13), overflow: TextOverflow.ellipsis),
-                      subtitle: Text(DateFormat('HH:mm').format(c.dateCreation), style: const TextStyle(fontSize: 11)),
-                      trailing: Text("${c.prixFinal > 0 ? c.prixFinal : c.prixEstime} F", style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
-                    );
-                  },
-                );
-              },
-            ),
-          ),
-        ],
+                      child: const Icon(Iconsax.box_copy, color: CouleursApp.secondaire, size: 20),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(c.adresseArrivee, style: GoogleFonts.inter(fontWeight: FontWeight.bold, fontSize: 14, color: Colors.white), overflow: TextOverflow.ellipsis),
+                          const SizedBox(height: 4),
+                          Text(DateFormat('HH:mm - dd MMM').format(c.dateCreation), style: GoogleFonts.inter(fontSize: 12, color: Colors.white54)),
+                        ],
+                      ),
+                    ),
+                    Text("${c.prixFinal > 0 ? c.prixFinal : c.prixEstime} F", style: GoogleFonts.inter(fontWeight: FontWeight.bold, fontSize: 15, color: CouleursApp.succes)),
+                  ],
+                ),
+              ).animate().fadeIn(delay: Duration(milliseconds: 100 * index)).slideX();
+            },
+          );
+        },
       ),
     );
   }
 
   Widget _buildGraphiqueRevenus(AsyncValue<List<double>> weeklyRevenuesAsync) {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10)],
-      ),
-      height: 400,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          const Text("Évolution des Revenus (7 derniers jours)", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-          const SizedBox(height: 24),
-          Expanded(
-            child: weeklyRevenuesAsync.when(
-              loading: () => Container(
-                color: Colors.grey.shade100,
-              ).animate(onPlay: (controller) => controller.repeat()).shimmer(color: Colors.grey.shade300, duration: 1.5.seconds),
-              error: (err, _) => Center(child: Text("Erreur chart: $err")),
-              data: (data) {
-                final spots = data.asMap().entries.map((e) => FlSpot(e.key.toDouble(), e.value)).toList();
-                
-                return LineChart(
-                  LineChartData(
-                    gridData: FlGridData(show: true, drawVerticalLine: false),
-                    titlesData: FlTitlesData(
-                      rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                      topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
-                      bottomTitles: AxisTitles(
-                        sideTitles: SideTitles(
-                          showTitles: true,
-                          getTitlesWidget: (value, meta) {
-                            const jours = ['J-6', 'J-5', 'J-4', 'J-3', 'J-2', 'Hier', 'Auj'];
-                            if (value.toInt() >= 0 && value.toInt() < jours.length) {
-                              return Text(jours[value.toInt()], style: const TextStyle(color: Colors.grey, fontSize: 10));
-                            }
-                            return const Text('');
-                          },
-                        ),
-                      ),
-                    ),
-                    borderData: FlBorderData(show: false),
-                    lineBarsData: [
-                      LineChartBarData(
-                        spots: spots,
-                        isCurved: true,
-                        color: CouleursApp.primaire,
-                        barWidth: 4,
-                        belowBarData: BarAreaData(
-                          show: true,
-                          color: CouleursApp.primaire.withValues(alpha: 0.1),
-                        ),
-                        dotData: const FlDotData(show: true),
-                      ),
-                    ],
+    return _CarteGlass(
+      titre: "Évolution des Revenus",
+      hauteur: 420,
+      enfant: weeklyRevenuesAsync.when(
+        loading: () => Container(color: Colors.white.withValues(alpha: 0.05)).animate(onPlay: (controller) => controller.repeat()).shimmer(color: Colors.white.withValues(alpha: 0.1), duration: 1.5.seconds),
+        error: (err, _) => Center(child: Text("Erreur chart: $err", style: const TextStyle(color: Colors.white))),
+        data: (data) {
+          final spots = data.asMap().entries.map((e) => FlSpot(e.key.toDouble(), e.value)).toList();
+          
+          return LineChart(
+            LineChartData(
+              gridData: FlGridData(
+                show: true, 
+                drawVerticalLine: false,
+                getDrawingHorizontalLine: (value) => FlLine(color: Colors.white.withValues(alpha: 0.05), strokeWidth: 1),
+              ),
+              titlesData: FlTitlesData(
+                rightTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                topTitles: AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                leftTitles: AxisTitles(
+                  sideTitles: SideTitles(
+                    showTitles: true,
+                    reservedSize: 50,
+                    getTitlesWidget: (value, meta) => Text(NumberFormat.compact().format(value), style: GoogleFonts.inter(color: Colors.white54, fontSize: 11)),
                   ),
-                );
-              },
+                ),
+                bottomTitles: AxisTitles(
+                  sideTitles: SideTitles(
+                    showTitles: true,
+                    reservedSize: 30,
+                    getTitlesWidget: (value, meta) {
+                      const jours = ['J-6', 'J-5', 'J-4', 'J-3', 'J-2', 'Hier', 'Auj'];
+                      if (value.toInt() >= 0 && value.toInt() < jours.length) {
+                        return Padding(
+                          padding: const EdgeInsets.only(top: 8.0),
+                          child: Text(jours[value.toInt()], style: GoogleFonts.inter(color: Colors.white54, fontSize: 12)),
+                        );
+                      }
+                      return const Text('');
+                    },
+                  ),
+                ),
+              ),
+              borderData: FlBorderData(show: false),
+              lineBarsData: [
+                LineChartBarData(
+                  spots: spots,
+                  isCurved: true,
+                  color: CouleursApp.secondaire,
+                  barWidth: 5,
+                  isStrokeCapRound: true,
+                  dotData: const FlDotData(show: false),
+                  belowBarData: BarAreaData(
+                    show: true,
+                    gradient: LinearGradient(
+                      colors: [
+                        CouleursApp.secondaire.withValues(alpha: 0.5),
+                        CouleursApp.secondaire.withValues(alpha: 0.0),
+                      ],
+                      begin: Alignment.topCenter,
+                      end: Alignment.bottomCenter,
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ),
-        ],
+          ).animate().fadeIn(duration: 800.ms, delay: 200.ms);
+        },
       ),
     );
   }
@@ -338,48 +366,74 @@ class PageVueEnsemble extends ConsumerWidget {
   Widget _buildCarteTransporteurs(AsyncValue<List<Transporteur>> transporteursAsync) {
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10)],
+        color: Colors.white.withValues(alpha: 0.03),
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
       ),
-      height: 400,
-      clipBehavior: Clip.hardEdge,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      height: 450,
+      clipBehavior: Clip.antiAlias,
+      child: Stack(
         children: [
-          const Padding(
-            padding: EdgeInsets.all(20.0),
-            child: Text("Activité en temps réel", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-          ),
-          Expanded(
-            child: transporteursAsync.when(
-              loading: () => Container(
-                color: Colors.grey.shade100,
-              ).animate(onPlay: (controller) => controller.repeat()).shimmer(color: Colors.grey.shade300, duration: 1.5.seconds),
-              error: (err, _) => Center(child: Text("Erreur map: $err")),
-              data: (transporteurs) {
-                final markers = transporteurs
-                    .where((t) => t.latitude != 0 && t.longitude != 0)
-                    .map<Marker>((t) => Marker(
-                          point: LatLng(t.latitude, t.longitude),
-                          child: Icon(Icons.local_shipping, color: t.disponible ? Colors.green : Colors.orange, size: 24),
-                        ))
-                    .toList();
+          transporteursAsync.when(
+            loading: () => Container(color: Colors.white.withValues(alpha: 0.05)).animate(onPlay: (controller) => controller.repeat()).shimmer(color: Colors.white.withValues(alpha: 0.1), duration: 1.5.seconds),
+            error: (err, _) => Center(child: Text("Erreur map: $err", style: const TextStyle(color: Colors.white))),
+            data: (transporteurs) {
+              final markers = transporteurs
+                  .where((t) => t.latitude != 0 && t.longitude != 0)
+                  .map<Marker>((t) => Marker(
+                        point: LatLng(t.latitude, t.longitude),
+                        width: 40,
+                        height: 40,
+                        child: Container(
+                          decoration: BoxDecoration(
+                            color: t.disponible ? CouleursApp.succes.withValues(alpha: 0.2) : Colors.orange.withValues(alpha: 0.2),
+                            shape: BoxShape.circle,
+                          ),
+                          child: Icon(Iconsax.truck_fast_copy, color: t.disponible ? CouleursApp.succes : Colors.orange, size: 20),
+                        ),
+                      ))
+                  .toList();
 
-                return FlutterMap(
-                  options: const MapOptions(
-                    initialCenter: LatLng(4.0511, 9.7679), // Douala
-                    initialZoom: 11,
+              return FlutterMap(
+                options: const MapOptions(
+                  initialCenter: LatLng(4.0511, 9.7679), // Douala
+                  initialZoom: 12,
+                ),
+                children: [
+                  TileLayer(
+                    // Utilisation d'une carte sombre (CartoDB Dark Matter) pour coller au thème Neo Premium
+                    urlTemplate: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
+                    subdomains: const ['a', 'b', 'c', 'd'],
+                    userAgentPackageName: 'com.joan.update_camtrans',
                   ),
-                  children: [
-                    TileLayer(
-                      urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                      userAgentPackageName: 'com.joan.update_camtrans',
-                    ),
-                    MarkerLayer(markers: markers),
-                  ],
-                );
-              },
+                  MarkerLayer(markers: markers),
+                ],
+              );
+            },
+          ),
+          Positioned(
+            top: 24,
+            left: 24,
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: BackdropFilter(
+                filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                child: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  decoration: BoxDecoration(
+                    color: Colors.black.withValues(alpha: 0.4),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(width: 8, height: 8, decoration: const BoxDecoration(color: Colors.redAccent, shape: BoxShape.circle)).animate(onPlay: (controller) => controller.repeat(reverse: true)).fade(begin: 0.4, end: 1),
+                      const SizedBox(width: 10),
+                      Text("Direct Tracker", style: GoogleFonts.inter(fontWeight: FontWeight.bold, color: Colors.white)),
+                    ],
+                  ),
+                ),
+              ),
             ),
           ),
         ],
@@ -398,36 +452,87 @@ class _KpiCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10)],
-      ),
-      child: Row(
-        children: [
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: couleur.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Icon(icone, color: couleur, size: 28),
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(24),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+        child: Container(
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: 0.03),
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: 0.2),
+                blurRadius: 30,
+                offset: const Offset(0, 10),
+              )
+            ]
           ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(titre, style: const TextStyle(color: Colors.grey, fontSize: 13, fontWeight: FontWeight.bold), overflow: TextOverflow.ellipsis),
-                const SizedBox(height: 4),
-                FittedBox(fit: BoxFit.scaleDown, child: Text(valeur, style: const TextStyle(color: Colors.black87, fontSize: 22, fontWeight: FontWeight.bold))),
-              ],
-            ),
-          )
-        ],
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: couleur.withValues(alpha: 0.15),
+                  shape: BoxShape.circle,
+                  boxShadow: [
+                    BoxShadow(color: couleur.withValues(alpha: 0.2), blurRadius: 15)
+                  ]
+                ),
+                child: Icon(icone, color: couleur, size: 28),
+              ),
+              const SizedBox(width: 20),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(titre, style: GoogleFonts.inter(color: Colors.white54, fontSize: 14, fontWeight: FontWeight.w500), overflow: TextOverflow.ellipsis),
+                    const SizedBox(height: 6),
+                    FittedBox(fit: BoxFit.scaleDown, child: Text(valeur, style: GoogleFonts.inter(color: Colors.white, fontSize: 26, fontWeight: FontWeight.bold, letterSpacing: -0.5))),
+                  ],
+                ),
+              )
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _CarteGlass extends StatelessWidget {
+  final String titre;
+  final Widget enfant;
+  final double hauteur;
+
+  const _CarteGlass({required this.titre, required this.enfant, required this.hauteur});
+
+  @override
+  Widget build(BuildContext context) {
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(24),
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
+        child: Container(
+          height: hauteur,
+          padding: const EdgeInsets.all(28),
+          decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: 0.03),
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(titre, style: GoogleFonts.inter(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.white)),
+              const SizedBox(height: 28),
+              Expanded(child: enfant),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -439,14 +544,14 @@ class _SkeletonVueEnsemble extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(24.0),
+      padding: const EdgeInsets.all(32.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(height: 30, width: 250, color: Colors.grey.shade200).animate(onPlay: (controller) => controller.repeat()).shimmer(color: Colors.grey.shade300, duration: 1.5.seconds),
+          Container(height: 40, width: 300, decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.05), borderRadius: BorderRadius.circular(8))).animate(onPlay: (controller) => controller.repeat()).shimmer(color: Colors.white.withValues(alpha: 0.1), duration: 1.5.seconds),
           const SizedBox(height: 10),
-          Container(height: 20, width: 350, color: Colors.grey.shade200).animate(onPlay: (controller) => controller.repeat()).shimmer(color: Colors.grey.shade300, duration: 1.5.seconds),
-          const SizedBox(height: 24),
+          Container(height: 20, width: 400, decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.05), borderRadius: BorderRadius.circular(8))).animate(onPlay: (controller) => controller.repeat()).shimmer(color: Colors.white.withValues(alpha: 0.1), duration: 1.5.seconds),
+          const SizedBox(height: 32),
           LayoutBuilder(
             builder: (context, constraints) {
               int crossAxisCount = constraints.maxWidth > 1200 ? 4 : constraints.maxWidth > 800 ? 2 : 1;
@@ -454,16 +559,43 @@ class _SkeletonVueEnsemble extends StatelessWidget {
                 crossAxisCount: crossAxisCount,
                 shrinkWrap: true,
                 physics: const NeverScrollableScrollPhysics(),
-                crossAxisSpacing: 16,
-                mainAxisSpacing: 16,
-                childAspectRatio: 2.5,
+                crossAxisSpacing: 24,
+                mainAxisSpacing: 24,
+                childAspectRatio: 2.2,
                 children: List.generate(4, (index) => Container(
-                  decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(16)),
-                ).animate(onPlay: (controller) => controller.repeat()).shimmer(color: Colors.grey.shade300, duration: 1.5.seconds)),
+                  decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.05), borderRadius: BorderRadius.circular(24)),
+                ).animate(onPlay: (controller) => controller.repeat()).shimmer(color: Colors.white.withValues(alpha: 0.1), duration: 1.5.seconds)),
               );
             },
           ),
         ],
+      ),
+    );
+  }
+}
+
+class _Badge extends StatelessWidget {
+  final String texte;
+  final Color couleur;
+
+  const _Badge(this.texte, this.couleur);
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+      decoration: BoxDecoration(
+        color: Colors.black.withValues(alpha: 0.6),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: couleur.withValues(alpha: 0.5)),
+      ),
+      child: Text(
+        texte,
+        style: GoogleFonts.inter(
+          fontSize: 12,
+          color: Colors.white,
+          fontWeight: FontWeight.bold,
+        ),
       ),
     );
   }

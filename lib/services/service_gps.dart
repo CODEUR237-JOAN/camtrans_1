@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -73,18 +74,33 @@ class ServiceGps {
     required double latitude,
     required double longitude,
   }) async {
-    final places = await placemarkFromCoordinates(
-      latitude,
-      longitude,
-    );
+    try {
+      final places = await placemarkFromCoordinates(
+        latitude,
+        longitude,
+      );
 
-    if (places.isEmpty) {
-      return "";
+      if (places.isEmpty) {
+        return "Position inconnue ($latitude, $longitude)";
+      }
+
+      final p = places.first;
+      
+      // Construction d'une adresse descriptive : Quartier, Ville, Pays
+      // subLocality correspond souvent au quartier
+      final quartier = p.subLocality?.isNotEmpty == true ? p.subLocality : p.thoroughfare;
+      final ville = p.locality?.isNotEmpty == true ? p.locality : p.subAdministrativeArea;
+      final pays = p.country;
+
+      List<String> composants = [];
+      if (quartier != null && quartier.isNotEmpty) composants.add(quartier);
+      if (ville != null && ville.isNotEmpty) composants.add(ville);
+      if (pays != null && pays.isNotEmpty) composants.add(pays);
+
+      return composants.join(", ");
+    } catch (e) {
+      return "Erreur de localisation ($latitude, $longitude)";
     }
-
-    final p = places.first;
-
-    return "${p.street}, ${p.locality}, ${p.country}";
   }
 
   // ===========================
@@ -94,15 +110,22 @@ class ServiceGps {
   Future<Location?> obtenirCoordonnees(
       String adresse,
       ) async {
-    final locations = await locationFromAddress(
-      adresse,
-    );
+    try {
+      if (adresse.isEmpty) return null;
+      
+      final locations = await locationFromAddress(
+        adresse,
+      );
 
-    if (locations.isEmpty) {
+      if (locations.isEmpty) {
+        return null;
+      }
+
+      return locations.first;
+    } catch (e) {
+      debugPrint("Erreur geocoding pour $adresse : $e");
       return null;
     }
-
-    return locations.first;
   }
 
   // ===========================

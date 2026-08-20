@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../modeles/paiement.dart';
-import '../../services/service_paiement.dart';
+import 'package:update_camtrans/modeles/paiement.dart';
+import 'package:update_camtrans/services/service_paiement.dart';
+import 'package:update_camtrans/services/service_notification.dart';
 
 class EtatTransaction {
   final bool enCours;
@@ -52,6 +53,7 @@ class PaiementNotifier extends StateNotifier<EtatTransaction> {
         telephonePayeur: telephone,
       );
       state = EtatTransaction(enCours: false, succes: paiement);
+      ServiceNotification.afficherNotification(titre: "✅ Paiement validé", message: "Votre reçu de $montant FCFA a été généré avec succès.");
     } catch (e) {
       state = EtatTransaction(enCours: false, erreur: e.toString());
     }
@@ -74,6 +76,7 @@ class PaiementNotifier extends StateNotifier<EtatTransaction> {
         telephonePayeur: telephone,
       );
       state = EtatTransaction(enCours: false, succes: paiement);
+      ServiceNotification.afficherNotification(titre: "✅ Paiement validé", message: "Votre reçu de $montant FCFA a été généré avec succès.");
     } catch (e) {
       state = EtatTransaction(enCours: false, erreur: e.toString());
     }
@@ -96,6 +99,28 @@ class PaiementNotifier extends StateNotifier<EtatTransaction> {
         nomTitulaire: nomTitulaire,
       );
       state = EtatTransaction(enCours: false, succes: paiement);
+      ServiceNotification.afficherNotification(titre: "✅ Paiement validé", message: "Votre reçu de $montant FCFA a été généré avec succès.");
+    } catch (e) {
+      state = EtatTransaction(enCours: false, erreur: e.toString());
+    }
+  }
+
+  Future<void> payerEnEspeces({
+    required String courseId,
+    required String clientId,
+    required String transporteurId,
+    required double montant,
+  }) async {
+    state = EtatTransaction(enCours: true);
+    try {
+      final paiement = await _service.initierPaiementEspeces(
+        courseId: courseId,
+        clientId: clientId,
+        transporteurId: transporteurId,
+        montant: montant,
+      );
+      state = EtatTransaction(enCours: false, succes: paiement);
+      ServiceNotification.afficherNotification(titre: "✅ Paiement validé", message: "Votre reçu de $montant FCFA a été généré avec succès.");
     } catch (e) {
       state = EtatTransaction(enCours: false, erreur: e.toString());
     }

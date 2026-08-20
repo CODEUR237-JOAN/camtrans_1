@@ -1,28 +1,35 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
-import '../animations/transitions_page.dart';
-import '../constantes/couleurs.dart';
-import '../widgets/effets_visuels.dart';
+import 'package:update_camtrans/coeur/animations/transitions_page.dart';
+import 'package:update_camtrans/coeur/constantes/couleurs.dart';
+import 'package:update_camtrans/coeur/widgets/effets_visuels.dart';
 
-import '../../fonctionnalites/authentification/choix_profil.dart';
-import '../../fonctionnalites/authentification/connexion.dart';
-import '../../fonctionnalites/authentification/inscription_client.dart';
-import '../../fonctionnalites/authentification/inscription_transporteur.dart';
-import '../../fonctionnalites/authentification/mot_de_passe_oublie.dart';
-import '../../fonctionnalites/authentification/verification_email.dart';
-import '../../fonctionnalites/client/carte.dart';
-import '../../fonctionnalites/client/creer_demande.dart';
-import '../../fonctionnalites/client/facture.dart';
-import '../../fonctionnalites/client/historique.dart';
-import '../../fonctionnalites/client/suivi_transport.dart';
-import '../../fonctionnalites/client/tableau_de_bord_client.dart';
-import '../../fonctionnalites/demarrage/ecran_splash.dart';
-import '../../fonctionnalites/demarrage/onboarding.dart';
-import '../../fonctionnalites/transporteur/tableau_de_bord_transporteur.dart';
-import '../../fonctionnalites/ia/ecran_assistant_ia.dart';
-import '../../fonctionnalites/paiement/ecran_paiement.dart';
-import '../../fonctionnalites/admin/tableau_de_bord_admin.dart';
+import 'package:update_camtrans/fonctionnalites/authentification/choix_profil.dart';
+import 'package:update_camtrans/fonctionnalites/authentification/connexion.dart';
+import 'package:update_camtrans/fonctionnalites/authentification/inscription_client.dart';
+import 'package:update_camtrans/fonctionnalites/authentification/inscription_transporteur.dart';
+import 'package:update_camtrans/fonctionnalites/authentification/mot_de_passe_oublie.dart';
+import 'package:update_camtrans/fonctionnalites/authentification/verification_email.dart';
+import 'package:update_camtrans/fonctionnalites/client/carte.dart';
+import 'package:update_camtrans/fonctionnalites/client/creer_demande.dart';
+import 'package:update_camtrans/fonctionnalites/client/facture.dart';
+import 'package:update_camtrans/fonctionnalites/client/historique.dart';
+import 'package:update_camtrans/fonctionnalites/client/suivi_transport.dart';
+import 'package:update_camtrans/fonctionnalites/client/tableau_de_bord_client.dart';
+import 'package:update_camtrans/fonctionnalites/demarrage/ecran_splash.dart';
+import 'package:update_camtrans/fonctionnalites/demarrage/onboarding.dart';
+import 'package:update_camtrans/fonctionnalites/transporteur/tableau_de_bord_transporteur.dart';
+import 'package:update_camtrans/fonctionnalites/ia/ecran_assistant_ia.dart';
+import 'package:update_camtrans/fonctionnalites/paiement/ecran_paiement.dart';
+import 'package:update_camtrans/fonctionnalites/admin/tableau_de_bord_admin.dart';
+import 'package:update_camtrans/fonctionnalites/client/adresses_favorites.dart';
+import 'package:update_camtrans/fonctionnalites/client/ecran_chat.dart';
+import 'package:update_camtrans/fonctionnalites/client/ecran_evaluation.dart';
+import 'package:update_camtrans/fonctionnalites/profil/modifier_profil.dart';
+import 'package:update_camtrans/fonctionnalites/profil/changer_mot_de_passe.dart';
+import 'package:update_camtrans/fonctionnalites/transporteur/historique_livraisons.dart';
+import 'package:update_camtrans/modeles/transporteur.dart';
 
 class RoutesApplication {
   RoutesApplication._();
@@ -39,6 +46,8 @@ class RoutesApplication {
   static const String inscriptionTransporteur = "/inscription-transporteur";
   static const String motDePasseOublie = "/mot-de-passe-oublie";
   static const String verificationEmail = "/verification-email";
+  static const String modifierProfil = "/modifier-profil";
+  static const String changerMotDePasse = "/changer-mot-de-passe";
   static const String tableauBordClient = "/tableau-bord-client";
   static const String creerDemande = "/creer-demande";
   static const String carte = "/carte";
@@ -49,7 +58,11 @@ class RoutesApplication {
   static const String tableauBordTransporteur = "/tableau-bord-transporteur";
   static const String assistantIA = "/assistant-ia";
   static const String paiement = "/paiement";
+  static const String evaluation = "/evaluation/:courseId";
   static const String admin = "/admin";
+  static const String adressesFavorites = "/adresses-favorites";
+  static const String chat = "/chat";
+  static const String historiqueLivraisonsTransporteur = "/historique-livraisons-transporteur";
 
   // ===========================
   // Routeur GoRouter
@@ -99,6 +112,14 @@ class RoutesApplication {
         pageBuilder: (context, state) => _page(const VerificationEmail(), state.pageKey),
       ),
       GoRoute(
+        path: modifierProfil,
+        pageBuilder: (context, state) => _page(const ModifierProfil(), state.pageKey),
+      ),
+      GoRoute(
+        path: changerMotDePasse,
+        pageBuilder: (context, state) => _page(const ChangerMotDePasse(), state.pageKey),
+      ),
+      GoRoute(
         path: tableauBordClient,
         pageBuilder: (context, state) => _page(const TableauDeBordClient(), state.pageKey),
       ),
@@ -143,6 +164,13 @@ class RoutesApplication {
         pageBuilder: (context, state) => _page(const EcranAssistantIA(), state.pageKey),
       ),
       GoRoute(
+        path: "/evaluation/:courseId",
+        pageBuilder: (context, state) => _page(
+          EcranEvaluation(courseId: state.pathParameters['courseId'] ?? ""),
+          state.pageKey,
+        ),
+      ),
+      GoRoute(
         path: paiement,
         pageBuilder: (context, state) {
           final args = state.extra as Map<String, dynamic>? ?? {};
@@ -155,6 +183,22 @@ class RoutesApplication {
             state.pageKey,
           );
         },
+      ),
+      GoRoute(
+        path: adressesFavorites,
+        pageBuilder: (context, state) => _page(const AdressesFavoritesPage(), state.pageKey),
+      ),
+      GoRoute(
+        path: chat,
+        pageBuilder: (context, state) {
+          final args = state.extra as Map<String, dynamic>? ?? {};
+          final transporteur = args['transporteur'] as Transporteur;
+          return _page(EcranChat(transporteur: transporteur), state.pageKey);
+        },
+      ),
+      GoRoute(
+        path: historiqueLivraisonsTransporteur,
+        pageBuilder: (context, state) => _page(const HistoriqueLivraisons(), state.pageKey),
       ),
       GoRoute(
         path: admin,

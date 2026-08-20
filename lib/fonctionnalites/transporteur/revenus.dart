@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../coeur/constantes/couleurs.dart';
-import '../../coeur/etat/transporteur_provider.dart';
+import 'package:update_camtrans/coeur/constantes/couleurs.dart';
+import 'package:update_camtrans/coeur/etat/transporteur_provider.dart';
 
 class Portefeuille extends ConsumerWidget {
   const Portefeuille({super.key});

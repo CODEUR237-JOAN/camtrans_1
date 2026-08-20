@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
-import '../../coeur/etat/admin_provider.dart';
+import 'package:update_camtrans/coeur/etat/admin_provider.dart';
 import 'widgets/sidebar_admin.dart';
 import 'pages/page_vue_ensemble.dart';
 import 'pages/page_utilisateurs.dart';
 import 'pages/page_moderation.dart';
 import 'pages/page_activites.dart';
+import 'pages/page_notifications.dart';
+import 'pages/page_carte_flotte.dart';
 
 class TableauDeBordAdmin extends ConsumerStatefulWidget {
   const TableauDeBordAdmin({super.key});
@@ -48,15 +50,15 @@ class _TableauDeBordAdminState extends ConsumerState<TableauDeBordAdmin> {
     final isDesktop = width > 900;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF4F7FB),
+      backgroundColor: const Color(0xFF08111F),
       // Sur mobile/tablette on met un Drawer
       drawer: !isDesktop ? const Drawer(child: SidebarAdmin()) : null,
       appBar: !isDesktop
           ? AppBar(
-              backgroundColor: Colors.white,
+              backgroundColor: const Color(0xFF08111F),
               elevation: 0,
-              iconTheme: const IconThemeData(color: Colors.black87),
-              title: const Text("CamTrans Admin", style: TextStyle(color: Colors.black87, fontWeight: FontWeight.bold)),
+              iconTheme: const IconThemeData(color: Colors.white),
+              title: const Text("CamTrans Admin", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
             )
           : null, // Pas d'appBar sur Desktop, la sidebar gère tout
       body: Row(
@@ -73,7 +75,9 @@ class _TableauDeBordAdminState extends ConsumerState<TableauDeBordAdmin> {
                 const PageVueEnsemble().animate().fadeIn(duration: 400.ms).slideY(begin: 0.05),
                 const PageUtilisateurs().animate().fadeIn(duration: 400.ms).slideY(begin: 0.05),
                 const PageModeration().animate().fadeIn(duration: 400.ms).slideY(begin: 0.05),
+                const PageCarteFlotte().animate().fadeIn(duration: 400.ms).slideY(begin: 0.05),
                 const PageActivites().animate().fadeIn(duration: 400.ms).slideY(begin: 0.05),
+                const PageNotifications().animate().fadeIn(duration: 400.ms).slideY(begin: 0.05),
               ],
             ),
           ),

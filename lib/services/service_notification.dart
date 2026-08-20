@@ -1,16 +1,33 @@
+import 'dart:async';
+import 'package:flutter/foundation.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:flutter/foundation.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
+// =====================================================
+// Stream global pour les notifications in-app (Web + Mobile)
+// =====================================================
+final StreamController<NotificationInApp> _notificationController =
+    StreamController<NotificationInApp>.broadcast();
+
+Stream<NotificationInApp> get fluxNotificationsInApp =>
+    _notificationController.stream;
+
+/// Modèle d'une notification in-app
+class NotificationInApp {
+  final String titre;
+  final String message;
+  final String type; // 'info' | 'succes' | 'alerte' | 'paiement'
+  NotificationInApp({required this.titre, required this.message, this.type = 'info'});
+}
 
 class ServiceNotification {
   ServiceNotification._();
 
-  static final FirebaseMessaging _messaging =
-      FirebaseMessaging.instance;
-
-  static final FlutterLocalNotificationsPlugin
-  _notifications =
-  FlutterLocalNotificationsPlugin();
+  static final FirebaseMessaging _messaging = FirebaseMessaging.instance;
+  static final FlutterLocalNotificationsPlugin _notifications =
+      FlutterLocalNotificationsPlugin();
+  static StreamSubscription<QuerySnapshot>? _abonnementCours;
 
   // ===========================
   // Initialisation
@@ -24,92 +41,208 @@ class ServiceNotification {
         sound: true,
       );
     } catch (e) {
-      // Ignorer l'erreur si les permissions sont bloquées
+      debugPrint('⚠️ Permission notification: $e');
     }
 
-    if (kIsWeb) return; // Pas de notifications locales sur le web pour l'instant
-
-    const AndroidInitializationSettings androidSettings =
-        AndroidInitializationSettings("@mipmap/ic_launcher");
-
-    const InitializationSettings settings =
-        InitializationSettings(android: androidSettings);
-
-    await _notifications.initialize(settings);
+    if (!kIsWeb) {
+      const AndroidInitializationSettings androidSettings =
+          AndroidInitializationSettings("@mipmap/ic_launcher");
+      const InitializationSettings settings =
+          InitializationSettings(android: androidSettings);
+      await _notifications.initialize(settings);
+    }
   }
 
   // ===========================
-  // Obtenir le Token FCM
+  // Obtenir / Enregistrer le Token FCM
   // ===========================
 
   static Future<String?> obtenirToken() async {
     return await _messaging.getToken();
   }
 
-  // ===========================
-  // Actualisation du Token
-  // ===========================
-
-  static Stream<String> changementToken() {
-    return _messaging.onTokenRefresh;
+  static Future<void> enregistrerTokenUtilisateur(
+      String userId, String typeUtilisateur) async {
+    try {
+      final token = await obtenirToken();
+      if (token != null) {
+        final db = FirebaseFirestore.instance;
+        final collection =
+            typeUtilisateur == 'client' ? 'clients' : 'transporteurs';
+        await db.collection(collection).doc(userId).set({
+          'fcmToken': token,
+          'derniereConnexion': FieldValue.serverTimestamp(),
+        }, SetOptions(merge: true));
+        debugPrint('✅ Token FCM enregistré pour $userId dans $collection');
+      }
+    } catch (e) {
+      debugPrint("❌ Erreur lors de l'enregistrement du token FCM: $e");
+    }
   }
 
+  static Stream<String> changementToken() => _messaging.onTokenRefresh;
+
   // ===========================
-  // Notification locale
+  // Notification locale (Mobile uniquement)
   // ===========================
 
   static Future<void> afficherNotification({
     required String titre,
     required String message,
+    String type = 'info',
   }) async {
-    const AndroidNotificationDetails details =
-    AndroidNotificationDetails(
-      "transport_ia",
-      "Transport Intelligent IA",
-      channelDescription:
-      "Notifications de l'application",
-      importance: Importance.max,
-      priority: Priority.high,
+    // Émettre dans le stream in-app (fonctionne sur Web ET Mobile)
+    _notificationController.add(
+      NotificationInApp(titre: titre, message: message, type: type),
     );
 
-    const NotificationDetails notification =
-    NotificationDetails(
-      android: details,
-    );
-
-    await _notifications.show(
-      0,
-      titre,
-      message,
-      notification,
-    );
+    // Sur mobile : afficher aussi la notification système
+    if (!kIsWeb) {
+      const AndroidNotificationDetails details = AndroidNotificationDetails(
+        "transport_ia",
+        "Transport Intelligent",
+        channelDescription: "Notifications de l'application",
+        importance: Importance.max,
+        priority: Priority.high,
+      );
+      await _notifications.show(
+        DateTime.now().millisecondsSinceEpoch ~/ 1000,
+        titre,
+        message,
+        const NotificationDetails(android: details),
+      );
+    }
   }
 
   // ===========================
-  // Notifications au premier plan
+  // Écoute FCM au premier plan
   // ===========================
 
   static void ecouterMessages() {
-    FirebaseMessaging.onMessage.listen(
-      (RemoteMessage message) {
-        if (kIsWeb) return;
-        afficherNotification(
-          titre: message.notification?.title ?? "Notification",
-          message: message.notification?.body ?? "",
-        );
-      },
-    );
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      final titre = message.notification?.title ?? 'Notification';
+      final corps = message.notification?.body ?? '';
+      debugPrint('🔔 FCM foreground: $titre');
+      afficherNotification(titre: titre, message: corps);
+    });
   }
 
   // ===========================
-  // Notifications ouvertes
+  // Auto-Notification via Firestore (Temps réel)
+  // Écoute les changements de courses pour notifier les utilisateurs
+  // même sans FCM (fonctionne en arrière-plan dans l'onglet web)
+  // ===========================
+
+  static void demarrerEcouteAutomatique(
+      String userId, String typeUtilisateur) {
+    arreterEcouteAutomatique();
+    final db = FirebaseFirestore.instance;
+
+    if (typeUtilisateur == 'client') {
+      _abonnementCours = db
+          .collection('courses')
+          .where('clientId', isEqualTo: userId)
+          .snapshots()
+          .listen(
+        (snapshot) {
+          for (var change in snapshot.docChanges) {
+            if (change.type == DocumentChangeType.modified) {
+              final data = change.doc.data() as Map<String, dynamic>;
+              final statut = data['statut'] ?? '';
+              final code = data['codeSuivi'] ?? '---';
+
+              if (statut == 'attribue') {
+                afficherNotification(
+                  titre: '🚕 Chauffeur trouvé !',
+                  message: 'Un transporteur a accepté votre course $code.',
+                  type: 'succes',
+                );
+              } else if (statut == 'en_route_depart') {
+                afficherNotification(
+                  titre: '🚚 En route !',
+                  message: 'Votre transporteur est en route vers vous.',
+                  type: 'info',
+                );
+              } else if (statut == 'arrive_depart') {
+                afficherNotification(
+                  titre: '📍 Transporteur arrivé !',
+                  message: 'Votre transporteur est arrivé au point de départ.',
+                  type: 'info',
+                );
+              } else if (statut == 'en_transit') {
+                afficherNotification(
+                  titre: '📦 Livraison en cours',
+                  message: 'Votre marchandise $code est en cours de livraison.',
+                  type: 'info',
+                );
+              } else if (statut == 'arrive_destination') {
+                afficherNotification(
+                  titre: '🏁 Arrivée à destination !',
+                  message:
+                      'La course $code est terminée. Veuillez procéder au paiement.',
+                  type: 'paiement',
+                );
+              } else if (statut == 'terminee') {
+                afficherNotification(
+                  titre: '✅ Course terminée',
+                  message: 'Merci pour votre confiance ! Évaluez votre chauffeur.',
+                  type: 'succes',
+                );
+              }
+            }
+          }
+        },
+        onError: (e) => debugPrint('Erreur écoute courses client: $e'),
+      );
+    } else {
+      // Transporteur : écoute les nouvelles courses ET les paiements
+      _abonnementCours = db
+          .collection('courses')
+          .where('transporteurId', isEqualTo: userId)
+          .snapshots()
+          .listen(
+        (snapshot) {
+          for (var change in snapshot.docChanges) {
+            if (change.type == DocumentChangeType.added) {
+              final data = change.doc.data() as Map<String, dynamic>;
+              final depart = data['adresseDepart'] ?? 'Inconnu';
+              afficherNotification(
+                titre: '📦 Nouvelle course assignée !',
+                message: 'Départ depuis $depart. Ouvrez l\'app pour voir les détails.',
+                type: 'info',
+              );
+            } else if (change.type == DocumentChangeType.modified) {
+              final data = change.doc.data() as Map<String, dynamic>;
+              final paiementEffectue = data['paiementEffectue'] ?? false;
+              final statut = data['statut'] ?? '';
+              if (paiementEffectue == true && statut == 'terminee') {
+                final montant = data['prixFinal'] ?? data['prixEstime'] ?? 0;
+                afficherNotification(
+                  titre: '💰 Paiement reçu !',
+                  message: 'Vous avez reçu un paiement de $montant FCFA.',
+                  type: 'paiement',
+                );
+              }
+            }
+          }
+        },
+        onError: (e) => debugPrint('Erreur écoute courses transporteur: $e'),
+      );
+    }
+  }
+
+  static void arreterEcouteAutomatique() {
+    _abonnementCours?.cancel();
+    _abonnementCours = null;
+  }
+
+  // ===========================
+  // Écoute ouverture notification
   // ===========================
 
   static void ecouterOuverture() {
-    FirebaseMessaging.onMessageOpenedApp.listen(
-          (RemoteMessage message) {
-        // Navigation future
-      },
-    );
+    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+      debugPrint('🔔 Notification ouverte : ${message.notification?.title}');
+    });
   }
 }

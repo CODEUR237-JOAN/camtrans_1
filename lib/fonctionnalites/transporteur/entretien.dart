@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../../coeur/constantes/couleurs.dart';
-import '../../coeur/constantes/tailles.dart';
+import 'package:update_camtrans/coeur/constantes/couleurs.dart';
+import 'package:update_camtrans/coeur/constantes/tailles.dart';
 
 class Entretien extends StatefulWidget {
   const Entretien({super.key});
@@ -179,7 +179,9 @@ class _EntretienState extends State<Entretien> {
                   trailing: IconButton(
                     icon: const Icon(Icons.edit),
                     color: CouleursApp.primaire,
-                    onPressed: () {},
+                    onPressed: () {
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Édition de l'entretien à venir avec le backend.")));
+                    },
                   ),
                 ),
               ),

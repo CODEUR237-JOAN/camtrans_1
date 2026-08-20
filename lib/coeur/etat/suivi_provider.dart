@@ -2,11 +2,12 @@ import 'dart:async';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:latlong2/latlong.dart';
-import '../../coeur/constantes/statuts.dart';
-import '../../services/service_firestore.dart';
-import '../../modeles/course.dart';
-import '../../modeles/transporteur.dart';
-import '../../services/service_routage.dart';
+import 'package:update_camtrans/coeur/constantes/statuts.dart';
+import 'package:update_camtrans/services/service_firestore.dart';
+import 'package:update_camtrans/services/service_gps.dart';
+import 'package:update_camtrans/modeles/course.dart';
+import 'package:update_camtrans/modeles/transporteur.dart';
+import 'package:update_camtrans/services/service_routage.dart';
 
 // État combiné du suivi
 class EtatSuivi {
@@ -20,6 +21,7 @@ class EtatSuivi {
   final LatLng? positionTransporteurSimule;
   final double distanceRestante;
   final double tempsRestantSeconds;
+  final String? quartierTransporteur; // Nouveau : Nom du quartier actuel
 
   EtatSuivi({
     this.chargement = true,
@@ -30,6 +32,7 @@ class EtatSuivi {
     this.positionTransporteurSimule,
     this.distanceRestante = 0.0,
     this.tempsRestantSeconds = 0.0,
+    this.quartierTransporteur,
   });
 
   EtatSuivi copierAvec({
@@ -41,6 +44,7 @@ class EtatSuivi {
     LatLng? positionTransporteurSimule,
     double? distanceRestante,
     double? tempsRestantSeconds,
+    String? quartierTransporteur,
   }) {
     return EtatSuivi(
       chargement: chargement ?? this.chargement,
@@ -51,23 +55,25 @@ class EtatSuivi {
       positionTransporteurSimule: positionTransporteurSimule ?? this.positionTransporteurSimule,
       distanceRestante: distanceRestante ?? this.distanceRestante,
       tempsRestantSeconds: tempsRestantSeconds ?? this.tempsRestantSeconds,
+      quartierTransporteur: quartierTransporteur ?? this.quartierTransporteur,
     );
   }
 }
 
 // Provider paramétré par l'ID de la course
 final suiviProvider = StateNotifierProvider.autoDispose.family<SuiviNotifier, EtatSuivi, String>((ref, courseId) {
-  return SuiviNotifier(ref.read(serviceFirestoreProvider), ref.read(serviceRoutageProvider), courseId);
+  return SuiviNotifier(ref.read(serviceFirestoreProvider), ref.read(serviceRoutageProvider), ref.read(serviceGpsProvider), courseId);
 });
 
 class SuiviNotifier extends StateNotifier<EtatSuivi> {
   final ServiceFirestore _firestore;
   final ServiceRoutage _routage;
+  final ServiceGps _gps;
   StreamSubscription? _courseSubscription;
   StreamSubscription? _transporteurSubscription;
   Timer? _simulateurTimer;
 
-  SuiviNotifier(this._firestore, this._routage, String courseId) : super(EtatSuivi()) {
+  SuiviNotifier(this._firestore, this._routage, this._gps, String courseId) : super(EtatSuivi()) {
     if (courseId == "course_demo_id") {
       _lancerSimulationMock();
     } else {
@@ -104,7 +110,7 @@ class SuiviNotifier extends StateNotifier<EtatSuivi> {
       prixFinal: 15000.0,
       modePaiement: "Cash",
       paiementEffectue: false,
-      statut: StatutCourse.enRoute,
+      statut: StatutCourse.enRouteDepart,
       description: "Simulation",
       photos: [],
       dateCreation: DateTime.now(),
@@ -180,6 +186,14 @@ class SuiviNotifier extends StateNotifier<EtatSuivi> {
         distanceRestante: distance > 0 ? distance : 0,
         tempsRestantSeconds: temps > 0 ? temps : 0,
       );
+
+      // Mettre à jour le quartier toutes les 10 secondes pour ne pas saturer l'API de géocodage
+      if (indexCourant % 5 == 0) {
+        _gps.obtenirAdresse(latitude: nouvellePos.latitude, longitude: nouvellePos.longitude).then((adresse) {
+          final quartier = adresse.split(',').first;
+          state = state.copierAvec(quartierTransporteur: quartier);
+        });
+      }
     });
   }
 
@@ -206,8 +220,48 @@ class SuiviNotifier extends StateNotifier<EtatSuivi> {
     _transporteurSubscription = _firestore.fluxDocument(collection: 'transporteurs', id: transporteurId).listen((snapshot) {
       if (snapshot.exists && snapshot.data() != null) {
         final transporteur = Transporteur.fromMap(snapshot.data()!);
-        state = state.copierAvec(transporteur: transporteur);
+        
+        // Calcul dynamique de la distance et du temps si la course est en cours
+        double distanceRestante = state.distanceRestante;
+        double tempsRestant = state.tempsRestantSeconds;
+
+        if (state.course != null && transporteur.latitude != 0 && transporteur.longitude != 0) {
+          final course = state.course!;
+          // Destination cible : point de départ si pas encore chargé, sinon point d'arrivée
+          double latCible = course.latitudeDepart;
+          double lngCible = course.longitudeDepart;
+          
+          if (course.statut == StatutCourse.charge || course.statut == StatutCourse.enTransit) {
+            latCible = course.latitudeArrivee;
+            lngCible = course.longitudeArrivee;
+          }
+
+          // On utilise une distance en ligne droite pour l'approximation temps réel (pour la fluidité)
+          final distance = const Distance().as(LengthUnit.Meter, 
+            LatLng(transporteur.latitude, transporteur.longitude), 
+            LatLng(latCible, lngCible)
+          );
+          distanceRestante = distance.toDouble();
+          // Estimation : 30 km/h en moyenne en ville (8.3 m/s)
+          tempsRestant = distanceRestante / 8.3;
+        }
+
+        state = state.copierAvec(
+          transporteur: transporteur,
+          distanceRestante: distanceRestante,
+          tempsRestantSeconds: tempsRestant,
+        );
+
+        // Mettre à jour le quartier si la position a changé significativement
+        if (transporteur.latitude != 0 && transporteur.longitude != 0) {
+           _gps.obtenirAdresse(latitude: transporteur.latitude, longitude: transporteur.longitude).then((adresse) {
+            final quartier = adresse.split(',').first;
+            state = state.copierAvec(quartierTransporteur: quartier);
+          }).catchError((_) {});
+        }
       }
+    }, onError: (e) {
+       state = state.copierAvec(erreur: e.toString());
     });
   }
 

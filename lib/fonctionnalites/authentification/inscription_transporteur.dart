@@ -3,18 +3,19 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../coeur/constantes/couleurs.dart';
-import '../../coeur/constantes/tailles.dart';
-import '../../coeur/routes/routes.dart';
-import '../../coeur/utilitaires/validateurs.dart';
-import '../../coeur/widgets/bouton_principal.dart';
-import '../../coeur/widgets/champ_texte.dart';
-import '../../coeur/widgets/page_responsive.dart';
+import 'package:update_camtrans/coeur/constantes/couleurs.dart';
+import 'package:update_camtrans/coeur/constantes/tailles.dart';
+import 'package:update_camtrans/coeur/routes/routes.dart';
+import 'package:update_camtrans/coeur/utilitaires/validateurs.dart';
+import 'package:update_camtrans/coeur/widgets/bouton_principal.dart';
+import 'package:update_camtrans/coeur/widgets/champ_texte.dart';
+import 'package:update_camtrans/coeur/widgets/page_responsive.dart';
 
-import '../../services/service_authentification.dart';
-import '../../services/service_firestore.dart';
-import '../../modeles/transporteur.dart';
-import '../../coeur/utilitaires/parseur.dart';
+import 'package:update_camtrans/services/service_authentification.dart';
+import 'package:update_camtrans/services/service_firestore.dart';
+import 'package:update_camtrans/services/service_notification.dart';
+import 'package:update_camtrans/modeles/transporteur.dart';
+import 'package:update_camtrans/coeur/utilitaires/parseur.dart';
 
 class InscriptionTransporteur extends ConsumerStatefulWidget {
   const InscriptionTransporteur({super.key});
@@ -48,10 +49,12 @@ class _InscriptionTransporteurState extends ConsumerState<InscriptionTransporteu
     "Camionnette",
     "Camion léger",
     "Camion moyen",
+    "Dépanneuse",
     "Semi-remorque",
     "Camion Benne",
     "Camion Plateau",
     "Camion Citerne",
+    "Fourgon",
     "Conteneur"
   ];
 
@@ -88,10 +91,14 @@ class _InscriptionTransporteurState extends ConsumerState<InscriptionTransporteu
 
       // Création du document Transporteur
       if (userCred.user != null) {
+        final nomComplet = _nom.text.trim().split(' ');
+        final prenom = nomComplet.length > 1 ? nomComplet.sublist(0, nomComplet.length - 1).join(' ') : "";
+        final nom = nomComplet.last;
+
         final transporteur = Transporteur(
           id: userCred.user!.uid,
-          nom: _nom.text.trim(),
-          prenom: "", 
+          nom: nom,
+          prenom: prenom, 
           email: _email.text.trim(),
           telephone: _telephone.text.trim(),
           photo: "",
@@ -114,12 +121,26 @@ class _InscriptionTransporteurState extends ConsumerState<InscriptionTransporteu
           donnees: transporteur.toMap(),
         );
 
+        // Enregistrer le Token FCM
+        await ServiceNotification.enregistrerTokenUtilisateur(transporteur.id, 'transporteur');
+
+        // Mettre à jour le profil Auth
+        await serviceAuth.mettreAJourProfil(nom: _nom.text.trim());
+
         // Envoyer l'email de vérification
         await serviceAuth.envoyerVerificationEmail();
       }
 
+      await serviceAuth.deconnexion();
+
       if (!mounted) return;
-      context.go(RoutesApplication.tableauBordTransporteur);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text("Inscription réussie. Veuillez vous connecter pour accéder à votre tableau de bord."),
+          backgroundColor: Colors.green,
+        ),
+      );
+      context.go(RoutesApplication.connexion);
 
     } catch (e) {
       if (!mounted) return;
@@ -268,28 +289,65 @@ class _InscriptionTransporteurState extends ConsumerState<InscriptionTransporteu
                       ).animate().fadeIn(delay: 700.ms),
                       const SizedBox(height: 15),
 
-                      DropdownButtonFormField<String>(
-                        initialValue: _vehicule,
-                        decoration: InputDecoration(
-                          labelText: "Type de véhicule",
-                          prefixIcon: const Icon(Icons.local_shipping_outlined),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(15),
-                            borderSide: BorderSide(color: Colors.grey.shade300),
+                      Theme(
+                        data: ThemeData.light().copyWith(
+                          colorScheme: const ColorScheme.light(
+                            primary: CouleursApp.primaire,
                           ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(15),
-                            borderSide: BorderSide(color: Colors.grey.shade300),
+                          inputDecorationTheme: InputDecorationTheme(
+                            fillColor: Colors.grey.shade50,
+                            filled: true,
                           ),
-                          filled: true,
-                          fillColor: Colors.grey.shade50,
                         ),
-                        items: _vehicules.map((e) => DropdownMenuItem(value: e, child: Text(e))).toList(),
-                        onChanged: (v) {
-                          setState(() {
-                            _vehicule = v;
-                          });
-                        },
+                        child: DropdownButtonFormField<String>(
+                          value: _vehicule,
+                          style: const TextStyle(
+                            color: Color(0xFF1E293B),
+                            fontSize: 15,
+                            fontWeight: FontWeight.w500,
+                          ),
+                          dropdownColor: Colors.white,
+                          iconEnabledColor: CouleursApp.primaire,
+                          decoration: InputDecoration(
+                            labelText: "Type de véhicule *",
+                            labelStyle: TextStyle(color: Colors.grey.shade600),
+                            prefixIcon: Icon(Icons.local_shipping_outlined, color: Colors.grey.shade500),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(15),
+                              borderSide: BorderSide(color: Colors.grey.shade300),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(15),
+                              borderSide: BorderSide(color: Colors.grey.shade300),
+                            ),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(15),
+                              borderSide: const BorderSide(color: CouleursApp.primaire, width: 2),
+                            ),
+                            filled: true,
+                            fillColor: Colors.grey.shade50,
+                          ),
+                          hint: Text(
+                            "Sélectionnez votre véhicule",
+                            style: TextStyle(color: Colors.grey.shade500, fontSize: 14),
+                          ),
+                          items: _vehicules.map((e) => DropdownMenuItem(
+                            value: e,
+                            child: Text(
+                              e,
+                              style: const TextStyle(
+                                color: Color(0xFF1E293B),
+                                fontSize: 15,
+                              ),
+                            ),
+                          )).toList(),
+                          validator: (v) => v == null ? "Veuillez choisir un type de véhicule" : null,
+                          onChanged: (v) {
+                            setState(() {
+                              _vehicule = v;
+                            });
+                          },
+                        ),
                       ).animate().fadeIn(delay: 800.ms).slideX(begin: -0.1),
 
                       const SizedBox(height: 15),

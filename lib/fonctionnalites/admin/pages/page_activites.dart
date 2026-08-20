@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:iconsax_flutter/iconsax_flutter.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+import 'package:go_router/go_router.dart';
 
-import '../../../coeur/etat/admin_provider.dart';
-import '../../../coeur/constantes/couleurs.dart';
-import '../../../coeur/constantes/statuts.dart';
-import '../../../coeur/widgets/etats_ui.dart';
-import '../../../modeles/course.dart';
+import 'package:update_camtrans/coeur/etat/admin_provider.dart';
+import 'package:update_camtrans/coeur/constantes/couleurs.dart';
+import 'package:update_camtrans/coeur/constantes/statuts.dart';
+import 'package:update_camtrans/coeur/widgets/etats_ui.dart';
+import 'package:update_camtrans/modeles/course.dart';
 
 class PageActivites extends ConsumerStatefulWidget {
   const PageActivites({super.key});
@@ -23,62 +27,92 @@ class _PageActivitesState extends ConsumerState<PageActivites> {
     final coursesAsync = ref.watch(adminCoursesProvider);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF4F7FB),
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        title: const Text("Toutes les activités (Temps réel)", style: TextStyle(color: Colors.black87, fontWeight: FontWeight.bold)),
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(60),
-          child: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+      backgroundColor: Colors.transparent, // Background handled by parent or stack
+      body: Stack(
+        children: [
+          Container(color: const Color(0xFF08111F)),
+          Positioned(
+            top: -100,
+            left: -100,
+            child: Container(
+              width: 300,
+              height: 300,
+              decoration: BoxDecoration(
+                color: CouleursApp.succes.withValues(alpha: 0.1),
+                shape: BoxShape.circle,
+              ),
+            ).animate(onPlay: (controller) => controller.repeat(reverse: true)).scale(duration: 4.seconds, begin: const Offset(1,1), end: const Offset(1.2,1.2)),
+          ),
+          
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildHeader(),
+              Expanded(
+                child: coursesAsync.when(
+                  loading: () => const EtatChargement(message: "Chargement de l'historique..."),
+                  error: (err, _) => EtatErreur(erreur: err.toString(), onRetry: () => ref.refresh(adminCoursesProvider)),
+                  data: (toutesCourses) {
+                    final courses = toutesCourses.where((c) {
+                      final texte = "${c.adresseDepart} ${c.adresseArrivee} ${c.statut}".toLowerCase();
+                      return texte.contains(_searchQuery);
+                    }).toList();
+
+                    courses.sort((a, b) => b.dateCreation.compareTo(a.dateCreation));
+
+                    if (courses.isEmpty) {
+                      return Center(child: Text("Aucune activité ne correspond à vos critères.", style: GoogleFonts.inter(color: Colors.white54)));
+                    }
+
+                    return ListView.builder(
+                      padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                      itemCount: courses.length,
+                      itemBuilder: (context, index) {
+                        return _CourseCard(course: courses[index])
+                            .animate().fadeIn(delay: Duration(milliseconds: 50 * index)).slideX();
+                      },
+                    );
+                  },
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildHeader() {
+    return Container(
+      padding: const EdgeInsets.only(left: 32, right: 32, top: 32, bottom: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            "Toutes les activités (Temps réel)",
+            style: GoogleFonts.inter(fontSize: 32, fontWeight: FontWeight.bold, color: Colors.white, letterSpacing: -1),
+          ),
+          const SizedBox(height: 24),
+          Container(
+            height: 50,
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 0.05),
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+            ),
             child: TextField(
+              style: GoogleFonts.inter(color: Colors.white),
               decoration: InputDecoration(
                 hintText: "Rechercher par adresse ou statut...",
-                prefixIcon: const Icon(Icons.search),
-                filled: true,
-                fillColor: Colors.grey.shade100,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide.none,
-                ),
-                contentPadding: const EdgeInsets.symmetric(vertical: 0),
+                hintStyle: GoogleFonts.inter(color: Colors.white54),
+                prefixIcon: const Icon(Iconsax.search_normal_copy, color: Colors.white54, size: 20),
+                border: InputBorder.none,
+                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
               ),
               onChanged: (value) => setState(() => _searchQuery = value.toLowerCase()),
             ),
           ),
-        ),
-      ),
-      body: coursesAsync.when(
-        loading: () => const EtatChargement(message: "Chargement de l'historique..."),
-        error: (err, _) => EtatErreur(
-          erreur: err.toString(),
-          onRetry: () => ref.refresh(adminCoursesProvider),
-        ),
-        data: (toutesCourses) {
-          final courses = toutesCourses.where((c) {
-            final texte = "${c.adresseDepart} ${c.adresseArrivee} ${c.statut}".toLowerCase();
-            return texte.contains(_searchQuery);
-          }).toList();
-
-          // Trier par date décroissante
-          courses.sort((a, b) => b.dateCreation.compareTo(a.dateCreation));
-
-          return courses.isEmpty
-              ? const EtatVide(
-                  titre: "Aucune activité",
-                  message: "Aucune course ne correspond à vos critères.",
-                  icone: Icons.history,
-                )
-              : ListView.builder(
-                  padding: const EdgeInsets.all(24),
-                  itemCount: courses.length,
-                  itemBuilder: (context, index) {
-                    final course = courses[index];
-                    return _CourseCard(course: course);
-                  },
-                );
-        },
+        ],
       ),
     );
   }
@@ -90,13 +124,13 @@ class _CourseCard extends StatelessWidget {
   const _CourseCard({required this.course});
 
   Color _getStatutColor(String statut) {
-    if (statut == StatutCourse.enAttente) return Colors.orange;
-    if (statut == StatutCourse.acceptee) return Colors.blue.shade300;
-    if (statut == StatutCourse.enRoute) return Colors.blue;
+    if (statut == StatutCourse.recherche) return Colors.orange;
+    if (statut == StatutCourse.attribue) return Colors.blue.shade300;
+    if (statut == StatutCourse.enRouteDepart) return CouleursApp.primaire;
     if (statut == StatutCourse.enTransit) return Colors.indigo;
-    if (statut == StatutCourse.arrive) return Colors.purple;
-    if (statut == StatutCourse.livre || statut == StatutCourse.termine) return Colors.green;
-    if (statut == StatutCourse.annulee) return Colors.red;
+    if (statut == StatutCourse.arriveDepart) return Colors.purpleAccent;
+    if (statut == StatutCourse.arriveDestination || statut == StatutCourse.terminee) return CouleursApp.succes;
+    if (statut == StatutCourse.annulee) return CouleursApp.erreur;
     return Colors.grey;
   }
 
@@ -106,12 +140,15 @@ class _CourseCard extends StatelessWidget {
     final color = _getStatutColor(course.statut);
     final prix = course.prixFinal > 0 ? course.prixFinal : course.prixEstime;
 
-    return Card(
+    return Container(
       margin: const EdgeInsets.only(bottom: 16),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-      elevation: 0,
+      decoration: BoxDecoration(
+        color: Colors.white.withValues(alpha: 0.03),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+      ),
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(20.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -119,57 +156,88 @@ class _CourseCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
-                    color: color.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(8),
+                    color: color.withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
                     StatutCourse.libelle(course.statut).toUpperCase(),
-                    style: TextStyle(color: color, fontWeight: FontWeight.bold, fontSize: 12),
+                    style: GoogleFonts.inter(color: color, fontWeight: FontWeight.bold, fontSize: 12),
                   ),
                 ),
                 Text(
                   dateFormat.format(course.dateCreation),
-                  style: const TextStyle(color: Colors.grey, fontSize: 12),
+                  style: GoogleFonts.inter(color: Colors.white54, fontSize: 13),
                 ),
               ],
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 20),
             Row(
               children: [
-                const Icon(Icons.my_location, color: CouleursApp.primaire, size: 20),
-                const SizedBox(width: 8),
-                Expanded(child: Text(course.adresseDepart, maxLines: 1, overflow: TextOverflow.ellipsis)),
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(color: CouleursApp.primaire.withValues(alpha: 0.15), shape: BoxShape.circle),
+                  child: const Icon(Iconsax.location_copy, color: CouleursApp.primaire, size: 16),
+                ),
+                const SizedBox(width: 12),
+                Expanded(child: Text(course.adresseDepart, style: GoogleFonts.inter(color: Colors.white), maxLines: 1, overflow: TextOverflow.ellipsis)),
               ],
             ),
-            const Padding(
-              padding: EdgeInsets.only(left: 9.0),
-              child: SizedBox(height: 15, child: VerticalDivider(color: Colors.grey, thickness: 1)),
+            Container(
+              height: 20,
+              width: 2,
+              margin: const EdgeInsets.only(left: 15),
+              color: Colors.white.withValues(alpha: 0.1),
             ),
             Row(
               children: [
-                const Icon(Icons.location_on, color: Colors.red, size: 20),
-                const SizedBox(width: 8),
-                Expanded(child: Text(course.adresseArrivee, maxLines: 1, overflow: TextOverflow.ellipsis)),
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(color: CouleursApp.erreur.withValues(alpha: 0.15), shape: BoxShape.circle),
+                  child: const Icon(Iconsax.routing_2_copy, color: CouleursApp.erreur, size: 16),
+                ),
+                const SizedBox(width: 12),
+                Expanded(child: Text(course.adresseArrivee, style: GoogleFonts.inter(color: Colors.white), maxLines: 1, overflow: TextOverflow.ellipsis)),
               ],
             ),
-            const Divider(height: 30),
+            const SizedBox(height: 20),
+            Divider(color: Colors.white.withValues(alpha: 0.1), height: 1),
+            const SizedBox(height: 16),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Row(
                   children: [
-                    const Icon(Icons.person_outline, size: 16, color: Colors.grey),
-                    const SizedBox(width: 4),
-                    Text("Client ID: ${course.clientId.length > 8 ? course.clientId.substring(0, 8) : course.clientId}...", style: const TextStyle(color: Colors.grey, fontSize: 12)),
+                    const Icon(Iconsax.user_copy, size: 16, color: Colors.white54),
+                    const SizedBox(width: 8),
+                    Text("Client: ${course.clientId.length > 8 ? course.clientId.substring(0, 8) : course.clientId}...", style: GoogleFonts.inter(color: Colors.white54, fontSize: 12)),
                   ],
                 ),
                 Text(
                   "${NumberFormat.compact().format(prix)} FCFA",
-                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: CouleursApp.succes),
+                  style: GoogleFonts.inter(fontWeight: FontWeight.bold, fontSize: 18, color: CouleursApp.succes),
                 ),
               ],
+            ),
+            const SizedBox(height: 16),
+            // Bouton "Suivre en direct"
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                onPressed: () {
+                  context.push('/suivi/${course.id}');
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: CouleursApp.primaire.withValues(alpha: 0.2),
+                  foregroundColor: CouleursApp.primaire,
+                  elevation: 0,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                ),
+                icon: const Icon(Iconsax.radar_2_copy),
+                label: const Text("Suivre en direct", style: TextStyle(fontWeight: FontWeight.bold)),
+              ),
             ),
           ],
         ),

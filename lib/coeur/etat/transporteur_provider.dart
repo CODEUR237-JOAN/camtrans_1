@@ -1,10 +1,10 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../services/service_firestore.dart';
-import '../../services/service_authentification.dart';
-import '../../modeles/transporteur.dart';
-import '../../modeles/course.dart';
-import '../../modeles/paiement.dart';
-import '../constantes/statuts.dart';
+import 'package:update_camtrans/services/service_firestore.dart';
+import 'package:update_camtrans/services/service_authentification.dart';
+import 'package:update_camtrans/modeles/transporteur.dart';
+import 'package:update_camtrans/modeles/course.dart';
+import 'package:update_camtrans/modeles/paiement.dart';
+import 'package:update_camtrans/coeur/constantes/statuts.dart';
 
 // ID du transporteur actuellement connecté (lié à Firebase Auth)
 final currentTransporteurIdProvider = Provider<String>((ref) {
@@ -39,7 +39,7 @@ final fluxCoursesDisponiblesProvider =
       .fluxCollectionCondition(
         collection: 'courses',
         champ: 'statut',
-        valeur: StatutCourse.enAttente, // ✅ statut normalisé
+        valeur: StatutCourse.recherche, // ✅ statut normalisé
       )
       .map((snapshot) =>
           snapshot.docs.map((doc) {
@@ -142,7 +142,7 @@ class TransporteurActions {
       throw Exception("Cette course n'existe plus.");
     }
     final statut = courseDoc.data()!['statut'];
-    if (statut != StatutCourse.enAttente) {
+    if (statut != StatutCourse.recherche) {
       throw Exception(
           "Cette course a déjà été acceptée par un autre transporteur.");
     }
@@ -152,7 +152,7 @@ class TransporteurActions {
       collection: 'courses',
       id: courseId,
       donnees: {
-        'statut': StatutCourse.acceptee,
+        'statut': StatutCourse.attribue,
         'transporteurId': _transporteurId,
         'nomTransporteur': nomTransporteur,
         'telephoneTransporteur': telephoneTransporteur,
@@ -179,10 +179,10 @@ class TransporteurActions {
     final Map<String, dynamic> miseAJour = {'statut': nouveauStatut};
 
     // Enrichir la mise à jour selon le nouveau statut
-    if (nouveauStatut == StatutCourse.livre) {
+    if (nouveauStatut == StatutCourse.arriveDestination) {
       miseAJour['dateFin'] = DateTime.now().toIso8601String();
     }
-    if (nouveauStatut == StatutCourse.enRoute) {
+    if (nouveauStatut == StatutCourse.enRouteDepart) {
       miseAJour['dateDebut'] = DateTime.now().toIso8601String();
     }
 

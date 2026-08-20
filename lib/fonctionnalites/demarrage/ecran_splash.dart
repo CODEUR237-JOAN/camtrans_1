@@ -5,13 +5,14 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../coeur/constantes/couleurs.dart';
-import '../../coeur/constantes/tailles.dart';
-import '../../coeur/constantes/textes.dart';
-import '../../coeur/routes/routes.dart';
-import '../../coeur/widgets/effets_visuels.dart';
-import '../../services/service_authentification.dart';
-import '../../services/service_firestore.dart';
+import 'package:update_camtrans/coeur/constantes/couleurs.dart';
+import 'package:update_camtrans/coeur/constantes/tailles.dart';
+import 'package:update_camtrans/coeur/constantes/textes.dart';
+import 'package:update_camtrans/coeur/routes/routes.dart';
+import 'package:update_camtrans/coeur/widgets/effets_visuels.dart';
+import 'package:update_camtrans/coeur/etat/utilisateur_provider.dart';
+import 'package:update_camtrans/services/service_authentification.dart';
+import 'package:update_camtrans/services/service_firestore.dart';
 
 class EcranSplash extends ConsumerStatefulWidget {
   const EcranSplash({super.key});
@@ -50,45 +51,21 @@ class _EcranSplashState extends ConsumerState<EcranSplash>
       return;
     }
 
-    // Connecté -> Déterminer le rôle
+    // Connecté -> Déterminer le rôle via le provider centralisé
     try {
-      final uid = user.uid;
-      final serviceDb = ref.read(serviceFirestoreProvider);
+      final role = await ref.read(userRoleProvider.future);
 
-      // Admin hardcodé
-      if (user.email == 'admintrans@gmail.com') {
-        if (!mounted) return;
-        context.go(RoutesApplication.admin);
-        return;
-      }
-
-      // Check Admin collection
-      final docAdmin = await serviceDb.lireDocument(collection: 'admin', id: uid);
       if (!mounted) return;
-      if (docAdmin.exists) {
-        context.go(RoutesApplication.admin);
-        return;
-      }
 
-      // Check Client
-      final docClient = await serviceDb.lireDocument(collection: 'clients', id: uid);
-      if (!mounted) return;
-      if (docClient.exists) {
+      if (role == 'admin') {
+        context.go(RoutesApplication.admin);
+      } else if (role == 'client') {
         context.go(RoutesApplication.tableauBordClient);
-        return;
-      }
-
-      // Check Transporteur
-      final docTransp = await serviceDb.lireDocument(collection: 'transporteurs', id: uid);
-      if (!mounted) return;
-      if (docTransp.exists) {
+      } else if (role == 'transporteur') {
         context.go(RoutesApplication.tableauBordTransporteur);
-        return;
+      } else {
+        context.go(RoutesApplication.choixProfil);
       }
-
-      // Si aucun rôle trouvé, vers le choix de profil
-      if (!mounted) return;
-      context.go(RoutesApplication.choixProfil);
     } catch (e) {
       if (!mounted) return;
       // En cas d'erreur (ex: pas d'internet), on va à la connexion par sécurité

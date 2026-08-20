@@ -5,8 +5,8 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:intl/intl.dart';
 
-import '../../../services/service_estimation.dart';
-import '../../../coeur/constantes/couleurs.dart';
+import 'package:update_camtrans/services/service_estimation.dart';
+import 'package:update_camtrans/coeur/constantes/couleurs.dart';
 
 class CarteEstimationIntelligente extends StatelessWidget {
   final ResultatEstimation resultat;
@@ -44,7 +44,7 @@ class CarteEstimationIntelligente extends StatelessWidget {
                   const Icon(Iconsax.magic_star_copy, color: CouleursApp.primaire),
                   const SizedBox(width: 8),
                   const Text(
-                    "Analyse IA Terminée",
+                    "Estimation Terminée",
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.black87),
                   ).animate().shimmer(duration: 2.seconds),
                 ],

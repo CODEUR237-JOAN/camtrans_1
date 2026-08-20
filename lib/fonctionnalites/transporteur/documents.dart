@@ -1,14 +1,13 @@
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
 
-import '../../coeur/constantes/couleurs.dart';
-import '../../coeur/constantes/tailles.dart';
-import '../../coeur/etat/transporteur_provider.dart';
-import '../../services/service_stockage.dart';
-import '../../services/service_firestore.dart';
-import '../../modeles/transporteur.dart';
+import 'package:update_camtrans/coeur/constantes/couleurs.dart';
+import 'package:update_camtrans/coeur/constantes/tailles.dart';
+import 'package:update_camtrans/coeur/etat/transporteur_provider.dart';
+import 'package:update_camtrans/services/service_stockage.dart';
+import 'package:update_camtrans/services/service_firestore.dart';
+import 'package:update_camtrans/modeles/transporteur.dart';
 
 class Documents extends ConsumerStatefulWidget {
   const Documents({super.key});
@@ -29,7 +28,7 @@ class _DocumentsState extends ConsumerState<Documents> {
       try {
         final storage = ref.read(serviceStockageProvider);
         final url = await storage.uploaderFichier(
-          fichier: File(image.path),
+          fichier: image,
           dossier: 'documents_transporteurs',
           nomFichier: '${transporteurId}_$fieldName',
         );

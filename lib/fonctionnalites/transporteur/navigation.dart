@@ -3,11 +3,12 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../coeur/constantes/couleurs.dart';
-import '../../coeur/widgets/bouton_principal.dart';
-import '../../coeur/etat/transporteur_provider.dart';
-import '../../coeur/constantes/statuts.dart';
-import '../../modeles/course.dart';
+import 'package:update_camtrans/coeur/constantes/couleurs.dart';
+import 'package:update_camtrans/coeur/widgets/bouton_principal.dart';
+import 'package:update_camtrans/coeur/etat/transporteur_provider.dart';
+import 'package:update_camtrans/services/service_gps.dart';
+import 'package:update_camtrans/coeur/constantes/statuts.dart';
+import 'package:update_camtrans/modeles/course.dart';
 
 class NavigationTransporteur extends ConsumerStatefulWidget {
   const NavigationTransporteur({super.key});
@@ -19,6 +20,23 @@ class NavigationTransporteur extends ConsumerStatefulWidget {
 class _NavigationTransporteurState extends ConsumerState<NavigationTransporteur> {
   final MapController controleurCarte = MapController();
   double progression = 0.35;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(serviceGpsProvider).verifierPermissions().then((autorise) {
+        if (!autorise && mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text("Le GPS est requis pour guider votre trajet."),
+              backgroundColor: Colors.orange,
+            ),
+          );
+        }
+      });
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -82,7 +100,7 @@ class _NavigationTransporteurState extends ConsumerState<NavigationTransporteur>
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        activeCourse.statut == StatutCourse.acceptee ? "En route vers le client" : "Livraison en cours",
+                        activeCourse.statut == StatutCourse.attribue ? "En route vers le client" : "Livraison en cours",
                         style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 12),
@@ -133,7 +151,9 @@ class _NavigationTransporteurState extends ConsumerState<NavigationTransporteur>
                             style: IconButton.styleFrom(backgroundColor: Colors.green.withValues(alpha: 0.1)),
                           ),
                           IconButton(
-                            onPressed: () {},
+                            onPressed: () {
+                               ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Le chat avec le client sera bientôt disponible.")));
+                            },
                             icon: const Icon(Icons.chat, color: Colors.blue),
                             style: IconButton.styleFrom(backgroundColor: Colors.blue.withValues(alpha: 0.1)),
                           ),
@@ -148,13 +168,23 @@ class _NavigationTransporteurState extends ConsumerState<NavigationTransporteur>
                     _buildStepInfo(Icons.inventory_2, "Marchandise", activeCourse.description, Colors.orange),
                     const SizedBox(height: 30),
                     BoutonPrincipal(
-                      texte: activeCourse.statut == StatutCourse.acceptee ? "Arrivé au départ" : "Livraison terminée",
+                      texte: activeCourse.statut == StatutCourse.attribue 
+                        ? "Démarrer la course" 
+                        : activeCourse.statut == StatutCourse.enRouteDepart 
+                          ? "Arrivé au départ" 
+                          : activeCourse.statut == StatutCourse.arriveDepart 
+                            ? "Charger la marchandise"
+                            : activeCourse.statut == StatutCourse.charge
+                              ? "Démarrer le transport"
+                              : "Arrivé à destination",
                       icone: Icons.check_circle,
                       auClic: () => _validerEtape(activeCourse),
                     ),
                     const SizedBox(height: 15),
                     OutlinedButton.icon(
-                      onPressed: () {},
+                      onPressed: () {
+                         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Retard signalé au client et à l'administration.")));
+                      },
                       icon: const Icon(Icons.warning_amber_rounded, color: Colors.orange),
                       label: const Text("Signaler un retard", style: TextStyle(color: Colors.orange)),
                       style: OutlinedButton.styleFrom(side: const BorderSide(color: Colors.orange), padding: const EdgeInsets.symmetric(vertical: 12)),
@@ -208,16 +238,36 @@ class _NavigationTransporteurState extends ConsumerState<NavigationTransporteur>
 
   void _validerEtape(Course course) async {
     final actions = ref.read(transporteurActionsProvider);
-    final nouveauStatut = course.statut == StatutCourse.acceptee ? StatutCourse.enTransit : StatutCourse.livre;
+    String nouveauStatut;
+    
+    // Cycle de vie complet Sprint 13
+    if (course.statut == StatutCourse.attribue) {
+      nouveauStatut = StatutCourse.enRouteDepart;
+    } else if (course.statut == StatutCourse.enRouteDepart) {
+      nouveauStatut = StatutCourse.arriveDepart;
+    } else if (course.statut == StatutCourse.arriveDepart) {
+      nouveauStatut = StatutCourse.charge;
+    } else if (course.statut == StatutCourse.charge) {
+      nouveauStatut = StatutCourse.enTransit;
+    } else {
+      nouveauStatut = StatutCourse.arriveDestination;
+    }
     
     try {
       await actions.changerStatutCourse(course.id, nouveauStatut);
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(nouveauStatut == StatutCourse.enTransit ? "Étape validée : En transit !" : "Course terminée !")));
+        String message = "Étape validée !";
+        if (nouveauStatut == StatutCourse.enRouteDepart) message = "C'est parti ! En route vers le client.";
+        if (nouveauStatut == StatutCourse.arriveDepart) message = "Vous êtes arrivé chez le client.";
+        if (nouveauStatut == StatutCourse.charge) message = "Marchandise chargée. Bonne route !";
+        if (nouveauStatut == StatutCourse.enTransit) message = "En transit vers la destination.";
+        if (nouveauStatut == StatutCourse.arriveDestination) message = "Bravo ! Vous êtes arrivé à destination.";
+        
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Erreur: $e"), backgroundColor: Colors.red));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Erreur: ${e.toString().replaceAll('Exception:', '')}"), backgroundColor: Colors.red));
       }
     }
   }

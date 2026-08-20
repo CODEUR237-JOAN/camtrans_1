@@ -2,18 +2,20 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-import '../../coeur/animations/animations_avancees.dart';
-import '../../coeur/constantes/couleurs.dart';
-import '../../coeur/constantes/tailles.dart';
-import '../../coeur/constantes/textes.dart';
-import '../../coeur/routes/routes.dart';
-import '../../coeur/utilitaires/validateurs.dart';
-import '../../coeur/widgets/bouton_principal.dart';
-import '../../coeur/widgets/champ_texte.dart';
-import '../../coeur/widgets/effets_visuels.dart';
+import 'package:update_camtrans/coeur/animations/animations_avancees.dart';
+import 'package:update_camtrans/coeur/constantes/couleurs.dart';
+import 'package:update_camtrans/coeur/constantes/tailles.dart';
+import 'package:update_camtrans/coeur/constantes/textes.dart';
+import 'package:update_camtrans/coeur/routes/routes.dart';
+import 'package:update_camtrans/coeur/utilitaires/validateurs.dart';
+import 'package:update_camtrans/coeur/widgets/bouton_principal.dart';
+import 'package:update_camtrans/coeur/widgets/champ_texte.dart';
+import 'package:update_camtrans/coeur/widgets/effets_visuels.dart';
 
-import '../../services/service_authentification.dart';
-import '../../services/service_firestore.dart';
+import 'package:update_camtrans/services/service_authentification.dart';
+import 'package:update_camtrans/services/service_firestore.dart';
+import 'package:update_camtrans/services/service_notification.dart';
+import 'package:update_camtrans/coeur/etat/utilisateur_provider.dart';
 
 class Connexion extends ConsumerStatefulWidget {
   const Connexion({super.key});
@@ -46,46 +48,87 @@ class _ConnexionState extends ConsumerState<Connexion> {
 
       if (userCred.user != null) {
         final uid = userCred.user!.uid;
+        final email = userCred.user!.email;
 
-        // 1. Priorité absolue : Admin par email hardcodé
-        if (_email.text.trim().toLowerCase() == 'admintrans@gmail.com') {
-          context.go(RoutesApplication.admin);
-          return;
-        }
+          String? role;
+          if (email == 'admintrans@gmail.com') {
+            role = 'admin';
+          } else {
+            // Vérification admin
+            try {
+              final adminDoc = await serviceDb.lireDocument(collection: 'admin', id: uid);
+              if (adminDoc.exists) role = 'admin';
+            } catch (_) {}
 
-        // 2. Recherche dans Firestore par rôle
-        // On vérifie d'abord si c'est un Admin en base
-        final docAdmin = await serviceDb.lireDocument(collection: 'admin', id: uid);
-        if (!mounted) return;
-        if (docAdmin.exists) {
-          context.go(RoutesApplication.admin);
-          return;
-        }
+            // Vérification transporteur EN PREMIER (priorité sur client)
+            if (role == null) {
+              try {
+                final transpDoc = await serviceDb.lireDocument(collection: 'transporteurs', id: uid);
+                if (transpDoc.exists) {
+                  role = 'transporteur';
+                  debugPrint('✅ Rôle détecté: transporteur (uid=$uid)');
+                }
+              } catch (e) {
+                debugPrint('⚠️ Erreur lecture transporteurs: $e');
+              }
+            }
 
-        // Ensuite Client
-        final docClient = await serviceDb.lireDocument(collection: 'clients', id: uid);
-        if (!mounted) return;
-        if (docClient.exists) {
-          context.go(RoutesApplication.tableauBordClient);
-          return;
-        }
+            // Vérification client
+            if (role == null) {
+              try {
+                final clientDoc = await serviceDb.lireDocument(collection: 'clients', id: uid);
+                if (clientDoc.exists) {
+                  role = 'client';
+                  debugPrint('✅ Rôle détecté: client (uid=$uid)');
+                }
+              } catch (e) {
+                debugPrint('⚠️ Erreur lecture clients: $e');
+              }
+            }
 
-        // Puis Transporteur
-        final docTransp = await serviceDb.lireDocument(collection: 'transporteurs', id: uid);
-        if (!mounted) return;
-        if (docTransp.exists) {
-          context.go(RoutesApplication.tableauBordTransporteur);
-          return;
-        }
+            // Fallback: lire le champ "role" dans le doc Firestore directement
+            if (role == null) {
+              for (final col in ['transporteurs', 'clients']) {
+                try {
+                  final doc = await serviceDb.lireDocument(collection: col, id: uid);
+                  if (doc.exists) {
+                    final data = doc.data() as Map<String, dynamic>?;
+                    final roleField = data?['role'] as String?;
+                    if (roleField != null && roleField.isNotEmpty) {
+                      role = roleField;
+                      debugPrint('✅ Rôle via champ role: $role (uid=$uid)');
+                      break;
+                    }
+                  }
+                } catch (_) {}
+              }
+            }
+          }
 
-        // Fallback : Redirection vers le choix de profil si aucun rôle n'est trouvé
-        context.go(RoutesApplication.choixProfil);
+          ref.invalidate(userRoleProvider);
+
+          if (!mounted) return;
+
+          debugPrint('🔀 Redirection → rôle=$role');
+
+          if (role == 'admin') {
+            context.go(RoutesApplication.admin);
+          } else if (role == 'client') {
+            await ServiceNotification.enregistrerTokenUtilisateur(uid, 'client');
+            if (mounted) context.go(RoutesApplication.tableauBordClient);
+          } else if (role == 'transporteur') {
+            await ServiceNotification.enregistrerTokenUtilisateur(uid, 'transporteur');
+            if (mounted) context.go(RoutesApplication.tableauBordTransporteur);
+          } else {
+            debugPrint('⚠️ Rôle introuvable pour uid=$uid, redirection vers choixProfil');
+            context.go(RoutesApplication.choixProfil);
+          }
       }
     } catch (e) {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text("Oups, la connexion a échoué. Vérifiez vos identifiants !"),
+        SnackBar(
+          content: Text("Oups, la connexion a échoué : ${e.toString()}"),
           backgroundColor: Colors.red,
         ),
       );

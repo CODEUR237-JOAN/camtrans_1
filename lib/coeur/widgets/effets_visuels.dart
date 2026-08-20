@@ -2,7 +2,7 @@ import 'dart:math' as math;
 import 'dart:ui';
 import 'package:flutter/material.dart';
 
-import '../constantes/couleurs.dart';
+import 'package:update_camtrans/coeur/constantes/couleurs.dart';
 
 /// =======================================================
 /// WIDGETS D'EFFETS VISUELS INNOVANTS

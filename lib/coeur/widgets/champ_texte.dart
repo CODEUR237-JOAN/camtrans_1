@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
-import '../constantes/couleurs.dart';
-import '../constantes/tailles.dart';
+import 'package:update_camtrans/coeur/constantes/couleurs.dart';
+import 'package:update_camtrans/coeur/constantes/tailles.dart';
 
 /// =======================================================
 /// CHAMP TEXTE MODERNISÉ

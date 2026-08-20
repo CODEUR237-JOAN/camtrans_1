@@ -3,10 +3,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
-import '../../coeur/constantes/couleurs.dart';
-import '../../services/service_firestore.dart';
-import '../../modeles/paiement.dart';
-import '../paiement/widgets/ticket_recu.dart';
+import 'package:update_camtrans/coeur/constantes/couleurs.dart';
+import 'package:update_camtrans/services/service_firestore.dart';
+import 'package:update_camtrans/modeles/paiement.dart';
+import 'package:update_camtrans/fonctionnalites/paiement/widgets/ticket_recu.dart';
 
 // Provider pour écouter la liste des paiements de l'utilisateur actuel
 final listePaiementsProvider = StreamProvider.autoDispose<List<Paiement>>((ref) {

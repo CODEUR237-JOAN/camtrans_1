@@ -6,20 +6,23 @@ import 'package:google_fonts/google_fonts.dart';
 
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 
-import '../../coeur/constantes/couleurs.dart';
-import '../../coeur/constantes/tailles.dart';
-import '../../coeur/widgets/carte_information.dart';
-import '../../coeur/widgets/effets_visuels.dart';
+import 'package:update_camtrans/coeur/constantes/couleurs.dart';
+import 'package:update_camtrans/coeur/constantes/tailles.dart';
+import 'package:update_camtrans/coeur/widgets/carte_information.dart';
+import 'package:update_camtrans/coeur/widgets/effets_visuels.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../coeur/constantes/statuts.dart';
-import '../../coeur/etat/transporteur_provider.dart';
-import '../../services/service_authentification.dart';
-import '../../modeles/course.dart';
+import 'package:update_camtrans/coeur/constantes/statuts.dart';
+import 'package:update_camtrans/coeur/etat/transporteur_provider.dart';
+import 'package:update_camtrans/coeur/routes/routes.dart';
+import 'package:update_camtrans/coeur/etat/gps_provider.dart';
+import 'package:update_camtrans/services/service_authentification.dart';
+import 'package:update_camtrans/modeles/course.dart';
+
 import 'courses_disponibles.dart';
 import 'navigation.dart';
-import '../notifications/notifications.dart';
+import 'package:update_camtrans/fonctionnalites/notifications/notifications.dart';
 import 'profil.dart';
-import '../../coeur/widgets/page_responsive.dart';
+import 'package:update_camtrans/coeur/widgets/page_responsive.dart';
 
 class TableauDeBordTransporteur extends ConsumerStatefulWidget {
   const TableauDeBordTransporteur({super.key});
@@ -44,6 +47,9 @@ class _TableauDeBordTransporteurState extends ConsumerState<TableauDeBordTranspo
           setState(() => estDisponible = t.disponible);
         }
       });
+      
+      // Démarrer le tracker GPS
+      ref.read(gpsTrackerProvider).startTracking();
     });
   }
 
@@ -87,46 +93,53 @@ class _TableauDeBordTransporteurState extends ConsumerState<TableauDeBordTranspo
   }
 
   Widget _buildDashboardAccueil(Map<String, double> statsRevenus, AsyncValue<List<Course>> mesCoursesAsync, bool documentsValides) {
+    final transporteurAsync = ref.watch(currentTransporteurProvider);
     final utilisateur = ref.watch(serviceAuthentificationProvider).utilisateur;
-    final nomAffichage = utilisateur?.displayName ?? "Transporteur";
 
-    return SingleChildScrollView(
-      padding: EdgeInsets.all(TaillesApp.margePage),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // BANNIERE DE VALIDATION
-          if (!documentsValides)
-            Container(
-              margin: const EdgeInsets.only(bottom: 20),
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: Colors.red.shade50,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: Colors.red.shade200),
-              ),
-              child: Row(
-                children: [
-                  Icon(Icons.warning_amber_rounded, color: Colors.red.shade700, size: 32),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text("Compte en attente de validation", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.red.shade900)),
-                        const SizedBox(height: 4),
-                        Text(
-                          "Vos documents sont en cours d'examen par l'administration. Vous ne pouvez pas encore accepter de courses.",
-                          style: TextStyle(fontSize: 12, color: Colors.red.shade700),
-                        ),
-                      ],
-                    ),
+    return transporteurAsync.when(
+      loading: () => const Center(child: CircularProgressIndicator()),
+      error: (err, _) => Center(child: Text("Erreur: $err")),
+      data: (transporteur) {
+        final nomAffichage = transporteur != null ? transporteur.prenom : (utilisateur?.displayName ?? "Transporteur");
+        final photoUrl = transporteur?.photo ?? utilisateur?.photoURL ?? "";
+
+        return SingleChildScrollView(
+          padding: EdgeInsets.all(TaillesApp.margePage),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // BANNIERE DE VALIDATION
+              if (!documentsValides)
+                Container(
+                  margin: const EdgeInsets.only(bottom: 20),
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: Colors.red.shade50,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: Colors.red.shade200),
                   ),
-                ],
-              ),
-            ).animate().fadeIn().slideY(begin: -0.2),
+                  child: Row(
+                    children: [
+                      Icon(Icons.warning_amber_rounded, color: Colors.red.shade700, size: 32),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text("Compte en attente de validation", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.red.shade900)),
+                            const SizedBox(height: 4),
+                            Text(
+                              "Vos documents sont en cours d'examen par l'administration. Vous ne pouvez pas encore accepter de courses.",
+                              style: TextStyle(fontSize: 12, color: Colors.red.shade700),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ).animate().fadeIn().slideY(begin: -0.2),
 
-          // HEADER
+              // HEADER
               Row(
                 children: [
                   Container(
@@ -143,8 +156,8 @@ class _TableauDeBordTransporteurState extends ConsumerState<TableauDeBordTranspo
                     child: CircleAvatar(
                       radius: 28,
                       backgroundColor: Colors.orange.withValues(alpha: 0.1),
-                      backgroundImage: utilisateur?.photoURL != null ? NetworkImage(utilisateur!.photoURL!) : null,
-                      child: utilisateur?.photoURL == null ? const Icon(Iconsax.truck_fast_copy, color: Colors.orange, size: 28) : null,
+                      backgroundImage: photoUrl.isNotEmpty ? NetworkImage(photoUrl) : null,
+                      child: photoUrl.isEmpty ? const Icon(Iconsax.truck_fast_copy, color: Colors.orange, size: 28) : null,
                     ),
                   ).animate().scale(delay: 100.ms, curve: Curves.easeOutBack),
                   const SizedBox(width: 15),
@@ -167,12 +180,12 @@ class _TableauDeBordTransporteurState extends ConsumerState<TableauDeBordTranspo
                     ),
                   ).animate().fadeIn(delay: 200.ms).slideX(begin: -0.1),
                   Switch(
-                    value: documentsValides ? estDisponible : false,
+                    value: estDisponible,
                     activeThumbColor: Colors.white,
                     activeTrackColor: Colors.green,
                     inactiveThumbColor: Colors.white,
                     inactiveTrackColor: Colors.grey.shade300,
-                    onChanged: (_chargementDisponibilite || !documentsValides)
+                    onChanged: _chargementDisponibilite
                         ? null
                         : (value) async {
                             setState(() {
@@ -184,7 +197,6 @@ class _TableauDeBordTransporteurState extends ConsumerState<TableauDeBordTranspo
                                   .read(transporteurActionsProvider)
                                   .changerDisponibilite(value);
                             } catch (_) {
-                              // Rollback si l'appel Firestore échoue
                               if (mounted) {
                                 setState(() => estDisponible = !value);
                               }
@@ -275,7 +287,7 @@ class _TableauDeBordTransporteurState extends ConsumerState<TableauDeBordTranspo
                 ),
                 error: (err, _) => const SizedBox.shrink(),
                 data: (courses) {
-                  int livrees = courses.where((c) => c.statut == StatutCourse.livre || c.statut == StatutCourse.termine).length;
+                  int livrees = courses.where((c) => c.statut == StatutCourse.arriveDestination || c.statut == StatutCourse.terminee).length;
                   int enAttente = courses.where((c) => StatutCourse.estActive(c.statut)).length;
                   
                   return Column(
@@ -355,7 +367,11 @@ class _TableauDeBordTransporteurState extends ConsumerState<TableauDeBordTranspo
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text("Dernières courses", style: GoogleFonts.inter(fontSize: 20, fontWeight: FontWeight.w700, letterSpacing: -0.5, color: Theme.of(context).brightness == Brightness.dark ? Colors.white : CouleursApp.textePrincipal)),
-                  TextButton(onPressed: () {}, child: Text("Voir tout", style: GoogleFonts.inter(fontWeight: FontWeight.w600))),
+                  TextButton(
+                      onPressed: () {
+                        context.push(RoutesApplication.historiqueLivraisonsTransporteur);
+                      },
+                      child: Text("Voir tout", style: GoogleFonts.inter(fontWeight: FontWeight.w600))),
                 ],
               ).animate().fadeIn(delay: 1300.ms),
               const SizedBox(height: 15),
@@ -397,6 +413,8 @@ class _TableauDeBordTransporteurState extends ConsumerState<TableauDeBordTranspo
               const SizedBox(height: 30),
             ],
           ),
+        );
+      },
     );
   }
 

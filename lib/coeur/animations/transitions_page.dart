@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:vector_math/vector_math_64.dart' show Vector3;
 
 /// =======================================================
 /// TRANSITIONS DE PAGE PERSONNALISÉES
@@ -210,7 +211,7 @@ class CubicTransition extends CustomTransitionPage {
                   transform: Matrix4.identity()
                     ..setEntry(3, 2, 0.001)
                     ..rotateY(rotateAnim.value)
-                    ..scale(scaleAnim.value, scaleAnim.value, 1.0),
+                    ..scaleByVector3(Vector3(scaleAnim.value, scaleAnim.value, 1.0)),
                   alignment: Alignment.centerLeft,
                   child: FadeTransition(
                     opacity: animation.drive(

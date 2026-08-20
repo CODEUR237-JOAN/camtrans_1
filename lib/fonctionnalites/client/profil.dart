@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../coeur/constantes/couleurs.dart';
-import '../../coeur/constantes/tailles.dart';
-import '../../services/service_authentification.dart';
+import 'package:update_camtrans/coeur/constantes/couleurs.dart';
+import 'package:update_camtrans/coeur/constantes/tailles.dart';
+import 'package:update_camtrans/coeur/etat/utilisateur_provider.dart';
+import 'package:update_camtrans/services/service_authentification.dart';
 
 class Profil extends ConsumerWidget {
   const Profil({super.key});
@@ -12,10 +13,7 @@ class Profil extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final auth = ref.watch(serviceAuthentificationProvider);
-    final user = auth.utilisateur;
-    final userName = user?.displayName ?? "Utilisateur";
-    final userEmail = user?.email ?? "Non renseigné";
-    final userPhone = user?.phoneNumber ?? "Non renseigné";
+    final clientAsync = ref.watch(currentClientProvider);
 
     return Scaffold(
       backgroundColor: CouleursApp.fond,
@@ -25,91 +23,105 @@ class Profil extends ConsumerWidget {
         elevation: 0,
         automaticallyImplyLeading: false,
       ),
-      body: SingleChildScrollView(
-        padding: EdgeInsets.all(TaillesApp.margePage),
-        child: Column(
-          children: [
-            const SizedBox(height: 10),
+      body: clientAsync.when(
+        loading: () => const Center(child: CircularProgressIndicator()),
+        error: (err, stack) => Center(child: Text("Erreur: $err")),
+        data: (client) {
+          final user = auth.utilisateur;
+          final userName = client != null ? "${client.prenom} ${client.nom}" : (user?.displayName ?? "Utilisateur");
+          final userEmail = client?.email ?? user?.email ?? "Non renseigné";
+          final userPhone = client?.telephone ?? user?.phoneNumber ?? "Non renseigné";
+          final userPhoto = client?.photo ?? user?.photoURL;
+          final userVille = client?.ville ?? "Cameroun (Général)";
 
-            Center(
-              child: Stack(
-                children: [
-                  CircleAvatar(
-                    radius: 60,
-                    backgroundColor: CouleursApp.primaire.withValues(alpha: 0.1),
-                    backgroundImage: user?.photoURL != null ? NetworkImage(user!.photoURL!) : null,
-                    child: user?.photoURL == null 
-                      ? const Icon(Icons.person, size: 60, color: CouleursApp.primaire)
-                      : null,
-                  ),
-                  Positioned(
-                    bottom: 0,
-                    right: 0,
-                    child: Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: const BoxDecoration(color: CouleursApp.primaire, shape: BoxShape.circle),
-                      child: const Icon(Icons.camera_alt, color: Colors.white, size: 20),
-                    ),
-                  ),
-                ],
-              ),
-            ),
+          return SingleChildScrollView(
+            padding: EdgeInsets.all(TaillesApp.margePage),
+            child: Column(
+              children: [
+                const SizedBox(height: 10),
 
-            const SizedBox(height: 20),
-
-            Text(
-              userName,
-              style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-            ),
-
-            const Text(
-              "Client TransConnect",
-              style: TextStyle(color: CouleursApp.texteSecondaire, fontWeight: FontWeight.w500),
-            ),
-
-            const SizedBox(height: 30),
-
-            _carteInformation(Icons.phone, "Téléphone", userPhone),
-            _carteInformation(Icons.email, "Adresse e-mail", userEmail),
-            _carteInformation(Icons.location_city, "Ville", "Cameroun (Général)"),
-
-            const SizedBox(height: 25),
-
-            _bouton(context, Icons.edit, "Modifier le profil", () => context.push("/modifier-profil")),
-            _bouton(context, Icons.lock_reset, "Changer le mot de passe", () {}),
-            _bouton(context, Icons.account_balance_wallet, "Moyens de paiement", () {}),
-            _bouton(context, Icons.settings, "Paramètres", () {}),
-            _bouton(context, Icons.help, "Centre d'assistance", () {}),
-
-            const SizedBox(height: 25),
-
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton.icon(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red.shade50,
-                  foregroundColor: Colors.red,
-                  minimumSize: const Size(double.infinity, 55),
-                  elevation: 0,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(15),
-                    side: BorderSide(color: Colors.red.shade100),
+                Center(
+                  child: Stack(
+                    children: [
+                      CircleAvatar(
+                        radius: 60,
+                        backgroundColor: CouleursApp.primaire.withValues(alpha: 0.1),
+                        backgroundImage: userPhoto != null && userPhoto.isNotEmpty ? NetworkImage(userPhoto) : null,
+                        child: (userPhoto == null || userPhoto.isEmpty)
+                          ? const Icon(Icons.person, size: 60, color: CouleursApp.primaire)
+                          : null,
+                      ),
+                      Positioned(
+                        bottom: 0,
+                        right: 0,
+                        child: Container(
+                          padding: const EdgeInsets.all(8),
+                          decoration: const BoxDecoration(color: CouleursApp.primaire, shape: BoxShape.circle),
+                          child: const Icon(Icons.camera_alt, color: Colors.white, size: 20),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                onPressed: () async {
-                  await auth.deconnexion();
-                  if (context.mounted) {
-                    context.go("/connexion");
-                  }
-                },
-                icon: const Icon(Icons.logout),
-                label: const Text("Se déconnecter", style: TextStyle(fontWeight: FontWeight.bold)),
-              ),
-            ),
 
-            const SizedBox(height: 30),
-          ],
-        ),
+                const SizedBox(height: 20),
+
+                Text(
+                  userName,
+                  style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                ),
+
+                const Text(
+                  "Client TransConnect",
+                  style: TextStyle(color: CouleursApp.texteSecondaire, fontWeight: FontWeight.w500),
+                ),
+
+                const SizedBox(height: 30),
+
+                _carteInformation(Icons.phone, "Téléphone", userPhone),
+                _carteInformation(Icons.email, "Adresse e-mail", userEmail),
+                _carteInformation(Icons.location_city, "Ville", userVille),
+
+                const SizedBox(height: 25),
+
+                _bouton(context, Icons.location_on, "Mes Adresses", () => context.push("/adresses-favorites")),
+                _bouton(context, Icons.edit, "Modifier le profil", () => context.push("/modifier-profil")),
+                _bouton(context, Icons.lock_reset, "Changer le mot de passe", () => context.push("/changer-mot-de-passe")),
+                _bouton(context, Icons.account_balance_wallet, "Moyens de paiement", () {}),
+                _bouton(context, Icons.settings, "Paramètres", () {}),
+                _bouton(context, Icons.help, "Centre d'assistance", () {}),
+
+                const SizedBox(height: 25),
+
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red.shade50,
+                      foregroundColor: Colors.red,
+                      minimumSize: const Size(double.infinity, 55),
+                      elevation: 0,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15),
+                        side: BorderSide(color: Colors.red.shade100),
+                      ),
+                    ),
+                    onPressed: () async {
+                      await auth.deconnexion();
+                      if (context.mounted) {
+                        context.go("/connexion");
+                      }
+                    },
+                    icon: const Icon(Icons.logout),
+                    label: const Text("Se déconnecter", style: TextStyle(fontWeight: FontWeight.bold)),
+                  ),
+                ),
+
+                const SizedBox(height: 30),
+              ],
+            ),
+          );
+        },
       ),
     );
   }

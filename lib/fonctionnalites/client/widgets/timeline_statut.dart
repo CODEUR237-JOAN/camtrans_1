@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-import '../../../coeur/constantes/couleurs.dart';
-import '../../../coeur/constantes/statuts.dart';
+import 'package:update_camtrans/coeur/constantes/couleurs.dart';
+import 'package:update_camtrans/coeur/constantes/statuts.dart';
 
 class TimelineStatut extends StatelessWidget {
   final String statutActuel;
@@ -10,12 +10,14 @@ class TimelineStatut extends StatelessWidget {
 
   // Liste ordonnée des statuts possibles (correspond aux constantes StatutCourse)
   final List<String> _etapes = const [
-    StatutCourse.enAttente,
-    StatutCourse.acceptee,
-    StatutCourse.enRoute,
+    StatutCourse.recherche,
+    StatutCourse.attribue,
+    StatutCourse.enRouteDepart,
+    StatutCourse.arriveDepart,
+    StatutCourse.charge,
     StatutCourse.enTransit,
-    StatutCourse.livre,
-    StatutCourse.termine,
+    StatutCourse.arriveDestination,
+    StatutCourse.terminee,
   ];
 
   @override

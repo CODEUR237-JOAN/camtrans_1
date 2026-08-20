@@ -1,6 +1,6 @@
-import '../../coeur/constantes/statuts.dart';
+import 'package:update_camtrans/coeur/constantes/statuts.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../modeles/paiement.dart';
+import 'package:update_camtrans/modeles/paiement.dart';
 import 'service_firestore.dart';
 
 final servicePaiementProvider = Provider<ServicePaiement>((ref) {
@@ -81,6 +81,26 @@ class ServicePaiement {
       methode: "Carte Bancaire",
       operateur: "Stripe/Visa",
       telephone: nomTitulaire, // On utilise ce champ pour le nom pour l'instant
+    );
+  }
+
+  /// Paiement en espèces (À régler au chauffeur)
+  Future<Paiement> initierPaiementEspeces({
+    required String courseId,
+    required String clientId,
+    required String transporteurId,
+    required double montant,
+  }) async {
+    await Future.delayed(const Duration(seconds: 1)); 
+    
+    return _creerPaiementReussi(
+      courseId: courseId,
+      clientId: clientId,
+      transporteurId: transporteurId,
+      montant: montant,
+      methode: "Espèces",
+      operateur: "Direct",
+      telephone: "N/A", 
     );
   }
 

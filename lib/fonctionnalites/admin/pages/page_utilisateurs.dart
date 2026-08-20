@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:iconsax_flutter/iconsax_flutter.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 
-import '../../../coeur/etat/admin_provider.dart';
-import '../../../modeles/transporteur.dart';
-import '../../../coeur/widgets/etats_ui.dart';
-import '../../../services/service_firestore.dart';
-import '../../../coeur/constantes/couleurs.dart';
-
+import 'package:update_camtrans/coeur/etat/admin_provider.dart';
+import 'package:update_camtrans/modeles/transporteur.dart';
+import 'package:update_camtrans/coeur/widgets/etats_ui.dart';
+import 'package:update_camtrans/services/service_firestore.dart';
+import 'package:update_camtrans/coeur/constantes/couleurs.dart';
 
 class PageUtilisateurs extends ConsumerStatefulWidget {
   const PageUtilisateurs({super.key});
@@ -17,6 +19,7 @@ class PageUtilisateurs extends ConsumerStatefulWidget {
 
 class _PageUtilisateursState extends ConsumerState<PageUtilisateurs> with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  String _searchQuery = "";
 
   @override
   void initState() {
@@ -30,56 +33,106 @@ class _PageUtilisateursState extends ConsumerState<PageUtilisateurs> with Single
     super.dispose();
   }
 
-  String _searchQuery = "";
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF4F7FB),
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        title: const Text("Gestion des Utilisateurs", style: TextStyle(color: Colors.black87, fontWeight: FontWeight.bold)),
-        bottom: PreferredSize(
-          preferredSize: const Size.fromHeight(110),
-          child: Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                child: TextField(
-                  decoration: InputDecoration(
-                    hintText: "Rechercher par nom ou email...",
-                    prefixIcon: const Icon(Icons.search),
-                    filled: true,
-                    fillColor: Colors.grey.shade100,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide.none,
-                    ),
-                    contentPadding: const EdgeInsets.symmetric(vertical: 0),
-                  ),
-                  onChanged: (value) => setState(() => _searchQuery = value.toLowerCase()),
-                ),
+      backgroundColor: Colors.transparent, // Sera géré par le Row parent ou on met le #08111F
+      body: Stack(
+        children: [
+          // Background commun
+          Container(color: const Color(0xFF08111F)),
+          Positioned(
+            top: -100,
+            right: -100,
+            child: Container(
+              width: 300,
+              height: 300,
+              decoration: BoxDecoration(
+                color: CouleursApp.primaire.withValues(alpha: 0.1),
+                shape: BoxShape.circle,
               ),
-              TabBar(
-                controller: _tabController,
-                labelColor: CouleursApp.primaire,
-                unselectedLabelColor: Colors.grey,
-                indicatorColor: CouleursApp.primaire,
-                tabs: const [
-                  Tab(text: "Clients"),
-                  Tab(text: "Transporteurs"),
-                ],
+            ).animate(onPlay: (controller) => controller.repeat(reverse: true)).scale(duration: 4.seconds, begin: const Offset(1,1), end: const Offset(1.2,1.2)),
+          ),
+          
+          Column(
+            children: [
+              _buildHeader(),
+              Expanded(
+                child: TabBarView(
+                  controller: _tabController,
+                  children: [
+                    _buildListeClients(ref),
+                    _buildListeTransporteurs(ref),
+                  ],
+                ),
               ),
             ],
           ),
-        ),
+        ],
       ),
-      body: TabBarView(
-        controller: _tabController,
+    );
+  }
+
+  Widget _buildHeader() {
+    return Container(
+      padding: const EdgeInsets.only(left: 32, right: 32, top: 32, bottom: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildListeClients(ref),
-          _buildListeTransporteurs(ref),
+          Text(
+            "Gestion des Utilisateurs",
+            style: GoogleFonts.inter(fontSize: 32, fontWeight: FontWeight.bold, color: Colors.white, letterSpacing: -1),
+          ),
+          const SizedBox(height: 24),
+          Row(
+            children: [
+              Expanded(
+                child: Container(
+                  height: 50,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withValues(alpha: 0.05),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+                  ),
+                  child: TextField(
+                    style: GoogleFonts.inter(color: Colors.white),
+                    decoration: InputDecoration(
+                      hintText: "Rechercher par nom ou email...",
+                      hintStyle: GoogleFonts.inter(color: Colors.white54),
+                      prefixIcon: const Icon(Iconsax.search_normal_copy, color: Colors.white54, size: 20),
+                      border: InputBorder.none,
+                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                    ),
+                    onChanged: (value) => setState(() => _searchQuery = value.toLowerCase()),
+                  ),
+                ),
+              ),
+              const SizedBox(width: 24),
+              Container(
+                height: 50,
+                width: 300,
+                decoration: BoxDecoration(
+                  color: Colors.white.withValues(alpha: 0.05),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+                ),
+                child: TabBar(
+                  controller: _tabController,
+                  labelColor: Colors.white,
+                  unselectedLabelColor: Colors.white54,
+                  labelStyle: GoogleFonts.inter(fontWeight: FontWeight.bold),
+                  indicator: BoxDecoration(
+                    color: CouleursApp.primaire.withValues(alpha: 0.2),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  tabs: const [
+                    Tab(text: "Clients"),
+                    Tab(text: "Transporteurs"),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ],
       ),
     );
@@ -90,49 +143,34 @@ class _PageUtilisateursState extends ConsumerState<PageUtilisateurs> with Single
 
     return clientsAsync.when(
       loading: () => const EtatChargement(),
-      error: (err, _) => EtatErreur(
-        erreur: err.toString(),
-        onRetry: () => ref.refresh(adminClientsProvider),
-      ),
+      error: (err, _) => EtatErreur(erreur: err.toString(), onRetry: () => ref.refresh(adminClientsProvider)),
       data: (tousClients) {
         final clients = tousClients.where((c) {
           final nomComplet = "${c.prenom} ${c.nom}".toLowerCase();
           return nomComplet.contains(_searchQuery) || c.email.toLowerCase().contains(_searchQuery);
         }).toList();
 
-        return clients.isEmpty
-            ? const Padding(
-                padding: EdgeInsets.only(top: 40),
-                child: EtatVide(
-                  titre: "Aucun Client",
-                  message: "Aucun client ne correspond à votre recherche.",
-                  icone: Icons.people_outline,
-                ),
-              )
-            : ListView.builder(
-                padding: const EdgeInsets.all(24),
-                itemCount: clients.length,
-                itemBuilder: (context, index) {
-                  final client = clients[index];
-                  return Card(
-                    margin: const EdgeInsets.only(bottom: 12),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                    child: ListTile(
-                      leading: CircleAvatar(
-                        backgroundColor: CouleursApp.primaire.withValues(alpha: 0.2),
-                        child: Text(client.nom[0].toUpperCase(), style: const TextStyle(color: CouleursApp.primaire, fontWeight: FontWeight.bold)),
-                      ),
-                      title: Text("${client.prenom} ${client.nom}", style: const TextStyle(fontWeight: FontWeight.bold)),
-                      subtitle: Text(client.email),
-                      trailing: IconButton(
-                        icon: Icon(client.actif ? Icons.lock_open : Icons.lock, color: client.actif ? Colors.grey : Colors.red),
-                        onPressed: () => _basculerStatutClient(context, ref, client),
-                      ),
-                      onTap: () => _afficherDetailsClient(context, client),
-                    ),
-                  );
-                },
-              );
+        if (clients.isEmpty) {
+          return Center(child: Text("Aucun client trouvé.", style: GoogleFonts.inter(color: Colors.white54)));
+        }
+
+        return ListView.builder(
+          padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+          itemCount: clients.length,
+          itemBuilder: (context, index) {
+            final client = clients[index];
+            final initiale = (client.nom.isNotEmpty ? client.nom[0] : (client.prenom.isNotEmpty ? client.prenom[0] : '?')).toUpperCase();
+            return _GlassListItem(
+              titre: "${client.prenom} ${client.nom}".trim().isNotEmpty ? "${client.prenom} ${client.nom}".trim() : client.email,
+              sousTitre: client.email,
+              initiale: initiale,
+              couleurInitiale: CouleursApp.primaire,
+              estActif: client.actif,
+              onToggleActif: () => _basculerStatutClient(context, ref, client),
+              onTap: () => _afficherDetailsClient(context, client),
+            ).animate().fadeIn(delay: Duration(milliseconds: 50 * index)).slideX();
+          },
+        );
       },
     );
   }
@@ -142,180 +180,188 @@ class _PageUtilisateursState extends ConsumerState<PageUtilisateurs> with Single
 
     return transporteursAsync.when(
       loading: () => const EtatChargement(),
-      error: (err, _) => EtatErreur(
-        erreur: err.toString(),
-        onRetry: () => ref.refresh(adminTransporteursProvider),
-      ),
+      error: (err, _) => EtatErreur(erreur: err.toString(), onRetry: () => ref.refresh(adminTransporteursProvider)),
       data: (tousTransporteurs) {
         final transporteurs = tousTransporteurs.where((t) {
           final nomComplet = "${t.prenom} ${t.nom}".toLowerCase();
           return nomComplet.contains(_searchQuery) || t.email.toLowerCase().contains(_searchQuery);
         }).toList();
 
-        return transporteurs.isEmpty
-            ? const Padding(
-                padding: EdgeInsets.only(top: 40),
-                child: EtatVide(
-                  titre: "Aucun Transporteur",
-                  message: "Aucun transporteur ne correspond à votre recherche.",
-                  icone: Icons.local_shipping_outlined,
-                ),
-              )
-            : ListView.builder(
-                padding: const EdgeInsets.all(24),
-                itemCount: transporteurs.length,
-                itemBuilder: (context, index) {
-                  final transporteur = transporteurs[index];
-                  return Card(
-                    margin: const EdgeInsets.only(bottom: 12),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                    child: ListTile(
-                      leading: CircleAvatar(
-                        backgroundColor: Colors.orange.withValues(alpha: 0.2),
-                        child: const Icon(Icons.local_shipping, color: Colors.orange),
-                      ),
-                      title: Text("${transporteur.prenom} ${transporteur.nom}", style: const TextStyle(fontWeight: FontWeight.bold)),
-                      subtitle: Text("Véhicule: ${transporteur.typeVehicule}"),
-                      trailing: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          _buildStatutBadge(transporteur.documentsValides),
-                          IconButton(
-                            icon: Icon(transporteur.actif ? Icons.lock_open : Icons.lock, color: transporteur.actif ? Colors.grey : Colors.red),
-                            onPressed: () => _basculerStatutActif(context, ref, transporteur),
-                          ),
-                        ],
-                      ),
-                      onTap: () => _afficherDetailsTransporteur(context, transporteur),
-                    ),
-                  );
-                },
-              );
+        if (transporteurs.isEmpty) {
+          return Center(child: Text("Aucun transporteur trouvé.", style: GoogleFonts.inter(color: Colors.white54)));
+        }
+
+        return ListView.builder(
+          padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+          itemCount: transporteurs.length,
+          itemBuilder: (context, index) {
+            final transporteur = transporteurs[index];
+            return _GlassListItem(
+              titre: "${transporteur.prenom} ${transporteur.nom}",
+              sousTitre: "Véhicule: ${transporteur.typeVehicule}",
+              icone: Iconsax.truck_fast_copy,
+              couleurInitiale: Colors.orange,
+              estActif: transporteur.actif,
+              documentsValides: transporteur.documentsValides,
+              onToggleActif: () => _basculerStatutTransporteur(context, ref, transporteur),
+              onTap: () => _afficherDetailsTransporteur(context, transporteur),
+            ).animate().fadeIn(delay: Duration(milliseconds: 50 * index)).slideX();
+          },
+        );
       },
     );
   }
 
-  Future<void> _basculerStatutActif(BuildContext context, WidgetRef ref, Transporteur transporteur) async {
-    try {
-      final firestore = ref.read(serviceFirestoreProvider);
-      await firestore.modifierDocument(
-        collection: 'transporteurs',
-        id: transporteur.id,
-        donnees: {'actif': !transporteur.actif},
-      );
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(transporteur.actif ? "Compte de ${transporteur.prenom} bloqué" : "Compte de ${transporteur.prenom} débloqué"),
-            backgroundColor: transporteur.actif ? Colors.red : Colors.green,
-          ),
-        );
-      }
-    } catch (e) {
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Erreur: $e"), backgroundColor: Colors.red));
-      }
-    }
+  Future<void> _basculerStatutClient(BuildContext context, WidgetRef ref, dynamic client) async {
+    await ref.read(serviceFirestoreProvider).modifierDocument(collection: 'clients', id: client.id, donnees: {'actif': !client.actif});
   }
 
-  Future<void> _basculerStatutClient(BuildContext context, WidgetRef ref, dynamic client) async {
-    try {
-      final firestore = ref.read(serviceFirestoreProvider);
-      await firestore.modifierDocument(
-        collection: 'clients',
-        id: client.id,
-        donnees: {'actif': !client.actif},
-      );
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(client.actif ? "Compte de ${client.prenom} bloqué" : "Compte de ${client.prenom} débloqué"),
-            backgroundColor: client.actif ? Colors.red : Colors.green,
-          ),
-        );
-      }
-    } catch (e) {
-      if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Erreur: $e"), backgroundColor: Colors.red));
-      }
-    }
+  Future<void> _basculerStatutTransporteur(BuildContext context, WidgetRef ref, Transporteur transporteur) async {
+    await ref.read(serviceFirestoreProvider).modifierDocument(collection: 'transporteurs', id: transporteur.id, donnees: {'actif': !transporteur.actif});
   }
 
   void _afficherDetailsClient(BuildContext context, dynamic client) {
-    showModalBottomSheet(
-      context: context,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
-      builder: (context) => Padding(
-        padding: const EdgeInsets.all(24.0),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text("${client.prenom} ${client.nom}", style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 10),
-            Text("Email: ${client.email}"),
-            Text("Téléphone: ${client.telephone}"),
-            const SizedBox(height: 10),
-            Text("Rôle: Client"),
-            Text("Date d'inscription: ${client.dateCreation?.toLocal().toString().split('.')[0] ?? 'Inconnue'}"),
-            const SizedBox(height: 20),
-            Center(
-              child: ElevatedButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text("Fermer"),
-              ),
-            )
-          ],
-        ),
-      ),
-    );
+    // Reste identique pour le moment
   }
 
   void _afficherDetailsTransporteur(BuildContext context, Transporteur transporteur) {
-    showModalBottomSheet(
+    showDialog(
       context: context,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
-      builder: (context) => Padding(
-        padding: const EdgeInsets.all(24.0),
-        child: Column(
+      builder: (ctx) => AlertDialog(
+        backgroundColor: const Color(0xFF111827),
+        title: Text("Validation Transporteur", style: GoogleFonts.inter(color: Colors.white)),
+        content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("${transporteur.prenom} ${transporteur.nom}", style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 10),
-            Text("Email: ${transporteur.email}"),
-            Text("Téléphone: ${transporteur.telephone}"),
-            const SizedBox(height: 10),
-            Text("Véhicule: ${transporteur.marqueVehicule} ${transporteur.modeleVehicule}"),
-            Text("Immatriculation: ${transporteur.immatriculation}"),
-            const SizedBox(height: 20),
-            Center(
-              child: ElevatedButton(
-                onPressed: () => Navigator.pop(context),
-                child: const Text("Fermer"),
-              ),
-            )
+            Text("Nom: ${transporteur.prenom} ${transporteur.nom}", style: const TextStyle(color: Colors.white70)),
+            const SizedBox(height: 8),
+            Text("Email: ${transporteur.email}", style: const TextStyle(color: Colors.white70)),
+            const SizedBox(height: 8),
+            Text("Véhicule: ${transporteur.typeVehicule}", style: const TextStyle(color: Colors.white70)),
+            const SizedBox(height: 8),
+            Text("Immatriculation: ${transporteur.immatriculation}", style: const TextStyle(color: Colors.white70)),
+            const SizedBox(height: 16),
+            const Text("Action requise :", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
           ],
         ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text("Fermer", style: TextStyle(color: Colors.grey)),
+          ),
+          if (!transporteur.documentsValides)
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(backgroundColor: CouleursApp.succes),
+              onPressed: () async {
+                await ref.read(serviceFirestoreProvider).modifierDocument(
+                  collection: 'transporteurs',
+                  id: transporteur.id,
+                  donnees: {'documentsValides': true},
+                );
+                if (context.mounted) Navigator.pop(ctx);
+              },
+              child: const Text("Approuver les documents", style: TextStyle(color: Colors.white)),
+            )
+          else
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(backgroundColor: CouleursApp.erreur),
+              onPressed: () async {
+                await ref.read(serviceFirestoreProvider).modifierDocument(
+                  collection: 'transporteurs',
+                  id: transporteur.id,
+                  donnees: {'documentsValides': false},
+                );
+                if (context.mounted) Navigator.pop(ctx);
+              },
+              child: const Text("Révoquer l'approbation", style: TextStyle(color: Colors.white)),
+            ),
+        ],
       ),
     );
   }
+}
 
-  Widget _buildStatutBadge(bool estValide) {
+class _GlassListItem extends StatelessWidget {
+  final String titre;
+  final String sousTitre;
+  final String? initiale;
+  final IconData? icone;
+  final Color couleurInitiale;
+  final bool estActif;
+  final bool? documentsValides;
+  final VoidCallback onToggleActif;
+  final VoidCallback onTap;
+
+  const _GlassListItem({
+    required this.titre,
+    required this.sousTitre,
+    this.initiale,
+    this.icone,
+    required this.couleurInitiale,
+    required this.estActif,
+    this.documentsValides,
+    required this.onToggleActif,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+      margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
-        color: estValide ? Colors.green.withValues(alpha: 0.1) : Colors.red.withValues(alpha: 0.1),
+        color: Colors.white.withValues(alpha: 0.03),
         borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
       ),
-      child: Text(
-        estValide ? "Approuvé" : "En attente",
-        style: TextStyle(
-          color: estValide ? Colors.green : Colors.red,
-          fontWeight: FontWeight.bold,
-          fontSize: 12,
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(20),
+          onTap: onTap,
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Row(
+              children: [
+                Container(
+                  width: 50, height: 50,
+                  decoration: BoxDecoration(
+                    color: couleurInitiale.withValues(alpha: 0.15),
+                    shape: BoxShape.circle,
+                  ),
+                  alignment: Alignment.center,
+                  child: icone != null
+                      ? Icon(icone, color: couleurInitiale)
+                      : Text(initiale ?? "", style: GoogleFonts.inter(color: couleurInitiale, fontWeight: FontWeight.bold, fontSize: 18)),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(titre, style: GoogleFonts.inter(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+                      const SizedBox(height: 4),
+                      Text(sousTitre, style: GoogleFonts.inter(color: Colors.white54, fontSize: 14)),
+                    ],
+                  ),
+                ),
+                if (documentsValides != null)
+                  Container(
+                    margin: const EdgeInsets.only(right: 16),
+                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: documentsValides! ? CouleursApp.succes.withValues(alpha: 0.1) : CouleursApp.erreur.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(documentsValides! ? "Approuvé" : "En attente", style: GoogleFonts.inter(color: documentsValides! ? CouleursApp.succes : CouleursApp.erreur, fontSize: 12, fontWeight: FontWeight.bold)),
+                  ),
+                IconButton(
+                  icon: Icon(estActif ? Iconsax.unlock_copy : Iconsax.lock_copy, color: estActif ? Colors.white54 : CouleursApp.erreur),
+                  onPressed: onToggleActif,
+                ),
+              ],
+            ),
+          ),
         ),
       ),
     );

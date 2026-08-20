@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:latlong2/latlong.dart';
 
-import '../../../modeles/transporteur.dart';
-import '../../../services/service_gps.dart';
+import 'package:update_camtrans/modeles/transporteur.dart';
+import 'package:update_camtrans/services/service_gps.dart';
 
 class FicheTransporteurBottomSheet extends ConsumerWidget {
   final Transporteur transporteur;

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../constantes/couleurs.dart';
-import '../constantes/tailles.dart';
+import 'package:update_camtrans/coeur/constantes/couleurs.dart';
+import 'package:update_camtrans/coeur/constantes/tailles.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 /// =======================================================

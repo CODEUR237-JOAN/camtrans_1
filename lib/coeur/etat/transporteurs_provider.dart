@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../modeles/transporteur.dart';
-import '../../services/service_firestore.dart';
+import 'package:update_camtrans/modeles/transporteur.dart';
+import 'package:update_camtrans/services/service_firestore.dart';
 
 final transporteursDisponiblesProvider = StreamProvider.autoDispose<List<Transporteur>>((ref) {
   final firestoreService = ref.watch(serviceFirestoreProvider);

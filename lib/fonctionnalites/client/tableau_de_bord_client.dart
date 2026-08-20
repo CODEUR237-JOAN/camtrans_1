@@ -8,21 +8,23 @@ import 'package:latlong2/latlong.dart';
 import 'package:go_router/go_router.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 
-import '../../coeur/etat/course_provider.dart';
-import '../../coeur/routes/routes.dart';
-import '../../modeles/course.dart';
-import '../../services/service_authentification.dart';
-import '../../services/service_firestore.dart';
+import 'package:update_camtrans/coeur/etat/course_provider.dart';
+import 'package:update_camtrans/coeur/etat/utilisateur_provider.dart';
+import 'package:update_camtrans/services/service_gps.dart';
+import 'package:update_camtrans/coeur/routes/routes.dart';
+import 'package:update_camtrans/modeles/course.dart';
+import 'package:update_camtrans/services/service_authentification.dart';
+import 'package:update_camtrans/services/service_firestore.dart';
 
 import 'historique.dart';
 import 'suivi_transport.dart';
-import '../notifications/notifications.dart';
+import 'package:update_camtrans/fonctionnalites/notifications/notifications.dart';
 import 'profil.dart';
-import '../../coeur/etat/notification_provider.dart';
+import 'package:update_camtrans/coeur/etat/notification_provider.dart';
 
-import '../../coeur/constantes/couleurs.dart';
-import '../../coeur/constantes/statuts.dart';
-import '../../coeur/widgets/page_responsive.dart';
+import 'package:update_camtrans/coeur/constantes/couleurs.dart';
+import 'package:update_camtrans/coeur/constantes/statuts.dart';
+import 'package:update_camtrans/coeur/widgets/page_responsive.dart';
 
 class TableauDeBordClient extends ConsumerStatefulWidget {
   const TableauDeBordClient({super.key});
@@ -34,6 +36,15 @@ class TableauDeBordClient extends ConsumerStatefulWidget {
 class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
   int _bottomNavIndex = 0;
   final MapController _mapController = MapController();
+
+  @override
+  void initState() {
+    super.initState();
+    // Demander les permissions GPS dès l'accueil pour une expérience fluide
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(serviceGpsProvider).verifierPermissions();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -117,7 +128,7 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
             error: (err, stack) => SliverToBoxAdapter(child: _buildErrorState(err.toString())),
             data: (courses) {
               final enCours = courses.where((c) => !StatutCourse.estTerminee(c.statut)).toList();
-              final livrees = courses.where((c) => c.statut == StatutCourse.livre || c.statut == StatutCourse.termine).toList();
+              final livrees = courses.where((c) => c.statut == StatutCourse.arriveDestination || c.statut == StatutCourse.terminee).toList();
               
               double depenses = livrees.fold(0, (sum, c) => sum + c.prixFinal);
               if (depenses == 0) {
@@ -145,80 +156,90 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
   // HEADER PREMIUM
   // ==========================================
   Widget _buildHeader() {
+    final clientAsync = ref.watch(currentClientProvider);
     final utilisateur = ref.watch(serviceAuthentificationProvider).utilisateur;
-    final String nomAffichage = utilisateur?.displayName ?? "Client";
 
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Row(
+    return clientAsync.when(
+      loading: () => const SizedBox.shrink(),
+      error: (err, stack) => const SizedBox.shrink(),
+      data: (client) {
+        final String nomAffichage = client != null ? client.prenom : (utilisateur?.displayName ?? "Client");
+        final String photoUrl = client?.photo ?? utilisateur?.photoURL ?? "";
+
+        return Padding(
+          padding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Container(
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(color: CouleursApp.primaire.withValues(alpha: 0.2), blurRadius: 15, offset: const Offset(0, 5))
-                  ],
-                ),
-                child: const CircleAvatar(
-                  radius: 25,
-                  backgroundColor: CouleursApp.primaire,
-                  child: Icon(Iconsax.user_copy, color: Colors.white),
-                ),
-              ).animate().scale(delay: 100.ms),
-              const SizedBox(width: 15),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    "Bienvenue, $nomAffichage",
-                    style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: CouleursApp.textePrincipal),
-                  ).animate().fadeIn(delay: 200.ms).slideX(),
-                  const Text(
-                    "Prêt à expédier aujourd'hui ?",
-                    style: TextStyle(fontSize: 14, color: CouleursApp.texteSecondaire),
-                  ).animate().fadeIn(delay: 300.ms),
-                ],
-              ),
-            ],
-          ),
-        Builder(builder: (context) {
-            final badgeCount = ref.watch(badgeNotificationsProvider);
-            return GestureDetector(
-              onTap: () => setState(() => _bottomNavIndex = 3),
-              child: Stack(
-                clipBehavior: Clip.none,
+              Row(
                 children: [
                   Container(
-                    padding: const EdgeInsets.all(10),
                     decoration: BoxDecoration(
-                      color: CouleursApp.surface,
-                      borderRadius: BorderRadius.circular(15),
-                      boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 10)],
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(color: CouleursApp.primaire.withValues(alpha: 0.2), blurRadius: 15, offset: const Offset(0, 5))
+                      ],
                     ),
-                    child: const Icon(Iconsax.notification_bing_copy, color: CouleursApp.textePrincipal),
+                    child: CircleAvatar(
+                      radius: 25,
+                      backgroundColor: CouleursApp.primaire,
+                      backgroundImage: photoUrl.isNotEmpty ? NetworkImage(photoUrl) : null,
+                      child: photoUrl.isEmpty ? const Icon(Iconsax.user_copy, color: Colors.white) : null,
+                    ),
+                  ).animate().scale(delay: 100.ms),
+                  const SizedBox(width: 15),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Bienvenue, $nomAffichage",
+                        style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: CouleursApp.textePrincipal),
+                      ).animate().fadeIn(delay: 200.ms).slideX(),
+                      const Text(
+                        "Prêt à expédier aujourd'hui ?",
+                        style: TextStyle(fontSize: 14, color: CouleursApp.texteSecondaire),
+                      ).animate().fadeIn(delay: 300.ms),
+                    ],
                   ),
-                  if (badgeCount > 0)
-                    Positioned(
-                      top: -5,
-                      right: -5,
-                      child: Container(
-                        padding: const EdgeInsets.all(5),
-                        decoration: const BoxDecoration(color: CouleursApp.erreur, shape: BoxShape.circle),
-                        child: Text(
-                          badgeCount > 9 ? "9+" : "$badgeCount",
-                          style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
-                        ),
-                      ).animate().scale(delay: 400.ms).shake(),
-                    )
                 ],
-              ).animate().fadeIn(delay: 300.ms),
-            );
-          })
-        ],
-      ),
+              ),
+              Builder(builder: (context) {
+                final badgeCount = ref.watch(badgeNotificationsProvider);
+                return GestureDetector(
+                  onTap: () => setState(() => _bottomNavIndex = 3),
+                  child: Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: CouleursApp.surface,
+                          borderRadius: BorderRadius.circular(15),
+                          boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 10)],
+                        ),
+                        child: const Icon(Iconsax.notification_bing_copy, color: CouleursApp.textePrincipal),
+                      ),
+                      if (badgeCount > 0)
+                        Positioned(
+                          top: -5,
+                          right: -5,
+                          child: Container(
+                            padding: const EdgeInsets.all(5),
+                            decoration: const BoxDecoration(color: CouleursApp.erreur, shape: BoxShape.circle),
+                            child: Text(
+                              badgeCount > 9 ? "9+" : "$badgeCount",
+                              style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+                            ),
+                          ).animate().scale(delay: 400.ms).shake(),
+                        )
+                    ],
+                  ).animate().fadeIn(delay: 300.ms),
+                );
+              })
+            ],
+          ),
+        );
+      },
     );
   }
 
@@ -568,11 +589,15 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               const Text("Historique Récent", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: CouleursApp.textePrincipal)),
-              TextButton(onPressed: () {}, child: const Text("Voir tout", style: TextStyle(color: CouleursApp.primaire, fontSize: 14))),
+              TextButton(
+                  onPressed: () {
+                    context.push(RoutesApplication.historique);
+                  },
+                  child: const Text("Voir tout", style: TextStyle(color: CouleursApp.primaire, fontSize: 14))),
             ],
           ),
           ...courses.take(3).map<Widget>((course) {
-            Color statusColor = (course.statut == StatutCourse.livre || course.statut == StatutCourse.termine)
+            Color statusColor = (course.statut == StatutCourse.arriveDestination || course.statut == StatutCourse.terminee)
                 ? CouleursApp.succes
                 : course.statut == StatutCourse.annulee
                     ? CouleursApp.erreur
@@ -717,9 +742,9 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
         context.push(RoutesApplication.assistantIA);
       },
       backgroundColor: CouleursApp.primaireFonce,
-      tooltip: "Discuter avec l'assistant d'Intelligence Artificielle",
+      tooltip: "Discuter avec l'assistant",
       icon: const Icon(Iconsax.message_text_copy, color: Colors.white),
-      label: const Text("Assistant IA", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+      label: const Text("Assistant", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
     ).animate().slideY(begin: 2, delay: 1200.ms, curve: Curves.easeOutBack);
   }
 

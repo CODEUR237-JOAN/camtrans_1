@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
-import '../../coeur/constantes/couleurs.dart';
-import '../../coeur/constantes/tailles.dart';
+import 'package:update_camtrans/coeur/constantes/couleurs.dart';
+import 'package:update_camtrans/coeur/constantes/tailles.dart';
 
 class Parametres extends StatefulWidget {
   const Parametres({super.key});
