@@ -7,6 +7,7 @@ import 'package:update_camtrans/services/service_firestore.dart';
 import 'package:update_camtrans/services/service_gps.dart';
 import 'package:update_camtrans/services/service_notification.dart';
 import 'package:update_camtrans/modeles/transporteur.dart';
+import 'package:update_camtrans/coeur/constantes/statuts.dart';
 
 class EtatDemandeExpedition {
   final String depart;
@@ -270,68 +271,131 @@ class DemandeExpeditionNotifier extends StateNotifier<EtatDemandeExpedition> {
         } catch (_) {}
       }
 
-      // Algorithme de Matching: Trouver le chauffeur dispo le plus proche (Haversine)
-      // On s'assure d'attribuer un véhicule adapté (Dépanneuse pour Remorque)
+      // ═══════════════════════════════════════════════════════
+      // ALGORITHME DE MATCHING (version corrigée)
+      // Conditions OBLIGATOIRES pour qu'un transporteur soit éligible :
+      //   1. disponible = true  (il s'est mis en ligne)
+      //   2. actif = true       (vérifié / validé par l'admin)
+      //   3. documentsValides = true (documents acceptés)
+      //   4. Véhicule adapté à la catégorie de service demandée
+      //   5. Aucune course active en cours
+      // Puis on trie par distance Haversine (si GPS disponible),
+      // sinon on fait un tirage aléatoire équitable.
+      // ═══════════════════════════════════════════════════════
       Transporteur? meilleurChauffeur;
       double distanceMin = double.infinity;
       int tempsMin = 0;
-      
+
       try {
+        // Étape 1 : Récupérer tous les transporteurs en ligne, actifs et validés
         final query = await serviceFirestore.transporteurs
             .where("disponible", isEqualTo: true)
+            .where("actif", isEqualTo: true)
             .get();
-            
+
+        // Étape 2 : Récupérer les IDs des transporteurs ayant une course active
+        // On cherche les courses avec statut actif (non terminées)
+        final coursesActives = await serviceFirestore.courses
+            .where("statut", whereIn: [
+              StatutCourse.attribue,
+              StatutCourse.enRouteDepart,
+              StatutCourse.arriveDepart,
+              StatutCourse.charge,
+              StatutCourse.enTransit,
+              StatutCourse.arriveDestination,
+            ])
+            .get();
+        final transporteursOccupes = <String>{
+          for (var doc in coursesActives.docs)
+            if ((doc.data()["transporteurId"] ?? "").toString().isNotEmpty)
+              doc.data()["transporteurId"] as String,
+        };
+
+        // Étape 3 : Filtrer les candidats éligibles
+        final List<_CandidatTransporteur> candidats = [];
+
         for (var doc in query.docs) {
           final t = Transporteur.fromMap(doc.data());
-          
+
+          // Vérification: documents validés par l'admin
+          if (!t.documentsValides) continue;
+
+          // Vérification: pas de course active en cours
+          if (transporteursOccupes.contains(t.id)) continue;
+
           // Vérification du type de véhicule (insensible à la casse)
-          final typeV = (t.typeVehicule ?? "").toLowerCase().trim();
+          final typeV = t.typeVehicule.toLowerCase().trim();
           bool vehiculeCompatible = false;
 
-          // Si le chauffeur n'a pas renseigné son type de véhicule → on l'accepte en fallback
           if (typeV.isEmpty) {
-            vehiculeCompatible = true;
+            // Type non renseigné → fallback accepté uniquement pour Marchandises
+            vehiculeCompatible = state.categorieService != "Remorque";
           } else if (state.categorieService == "Remorque") {
-            // Dépanneuse, Semi-remorque, ou tout type contenant remorque
+            // UNIQUEMENT dépanneuse / semi-remorque pour Remorque
             vehiculeCompatible = typeV.contains("depanneuse") ||
                 typeV.contains("dépanneuse") ||
-                typeV.contains("remorque") ||  // couvre "semi-remorque"
-                typeV.contains("semi");
+                typeV.contains("semi-remorque") ||
+                typeV.contains("semi_remorque") ||
+                typeV.contains("remorque");
           } else if (state.categorieService == "Déménagement") {
             vehiculeCompatible = typeV.contains("camion") ||
                 typeV.contains("fourgon") ||
                 typeV.contains("van") ||
                 typeV.contains("semi");
           } else {
-            // Marchandises : on s'aligne sur la recommandation IA ou le choix client
-            final reqV = (estimation["vehicule"] ?? state.categorieVehicule).toString().toLowerCase().trim();
+            // Marchandises : aligner sur la recommandation IA ou le choix client
+            final reqV = (estimation["vehicule"] ?? state.categorieVehicule)
+                .toString()
+                .toLowerCase()
+                .trim();
             if (reqV.isEmpty) {
               vehiculeCompatible = true;
             } else if (reqV.contains("moto")) {
               vehiculeCompatible = typeV.contains("moto");
             } else if (reqV.contains("camion") || reqV.contains("fourgon")) {
-              vehiculeCompatible = typeV.contains("camion") || typeV.contains("fourgon") || typeV.contains("van");
+              vehiculeCompatible = typeV.contains("camion") ||
+                  typeV.contains("fourgon") ||
+                  typeV.contains("van");
             } else if (reqV.contains("voiture") || reqV.contains("berline")) {
-              vehiculeCompatible = typeV.contains("voiture") || typeV.contains("berline") || typeV.contains("sedan");
+              vehiculeCompatible = typeV.contains("voiture") ||
+                  typeV.contains("berline") ||
+                  typeV.contains("sedan");
             } else {
-              // Matching générique ou accepter tout
-              vehiculeCompatible = typeV.contains(reqV) || reqV.contains(typeV) || true;
+              vehiculeCompatible = typeV.contains(reqV) || reqV.contains(typeV);
             }
           }
 
-          if (!vehiculeCompatible) {
-            continue; // Ignorer les véhicules inadaptés
+          if (!vehiculeCompatible) continue;
+
+          // Calculer distance si GPS disponible
+          double distCandidat = double.infinity;
+          if (latClient != 0.0 &&
+              lngClient != 0.0 &&
+              t.latitude != 0 &&
+              t.longitude != 0) {
+            distCandidat = _calculerDistanceHaversine(
+                latClient, lngClient, t.latitude, t.longitude);
           }
 
-          if (latClient != 0.0 && lngClient != 0.0 && t.latitude != 0 && t.longitude != 0) {
-            final dist = _calculerDistanceHaversine(latClient, lngClient, t.latitude, t.longitude);
-            if (dist < distanceMin) {
-              distanceMin = dist;
-              meilleurChauffeur = t;
-              tempsMin = (dist / 40 * 60).round();
-            }
-          } else if (meilleurChauffeur == null) {
-            meilleurChauffeur = t;
+          candidats.add(_CandidatTransporteur(transporteur: t, distance: distCandidat));
+        }
+
+        // Étape 4 : Sélectionner le meilleur candidat
+        if (candidats.isNotEmpty) {
+          final avecGPS =
+              candidats.where((c) => c.distance != double.infinity).toList();
+
+          if (avecGPS.isNotEmpty) {
+            // GPS disponible → prendre le plus proche
+            avecGPS.sort((a, b) => a.distance.compareTo(b.distance));
+            final meilleur = avecGPS.first;
+            meilleurChauffeur = meilleur.transporteur;
+            distanceMin = meilleur.distance;
+            tempsMin = (distanceMin / 40 * 60).round();
+          } else {
+            // GPS indisponible → tirage aléatoire équitable (rotation)
+            candidats.shuffle(Random());
+            meilleurChauffeur = candidats.first.transporteur;
             distanceMin = 5.0;
             tempsMin = 8;
           }
@@ -339,6 +403,7 @@ class DemandeExpeditionNotifier extends StateNotifier<EtatDemandeExpedition> {
       } catch (e) {
         debugPrint("Erreur matching chauffeur: $e");
       }
+
 
       state = state.copierAvec(
         estEnAttenteIA: false,
@@ -368,3 +433,14 @@ final demandeExpeditionProvider =
   final gps = ref.watch(serviceGpsProvider);
   return DemandeExpeditionNotifier(service, firestore, gps);
 });
+
+/// Classe utilitaire interne pour trier les candidats lors du matching
+class _CandidatTransporteur {
+  final Transporteur transporteur;
+  final double distance; // en km ; double.infinity si GPS indisponible
+
+  const _CandidatTransporteur({
+    required this.transporteur,
+    required this.distance,
+  });
+}
