@@ -4,8 +4,8 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:update_camtrans/coeur/constantes/couleurs.dart';
 import 'package:update_camtrans/coeur/etat/transporteur_provider.dart';
 
-class Portefeuille extends ConsumerWidget {
-  const Portefeuille({super.key});
+class Revenus extends ConsumerWidget {
+  const Revenus({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

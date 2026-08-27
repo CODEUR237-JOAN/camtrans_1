@@ -248,12 +248,12 @@ class DemandeExpeditionNotifier extends StateNotifier<EtatDemandeExpedition> {
         fichiersImages: state.photos,
       );
     } catch (e) {
-      debugPrint("⚠️ IA Indisponible (Quota/Erreur), utilisation du fallback : $e");
+      debugPrint("️ IA Indisponible (Quota/Erreur), utilisation du fallback : $e");
       estimation = {
         "vehicule": state.categorieVehicule.isNotEmpty ? state.categorieVehicule : "Camionnette",
         "volume": "Selon chargement",
         "prix": "Sur devis",
-        "conseil": "L'assistant IA est temporairement saturé. Un conseiller vérifiera vos détails.",
+        "conseil": "Le système d'analyse est temporairement saturé. Un conseiller vérifiera vos détails.",
       };
     }
 
@@ -319,6 +319,9 @@ class DemandeExpeditionNotifier extends StateNotifier<EtatDemandeExpedition> {
 
           // Vérification: documents validés par l'admin
           if (!t.documentsValides) continue;
+
+          // Vérification: le transporteur doit être connecté (Point vert)
+          if (!t.estEnLigne) continue;
 
           // Vérification: pas de course active en cours
           if (transporteursOccupes.contains(t.id)) continue;
@@ -419,7 +422,7 @@ class DemandeExpeditionNotifier extends StateNotifier<EtatDemandeExpedition> {
       // Notification Autonome Simulée (Sprint 12)
       if (meilleurChauffeur != null) {
         ServiceNotification.afficherNotification(
-          titre: "🚕 Transporteur trouvé !",
+          titre: " Transporteur trouvé !",
           message: "Le chauffeur ${meilleurChauffeur.prenom} a accepté votre course et se trouve à $tempsMin min.",
         );
       }

@@ -14,10 +14,10 @@ class TextesApp {
   // Application
   // ==========================
 
-  static const String nomApplication = "TransConnect Cameroun";
+  static const String nomApplication = "Camtrans";
 
   static const String slogan =
-      "Le transport intelligent au service du Cameroun";
+      "Votre remorquage d'urgence au Cameroun, 24h/24";
 
   // ==========================
   // Boutons

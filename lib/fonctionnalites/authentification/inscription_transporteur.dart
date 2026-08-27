@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -22,7 +21,7 @@ class InscriptionTransporteur extends ConsumerStatefulWidget {
 
   @override
   ConsumerState<InscriptionTransporteur> createState() => _InscriptionTransporteurState();
-}
+  }
 
 class _InscriptionTransporteurState extends ConsumerState<InscriptionTransporteur> {
   final _formKey = GlobalKey<FormState>();
@@ -66,14 +65,14 @@ class _InscriptionTransporteurState extends ConsumerState<InscriptionTransporteu
         const SnackBar(content: Text("Veuillez choisir un type de véhicule.")),
       );
       return;
-    }
+  }
 
     if (!_conditions) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Veuillez accepter les conditions d'utilisation.")),
       );
       return;
-    }
+  }
 
     setState(() {
       _chargement = true;
@@ -129,7 +128,7 @@ class _InscriptionTransporteurState extends ConsumerState<InscriptionTransporteu
 
         // Envoyer l'email de vérification
         await serviceAuth.envoyerVerificationEmail();
-      }
+  }
 
       await serviceAuth.deconnexion();
 
@@ -155,8 +154,8 @@ class _InscriptionTransporteurState extends ConsumerState<InscriptionTransporteu
         setState(() {
           _chargement = false;
         });
-      }
-    }
+  }
+  }
   }
 
   @override
@@ -200,7 +199,7 @@ class _InscriptionTransporteurState extends ConsumerState<InscriptionTransporteu
                     fontWeight: FontWeight.w900,
                     letterSpacing: -0.5,
                   ),
-                ).animate().fadeIn(delay: 100.ms).slideY(begin: 0.2, end: 0),
+                ),
                 
                 const SizedBox(height: 30),
 
@@ -223,7 +222,7 @@ class _InscriptionTransporteurState extends ConsumerState<InscriptionTransporteu
                       const Align(
                         alignment: Alignment.centerLeft,
                         child: Text("Informations Personnelles", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: CouleursApp.primaire)),
-                      ).animate().fadeIn(delay: 200.ms),
+                      ),
                       const SizedBox(height: 15),
 
                       ChampTexte(
@@ -231,7 +230,7 @@ class _InscriptionTransporteurState extends ConsumerState<InscriptionTransporteu
                         libelle: "Nom complet",
                         icone: Icons.person_outline,
                         validateur: Validateurs.nom,
-                      ).animate().fadeIn(delay: 300.ms).slideX(begin: -0.1),
+                      ),
 
                       const SizedBox(height: 15),
 
@@ -241,7 +240,7 @@ class _InscriptionTransporteurState extends ConsumerState<InscriptionTransporteu
                         icone: Icons.phone_outlined,
                         typeClavier: TextInputType.phone,
                         validateur: Validateurs.telephone,
-                      ).animate().fadeIn(delay: 400.ms).slideX(begin: -0.1),
+                      ),
 
                       const SizedBox(height: 15),
 
@@ -251,7 +250,7 @@ class _InscriptionTransporteurState extends ConsumerState<InscriptionTransporteu
                         icone: Icons.email_outlined,
                         typeClavier: TextInputType.emailAddress,
                         validateur: Validateurs.email,
-                      ).animate().fadeIn(delay: 500.ms).slideX(begin: -0.1),
+                      ),
 
                       const SizedBox(height: 15),
 
@@ -260,7 +259,7 @@ class _InscriptionTransporteurState extends ConsumerState<InscriptionTransporteu
                         libelle: "Ville",
                         icone: Icons.location_city_outlined,
                         validateur: (v) => Validateurs.obligatoire(v, nomChamp: "Ville"),
-                      ).animate().fadeIn(delay: 600.ms).slideX(begin: -0.1),
+                      ),
                     ],
                   ),
                 ),
@@ -286,7 +285,7 @@ class _InscriptionTransporteurState extends ConsumerState<InscriptionTransporteu
                       const Align(
                         alignment: Alignment.centerLeft,
                         child: Text("Informations Professionnelles", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: CouleursApp.primaire)),
-                      ).animate().fadeIn(delay: 700.ms),
+                      ),
                       const SizedBox(height: 15),
 
                       Theme(
@@ -300,7 +299,7 @@ class _InscriptionTransporteurState extends ConsumerState<InscriptionTransporteu
                           ),
                         ),
                         child: DropdownButtonFormField<String>(
-                          value: _vehicule,
+                          initialValue: _vehicule,
                           style: const TextStyle(
                             color: Color(0xFF1E293B),
                             fontSize: 15,
@@ -348,7 +347,7 @@ class _InscriptionTransporteurState extends ConsumerState<InscriptionTransporteu
                             });
                           },
                         ),
-                      ).animate().fadeIn(delay: 800.ms).slideX(begin: -0.1),
+                      ),
 
                       const SizedBox(height: 15),
 
@@ -357,7 +356,7 @@ class _InscriptionTransporteurState extends ConsumerState<InscriptionTransporteu
                         libelle: "Immatriculation",
                         icone: Icons.directions_car_outlined,
                         validateur: (v) => Validateurs.obligatoire(v, nomChamp: "Immatriculation"),
-                      ).animate().fadeIn(delay: 900.ms).slideX(begin: -0.1),
+                      ),
 
                       const SizedBox(height: 15),
 
@@ -366,7 +365,7 @@ class _InscriptionTransporteurState extends ConsumerState<InscriptionTransporteu
                         libelle: "Numéro de permis",
                         icone: Icons.badge_outlined,
                         validateur: (v) => Validateurs.obligatoire(v, nomChamp: "Permis"),
-                      ).animate().fadeIn(delay: 1000.ms).slideX(begin: -0.1),
+                      ),
 
                       const SizedBox(height: 15),
 
@@ -376,7 +375,7 @@ class _InscriptionTransporteurState extends ConsumerState<InscriptionTransporteu
                         icone: Icons.scale_outlined,
                         typeClavier: const TextInputType.numberWithOptions(decimal: true),
                         validateur: Validateurs.poids,
-                      ).animate().fadeIn(delay: 1100.ms).slideX(begin: -0.1),
+                      ),
                     ],
                   ),
                 ),
@@ -406,7 +405,7 @@ class _InscriptionTransporteurState extends ConsumerState<InscriptionTransporteu
                       _docItem(Icons.photo_camera, "Photos du véhicule (Int/Ext)"),
                     ],
                   ),
-                ).animate().fadeIn(delay: 1200.ms),
+                ),
 
                 const SizedBox(height: 25),
 
@@ -422,14 +421,14 @@ class _InscriptionTransporteurState extends ConsumerState<InscriptionTransporteu
                         blurRadius: 20,
                         offset: const Offset(0, 10),
                       )
-                    ]
+                    ],
                   ),
                   child: Column(
                     children: [
                       const Align(
                         alignment: Alignment.centerLeft,
                         child: Text("Sécurité", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: CouleursApp.primaire)),
-                      ).animate().fadeIn(delay: 1300.ms),
+                      ),
                       const SizedBox(height: 15),
 
                       ChampTexte(
@@ -438,7 +437,7 @@ class _InscriptionTransporteurState extends ConsumerState<InscriptionTransporteu
                         icone: Icons.lock_outline,
                         estMotDePasse: true,
                         validateur: Validateurs.motDePasse,
-                      ).animate().fadeIn(delay: 1400.ms).slideX(begin: -0.1),
+                      ),
 
                       const SizedBox(height: 15),
 
@@ -448,7 +447,7 @@ class _InscriptionTransporteurState extends ConsumerState<InscriptionTransporteu
                         icone: Icons.lock_outline,
                         estMotDePasse: true,
                         validateur: (v) => Validateurs.confirmerMotDePasse(v, _motDePasse.text),
-                      ).animate().fadeIn(delay: 1500.ms).slideX(begin: -0.1),
+                      ),
                     ],
                   ),
                 ),
@@ -469,7 +468,7 @@ class _InscriptionTransporteurState extends ConsumerState<InscriptionTransporteu
                   ),
                   controlAffinity: ListTileControlAffinity.leading,
                   contentPadding: EdgeInsets.zero,
-                ).animate().fadeIn(delay: 1600.ms),
+                ),
 
                 const SizedBox(height: 25),
 
@@ -478,7 +477,7 @@ class _InscriptionTransporteurState extends ConsumerState<InscriptionTransporteu
                   icone: Icons.local_shipping,
                   chargement: _chargement,
                   auClic: _inscription,
-                ).animate().fadeIn(delay: 1700.ms).scale(begin: const Offset(0.9, 0.9)),
+                ),
 
                 const SizedBox(height: 20),
 
@@ -494,13 +493,13 @@ class _InscriptionTransporteurState extends ConsumerState<InscriptionTransporteu
                       child: const Text("Se connecter", style: TextStyle(fontWeight: FontWeight.bold)),
                     ),
                   ],
-                ).animate().fadeIn(delay: 1800.ms),
+                ),
 
                 const SizedBox(height: 40),
               ],
             ),
-            ),
           ),
+        ),
         ),
       ),
     );
@@ -518,4 +517,4 @@ class _InscriptionTransporteurState extends ConsumerState<InscriptionTransporteu
       ),
     );
   }
-}
+  }

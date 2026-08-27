@@ -1,7 +1,6 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -153,7 +152,7 @@ class TicketRecu extends StatelessWidget {
           ),
         ),
       ),
-    ).animate().slideY(begin: 1.0, end: 0, curve: Curves.easeOutQuart, duration: 600.ms).fadeIn();
+    );
   }
 
   Widget _buildLigneDetails(String titre, String valeur) {

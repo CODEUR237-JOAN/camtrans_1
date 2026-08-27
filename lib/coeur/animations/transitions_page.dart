@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:vector_math/vector_math_64.dart' show Vector3;
 
+
 /// =======================================================
 /// TRANSITIONS DE PAGE PERSONNALISÉES
 /// Pour GoRouter - Effets fluides et modernes

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 
 import 'package:update_camtrans/coeur/etat/admin_provider.dart';
 import 'widgets/sidebar_admin.dart';
@@ -10,6 +9,7 @@ import 'pages/page_moderation.dart';
 import 'pages/page_activites.dart';
 import 'pages/page_notifications.dart';
 import 'pages/page_carte_flotte.dart';
+
 
 class TableauDeBordAdmin extends ConsumerStatefulWidget {
   const TableauDeBordAdmin({super.key});
@@ -72,12 +72,12 @@ class _TableauDeBordAdminState extends ConsumerState<TableauDeBordAdmin> {
               controller: _pageController,
               physics: const NeverScrollableScrollPhysics(), // Désactive le swipe manuel
               children: [
-                const PageVueEnsemble().animate().fadeIn(duration: 400.ms).slideY(begin: 0.05),
-                const PageUtilisateurs().animate().fadeIn(duration: 400.ms).slideY(begin: 0.05),
-                const PageModeration().animate().fadeIn(duration: 400.ms).slideY(begin: 0.05),
-                const PageCarteFlotte().animate().fadeIn(duration: 400.ms).slideY(begin: 0.05),
-                const PageActivites().animate().fadeIn(duration: 400.ms).slideY(begin: 0.05),
-                const PageNotifications().animate().fadeIn(duration: 400.ms).slideY(begin: 0.05),
+                const PageVueEnsemble(),
+                const PageUtilisateurs(),
+                const PageModeration(),
+                const PageCarteFlotte(),
+                const PageActivites(),
+                const PageNotifications(),
               ],
             ),
           ),

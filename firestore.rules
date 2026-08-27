@@ -1,0 +1,150 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ============================================================
+    // FONCTIONS UTILITAIRES
+    // ============================================================
+
+    function estConnecte() {
+      return request.auth != null;
+    }
+
+    function estProprietaire(userId) {
+      return request.auth.uid == userId;
+    }
+
+    function estAdmin() {
+      return request.auth != null &&
+        (request.auth.token.email == 'admintrans@gmail.com' ||
+         exists(/databases/$(database)/documents/admin/$(request.auth.uid)));
+    }
+
+    function estClient() {
+      return request.auth != null &&
+        exists(/databases/$(database)/documents/clients/$(request.auth.uid));
+    }
+
+    function estTransporteur() {
+      return request.auth != null &&
+        exists(/databases/$(database)/documents/transporteurs/$(request.auth.uid));
+    }
+
+    // ============================================================
+    // COLLECTION : admin
+    // Tout utilisateur connecté peut lire son propre doc (pour vérifier son rôle au login).
+    // Seul l'admin peut lire les docs des autres et écrire.
+    // ============================================================
+    match /admin/{adminId} {
+      allow read: if estConnecte() && (estProprietaire(adminId) || estAdmin());
+      allow write: if estAdmin();
+    }
+
+    // ============================================================
+    // COLLECTION : clients
+    // Accès lors de l'inscription : l'utilisateur connecté crée son propre doc.
+    // Accès en lecture par les transporteurs (pour les infos client d'une course).
+    // ============================================================
+    match /clients/{clientId} {
+      allow read: if estConnecte() && (estProprietaire(clientId) || estAdmin() || estTransporteur());
+      allow create: if estConnecte() && estProprietaire(clientId);
+      allow update: if estConnecte() && (estProprietaire(clientId) || estAdmin());
+      allow delete: if estAdmin();
+    }
+
+    // ============================================================
+    // COLLECTION : transporteurs
+    // ============================================================
+    match /transporteurs/{transporteurId} {
+      allow read: if estConnecte(); // Lecture libre pour le matching de chauffeurs
+      allow create: if estConnecte() && estProprietaire(transporteurId);
+      allow update: if estConnecte() && (estProprietaire(transporteurId) || estAdmin());
+      allow delete: if estAdmin();
+    }
+
+    // ============================================================
+    // COLLECTION : utilisateurs (profil générique, token FCM)
+    // ============================================================
+    match /utilisateurs/{userId} {
+      allow read: if estConnecte() && (estProprietaire(userId) || estAdmin());
+      allow write: if estConnecte() && (estProprietaire(userId) || estAdmin());
+    }
+
+    // ============================================================
+    // COLLECTION : courses
+    // ============================================================
+    match /courses/{courseId} {
+      // Lecture : tout utilisateur connecté peut lire les courses
+      // (nécessaire pour les requêtes filtrées par clientId ou statut)
+      allow read: if estConnecte();
+
+      // Création : tout utilisateur connecté peut créer une course
+      // (dev: règle permissive pour les tests)
+      allow create: if estConnecte();
+
+      // Modification par le client propriétaire, le transporteur assigné, ou l'admin.
+      allow update: if estConnecte() && (
+        estAdmin() ||
+        (resource.data.clientId == request.auth.uid) ||
+        (resource.data.statut == 'recherche') ||
+        (resource.data.transporteurId == request.auth.uid)
+      );
+
+      allow delete: if estConnecte() && (
+        estAdmin() ||
+        (resource.data.clientId == request.auth.uid) ||
+        (resource.data.transporteurId == request.auth.uid)
+      );
+    }
+
+    // ============================================================
+    // COLLECTION : paiements
+    // ============================================================
+    match /paiements/{paiementId} {
+      allow read: if estConnecte() && (
+        estAdmin() ||
+        resource.data.clientId == request.auth.uid ||
+        resource.data.transporteurId == request.auth.uid
+      );
+      allow create: if estConnecte() && (estClient() || estAdmin());
+      allow update: if estAdmin();
+      allow delete: if estAdmin();
+    }
+
+    // ============================================================
+    // COLLECTION : notifications (in-app)
+    // ============================================================
+    match /notifications/{notifId} {
+      allow read: if estConnecte() && (
+        estAdmin() ||
+        resource.data.utilisateurId == request.auth.uid
+      );
+      allow create: if estAdmin();
+      allow update: if estConnecte() && (
+        estAdmin() || resource.data.utilisateurId == request.auth.uid
+      );
+      allow delete: if estConnecte() && (
+        estAdmin() || resource.data.utilisateurId == request.auth.uid
+      );
+    }
+
+    // ============================================================
+    // COLLECTION : notifications_push (file d'attente pour l'envoi de masse)
+    // Utilisée uniquement par l'admin depuis le tableau de bord.
+    // ============================================================
+    match /notifications_push/{notifId} {
+      allow read, write: if estAdmin();
+    }
+
+    // ============================================================
+    // COLLECTION : messages (messagerie client <-> transporteur)
+    // ============================================================
+    match /messages/{messageId} {
+      allow read: if estConnecte();
+      allow create: if estConnecte() && request.resource.data.expediteurId == request.auth.uid;
+      allow update, delete: if estAdmin();
+    }
+
+  }
+}
+

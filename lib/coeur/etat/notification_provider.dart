@@ -23,19 +23,7 @@ final gestionTokenFCMProvider = Provider.autoDispose<void>((ref) {
       }
     }).catchError((_) {});
 
-    // 2. Détecter le rôle pour lancer l'écoute automatique (simulation push)
-    // On vérifie dans quelle collection l'utilisateur se trouve
-    firestore.lireDocument(collection: 'clients', id: userId).then((doc) {
-      if (doc.exists) {
-        ServiceNotification.demarrerEcouteAutomatique(userId, 'client');
-      } else {
-        firestore.lireDocument(collection: 'transporteurs', id: userId).then((docT) {
-          if (docT.exists) {
-            ServiceNotification.demarrerEcouteAutomatique(userId, 'transporteur');
-          }
-        }).catchError((_) {});
-      }
-    }).catchError((_) {});
+    // 2. Détecter le rôle (Anciennement pour la simulation locale, maintenant géré par Cloud Functions)
 
     // 3. Écouter les changements de token
     final sub = ServiceNotification.changementToken().listen((token) {
@@ -50,7 +38,7 @@ final gestionTokenFCMProvider = Provider.autoDispose<void>((ref) {
 
     ref.onDispose(() {
       sub.cancel();
-      ServiceNotification.arreterEcouteAutomatique();
+      // ServiceNotification.arreterEcouteAutomatique();
     });
   }
 });

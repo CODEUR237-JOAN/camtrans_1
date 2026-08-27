@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:go_router/go_router.dart';
 import 'package:update_camtrans/coeur/constantes/couleurs.dart';
 import 'package:update_camtrans/services/service_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+
 
 class EcranEvaluation extends ConsumerStatefulWidget {
   final String courseId;
@@ -45,20 +46,20 @@ class _EcranEvaluationState extends ConsumerState<EcranEvaluation> {
                   shape: BoxShape.circle,
                 ),
                 child: const Icon(Icons.check_circle_outline, color: CouleursApp.succes, size: 80),
-              ).animate().scale(delay: 200.ms, curve: Curves.easeOutBack),
+              ),
               
               const SizedBox(height: 24),
               Text(
                 "Course terminée !",
                 style: GoogleFonts.poppins(color: Colors.white, fontSize: 28, fontWeight: FontWeight.bold),
-              ).animate().fadeIn(delay: 400.ms).slideY(begin: 0.2),
+              ),
               
               const SizedBox(height: 8),
               Text(
                 "Comment s'est passée votre livraison ?",
                 textAlign: TextAlign.center,
                 style: GoogleFonts.poppins(color: Colors.white54, fontSize: 16),
-              ).animate().fadeIn(delay: 600.ms),
+              ),
               
               const SizedBox(height: 40),
               
@@ -82,7 +83,7 @@ class _EcranEvaluationState extends ConsumerState<EcranEvaluation> {
                     ),
                   );
                 }),
-              ).animate().fadeIn(delay: 800.ms),
+              ),
               
               const SizedBox(height: 40),
               
@@ -102,7 +103,7 @@ class _EcranEvaluationState extends ConsumerState<EcranEvaluation> {
                       borderSide: BorderSide.none,
                     ),
                   ),
-                ).animate().fadeIn().slideY(begin: 0.2),
+                ),
               
               const Spacer(),
               
@@ -147,7 +148,7 @@ class _EcranEvaluationState extends ConsumerState<EcranEvaluation> {
                     ? const CircularProgressIndicator(color: Colors.white)
                     : Text("Envoyer mon avis", style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.bold)),
                 ),
-              ).animate().fadeIn(delay: 1000.ms),
+              ),
             ],
           ),
         ),

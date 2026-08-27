@@ -2,13 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 
 import 'package:update_camtrans/coeur/etat/admin_provider.dart';
 import 'package:update_camtrans/coeur/constantes/couleurs.dart';
 import 'package:update_camtrans/modeles/transporteur.dart';
 import 'package:update_camtrans/coeur/widgets/etats_ui.dart';
 import 'package:update_camtrans/services/service_firestore.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+
 
 class PageModeration extends ConsumerWidget {
   const PageModeration({super.key});
@@ -81,7 +82,7 @@ class PageModeration extends ConsumerWidget {
                               padding: const EdgeInsets.all(24),
                               decoration: BoxDecoration(color: CouleursApp.succes.withValues(alpha: 0.1), shape: BoxShape.circle),
                               child: const Icon(Iconsax.verify_copy, size: 64, color: CouleursApp.succes),
-                            ).animate().scale(delay: 200.ms, duration: 400.ms, curve: Curves.easeOutBack),
+                            ),
                             const SizedBox(height: 24),
                             Text("À jour !", style: GoogleFonts.inter(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white)),
                             const SizedBox(height: 8),
@@ -106,7 +107,7 @@ class PageModeration extends ConsumerWidget {
                           itemCount: enAttente.length,
                           itemBuilder: (context, index) {
                             return _DossierCard(transporteur: enAttente[index])
-                                .animate().fadeIn(delay: Duration(milliseconds: 100 * index)).slideY(begin: 0.1);
+                                .animate().slideY(begin: 0.1);
                           },
                         );
                       }

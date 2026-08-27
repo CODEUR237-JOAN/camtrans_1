@@ -1,6 +1,6 @@
-﻿import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
@@ -102,7 +102,7 @@ class _BottomSheetPaiementState extends ConsumerState<BottomSheetPaiement> {
 
       // Notification au transporteur
       await ServiceNotification.afficherNotification(
-        titre: '💰 Paiement reçu !',
+        titre: ' Paiement reçu !',
         message: '${widget.montant.toStringAsFixed(0)} FCFA ont été réglés.',
         type: 'paiement',
       );
@@ -156,15 +156,13 @@ class _BottomSheetPaiementState extends ConsumerState<BottomSheetPaiement> {
           width: 80,
           height: 80,
           decoration: BoxDecoration(
-            color: CouleursApp.succes.withOpacity(0.15),
+            color: CouleursApp.succes.withValues(alpha: 0.15),
             shape: BoxShape.circle,
           ),
           child: const Icon(Icons.check_circle_outline,
               color: CouleursApp.succes, size: 48),
         )
-            .animate()
-            .scale(duration: 400.ms, curve: Curves.elasticOut)
-            .fadeIn(),
+            ,
         const SizedBox(height: 20),
         Text(
           'Paiement confirmé !',
@@ -172,7 +170,7 @@ class _BottomSheetPaiementState extends ConsumerState<BottomSheetPaiement> {
               color: Colors.white,
               fontWeight: FontWeight.bold,
               fontSize: 22),
-        ).animate().fadeIn(delay: 200.ms),
+        ),
         const SizedBox(height: 8),
         Text(
           '${widget.montant.toStringAsFixed(0)} FCFA',
@@ -180,12 +178,12 @@ class _BottomSheetPaiementState extends ConsumerState<BottomSheetPaiement> {
               color: CouleursApp.succes,
               fontWeight: FontWeight.w800,
               fontSize: 32),
-        ).animate().fadeIn(delay: 300.ms),
+        ),
         const SizedBox(height: 8),
         Text(
           'Merci pour votre confiance.',
           style: GoogleFonts.inter(color: Colors.white54, fontSize: 14),
-        ).animate().fadeIn(delay: 400.ms),
+        ),
         const SizedBox(height: 32),
       ],
     );
@@ -214,7 +212,7 @@ class _BottomSheetPaiementState extends ConsumerState<BottomSheetPaiement> {
             Container(
               padding: const EdgeInsets.all(10),
               decoration: BoxDecoration(
-                color: CouleursApp.primaire.withOpacity(0.15),
+                color: CouleursApp.primaire.withValues(alpha: 0.15),
                 shape: BoxShape.circle,
               ),
               child: const Icon(Iconsax.wallet_3_copy,
@@ -235,7 +233,7 @@ class _BottomSheetPaiementState extends ConsumerState<BottomSheetPaiement> {
               ],
             ),
           ],
-        ).animate().fadeIn().slideX(begin: -0.1),
+        ),
 
         const SizedBox(height: 20),
 
@@ -246,12 +244,12 @@ class _BottomSheetPaiementState extends ConsumerState<BottomSheetPaiement> {
           decoration: BoxDecoration(
             gradient: LinearGradient(
               colors: [
-                CouleursApp.primaire.withOpacity(0.2),
-                CouleursApp.primaire.withOpacity(0.05),
+                CouleursApp.primaire.withValues(alpha: 0.2),
+                CouleursApp.primaire.withValues(alpha: 0.05),
               ],
             ),
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: CouleursApp.primaire.withOpacity(0.3)),
+            border: Border.all(color: CouleursApp.primaire.withValues(alpha: 0.3)),
           ),
           child: Column(
             children: [
@@ -271,7 +269,7 @@ class _BottomSheetPaiementState extends ConsumerState<BottomSheetPaiement> {
                       color: Colors.white38, fontSize: 11)),
             ],
           ),
-        ).animate().fadeIn(delay: 100.ms),
+        ),
 
         const SizedBox(height: 24),
 
@@ -325,7 +323,7 @@ class _BottomSheetPaiementState extends ConsumerState<BottomSheetPaiement> {
                         fontSize: 16),
                   ),
           ),
-        ).animate().fadeIn(delay: 300.ms),
+        ),
       ],
     );
   }
@@ -335,25 +333,25 @@ class _BottomSheetPaiementState extends ConsumerState<BottomSheetPaiement> {
       {
         'id': 'orange',
         'label': 'Orange Money',
-        'icon': '🟠',
+        'icon': Iconsax.mobile_copy,
         'couleur': const Color(0xFFFF6B00),
       },
       {
         'id': 'mtn',
         'label': 'MTN Mobile Money',
-        'icon': '🟡',
+        'icon': Iconsax.mobile_copy,
         'couleur': const Color(0xFFFFCC00),
       },
       {
         'id': 'carte',
         'label': 'Carte Bancaire',
-        'icon': '💳',
+        'icon': Iconsax.card_copy,
         'couleur': const Color(0xFF6366F1),
       },
       {
         'id': 'especes',
         'label': 'Espèces',
-        'icon': '💵',
+        'icon': Iconsax.money_2_copy,
         'couleur': CouleursApp.succes,
       },
     ];
@@ -367,7 +365,7 @@ class _BottomSheetPaiementState extends ConsumerState<BottomSheetPaiement> {
         mainAxisSpacing: 12,
         childAspectRatio: 2.2,
         children: modes.asMap().entries.map((entry) {
-          final index = entry.key;
+          
           final mode = entry.value;
           final id = mode['id'] as String;
           final selected = _modeSelectionne == id;
@@ -387,8 +385,8 @@ class _BottomSheetPaiementState extends ConsumerState<BottomSheetPaiement> {
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
               decoration: BoxDecoration(
                 color: selected
-                    ? couleur.withOpacity(0.15)
-                    : Colors.white.withOpacity(0.05),
+                    ? couleur.withValues(alpha: 0.15)
+                    : Colors.white.withValues(alpha: 0.05),
                 borderRadius: BorderRadius.circular(14),
                 border: Border.all(
                   color: selected ? couleur : Colors.white12,
@@ -397,7 +395,7 @@ class _BottomSheetPaiementState extends ConsumerState<BottomSheetPaiement> {
               ),
               child: Row(
                 children: [
-                  Text(mode['icon'] as String, style: const TextStyle(fontSize: 20)),
+                  Icon(mode['icon'] as IconData, color: selected ? couleur : Colors.white70, size: 20),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
@@ -412,7 +410,7 @@ class _BottomSheetPaiementState extends ConsumerState<BottomSheetPaiement> {
                 ],
               ),
             ),
-          ).animate().fadeIn(delay: Duration(milliseconds: 50 * index));
+          );
         }).toList(),
       ),
     ];
@@ -432,7 +430,7 @@ class _BottomSheetPaiementState extends ConsumerState<BottomSheetPaiement> {
         const SizedBox(height: 8),
         Container(
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.07),
+            color: Colors.white.withValues(alpha: 0.07),
             borderRadius: BorderRadius.circular(14),
             border: Border.all(color: Colors.white12),
           ),
@@ -455,7 +453,7 @@ class _BottomSheetPaiementState extends ConsumerState<BottomSheetPaiement> {
                   const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
             ),
           ),
-        ).animate().fadeIn().slideY(begin: 0.1),
+        ),
         const SizedBox(height: 16),
       ],
     );
@@ -470,7 +468,7 @@ class _BottomSheetPaiementState extends ConsumerState<BottomSheetPaiement> {
         const SizedBox(height: 8),
         Container(
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.07),
+            color: Colors.white.withValues(alpha: 0.07),
             borderRadius: BorderRadius.circular(14),
             border: Border.all(color: Colors.white12),
           ),
@@ -487,7 +485,7 @@ class _BottomSheetPaiementState extends ConsumerState<BottomSheetPaiement> {
                   EdgeInsets.symmetric(horizontal: 16, vertical: 16),
             ),
           ),
-        ).animate().fadeIn().slideY(begin: 0.1),
+        ),
         const SizedBox(height: 16),
       ],
     );
@@ -498,9 +496,9 @@ class _BottomSheetPaiementState extends ConsumerState<BottomSheetPaiement> {
       padding: const EdgeInsets.all(14),
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
-        color: CouleursApp.succes.withOpacity(0.08),
+        color: CouleursApp.succes.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: CouleursApp.succes.withOpacity(0.3)),
+        border: Border.all(color: CouleursApp.succes.withValues(alpha: 0.3)),
       ),
       child: Row(
         children: [
@@ -515,6 +513,6 @@ class _BottomSheetPaiementState extends ConsumerState<BottomSheetPaiement> {
           ),
         ],
       ),
-    ).animate().fadeIn().slideY(begin: 0.1);
+    );
   }
 }

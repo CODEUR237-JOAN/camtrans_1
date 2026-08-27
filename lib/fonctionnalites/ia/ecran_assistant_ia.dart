@@ -2,12 +2,13 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:go_router/go_router.dart';
 import 'package:update_camtrans/coeur/widgets/page_responsive.dart';
 import 'package:update_camtrans/services/service_ia.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+
 
 class EcranAssistantIA extends ConsumerStatefulWidget {
   const EcranAssistantIA({super.key});
@@ -99,13 +100,13 @@ class _EcranAssistantIAState extends ConsumerState<EcranAssistantIA> {
         title: Text(
           "Assistant Intelligent",
           style: GoogleFonts.poppins(fontWeight: FontWeight.w600, fontSize: 18, color: Colors.white),
-        ).animate().fadeIn().slideY(begin: -0.2),
+        ),
         centerTitle: true,
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 16.0),
             child: Icon(Iconsax.info_circle_copy, color: const Color(0xFF94A3B8).withValues(alpha: 0.8)),
-          ).animate().fadeIn().slideX(begin: 0.2),
+          ),
         ],
       ),
       body: Stack(
@@ -168,9 +169,7 @@ class _EcranAssistantIAState extends ConsumerState<EcranAssistantIA> {
                       itemBuilder: (context, index) {
                         final msg = _messages[index];
                         return _MessageBubble(message: msg)
-                            .animate()
-                            .fadeIn(duration: 400.ms, curve: Curves.easeOut)
-                            .slideY(begin: 0.2, end: 0);
+                            ;
                       },
                     ),
                   ),
@@ -263,7 +262,7 @@ class _EcranAssistantIAState extends ConsumerState<EcranAssistantIA> {
           ),
         ),
       ),
-    ).animate().slideY(begin: 1.0, duration: 600.ms, curve: Curves.easeOutExpo);
+    );
   }
 }
 
@@ -320,7 +319,7 @@ class _MessageBubble extends StatelessWidget {
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
-                        "Devis IA Généré",
+                        "Devis Automatique",
                         style: GoogleFonts.poppins(color: const Color(0xFF34D399), fontSize: 10, fontWeight: FontWeight.bold),
                       ).animate(onPlay: (c) => c.repeat(reverse: true)).shimmer(duration: 2.seconds),
                     ),

@@ -3,14 +3,61 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
 import 'package:update_camtrans/coeur/constantes/couleurs.dart';
+import 'package:update_camtrans/coeur/constantes/statuts.dart';
 import 'package:update_camtrans/coeur/constantes/tailles.dart';
 import 'package:update_camtrans/coeur/etat/transporteur_provider.dart';
+import 'package:update_camtrans/modeles/course.dart';
+import 'package:update_camtrans/services/service_authentification.dart';
+import 'package:update_camtrans/services/service_firestore.dart';
 
-class HistoriqueLivraisons extends ConsumerWidget {
+class HistoriqueLivraisons extends ConsumerStatefulWidget {
   const HistoriqueLivraisons({super.key});
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  ConsumerState<HistoriqueLivraisons> createState() =>
+      _HistoriquelivraisonsState();
+}
+
+class _HistoriquelivraisonsState
+    extends ConsumerState<HistoriqueLivraisons> {
+  bool _suppressionEnCours = false;
+
+  bool _peutSupprimer(Course course) =>
+      StatutCourse.estTerminee(course.statut);
+
+  Future<void> _supprimerTout() async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (_) => _DialogConfirmation(
+        titre: "Vider l'historique ?",
+        message: "Toutes vos livraisons terminées/annulées seront supprimées définitivement.",
+        bouton: "Tout supprimer",
+        couleur: CouleursApp.erreur,
+      ),
+    );
+    if (confirm != true || !mounted) return;
+    setState(() => _suppressionEnCours = true);
+    try {
+      final userId =
+          ref.read(serviceAuthentificationProvider).utilisateur?.uid ?? '';
+      final nb = await ref
+          .read(serviceFirestoreProvider)
+          .supprimerCoursesTerminees(userId, estClient: false);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("$nb livraison(s) supprimée(s)"),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _suppressionEnCours = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
     final coursesAsync = ref.watch(fluxMesCoursesProvider);
 
     return Scaffold(
@@ -20,7 +67,23 @@ class HistoriqueLivraisons extends ConsumerWidget {
         backgroundColor: Colors.white,
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.black87),
-        titleTextStyle: const TextStyle(color: Colors.black87, fontWeight: FontWeight.bold, fontSize: 18),
+        titleTextStyle: const TextStyle(
+            color: Colors.black87, fontWeight: FontWeight.bold, fontSize: 18),
+        actions: [
+          Tooltip(
+            message: "Supprimer les livraisons terminées/annulées",
+            child: IconButton(
+              icon: _suppressionEnCours
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(strokeWidth: 2))
+                  : const Icon(Icons.delete_sweep_rounded,
+                      color: CouleursApp.erreur),
+              onPressed: _suppressionEnCours ? null : _supprimerTout,
+            ),
+          ),
+        ],
       ),
       body: Padding(
         padding: EdgeInsets.all(TaillesApp.margePage),
@@ -40,11 +103,12 @@ class HistoriqueLivraisons extends ConsumerWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text("Historique", style: TextStyle(color: Colors.white70)),
+                        Text("Historique",
+                            style: TextStyle(color: Colors.white70)),
                         SizedBox(height: 6),
                         Text(
-                          "Toutes vos livraisons réalisées sont enregistrées ici.",
-                          style: TextStyle(color: Colors.white, fontSize: 16),
+                          "Glissez vers la gauche pour supprimer une livraison terminée.",
+                          style: TextStyle(color: Colors.white, fontSize: 14),
                         ),
                       ],
                     ),
@@ -55,41 +119,65 @@ class HistoriqueLivraisons extends ConsumerWidget {
             const SizedBox(height: 25),
             Expanded(
               child: coursesAsync.when(
-                loading: () => const Center(child: CircularProgressIndicator(color: CouleursApp.primaire)),
-                error: (error, _) => Center(child: Text("Erreur : $error")),
+                loading: () => const Center(
+                    child: CircularProgressIndicator(
+                        color: CouleursApp.primaire)),
+                error: (error, _) =>
+                    Center(child: Text("Erreur : $error")),
                 data: (courses) {
                   if (courses.isEmpty) {
-                    return const Center(child: Text("Aucune livraison dans votre historique."));
+                    return const Center(
+                        child:
+                            Text("Aucune livraison dans votre historique."));
                   }
 
                   return ListView.builder(
                     itemCount: courses.length,
                     itemBuilder: (context, index) {
                       final course = courses[index];
-
-                      return Card(
+                      final peutSuppr = _peutSupprimer(course);
+                      final card = Card(
                         elevation: 3,
                         margin: const EdgeInsets.only(bottom: 15),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(18)),
                         child: ListTile(
+                          contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 8),
                           leading: CircleAvatar(
                             radius: 28,
-                            backgroundColor: Colors.green.shade100,
-                            child: const Icon(Icons.local_shipping, color: Colors.green),
+                            backgroundColor: peutSuppr
+                                ? Colors.green.shade100
+                                : Colors.orange.shade100,
+                            child: Icon(
+                              peutSuppr
+                                  ? Icons.check_circle
+                                  : Icons.local_shipping,
+                              color: peutSuppr
+                                  ? Colors.green
+                                  : Colors.orange,
+                            ),
                           ),
                           title: Text(
                             "${course.adresseDepart} → ${course.adresseArrivee}",
-                            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
+                            style: const TextStyle(
+                                fontWeight: FontWeight.bold, fontSize: 13),
                             overflow: TextOverflow.ellipsis,
                           ),
                           subtitle: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               const SizedBox(height: 6),
-                              Text(DateFormat('dd MMMM yyyy').format(course.dateCreation)),
+                              Text(DateFormat('dd MMMM yyyy')
+                                  .format(course.dateCreation)),
                               Text(
-                                course.statut.toUpperCase(),
-                                style: const TextStyle(color: Colors.green, fontWeight: FontWeight.bold),
+                                StatutCourse.libelle(course.statut)
+                                    .toUpperCase(),
+                                style: TextStyle(
+                                    color: peutSuppr
+                                        ? Colors.green
+                                        : Colors.orange,
+                                    fontWeight: FontWeight.bold),
                               ),
                             ],
                           ),
@@ -98,18 +186,67 @@ class HistoriqueLivraisons extends ConsumerWidget {
                             children: [
                               Text(
                                 "${course.prixFinal > 0 ? course.prixFinal : course.prixEstime} F",
-                                style: const TextStyle(color: Colors.green, fontWeight: FontWeight.bold),
+                                style: const TextStyle(
+                                    color: Colors.green,
+                                    fontWeight: FontWeight.bold),
                               ),
                               const SizedBox(height: 8),
-                              const Icon(Icons.arrow_forward_ios, size: 16)
+                              const Icon(Icons.arrow_forward_ios, size: 16),
                             ],
                           ),
                           onTap: () {
-                            // En vrai on devrait ouvrir details_course.dart 
-                            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Détails bientôt disponibles.")));
+                            ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                    content: Text(
+                                        "Détails bientôt disponibles.")));
                           },
                         ),
                       );
+
+                      if (peutSuppr) {
+                        return Dismissible(
+                          key: Key(course.id),
+                          direction: DismissDirection.endToStart,
+                          background: Container(
+                            alignment: Alignment.centerRight,
+                            padding: const EdgeInsets.only(right: 20),
+                            margin: const EdgeInsets.only(bottom: 15),
+                            decoration: BoxDecoration(
+                              color: CouleursApp.erreur,
+                              borderRadius: BorderRadius.circular(18),
+                            ),
+                            child: const Icon(Icons.delete_rounded,
+                                color: Colors.white, size: 30),
+                          ),
+                          confirmDismiss: (_) async {
+                            return await showDialog<bool>(
+                              context: context,
+                              builder: (_) => _DialogConfirmation(
+                                titre: "Supprimer cette livraison ?",
+                                message: "Cette action est irréversible.",
+                                bouton: "Supprimer",
+                                couleur: CouleursApp.erreur,
+                              ),
+                            );
+                          },
+                          onDismissed: (_) async {
+                            await ref
+                                .read(serviceFirestoreProvider)
+                                .supprimerDocument(
+                                    collection: 'courses', id: course.id);
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                const SnackBar(
+                                  content: Text("Livraison supprimée"),
+                                  backgroundColor: Colors.green,
+                                ),
+                              );
+                            }
+                          },
+                          child: card,
+                        );
+                      }
+                      return card;
                     },
                   );
                 },
@@ -118,6 +255,55 @@ class HistoriqueLivraisons extends ConsumerWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+class _DialogConfirmation extends StatelessWidget {
+  final String titre;
+  final String message;
+  final String bouton;
+  final Color couleur;
+
+  const _DialogConfirmation({
+    required this.titre,
+    required this.message,
+    required this.bouton,
+    required this.couleur,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      title: Row(
+        children: [
+          Icon(Icons.warning_amber_rounded, color: couleur),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(titre,
+                style: const TextStyle(
+                    fontWeight: FontWeight.bold, fontSize: 16)),
+          ),
+        ],
+      ),
+      content: Text(message),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context, false),
+          child: const Text("Annuler"),
+        ),
+        ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: couleur,
+            foregroundColor: Colors.white,
+            shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12)),
+          ),
+          onPressed: () => Navigator.pop(context, true),
+          child: Text(bouton),
+        ),
+      ],
     );
   }
 }

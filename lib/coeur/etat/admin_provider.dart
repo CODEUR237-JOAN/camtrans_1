@@ -126,11 +126,16 @@ final adminWeeklyRevenuesProvider = Provider.autoDispose<AsyncValue<List<double>
   return coursesAsync.maybeWhen(
     data: (courses) {
       final List<double> weeklyData = List.filled(7, 0.0);
-      final now = DateTime.now();
+      // Fuseau horaire du Cameroun : UTC+1
+      final now = DateTime.now().toLocal();
+      final debutAujourdhuiLocal = DateTime(now.year, now.month, now.day);
 
       for (var course in courses) {
         if (StatutCourse.estTerminee(course.statut) && course.statut != StatutCourse.annulee) {
-          final diff = now.difference(course.dateCreation).inDays;
+          // Convertir la date de la course en heure locale
+          final dateLocale = course.dateCreation.toLocal();
+          final debutJourCourse = DateTime(dateLocale.year, dateLocale.month, dateLocale.day);
+          final diff = debutAujourdhuiLocal.difference(debutJourCourse).inDays;
           if (diff >= 0 && diff < 7) {
             // Index 6 = aujourd'hui, 0 = il y a 6 jours
             final index = 6 - diff;

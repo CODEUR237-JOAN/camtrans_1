@@ -4,11 +4,12 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 
 import 'package:update_camtrans/coeur/etat/admin_provider.dart';
 import 'package:update_camtrans/coeur/constantes/couleurs.dart';
 import 'package:update_camtrans/modeles/transporteur.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+
 
 class PageCarteFlotte extends ConsumerStatefulWidget {
   const PageCarteFlotte({super.key});
@@ -169,7 +170,7 @@ class _PageCarteFlotteState extends ConsumerState<PageCarteFlotte> {
             ),
           ],
         ),
-      ).animate().scale(delay: 200.ms, curve: Curves.easeOutBack),
+      ),
     );
   }
 

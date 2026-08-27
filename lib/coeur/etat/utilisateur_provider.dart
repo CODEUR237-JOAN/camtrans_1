@@ -2,12 +2,18 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../modeles/client.dart';
 import '../../services/service_authentification.dart';
 import '../../services/service_firestore.dart';
+import '../../services/service_presence.dart';
 
 /// Détecte le rôle de l'utilisateur connecté en vérifiant les collections Firestore
 final userRoleProvider = FutureProvider.autoDispose<String?>((ref) async {
   final authState = ref.watch(authStateProvider);
   final userId = authState.value?.uid;
-  if (userId == null) return null;
+
+  // Déconnexion détectée → arrêter la présence
+  if (userId == null) {
+    ServicePresence().arreter();
+    return null;
+  }
 
   final firestore = ref.read(serviceFirestoreProvider);
   
@@ -18,11 +24,17 @@ final userRoleProvider = FutureProvider.autoDispose<String?>((ref) async {
 
   // 2. Check Client
   final clientDoc = await firestore.lireDocument(collection: 'clients', id: userId);
-  if (clientDoc.exists) return 'client';
+  if (clientDoc.exists) {
+    ServicePresence().demarrer(role: 'client');
+    return 'client';
+  }
 
   // 3. Check Transporteur
   final transpDoc = await firestore.lireDocument(collection: 'transporteurs', id: userId);
-  if (transpDoc.exists) return 'transporteur';
+  if (transpDoc.exists) {
+    ServicePresence().demarrer(role: 'transporteur');
+    return 'transporteur';
+  }
 
   return null;
 });

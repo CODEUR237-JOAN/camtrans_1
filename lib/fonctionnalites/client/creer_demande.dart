@@ -3,7 +3,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -12,6 +11,8 @@ import 'package:update_camtrans/services/service_gps.dart';
 import 'widgets/resume_expedition_bottom_sheet.dart';
 import 'package:update_camtrans/coeur/widgets/page_responsive.dart';
 import 'package:update_camtrans/coeur/constantes/couleurs.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+
 
 /// =================================================================
 /// NEO PREMIUM GLASS DARK - TUNNEL DE COMMANDE SPRINT 10
@@ -26,6 +27,18 @@ const List<String> _marquesVehicules = [
   'Mazda', 'Volvo', 'Scania', 'DAF', 'Autre',
 ];
 
+// Liste statique de quartiers populaires (Yaoundé / Douala) pour l'autocomplétion
+const List<String> _quartiersCameroun = [
+  // Yaoundé
+  'Bastos, Yaoundé', 'Biyem-Assi, Yaoundé', 'Melen, Yaoundé', 'Omnisport, Yaoundé', 
+  'Essos, Yaoundé', 'Ekounou, Yaoundé', 'Nkolbisson, Yaoundé', 'Odza, Yaoundé', 
+  'Ngousso, Yaoundé', 'Mimboman, Yaoundé', 'Etoudi, Yaoundé', 'Mvog-Mbi, Yaoundé', 
+  'Centre-ville, Yaoundé', 'Mokolo, Yaoundé', 'Tsinga, Yaoundé', 'Nlongkak, Yaoundé',
+  // Douala
+  'Akwa, Douala', 'Bonanjo, Douala', 'Bonapriso, Douala', 'Deido, Douala',
+  'Bonabéri, Douala', 'Makepe, Douala', 'Logpom, Douala', 'Kotto, Douala',
+  'Ndokoti, Douala', 'Bépanda, Douala', 'New Bell, Douala', 'Cité des Palmiers, Douala'
+];
 class CreerDemande extends ConsumerStatefulWidget {
   const CreerDemande({super.key});
 
@@ -94,9 +107,37 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
       notifier.estimerAvecIA();
     }
 
+    if (_etapeCourante == 3) {
+      // Lancement automatique du GPS pour l'étape 4 (Itinéraire)
+      if (etat.depart.isEmpty) {
+        _fetchGPSLocation(notifier);
+      }
+    }
+
     setState(() {
       if (_etapeCourante < 5) _etapeCourante++;
     });
+  }
+
+  Future<void> _fetchGPSLocation(DemandeExpeditionNotifier notifier) async {
+    setState(() => _isLoadingGps = true);
+    final gps = ref.read(serviceGpsProvider);
+    final position = await gps.obtenirPositionActuelle();
+    
+    if (position != null) {
+      final adresse = await gps.obtenirAdresse(latitude: position.latitude, longitude: position.longitude);
+      if (adresse.isNotEmpty) {
+        notifier.setDepart(adresse);
+        _departController.text = adresse;
+        notifier.setLatitudeDepart(position.latitude);
+        notifier.setLongitudeDepart(position.longitude);
+      } else {
+        _montrerErreur("Impossible de trouver l'adresse exacte. Entrez-la manuellement.");
+      }
+    } else {
+      _montrerErreur("Localisation non disponible. Veuillez vérifier vos permissions GPS.");
+    }
+    if (mounted) setState(() => _isLoadingGps = false);
   }
 
   void _etapePrecedente() {
@@ -319,7 +360,7 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
                       ),
                     ),
                 ],
-              ).animate().fadeIn(delay: (100 * index).ms),
+              ).animate().fadeIn(delay: (index * 100).ms)
             );
           }),
         );
@@ -334,12 +375,12 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
         Text(
           title,
           style: GoogleFonts.poppins(fontSize: 24, fontWeight: FontWeight.w700, color: Colors.white, letterSpacing: -0.5),
-        ).animate().fadeIn(delay: 200.ms).slideX(begin: -0.1),
+        ),
         const SizedBox(height: 8),
         Text(
           subtitle,
           style: GoogleFonts.poppins(fontSize: 14, color: Colors.white54),
-        ).animate().fadeIn(delay: 300.ms).slideX(begin: -0.1),
+        ),
         const SizedBox(height: 24),
       ],
     );
@@ -416,7 +457,7 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
                     ),
                   ],
                 ),
-              ).animate().fadeIn(delay: (100 * index).ms).scale(begin: const Offset(0.9, 0.9)),
+              ).animate(delay: (index * 100).ms).scale(begin: const Offset(0.9, 0.9)),
             );
           },
         ),
@@ -466,7 +507,7 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
                           fontWeight: FontWeight.bold,
                           fontSize: 13,
                         ),
-                      ).animate().fadeIn(),
+                      ),
                   ],
                 ),
                 const SizedBox(height: 12),
@@ -604,7 +645,7 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
                                 ),
                             const SizedBox(width: 12),
                             Text(
-                              "L'IA analyse le véhicule…",
+                              "Analyse du véhicule en cours…",
                               style: GoogleFonts.inter(color: Colors.white54, fontSize: 13),
                             ),
                           ],
@@ -651,7 +692,7 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
                         ),
                       ],
                     ),
-                  ).animate().fadeIn(duration: 400.ms).slideY(begin: 0.15, curve: Curves.easeOutCubic),
+                  ),
                 ],
               ] else if (etat.categorieService == "Marchandises") ...[
                 _buildFloatingTextField(
@@ -723,7 +764,7 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
                 )
             ],
           ),
-        ).animate().fadeIn().slideY(begin: 0.1),
+        ),
       ],
     );
   }
@@ -803,7 +844,7 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
             )
           ],
         ),
-      ).animate().fadeIn().slideY(begin: 0.1),
+      ),
     );
   }
 
@@ -814,53 +855,154 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildSectionTitle("Itinéraire du Trajet", "Où allons-nous ? (Départ immédiat)"),
+        _buildSectionTitle("Où voulez-vous aller ?", "Votre position de départ sera automatiquement transmise au dépanneur."),
         _GlassCard(
           child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              _buildFloatingTextField(
-                controller: _departController,
-                hint: "Lieu de départ",
-                icon: Iconsax.send_2_copy,
-                onChanged: (val) {
-                  notifier.setDepart(val);
-                },
-                isLoadingSuffix: _isLoadingGps,
-                onSuffixTap: () async {
-                  setState(() => _isLoadingGps = true);
-                  final gps = ref.read(serviceGpsProvider);
-                  final position = await gps.obtenirPositionActuelle();
-                  
-                  if (position != null) {
-                    final adresse = await gps.obtenirAdresse(latitude: position.latitude, longitude: position.longitude);
-                    if (adresse.isNotEmpty) {
-                      notifier.setDepart(adresse);
-                      _departController.text = adresse;
-                      notifier.setLatitudeDepart(position.latitude);
-                      notifier.setLongitudeDepart(position.longitude);
-                    } else {
-                      _montrerErreur("Impossible de trouver l'adresse.");
-                    }
-                  } else {
-                    _montrerErreur("Localisation non disponible. Veuillez vérifier vos permissions GPS.");
-                  }
-                  setState(() => _isLoadingGps = false);
-                },
+              // Indicateur Position Actuelle (Départ)
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: CouleursApp.primaire.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: CouleursApp.primaire.withValues(alpha: 0.3)),
+                ),
+                child: Row(
+                  children: [
+                    const Icon(Icons.my_location, color: CouleursApp.primaire),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text("Position de départ", style: TextStyle(color: Colors.white54, fontSize: 12)),
+                          _isLoadingGps 
+                            ? const Text("Recherche GPS en cours...", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold))
+                            : Text(etat.depart.isNotEmpty ? etat.depart : "Localisation introuvable", style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                        ],
+                      ),
+                    ),
+                    if (!_isLoadingGps && etat.depart.isEmpty)
+                      IconButton(
+                        icon: const Icon(Icons.edit_location_alt, color: Colors.white54),
+                        onPressed: () {
+                          // Fallback manuel si GPS échoue
+                          showDialog(
+                            context: context,
+                            builder: (ctx) => AlertDialog(
+                              title: const Text("Entrer le départ"),
+                              content: TextField(
+                                controller: _departController,
+                                decoration: const InputDecoration(hintText: "Saisissez votre quartier"),
+                                onChanged: (val) => notifier.setDepart(val),
+                              ),
+                              actions: [
+                                TextButton(onPressed: () => Navigator.pop(ctx), child: const Text("OK"))
+                              ],
+                            ),
+                          );
+                        },
+                      )
+                    else if (!_isLoadingGps)
+                      const Icon(Icons.check_circle, color: CouleursApp.succes, size: 20)
+                  ],
+                ),
               ),
               const SizedBox(height: 16),
-              _buildFloatingTextField(
-                controller: _destinationController,
-                hint: "Lieu d'arrivée",
-                icon: Iconsax.location_add_copy,
-                onChanged: (val) {
-                  notifier.setDestination(val);
+              
+              // Destination avec Autocomplete
+              Row(
+                children: [
+                  const Icon(Icons.location_on, color: CouleursApp.erreur, size: 16),
+                  const SizedBox(width: 6),
+                  Text("Destination", style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 14)),
+                ],
+              ),
+              const SizedBox(height: 8),
+              
+              Autocomplete<String>(
+                optionsBuilder: (TextEditingValue textEditingValue) {
+                  if (textEditingValue.text.isEmpty) {
+                    return const Iterable<String>.empty();
+                  }
+                  return _quartiersCameroun.where((String option) {
+                    return option.toLowerCase().contains(textEditingValue.text.toLowerCase());
+                  });
+                },
+                onSelected: (String selection) {
+                  notifier.setDestination(selection);
+                  _destinationController.text = selection;
+                },
+                fieldViewBuilder: (context, controller, focusNode, onFieldSubmitted) {
+                  // Synchroniser le controller de l'autocomplete avec le state
+                  if (controller.text.isEmpty && _destinationController.text.isNotEmpty) {
+                    controller.text = _destinationController.text;
+                  }
+                  controller.addListener(() {
+                    if (controller.text != _destinationController.text) {
+                      _destinationController.text = controller.text;
+                      notifier.setDestination(controller.text);
+                    }
+                  });
+                  return TextField(
+                    controller: controller,
+                    focusNode: focusNode,
+                    style: const TextStyle(color: Colors.white),
+                    decoration: InputDecoration(
+                      hintText: "Entrez un nom de quartier",
+                      hintStyle: const TextStyle(color: Colors.white54),
+                      prefixIcon: const Icon(Iconsax.location_add_copy, color: Colors.white70),
+                      filled: true,
+                      fillColor: const Color(0xFF1E293B),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(16),
+                        borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.1)),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(16),
+                        borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.05)),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(16),
+                        borderSide: BorderSide(color: CouleursApp.primaire.withValues(alpha: 0.5)),
+                      ),
+                    ),
+                  );
+                },
+                optionsViewBuilder: (context, onSelected, options) {
+                  return Align(
+                    alignment: Alignment.topLeft,
+                    child: Material(
+                      elevation: 4.0,
+                      borderRadius: BorderRadius.circular(16),
+                      color: const Color(0xFF1E293B),
+                      child: Container(
+                        width: MediaQuery.of(context).size.width - 64, // Ajustement largeur
+                        constraints: const BoxConstraints(maxHeight: 200),
+                        child: ListView.builder(
+                          padding: EdgeInsets.zero,
+                          shrinkWrap: true,
+                          itemCount: options.length,
+                          itemBuilder: (BuildContext context, int index) {
+                            final option = options.elementAt(index);
+                            return ListTile(
+                              leading: const Icon(Icons.location_city, color: Colors.white54, size: 20),
+                              title: Text(option, style: const TextStyle(color: Colors.white)),
+                              onTap: () => onSelected(option),
+                            );
+                          },
+                        ),
+                      ),
+                    ),
+                  );
                 },
               ),
             ],
           ),
         ),
       ],
-    ).animate().fadeIn().slideY(begin: 0.1);
+    );
   }
 
   // ==========================================
@@ -946,7 +1088,7 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
                 ),
               ],
             ),
-          ).animate().fadeIn().slideY(begin: 0.1),
+          ),
           
           const SizedBox(height: 16),
           // Distance & Temps
@@ -978,7 +1120,7 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
                 ),
               ),
             ],
-          ).animate().fadeIn(delay: 200.ms).slideY(begin: 0.1),
+          ),
         ] else ...[
           _GlassCard(
             child: Padding(
@@ -997,7 +1139,7 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text("Estimation IA", style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+              Text("Estimation Automatique", style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
               const Divider(color: Colors.white12, height: 32),
               _buildEstimationRow(
                 "Véhicule Recommandé",
@@ -1029,7 +1171,7 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
               )
             ],
           ),
-        ).animate().fadeIn(delay: 400.ms).slideY(begin: 0.1),
+        ),
       ],
     );
   }

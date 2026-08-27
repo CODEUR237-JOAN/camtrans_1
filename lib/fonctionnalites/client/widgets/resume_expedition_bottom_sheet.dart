@@ -120,7 +120,7 @@ class _ResumeExpeditionBottomSheetState extends ConsumerState<ResumeExpeditionBo
                     ],
                   ),
                   const Divider(height: 30),
-                  _buildInfoRow(context, Iconsax.location_copy, "Trajet", "${etat.depart} ➔ ${etat.destination}"),
+                  _buildInfoRow(context, Iconsax.location_copy, "Trajet", "${etat.depart}  ${etat.destination}"),
                   const SizedBox(height: 16),
                   _buildInfoRow(context, Iconsax.category_copy, "Service", "${etat.categorieService} (Gamme ${etat.optionGamme})"),
                   const SizedBox(height: 16),

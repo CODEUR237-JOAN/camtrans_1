@@ -1,7 +1,12 @@
-import 'package:update_camtrans/coeur/constantes/statuts.dart';
+import 'dart:async';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:update_camtrans/coeur/constantes/api_keys.dart';
+import 'package:update_camtrans/coeur/constantes/statuts.dart';
 import 'package:update_camtrans/modeles/paiement.dart';
-import 'service_firestore.dart';
+import 'package:update_camtrans/services/service_firestore.dart';
+import 'package:flutter/foundation.dart';
 
 final servicePaiementProvider = Provider<ServicePaiement>((ref) {
   return ServicePaiement(ref.read(serviceFirestoreProvider));
@@ -9,10 +14,123 @@ final servicePaiementProvider = Provider<ServicePaiement>((ref) {
 
 class ServicePaiement {
   final ServiceFirestore _firestore;
-
+  
   ServicePaiement(this._firestore);
+  
+  String get _baseUrl => ApiKeys.isCampayProduction 
+      ? 'https://www.campay.net/api' 
+      : 'https://demo.campay.net/api';
 
-  /// Simulation d'un paiement Orange Money
+  /// 1. Authentification : Obtenir le Token Campay
+  Future<String> _obtenirToken() async {
+    if (ApiKeys.campayUsername.isEmpty || ApiKeys.campayPassword.isEmpty) {
+      throw Exception("Clés d'API Campay non configurées. Veuillez vérifier le fichier .env");
+    }
+
+    final response = await http.post(
+      Uri.parse('$_baseUrl/token/'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        "username": ApiKeys.campayUsername,
+        "password": ApiKeys.campayPassword
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      final data = jsonDecode(response.body);
+      return data['token'];
+    } else {
+      debugPrint("Erreur auth Campay: ${response.body}");
+      throw Exception("Impossible de s'authentifier auprès de Campay.");
+    }
+  }
+
+  /// 2. Collecte Mobile Money (MTN / Orange) avec Polling
+  Future<Paiement> _initierCollecteMobileMoney({
+    required String courseId,
+    required String clientId,
+    required String transporteurId,
+    required double montant,
+    required String telephonePayeur,
+    required String operateur,
+  }) async {
+    // 1. Obtenir le token
+    final token = await _obtenirToken();
+    
+    // 2. Lancer la demande de paiement (Push USSD sur le téléphone du client)
+    // 237 est requis par l'API Campay pour le Cameroun, on s'assure du format
+    String phone = telephonePayeur.replaceAll(RegExp(r'[^0-9]'), '');
+    if (phone.length == 9) phone = "237$phone"; // Ajouter l'indicatif si manquant
+
+    final refExterne = "CAMTRANS-${courseId.substring(0, 5).toUpperCase()}-${DateTime.now().millisecondsSinceEpoch}";
+
+    final collectResponse = await http.post(
+      Uri.parse('$_baseUrl/collect/'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Token $token',
+      },
+      body: jsonEncode({
+        "amount": montant.toInt().toString(), // Campay demande souvent un entier
+        "currency": "XAF",
+        "from": phone,
+        "description": "Paiement Course Camtrans",
+        "external_reference": refExterne
+      }),
+    );
+
+    if (collectResponse.statusCode != 200) {
+      debugPrint("Erreur de collecte Campay: ${collectResponse.body}");
+      throw Exception("Erreur d'initialisation du paiement: ${jsonDecode(collectResponse.body)['message'] ?? 'Erreur inconnue'}");
+    }
+
+    final collectData = jsonDecode(collectResponse.body);
+    final referenceId = collectData['reference'];
+
+    // 3. Boucle de vérification (Polling) du statut de la transaction
+    // On boucle jusqu'à ce que le statut soit SUCCESSFUL ou FAILED, ou qu'on dépasse 2 minutes.
+    String status = "PENDING";
+    int tentatives = 0;
+    
+    while (status == "PENDING" && tentatives < 40) { // 40 * 3s = 120 secondes max
+      await Future.delayed(const Duration(seconds: 3));
+      tentatives++;
+
+      final statusResponse = await http.get(
+        Uri.parse('$_baseUrl/transaction/$referenceId/'),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Token $token',
+        },
+      );
+
+      if (statusResponse.statusCode == 200) {
+        final statusData = jsonDecode(statusResponse.body);
+        status = statusData['status'];
+        
+        if (status == "SUCCESSFUL") {
+          return _creerPaiementReussi(
+            courseId: courseId,
+            clientId: clientId,
+            transporteurId: transporteurId,
+            montant: montant,
+            methode: "$operateur Mobile Money",
+            operateur: operateur,
+            telephone: phone,
+          );
+        } else if (status == "FAILED") {
+          throw Exception("Le paiement a échoué ou a été refusé par l'utilisateur.");
+        }
+      }
+    }
+
+    if (status == "PENDING") {
+      throw Exception("Délai d'attente dépassé. Veuillez réessayer.");
+    }
+    throw Exception("Erreur lors de la validation du paiement.");
+  }
+
+  /// Traitement d'un paiement Orange Money
   Future<Paiement> initierPaiementOM({
     required String courseId,
     required String clientId,
@@ -20,25 +138,17 @@ class ServicePaiement {
     required double montant,
     required String telephonePayeur,
   }) async {
-    await Future.delayed(const Duration(seconds: 3)); // Simulation réseau
-    
-    // Si c'est un test d'échec
-    if (telephonePayeur == "000000000") {
-      throw Exception("Solde insuffisant sur le compte Orange Money.");
-    }
-
-    return _creerPaiementReussi(
+    return _initierCollecteMobileMoney(
       courseId: courseId,
       clientId: clientId,
       transporteurId: transporteurId,
       montant: montant,
-      methode: "Orange Money",
+      telephonePayeur: telephonePayeur,
       operateur: "Orange",
-      telephone: telephonePayeur,
     );
   }
 
-  /// Simulation d'un paiement MTN Mobile Money
+  /// Traitement d'un paiement MTN Mobile Money
   Future<Paiement> initierPaiementMTN({
     required String courseId,
     required String clientId,
@@ -46,24 +156,17 @@ class ServicePaiement {
     required double montant,
     required String telephonePayeur,
   }) async {
-    await Future.delayed(const Duration(seconds: 3)); // Simulation réseau
-    
-    if (telephonePayeur == "000000000") {
-      throw Exception("Transaction refusée par MTN.");
-    }
-
-    return _creerPaiementReussi(
+    return _initierCollecteMobileMoney(
       courseId: courseId,
       clientId: clientId,
       transporteurId: transporteurId,
       montant: montant,
-      methode: "MTN Mobile Money",
+      telephonePayeur: telephonePayeur,
       operateur: "MTN",
-      telephone: telephonePayeur,
     );
   }
 
-  /// Simulation d'un paiement par Carte Bancaire
+  /// Traitement d'un paiement par Carte Bancaire
   Future<Paiement> initierPaiementCarte({
     required String courseId,
     required String clientId,
@@ -71,8 +174,9 @@ class ServicePaiement {
     required double montant,
     required String nomTitulaire,
   }) async {
-    await Future.delayed(const Duration(seconds: 4)); // Simulation de la passerelle 3D Secure
-    
+    // Non implémenté par Campay directement pour les cartes au Cameroun.
+    // Simulation pour Stripe/Carte.
+    await Future.delayed(const Duration(seconds: 4)); 
     return _creerPaiementReussi(
       courseId: courseId,
       clientId: clientId,
@@ -80,7 +184,7 @@ class ServicePaiement {
       montant: montant,
       methode: "Carte Bancaire",
       operateur: "Stripe/Visa",
-      telephone: nomTitulaire, // On utilise ce champ pour le nom pour l'instant
+      telephone: nomTitulaire,
     );
   }
 
@@ -92,7 +196,6 @@ class ServicePaiement {
     required double montant,
   }) async {
     await Future.delayed(const Duration(seconds: 1)); 
-    
     return _creerPaiementReussi(
       courseId: courseId,
       clientId: clientId,
@@ -131,12 +234,12 @@ class ServicePaiement {
       reference: "Ref-$courseId",
       operateur: operateur,
       telephonePayeur: telephone,
-      commentaire: "Paiement simulé avec succès",
-      fraisTransaction: montant * 0.02, // 2% simulé
+      commentaire: "Paiement validé via $operateur",
+      fraisTransaction: montant * 0.02, 
       montantNet: montant * 0.98,
       remboursementEffectue: false,
       motifRemboursement: "",
-      facturePdf: "https://camtrans.com/facture/$id.pdf", // Lien factice
+      facturePdf: "", 
     );
 
     // Enregistrer le paiement
@@ -146,7 +249,7 @@ class ServicePaiement {
       donnees: paiement.toMap(),
     );
 
-    // On pourrait aussi mettre à jour le statut de la course ici
+    // Mettre à jour le statut de la course
     await _firestore.modifierDocument(
       collection: 'courses',
       id: courseId,

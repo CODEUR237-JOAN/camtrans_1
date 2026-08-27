@@ -2,13 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 
 import 'package:update_camtrans/coeur/etat/admin_provider.dart';
 import 'package:update_camtrans/modeles/transporteur.dart';
 import 'package:update_camtrans/coeur/widgets/etats_ui.dart';
 import 'package:update_camtrans/services/service_firestore.dart';
 import 'package:update_camtrans/coeur/constantes/couleurs.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+
 
 class PageUtilisateurs extends ConsumerStatefulWidget {
   const PageUtilisateurs({super.key});
@@ -166,9 +167,12 @@ class _PageUtilisateursState extends ConsumerState<PageUtilisateurs> with Single
               initiale: initiale,
               couleurInitiale: CouleursApp.primaire,
               estActif: client.actif,
+              estEnLigne: client.estEnLigne,
+              derniereConnexion: client.derniereConnexion,
               onToggleActif: () => _basculerStatutClient(context, ref, client),
               onTap: () => _afficherDetailsClient(context, client),
-            ).animate().fadeIn(delay: Duration(milliseconds: 50 * index)).slideX();
+              onSupprimer: () => _supprimerCompte(context, client.id, 'client', "${client.prenom} ${client.nom}"),
+            ).animate().slideX();
           },
         );
       },
@@ -202,10 +206,13 @@ class _PageUtilisateursState extends ConsumerState<PageUtilisateurs> with Single
               icone: Iconsax.truck_fast_copy,
               couleurInitiale: Colors.orange,
               estActif: transporteur.actif,
+              estEnLigne: transporteur.estEnLigne,
+              derniereConnexion: transporteur.derniereConnexion,
               documentsValides: transporteur.documentsValides,
               onToggleActif: () => _basculerStatutTransporteur(context, ref, transporteur),
               onTap: () => _afficherDetailsTransporteur(context, transporteur),
-            ).animate().fadeIn(delay: Duration(milliseconds: 50 * index)).slideX();
+              onSupprimer: () => _supprimerCompte(context, transporteur.id, 'transporteur', "${transporteur.prenom} ${transporteur.nom}"),
+            ).animate().slideX();
           },
         );
       },
@@ -218,6 +225,42 @@ class _PageUtilisateursState extends ConsumerState<PageUtilisateurs> with Single
 
   Future<void> _basculerStatutTransporteur(BuildContext context, WidgetRef ref, Transporteur transporteur) async {
     await ref.read(serviceFirestoreProvider).modifierDocument(collection: 'transporteurs', id: transporteur.id, donnees: {'actif': !transporteur.actif});
+  }
+
+  Future<void> _supprimerCompte(BuildContext context, String userId, String role, String nom) async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (_) => AlertDialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        backgroundColor: const Color(0xFF111827),
+        title: Row(
+          children: [
+            Icon(Icons.person_remove_rounded, color: CouleursApp.erreur),
+            const SizedBox(width: 10),
+            const Expanded(child: Text("Supprimer ce compte ?", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16))),
+          ],
+        ),
+        content: Text(
+          "Le compte de $nom et toutes ses courses associées seront supprimés définitivement.",
+          style: const TextStyle(color: Colors.white70),
+        ),
+        actions: [
+          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text("Annuler", style: TextStyle(color: Colors.white54))),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: CouleursApp.erreur, foregroundColor: Colors.white, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text("Supprimer"),
+          ),
+        ],
+      ),
+    );
+    if (confirm != true || !mounted) return;
+    await ref.read(serviceFirestoreProvider).supprimerCompteUtilisateur(userId, role);
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Compte de $nom supprimé"), backgroundColor: Colors.green),
+      );
+    }
   }
 
   void _afficherDetailsClient(BuildContext context, dynamic client) {
@@ -289,9 +332,12 @@ class _GlassListItem extends StatelessWidget {
   final IconData? icone;
   final Color couleurInitiale;
   final bool estActif;
+  final bool estEnLigne;
+  final DateTime? derniereConnexion;
   final bool? documentsValides;
   final VoidCallback onToggleActif;
   final VoidCallback onTap;
+  final VoidCallback? onSupprimer;
 
   const _GlassListItem({
     required this.titre,
@@ -300,9 +346,12 @@ class _GlassListItem extends StatelessWidget {
     this.icone,
     required this.couleurInitiale,
     required this.estActif,
+    this.estEnLigne = false,
+    this.derniereConnexion,
     this.documentsValides,
     required this.onToggleActif,
     required this.onTap,
+    this.onSupprimer,
   });
 
   @override
@@ -330,9 +379,33 @@ class _GlassListItem extends StatelessWidget {
                     shape: BoxShape.circle,
                   ),
                   alignment: Alignment.center,
-                  child: icone != null
-                      ? Icon(icone, color: couleurInitiale)
-                      : Text(initiale ?? "", style: GoogleFonts.inter(color: couleurInitiale, fontWeight: FontWeight.bold, fontSize: 18)),
+                  child: Stack(
+                    clipBehavior: Clip.none,
+                    children: [
+                      icone != null
+                          ? Icon(icone, color: couleurInitiale)
+                          : Text(initiale ?? "", style: GoogleFonts.inter(color: couleurInitiale, fontWeight: FontWeight.bold, fontSize: 18)),
+                      // Indicateur vert "en ligne"
+                      if (estEnLigne)
+                        Positioned(
+                          bottom: -2,
+                          right: -4,
+                          child: Container(
+                            width: 14,
+                            height: 14,
+                            decoration: BoxDecoration(
+                              color: CouleursApp.succes,
+                              shape: BoxShape.circle,
+                              border: Border.all(color: const Color(0xFF08111F), width: 2),
+                            ),
+                          ).animate(onPlay: (c) => c.repeat(reverse: true)).scale(
+                            begin: const Offset(0.8, 0.8),
+                            end: const Offset(1.1, 1.1),
+                            duration: 1200.ms,
+                          ),
+                        ),
+                    ],
+                  ),
                 ),
                 const SizedBox(width: 16),
                 Expanded(
@@ -341,7 +414,20 @@ class _GlassListItem extends StatelessWidget {
                     children: [
                       Text(titre, style: GoogleFonts.inter(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
                       const SizedBox(height: 4),
-                      Text(sousTitre, style: GoogleFonts.inter(color: Colors.white54, fontSize: 14)),
+                      Row(
+                        children: [
+                          Text(sousTitre, style: GoogleFonts.inter(color: Colors.white54, fontSize: 13)),
+                          if (estEnLigne) ...
+                          [
+                            const SizedBox(width: 8),
+                            Text("En ligne", style: GoogleFonts.inter(color: CouleursApp.succes, fontSize: 12, fontWeight: FontWeight.w600)),
+                          ] else if (derniereConnexion != null) ...
+                          [
+                            const SizedBox(width: 8),
+                            Text(_formatDerniereConnexion(derniereConnexion!), style: GoogleFonts.inter(color: Colors.white38, fontSize: 11)),
+                          ]
+                        ],
+                      ),
                     ],
                   ),
                 ),
@@ -358,12 +444,28 @@ class _GlassListItem extends StatelessWidget {
                 IconButton(
                   icon: Icon(estActif ? Iconsax.unlock_copy : Iconsax.lock_copy, color: estActif ? Colors.white54 : CouleursApp.erreur),
                   onPressed: onToggleActif,
+                  tooltip: estActif ? "Désactiver" : "Activer",
                 ),
+                if (onSupprimer != null)
+                  IconButton(
+                    icon: const Icon(Icons.person_remove_rounded, color: CouleursApp.erreur),
+                    onPressed: onSupprimer,
+                    tooltip: "Supprimer le compte",
+                  ),
               ],
             ),
           ),
         ),
       ),
     );
+  }
+
+  String _formatDerniereConnexion(DateTime date) {
+    final diff = DateTime.now().difference(date);
+    if (diff.inMinutes < 1) return "À l'instant";
+    if (diff.inMinutes < 60) return "Il y a ${diff.inMinutes} min";
+    if (diff.inHours < 24) return "Il y a ${diff.inHours}h";
+    if (diff.inDays == 1) return "Hier";
+    return "Il y a ${diff.inDays} jours";
   }
 }

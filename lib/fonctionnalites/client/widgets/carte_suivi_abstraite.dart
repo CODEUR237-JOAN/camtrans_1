@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:update_camtrans/coeur/constantes/couleurs.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+
 
 /// Abstraction de la carte. Prêt pour migration vers Google Maps si besoin.
 class CarteSuiviAbstraite extends StatefulWidget {

@@ -1,7 +1,6 @@
 
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:intl/intl.dart';
 
@@ -46,7 +45,7 @@ class CarteEstimationIntelligente extends StatelessWidget {
                   const Text(
                     "Estimation Terminée",
                     style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.black87),
-                  ).animate().shimmer(duration: 2.seconds),
+                  ),
                 ],
               ),
               const SizedBox(height: 24),
@@ -156,12 +155,12 @@ class CarteEstimationIntelligente extends StatelessWidget {
                     ),
                   ],
                 ),
-              ).animate().fadeIn(delay: 600.ms).slideY(begin: 0.2),
+              ),
             ],
           ),
         ),
       ),
-    ).animate().fadeIn(duration: 500.ms).scale(begin: const Offset(0.95, 0.95));
+    );
   }
 
   Widget _buildMetricCard(double parentWidth, {required IconData icon, required String label, required double value, required String suffix, required int delay}) {
@@ -217,6 +216,6 @@ class CarteEstimationIntelligente extends StatelessWidget {
           ),
         ],
       ),
-    ).animate().fadeIn(delay: delay.ms).slideX(begin: -0.1);
+    );
   }
 }

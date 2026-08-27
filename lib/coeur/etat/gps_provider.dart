@@ -57,6 +57,17 @@ class GpsTracker {
             if (dist < 0.1) { // moins de 100m
                _ref.read(transporteurActionsProvider).changerStatutCourse(activeCourse.id, StatutCourse.arriveDepart);
             }
+          } else if (activeCourse.statut == StatutCourse.arriveDepart || activeCourse.statut == StatutCourse.charge) {
+            final distToDepart = serviceGps.calculerDistance(
+              latitudeDepart: position.latitude,
+              longitudeDepart: position.longitude,
+              latitudeArrivee: activeCourse.latitudeDepart,
+              longitudeArrivee: activeCourse.longitudeDepart,
+            );
+            // S'il s'éloigne de plus de 150m du point de départ, on déduit qu'il est en transit
+            if (distToDepart > 0.15) {
+               _ref.read(transporteurActionsProvider).changerStatutCourse(activeCourse.id, StatutCourse.enTransit);
+            }
           } else if (activeCourse.statut == StatutCourse.enTransit) {
             final dist = serviceGps.calculerDistance(
               latitudeDepart: position.latitude,

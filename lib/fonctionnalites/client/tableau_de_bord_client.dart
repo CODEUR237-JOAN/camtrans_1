@@ -1,7 +1,5 @@
-
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
@@ -25,6 +23,8 @@ import 'package:update_camtrans/coeur/etat/notification_provider.dart';
 import 'package:update_camtrans/coeur/constantes/couleurs.dart';
 import 'package:update_camtrans/coeur/constantes/statuts.dart';
 import 'package:update_camtrans/coeur/widgets/page_responsive.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+
 
 class TableauDeBordClient extends ConsumerStatefulWidget {
   const TableauDeBordClient({super.key});
@@ -90,7 +90,7 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
                     ),
                   );
                 }
-                return SuiviTransport(courseId: enCours.first.id);
+                return SuiviTransport(courseId: enCours.first.id, isFullScreen: false);
               },
               loading: () => const Scaffold(body: Center(child: CircularProgressIndicator())),
               error: (err, stack) => Scaffold(body: Center(child: Text("Erreur: $err"))),
@@ -186,7 +186,7 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
                       backgroundImage: photoUrl.isNotEmpty ? NetworkImage(photoUrl) : null,
                       child: photoUrl.isEmpty ? const Icon(Iconsax.user_copy, color: Colors.white) : null,
                     ),
-                  ).animate().scale(delay: 100.ms),
+                  ),
                   const SizedBox(width: 15),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -194,11 +194,11 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
                       Text(
                         "Bienvenue, $nomAffichage",
                         style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: CouleursApp.textePrincipal),
-                      ).animate().fadeIn(delay: 200.ms).slideX(),
+                      ),
                       const Text(
                         "Prêt à expédier aujourd'hui ?",
                         style: TextStyle(fontSize: 14, color: CouleursApp.texteSecondaire),
-                      ).animate().fadeIn(delay: 300.ms),
+                      ),
                     ],
                   ),
                 ],
@@ -230,10 +230,10 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
                               badgeCount > 9 ? "9+" : "$badgeCount",
                               style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
                             ),
-                          ).animate().scale(delay: 400.ms).shake(),
+                          ),
                         )
                     ],
-                  ).animate().fadeIn(delay: 300.ms),
+                  ),
                 );
               })
             ],
@@ -249,39 +249,44 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
   Widget _buildSearchBar() {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.8),
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: Colors.white, width: 2),
-          boxShadow: [
-            BoxShadow(color: CouleursApp.primaireFonce.withValues(alpha: 0.05), blurRadius: 20, offset: const Offset(0, 10))
-          ],
-        ),
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(20),
-          child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-            child: TextField(
-              decoration: InputDecoration(
-                hintText: "Où souhaitez-vous expédier ?",
-                hintStyle: TextStyle(color: CouleursApp.texteSecondaire.withValues(alpha: 0.8), fontSize: 15),
-                prefixIcon: const Icon(Iconsax.location_copy, color: CouleursApp.primaire),
-                suffixIcon: Container(
-                  margin: const EdgeInsets.all(6),
-                  decoration: BoxDecoration(
-                    color: CouleursApp.primaireFonce,
-                    borderRadius: BorderRadius.circular(14),
+      child: GestureDetector(
+        onTap: () => context.push(RoutesApplication.creerDemande),
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.white.withValues(alpha: 0.8),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: Colors.white, width: 2),
+            boxShadow: [
+              BoxShadow(color: CouleursApp.primaireFonce.withValues(alpha: 0.05), blurRadius: 20, offset: const Offset(0, 10))
+            ],
+          ),
+          child: ClipRRect(
+            borderRadius: BorderRadius.circular(20),
+            child: BackdropFilter(
+              filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+              child: AbsorbPointer(
+                child: TextField(
+                  decoration: InputDecoration(
+                    hintText: "Où souhaitez-vous expédier ?",
+                    hintStyle: TextStyle(color: CouleursApp.texteSecondaire.withValues(alpha: 0.8), fontSize: 15),
+                    prefixIcon: const Icon(Iconsax.location_copy, color: CouleursApp.primaire),
+                    suffixIcon: Container(
+                      margin: const EdgeInsets.all(6),
+                      decoration: BoxDecoration(
+                        color: CouleursApp.primaireFonce,
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                      child: const Icon(Iconsax.arrow_right_3_copy, color: Colors.white, size: 18),
+                    ),
+                    border: InputBorder.none,
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
                   ),
-                  child: const Icon(Iconsax.setting_4_copy, color: Colors.white, size: 18),
                 ),
-                border: InputBorder.none,
-                contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
               ),
             ),
           ),
         ),
-      ).animate().fadeIn(delay: 400.ms).slideY(begin: 0.2),
+      ),
     );
   }
 
@@ -350,7 +355,7 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
           ),
           ), // Fermeture InkWell
         ), // Fermeture Semantics
-      ).animate().scale(delay: 500.ms, curve: Curves.easeOutBack),
+      ),
     );
   }
 
@@ -413,7 +418,7 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
           _buildStatCard("En cours", enCours.toString(), Iconsax.truck_copy, CouleursApp.primaire),
         ],
       ),
-    ).animate().fadeIn(delay: 700.ms).slideX(begin: 0.1);
+    );
   }
 
   Widget _buildStatCard(String title, String value, IconData icon, Color color) {
@@ -463,12 +468,18 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
           children: [
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text("Expédition Active", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: CouleursApp.textePrincipal)),
+                const Expanded(
+                  child: Text("Expédition Active", 
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: CouleursApp.textePrincipal),
+                  ),
+                ),
+                const SizedBox(width: 8),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                   decoration: BoxDecoration(color: CouleursApp.avertissement.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(20)),
-                  child: Text(course.statut, style: const TextStyle(color: CouleursApp.avertissement, fontWeight: FontWeight.bold, fontSize: 13)),
+                  child: Text(course.statut, style: const TextStyle(color: CouleursApp.avertissement, fontWeight: FontWeight.bold, fontSize: 12)),
                 )
               ],
             ),
@@ -500,10 +511,56 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
                   ],
                 ),
               ],
-            )
+            ),
+            if (course.statut == StatutCourse.recherche || course.statut == StatutCourse.attribue || course.statut == StatutCourse.enRouteDepart) ...[
+              const SizedBox(height: 15),
+              SizedBox(
+                width: double.infinity,
+                child: OutlinedButton(
+                  onPressed: () => _confirmerAnnulation(context, course.id),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: CouleursApp.erreur, 
+                    side: const BorderSide(color: CouleursApp.erreur),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+                  ),
+                  child: const Text("Annuler l'expédition"),
+                ),
+              ),
+            ],
           ],
         ),
-      ).animate().fadeIn(delay: 800.ms).slideY(begin: 0.1),
+      ),
+    );
+  }
+
+  void _confirmerAnnulation(BuildContext context, String courseId) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text("Annuler l'expédition"),
+        content: const Text("Êtes-vous sûr de vouloir annuler cette expédition ?"),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text("Non, garder"),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              Navigator.pop(ctx);
+              await ref.read(serviceFirestoreProvider).modifierDocument(
+                collection: 'courses',
+                id: courseId,
+                donnees: {'statut': StatutCourse.annulee},
+              );
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("L'expédition a été annulée.", style: TextStyle(color: Colors.white)), backgroundColor: CouleursApp.erreur));
+              }
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: CouleursApp.erreur, foregroundColor: Colors.white),
+            child: const Text("Oui, annuler"),
+          ),
+        ],
+      ),
     );
   }
 
@@ -566,13 +623,13 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
               child: FloatingActionButton.small(
                 heroTag: "btn_map",
                 backgroundColor: CouleursApp.surface,
-                onPressed: () => context.push(RoutesApplication.suivi),
+                onPressed: () => setState(() => _bottomNavIndex = 2),
                 child: const Icon(Iconsax.maximize_circle_copy, color: CouleursApp.primaireFonce),
               ),
             )
           ],
         ),
-      ).animate().fadeIn(delay: 900.ms).scale(),
+      ),
     );
   }
 
@@ -624,7 +681,7 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
                       children: [
                         Text(course.description.isNotEmpty ? course.description : "Marchandise", style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                         const SizedBox(height: 4),
-                        Text("${course.adresseDepart} ➔ ${course.adresseArrivee}", style: const TextStyle(fontSize: 13, color: CouleursApp.texteSecondaire), overflow: TextOverflow.ellipsis),
+                        Text("${course.adresseDepart}  ${course.adresseArrivee}", style: const TextStyle(fontSize: 13, color: CouleursApp.texteSecondaire), overflow: TextOverflow.ellipsis),
                       ],
                     ),
                   ),
@@ -642,7 +699,7 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
                   )
                 ],
               ),
-            ).animate().fadeIn(delay: 1000.ms).slideY(begin: 0.1);
+            );
           })
         ],
       ),
@@ -692,7 +749,7 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
           ],
         ),
       ),
-    ).animate().fadeIn().scale();
+    );
   }
 
   Widget _buildEmptyState() {
@@ -712,24 +769,9 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
           const Text("Lancez votre première demande de transport dès maintenant.", textAlign: TextAlign.center, style: TextStyle(color: CouleursApp.texteSecondaire)),
           
           const SizedBox(height: 20),
-          
-          // Bouton temporaire de génération de données
-          TextButton.icon(
-            onPressed: () async {
-              final auth = ref.read(serviceAuthentificationProvider);
-              final firestore = ref.read(serviceFirestoreProvider);
-              final userId = auth.utilisateur?.uid;
-              if (userId != null) {
-                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Génération en cours...", style: TextStyle(color: Colors.white)), backgroundColor: CouleursApp.primaireFonce));
-                await firestore.genererCoursesTest(userId);
-              }
-            },
-            icon: const Icon(Icons.bug_report, color: CouleursApp.primaire),
-            label: const Text("Générer des données de test", style: TextStyle(color: CouleursApp.primaire)),
-          )
         ],
       ),
-    ).animate().fadeIn(delay: 500.ms);
+    );
   }
 
   // ==========================================
@@ -745,7 +787,7 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
       tooltip: "Discuter avec l'assistant",
       icon: const Icon(Iconsax.message_text_copy, color: Colors.white),
       label: const Text("Assistant", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-    ).animate().slideY(begin: 2, delay: 1200.ms, curve: Curves.easeOutBack);
+    );
   }
 
 
@@ -782,6 +824,6 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
           ),
         ),
       ),
-    ).animate().slideY(begin: 1, delay: 1000.ms, curve: Curves.easeOutBack);
+    );
   }
 }

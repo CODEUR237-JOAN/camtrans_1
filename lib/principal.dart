@@ -21,26 +21,26 @@ class MonApplication extends ConsumerWidget {
       minTextAdapt: true,
       splitScreenMode: true,
       builder: (context, child) {
-        return EcouteurNotificationsApp(
-          child: MaterialApp.router(
-            debugShowCheckedModeBanner: false,
-            title: "Transport Intelligent",
+        return MaterialApp.router(
+          debugShowCheckedModeBanner: false,
+          title: "Transport Intelligent",
 
-            theme: ThemeApplication.themeClair,
-            darkTheme: ThemeApplication.themeSombre,
-            themeMode: ThemeMode.system,
+          builder: (context, child) => EcouteurNotificationsApp(child: child!),
 
-            localizationsDelegates: const [
-              GlobalMaterialLocalizations.delegate,
-              GlobalWidgetsLocalizations.delegate,
-              GlobalCupertinoLocalizations.delegate,
-            ],
-            supportedLocales: const [
-              Locale('fr', ''),
-            ],
+          theme: ThemeApplication.themeClair,
+          darkTheme: ThemeApplication.themeSombre,
+          themeMode: ThemeMode.system,
 
-            routerConfig: RoutesApplication.routeur,
-          ),
+          localizationsDelegates: const [
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [
+            Locale('fr', ''),
+          ],
+
+          routerConfig: RoutesApplication.routeur,
         );
       },
     );

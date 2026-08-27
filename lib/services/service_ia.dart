@@ -177,7 +177,7 @@ Ne rajoute aucun autre texte, juste l'objet JSON.
         "conseil": data["conseil"]?.toString() ?? "Emballez soigneusement vos articles.",
       };
     } catch (e) {
-      debugPrint("❌ Erreur Groq : $e");
+      debugPrint(" Erreur Groq : $e");
       throw Exception("Impossible d'estimer : $e");
     }
   }
@@ -229,7 +229,7 @@ Ne rajoute aucun autre texte, juste l'objet JSON.
       }
       return 1500.0;
     } catch (e) {
-      debugPrint("❌ Erreur Groq Masse : $e");
+      debugPrint(" Erreur Groq Masse : $e");
       return 1500.0; // Poids moyen par défaut
     }
   }

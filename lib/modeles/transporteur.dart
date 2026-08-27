@@ -71,6 +71,8 @@ class Transporteur extends Utilisateur {
 
     this.latitude = 0,
     this.longitude = 0,
+    super.estEnLigne = false,
+    super.derniereConnexion,
   });
 
   @override
@@ -87,6 +89,8 @@ class Transporteur extends Utilisateur {
     bool? actif,
     bool? emailVerifie,
     DateTime? dateCreation,
+    bool? estEnLigne,
+    DateTime? derniereConnexion,
 
     String? typeVehicule,
     String? marqueVehicule,
@@ -130,6 +134,8 @@ class Transporteur extends Utilisateur {
       actif: actif ?? this.actif,
       emailVerifie: emailVerifie ?? this.emailVerifie,
       dateCreation: dateCreation ?? this.dateCreation,
+      estEnLigne: estEnLigne ?? this.estEnLigne,
+      derniereConnexion: derniereConnexion ?? this.derniereConnexion,
 
       typeVehicule: typeVehicule ?? this.typeVehicule,
       marqueVehicule: marqueVehicule ?? this.marqueVehicule,
@@ -236,6 +242,8 @@ class Transporteur extends Utilisateur {
 
       latitude: Parseur.toDouble(map["latitude"]),
       longitude: Parseur.toDouble(map["longitude"]),
+      estEnLigne: map["estEnLigne"] ?? false,
+      derniereConnexion: map["derniereConnexion"] != null ? Parseur.toDateTime(map["derniereConnexion"]) : null,
     );
   }
 

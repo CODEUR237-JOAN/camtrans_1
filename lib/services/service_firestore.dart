@@ -1,4 +1,3 @@
-import 'package:update_camtrans/coeur/constantes/statuts.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -82,6 +81,55 @@ class ServiceFirestore {
         .collection(collection)
         .doc(id)
         .delete();
+  }
+
+  /// Supprime les courses terminées ou annulées d'un utilisateur (client ou transporteur)
+  Future<int> supprimerCoursesTerminees(String userId, {bool estClient = true}) async {
+    final champ = estClient ? 'clientId' : 'transporteurId';
+    final snapshot = await _db
+        .collection('courses')
+        .where(champ, isEqualTo: userId)
+        .where('statut', whereIn: ['terminee', 'annulee'])
+        .get();
+    final batch = _db.batch();
+    for (final doc in snapshot.docs) {
+      batch.delete(doc.reference);
+    }
+    await batch.commit();
+    return snapshot.docs.length;
+  }
+
+  /// [ADMIN] Supprime TOUTES les courses terminées/annulées de la base (purge globale)
+  Future<int> purgerHistoriqueGlobal() async {
+    final snapshot = await _db
+        .collection('courses')
+        .where('statut', whereIn: ['terminee', 'annulee'])
+        .get();
+    final batch = _db.batch();
+    for (final doc in snapshot.docs) {
+      batch.delete(doc.reference);
+    }
+    await batch.commit();
+    return snapshot.docs.length;
+  }
+
+  /// [ADMIN] Supprime un compte utilisateur (son profil + toutes ses courses)
+  Future<void> supprimerCompteUtilisateur(String userId, String role) async {
+    final batch = _db.batch();
+    // Supprimer le profil
+    final collection = role == 'transporteur' ? 'transporteurs' : 'clients';
+    batch.delete(_db.collection(collection).doc(userId));
+    // Supprimer ses courses (en tant que client)
+    final coursesClient = await _db.collection('courses').where('clientId', isEqualTo: userId).get();
+    for (final doc in coursesClient.docs) {
+      batch.delete(doc.reference);
+    }
+    // Supprimer ses courses (en tant que transporteur)
+    final coursesTransp = await _db.collection('courses').where('transporteurId', isEqualTo: userId).get();
+    for (final doc in coursesTransp.docs) {
+      batch.delete(doc.reference);
+    }
+    await batch.commit();
   }
 
   // ===========================
@@ -195,54 +243,6 @@ class ServiceFirestore {
         .where("transporteurId", isEqualTo: transporteurId)
         .orderBy("dateCreation", descending: true)
         .snapshots();
-  }
-
-  // ===========================
-  // Générer des données de test
-  // ===========================
-
-  Future<void> genererCoursesTest(String clientId) async {
-    final batch = _db.batch();
-    
-    // 1. Course en cours
-    final ref1 = _db.collection("courses").doc();
-    batch.set(ref1, {
-      "id": ref1.id,
-      "clientId": clientId,
-      "transporteurId": "transp_123",
-      "codeSuivi": "CMR-${DateTime.now().millisecondsSinceEpoch.toString().substring(8)}",
-      "adresseDepart": "Douala, Akwa",
-      "adresseArrivee": "Yaoundé, Bastos",
-      "statut": StatutCourse.enTransit,
-      "typeVehicule": "Camionnette",
-      "description": "Mobilier de bureau",
-      "poidsKg": 120.5,
-      "prixEstime": 45000.0,
-      "dateCreation": FieldValue.serverTimestamp(),
-      "dateDebut": FieldValue.serverTimestamp(),
-      "dateFin": null,
-    });
-
-    // 2. Course livrée
-    final ref2 = _db.collection("courses").doc();
-    batch.set(ref2, {
-      "id": ref2.id,
-      "clientId": clientId,
-      "transporteurId": "transp_456",
-      "codeSuivi": "CMR-${(DateTime.now().millisecondsSinceEpoch - 100000).toString().substring(8)}",
-      "adresseDepart": "Kribi, Port",
-      "adresseArrivee": "Douala, Bonanjo",
-      "statut": StatutCourse.arriveDestination,
-      "typeVehicule": "Camion lourd",
-      "description": "Matériel de construction",
-      "poidsKg": 850.0,
-      "prixEstime": 120000.0,
-      "dateCreation": FieldValue.serverTimestamp(),
-      "dateDebut": FieldValue.serverTimestamp(),
-      "dateFin": FieldValue.serverTimestamp(),
-    });
-
-    await batch.commit();
   }
 
   // ===========================

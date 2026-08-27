@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -12,7 +11,8 @@ import 'package:update_camtrans/coeur/routes/routes.dart';
 import 'package:update_camtrans/coeur/widgets/effets_visuels.dart';
 import 'package:update_camtrans/coeur/etat/utilisateur_provider.dart';
 import 'package:update_camtrans/services/service_authentification.dart';
-import 'package:update_camtrans/services/service_firestore.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+
 
 class EcranSplash extends ConsumerStatefulWidget {
   const EcranSplash({super.key});
@@ -126,10 +126,7 @@ class _EcranSplashState extends ConsumerState<EcranSplash>
                       color: CouleursApp.primaire,
                     ),
                   )
-                      .animate()
-                      .scale(duration: 1000.ms, curve: Curves.elasticOut)
-                      .fadeIn(duration: 800.ms)
-                      .shimmer(delay: 1000.ms, duration: 1500.ms),
+                      ,
 
                   const SizedBox(height: 40),
 
@@ -154,9 +151,7 @@ class _EcranSplashState extends ConsumerState<EcranSplash>
                       ),
                     ),
                   )
-                      .animate()
-                      .fadeIn(delay: 500.ms, duration: 600.ms)
-                      .slideY(begin: 0.5, end: 0, curve: Curves.easeOutBack),
+                      ,
 
                   const SizedBox(height: 14),
 
@@ -170,7 +165,7 @@ class _EcranSplashState extends ConsumerState<EcranSplash>
                       height: 1.5,
                       fontWeight: FontWeight.w500,
                     ),
-                  ).animate().fadeIn(delay: 1000.ms, duration: 600.ms),
+                  ),
 
                   const SizedBox(height: 30),
 
@@ -188,7 +183,7 @@ class _EcranSplashState extends ConsumerState<EcranSplash>
                         letterSpacing: 1.5,
                       ),
                     ),
-                  ).animate().fadeIn(delay: 800.ms).slideY(begin: 0.5),
+                  ),
 
                   const Spacer(),
 
@@ -212,7 +207,7 @@ class _EcranSplashState extends ConsumerState<EcranSplash>
                         },
                       ),
                     ),
-                  ).animate().fadeIn(delay: 1400.ms, duration: 600.ms),
+                  ),
 
                   const SizedBox(height: 20),
 

@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:update_camtrans/services/service_notification.dart';
 import 'package:update_camtrans/coeur/constantes/couleurs.dart';
@@ -120,17 +119,17 @@ class _BanniereNotification extends StatelessWidget {
           width: double.infinity,
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
           decoration: BoxDecoration(
-            color: const Color(0xFF0F172A).withOpacity(0.95),
+            color: const Color(0xFF0F172A).withValues(alpha: 0.95),
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: _couleurAccent.withOpacity(0.4)),
+            border: Border.all(color: _couleurAccent.withValues(alpha: 0.4)),
             boxShadow: [
               BoxShadow(
-                color: _couleurAccent.withOpacity(0.15),
+                color: _couleurAccent.withValues(alpha: 0.15),
                 blurRadius: 20,
                 spreadRadius: 2,
               ),
               BoxShadow(
-                color: Colors.black.withOpacity(0.4),
+                color: Colors.black.withValues(alpha: 0.4),
                 blurRadius: 12,
                 offset: const Offset(0, 4),
               ),
@@ -142,9 +141,9 @@ class _BanniereNotification extends StatelessWidget {
                 width: 40,
                 height: 40,
                 decoration: BoxDecoration(
-                  color: _couleurAccent.withOpacity(0.15),
+                  color: _couleurAccent.withValues(alpha: 0.15),
                   shape: BoxShape.circle,
-                  border: Border.all(color: _couleurAccent.withOpacity(0.3)),
+                  border: Border.all(color: _couleurAccent.withValues(alpha: 0.3)),
                 ),
                 child: Icon(_icone, color: _couleurAccent, size: 20),
               ),
@@ -167,7 +166,7 @@ class _BanniereNotification extends StatelessWidget {
                     Text(
                       notif.message,
                       style: TextStyle(
-                        color: Colors.white.withOpacity(0.7),
+                        color: Colors.white.withValues(alpha: 0.7),
                         fontSize: 12,
                       ),
                       maxLines: 2,
@@ -181,9 +180,7 @@ class _BanniereNotification extends StatelessWidget {
             ],
           ),
         )
-        .animate()
-        .slideY(begin: -1.0, end: 0.0, duration: 350.ms, curve: Curves.easeOutCubic)
-        .fadeIn(duration: 300.ms),
+        ,
       ),
     );
   }

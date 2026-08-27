@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -58,12 +58,12 @@ class _AdressesFavoritesPageState extends ConsumerState<AdressesFavoritesPage> {
               Text(
                 "Vos lieux enregistrés",
                 style: GoogleFonts.inter(fontSize: 22, fontWeight: FontWeight.w700, color: CouleursApp.textePrincipal),
-              ).animate().fadeIn().slideX(begin: -0.1),
+              ),
               const SizedBox(height: 8),
               Text(
                 "Accédez rapidement à vos destinations récurrentes lors de vos prochaines expéditions.",
                 style: GoogleFonts.inter(fontSize: 14, color: CouleursApp.texteSecondaire, height: 1.5),
-              ).animate().fadeIn(delay: 100.ms).slideX(begin: -0.1),
+              ),
               const SizedBox(height: 32),
               
               Expanded(
@@ -97,7 +97,7 @@ class _AdressesFavoritesPageState extends ConsumerState<AdressesFavoritesPage> {
                   icon: const Icon(Iconsax.add_copy),
                   label: Text("Ajouter une adresse", style: GoogleFonts.inter(fontWeight: FontWeight.w600, fontSize: 16)),
                 ),
-              ).animate().slideY(begin: 1.0, curve: Curves.easeOutExpo, duration: 600.ms),
+              ),
             ],
           ),
         ),
@@ -153,7 +153,7 @@ class _AdressesFavoritesPageState extends ConsumerState<AdressesFavoritesPage> {
           ),
         ],
       ),
-    ).animate().fadeIn(delay: (200 + index * 100).ms).slideY(begin: 0.2);
+    ).animate().slideY(begin: 0.2);
   }
 
   void _showAddAddressModal(BuildContext context) {

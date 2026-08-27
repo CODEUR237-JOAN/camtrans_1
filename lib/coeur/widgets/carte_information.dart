@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:update_camtrans/coeur/constantes/couleurs.dart';
 import 'package:google_fonts/google_fonts.dart';
 
+
 /// =======================================================
 /// CARTE INFORMATION MODERNISÉE
 /// Avec ombres dynamiques, icône avec glow, et micro-interactions

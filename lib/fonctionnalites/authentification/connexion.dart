@@ -66,10 +66,10 @@ class _ConnexionState extends ConsumerState<Connexion> {
                 final transpDoc = await serviceDb.lireDocument(collection: 'transporteurs', id: uid);
                 if (transpDoc.exists) {
                   role = 'transporteur';
-                  debugPrint('✅ Rôle détecté: transporteur (uid=$uid)');
+                  debugPrint(' Rôle détecté: transporteur (uid=$uid)');
                 }
               } catch (e) {
-                debugPrint('⚠️ Erreur lecture transporteurs: $e');
+                debugPrint('️ Erreur lecture transporteurs: $e');
               }
             }
 
@@ -79,10 +79,10 @@ class _ConnexionState extends ConsumerState<Connexion> {
                 final clientDoc = await serviceDb.lireDocument(collection: 'clients', id: uid);
                 if (clientDoc.exists) {
                   role = 'client';
-                  debugPrint('✅ Rôle détecté: client (uid=$uid)');
+                  debugPrint(' Rôle détecté: client (uid=$uid)');
                 }
               } catch (e) {
-                debugPrint('⚠️ Erreur lecture clients: $e');
+                debugPrint('️ Erreur lecture clients: $e');
               }
             }
 
@@ -92,11 +92,11 @@ class _ConnexionState extends ConsumerState<Connexion> {
                 try {
                   final doc = await serviceDb.lireDocument(collection: col, id: uid);
                   if (doc.exists) {
-                    final data = doc.data() as Map<String, dynamic>?;
+                    final data = doc.data();
                     final roleField = data?['role'] as String?;
                     if (roleField != null && roleField.isNotEmpty) {
                       role = roleField;
-                      debugPrint('✅ Rôle via champ role: $role (uid=$uid)');
+                      debugPrint(' Rôle via champ role: $role (uid=$uid)');
                       break;
                     }
                   }
@@ -109,7 +109,7 @@ class _ConnexionState extends ConsumerState<Connexion> {
 
           if (!mounted) return;
 
-          debugPrint('🔀 Redirection → rôle=$role');
+          debugPrint(' Redirection → rôle=$role');
 
           if (role == 'admin') {
             context.go(RoutesApplication.admin);
@@ -120,7 +120,7 @@ class _ConnexionState extends ConsumerState<Connexion> {
             await ServiceNotification.enregistrerTokenUtilisateur(uid, 'transporteur');
             if (mounted) context.go(RoutesApplication.tableauBordTransporteur);
           } else {
-            debugPrint('⚠️ Rôle introuvable pour uid=$uid, redirection vers choixProfil');
+            debugPrint('️ Rôle introuvable pour uid=$uid, redirection vers choixProfil');
             context.go(RoutesApplication.choixProfil);
           }
       }

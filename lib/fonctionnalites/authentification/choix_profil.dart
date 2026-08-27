@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:update_camtrans/coeur/constantes/couleurs.dart';
@@ -78,7 +77,7 @@ class ChoixProfil extends StatelessWidget {
                               ),
                             ],
                           ),
-                        ).animate().fadeIn(delay: 80.ms).slideY(begin: 0.16),
+                        ),
                         const SizedBox(height: 18),
                         const Text(
                           'Comment souhaitez-vous utiliser Camtrans ?',
@@ -88,7 +87,7 @@ class ChoixProfil extends StatelessWidget {
                             color: CouleursApp.textePrincipal,
                             height: 1.08,
                           ),
-                        ).animate().fadeIn(delay: 140.ms).slideY(begin: 0.18),
+                        ),
                         const SizedBox(height: 12),
                         const Text(
                           'Choisissez votre espace pour obtenir les bons outils, les bons indicateurs et les bonnes actions des le depart.',
@@ -98,7 +97,7 @@ class ChoixProfil extends StatelessWidget {
                             height: 1.55,
                             fontWeight: FontWeight.w500,
                           ),
-                        ).animate().fadeIn(delay: 220.ms).slideY(begin: 0.14),
+                        ),
                         const SizedBox(height: 34),
                         _creerCarteProfil(
                           context,
@@ -132,7 +131,7 @@ class ChoixProfil extends StatelessWidget {
                               style: TextStyle(fontWeight: FontWeight.w800),
                             ),
                           ),
-                        ).animate().fadeIn(delay: 520.ms),
+                        ),
                       ],
                     ),
                   ),
@@ -266,6 +265,6 @@ class ChoixProfil extends StatelessWidget {
           ),
         ),
       ),
-    ).animate().fadeIn(delay: delay.ms).slideY(begin: 0.12, curve: Curves.easeOutCubic);
+    );
   }
 }

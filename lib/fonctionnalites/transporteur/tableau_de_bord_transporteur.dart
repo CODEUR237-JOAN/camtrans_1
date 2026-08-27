@@ -1,6 +1,6 @@
+import 'package:flutter_animate/flutter_animate.dart';
 import 'dart:ui';
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -18,7 +18,6 @@ import 'package:update_camtrans/coeur/etat/gps_provider.dart';
 import 'package:update_camtrans/services/service_authentification.dart';
 import 'package:update_camtrans/modeles/course.dart';
 
-import 'courses_disponibles.dart';
 import 'navigation.dart';
 import 'package:update_camtrans/fonctionnalites/notifications/notifications.dart';
 import 'profil.dart';
@@ -62,7 +61,7 @@ class _TableauDeBordTransporteurState extends ConsumerState<TableauDeBordTranspo
 
     return Scaffold(
       backgroundColor: CouleursApp.fond,
-      bottomNavigationBar: _buildBottomNav().animate().slideY(begin: 1, end: 0, delay: 500.ms, duration: 400.ms),
+      bottomNavigationBar: _buildBottomNav(),
       body: FondPremiumAnime(
         safeArea: true,
         child: PageResponsive(
@@ -78,7 +77,6 @@ class _TableauDeBordTransporteurState extends ConsumerState<TableauDeBordTranspo
               child: _buildDashboardAccueil(statsRevenus, mesCoursesAsync, documentsValides),
             ),
             // 1: Demandes
-            const CoursesDisponibles(),
             // 2: Suivi
             const NavigationTransporteur(),
             // 3: Notifications
@@ -137,7 +135,7 @@ class _TableauDeBordTransporteurState extends ConsumerState<TableauDeBordTranspo
                       ),
                     ],
                   ),
-                ).animate().fadeIn().slideY(begin: -0.2),
+                ),
 
               // HEADER
               Row(
@@ -159,7 +157,7 @@ class _TableauDeBordTransporteurState extends ConsumerState<TableauDeBordTranspo
                       backgroundImage: photoUrl.isNotEmpty ? NetworkImage(photoUrl) : null,
                       child: photoUrl.isEmpty ? const Icon(Iconsax.truck_fast_copy, color: Colors.orange, size: 28) : null,
                     ),
-                  ).animate().scale(delay: 100.ms, curve: Curves.easeOutBack),
+                  ),
                   const SizedBox(width: 15),
                   Expanded(
                     child: Column(
@@ -178,7 +176,7 @@ class _TableauDeBordTransporteurState extends ConsumerState<TableauDeBordTranspo
                         ),
                       ],
                     ),
-                  ).animate().fadeIn(delay: 200.ms).slideX(begin: -0.1),
+                  ),
                   Switch(
                     value: estDisponible,
                     activeThumbColor: Colors.white,
@@ -206,7 +204,7 @@ class _TableauDeBordTransporteurState extends ConsumerState<TableauDeBordTranspo
                               }
                             }
                           },
-                  ).animate().scale(delay: 300.ms),
+                  ),
                 ],
               ),
               const SizedBox(height: 30),
@@ -265,7 +263,7 @@ class _TableauDeBordTransporteurState extends ConsumerState<TableauDeBordTranspo
                     ),
                   ],
                 ),
-              ).animate().fadeIn(delay: 400.ms).slideY(begin: 0.1),
+              ),
 
               const SizedBox(height: 35),
 
@@ -273,7 +271,7 @@ class _TableauDeBordTransporteurState extends ConsumerState<TableauDeBordTranspo
               Text(
                 "Statistiques",
                 style: GoogleFonts.inter(fontSize: 20, fontWeight: FontWeight.w700, letterSpacing: -0.5, color: Theme.of(context).brightness == Brightness.dark ? Colors.white : CouleursApp.textePrincipal),
-              ).animate().fadeIn(delay: 500.ms),
+              ),
               const SizedBox(height: 15),
 
               mesCoursesAsync.when(
@@ -296,11 +294,11 @@ class _TableauDeBordTransporteurState extends ConsumerState<TableauDeBordTranspo
                         children: [
                           Expanded(
                             child: CarteInformation(titre: "Courses", valeur: "${courses.length}", icone: Icons.local_shipping),
-                          ).animate().slideX(begin: -0.1, delay: 600.ms),
+                          ),
                           const SizedBox(width: 15),
                           Expanded(
                             child: CarteInformation(titre: "Livrées", valeur: "$livrees", icone: Icons.check_circle, couleurIcone: Colors.green, couleurValeur: Colors.green),
-                          ).animate().slideX(begin: 0.1, delay: 600.ms),
+                          ),
                         ],
                       ),
                       const SizedBox(height: 15),
@@ -308,11 +306,11 @@ class _TableauDeBordTransporteurState extends ConsumerState<TableauDeBordTranspo
                         children: [
                           Expanded(
                             child: CarteInformation(titre: "En cours", valeur: "$enAttente", icone: Icons.schedule, couleurIcone: Colors.orange, couleurValeur: Colors.orange),
-                          ).animate().slideX(begin: -0.1, delay: 700.ms),
+                          ),
                           const SizedBox(width: 15),
                           Expanded(
-                            child: CarteInformation(titre: "Note", valeur: "4.9 ★", icone: Icons.star, couleurIcone: Colors.amber, couleurValeur: Colors.amber),
-                          ).animate().slideX(begin: 0.1, delay: 700.ms),
+                            child: CarteInformation(titre: "Note", valeur: "4.9 ", icone: Icons.star, couleurIcone: Colors.amber, couleurValeur: Colors.amber),
+                          ),
                         ],
                       ),
                     ],
@@ -326,7 +324,7 @@ class _TableauDeBordTransporteurState extends ConsumerState<TableauDeBordTranspo
               Text(
                 "Actions rapides",
                 style: GoogleFonts.inter(fontSize: 20, fontWeight: FontWeight.w700, letterSpacing: -0.5, color: Theme.of(context).brightness == Brightness.dark ? Colors.white : CouleursApp.textePrincipal),
-              ).animate().fadeIn(delay: 800.ms),
+              ),
               const SizedBox(height: 15),
 
               GridView.count(
@@ -373,7 +371,7 @@ class _TableauDeBordTransporteurState extends ConsumerState<TableauDeBordTranspo
                       },
                       child: Text("Voir tout", style: GoogleFonts.inter(fontWeight: FontWeight.w600))),
                 ],
-              ).animate().fadeIn(delay: 1300.ms),
+              ),
               const SizedBox(height: 15),
 
               mesCoursesAsync.when(
@@ -403,7 +401,7 @@ class _TableauDeBordTransporteurState extends ConsumerState<TableauDeBordTranspo
                           "${course.prixEstime.toStringAsFixed(0)} FCFA", 
                           Icons.local_shipping, 
                           Colors.blue
-                        ).animate().fadeIn().slideY(begin: 0.1);
+                        );
                       }),
                     ],
                   );

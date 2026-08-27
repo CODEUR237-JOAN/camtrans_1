@@ -1,5 +1,8 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:latlong2/latlong.dart';
+import 'package:update_camtrans/services/service_gps.dart';
+import 'package:update_camtrans/services/service_routage.dart';
 import 'service_ia.dart';
 
 // ============================================================
@@ -54,17 +57,22 @@ class ResultatEstimation {
   });
 }
 
+
 final serviceEstimationProvider = Provider<ServiceEstimation>((ref) {
   final ia = ref.watch(serviceIAProvider);
-  return ServiceEstimation(ia);
+  final gps = ref.watch(serviceGpsProvider);
+  final routage = ref.watch(serviceRoutageProvider);
+  return ServiceEstimation(ia, gps, routage);
 });
 
 class ServiceEstimation {
   final ServiceIA _ia;
-  ServiceEstimation(this._ia);
+  final ServiceGps _gps;
+  final ServiceRoutage _routage;
 
-  /// Méthode locale (heuristiques basiques) pour calculer une estimation.
-  /// Logique existante conservée à l'identique — sans régression.
+  ServiceEstimation(this._ia, this._gps, this._routage);
+
+  /// Méthode locale pour calculer une estimation basée sur un vrai routage OSRM.
   Future<ResultatEstimation> genererEstimationLocale({
     required String depart,
     required String arrivee,
@@ -72,30 +80,54 @@ class ServiceEstimation {
     required String description,
     required String categorieVehicule,
   }) async {
-    await Future.delayed(const Duration(seconds: 2));
+    // 1. Géocodage
+    final locDepart = await _gps.obtenirCoordonnees(depart);
+    final locArrivee = await _gps.obtenirCoordonnees(arrivee);
 
-    final distanceSimulee = (depart.length + arrivee.length) * 1.5;
-    final dureeSimulee = distanceSimulee * 1.2;
+    double distanceKm = 10.0;
+    double dureeMinutes = 30.0;
 
-    double volumeSimule = 1.0;
-    double poidsSimule = 50.0;
+    if (locDepart != null && locArrivee != null) {
+      // 2. Routage réel OSRM
+      final infoTrajet = await _routage.obtenirItineraire(
+        LatLng(locDepart.latitude, locDepart.longitude),
+        LatLng(locArrivee.latitude, locArrivee.longitude),
+      );
+
+      if (infoTrajet != null && infoTrajet.distanceMetres > 0) {
+        distanceKm = infoTrajet.distanceMetres / 1000.0;
+        dureeMinutes = infoTrajet.dureeSecondes / 60.0;
+      } else {
+        // Fallback: Distance vol d'oiseau
+        distanceKm = _gps.calculerDistance(
+          latitudeDepart: locDepart.latitude,
+          longitudeDepart: locDepart.longitude,
+          latitudeArrivee: locArrivee.latitude,
+          longitudeArrivee: locArrivee.longitude,
+        );
+        dureeMinutes = distanceKm * 1.5;
+      }
+    }
+
+    double volume = 1.0;
+    double poids = 50.0;
 
     if (typeMarchandise.toLowerCase().contains("lourd") || typeMarchandise.toLowerCase().contains("matériaux")) {
-      volumeSimule = 15.0;
-      poidsSimule = 800.0;
+      volume = 15.0;
+      poids = 800.0;
     } else if (typeMarchandise.toLowerCase().contains("déménagement")) {
-      volumeSimule = 20.0;
-      poidsSimule = 500.0;
+      volume = 20.0;
+      poids = 500.0;
     } else if (typeMarchandise.toLowerCase().contains("léger")) {
-      volumeSimule = 0.5;
-      poidsSimule = 10.0;
+      volume = 0.5;
+      poids = 10.0;
     }
 
     String vehiculeFinal = categorieVehicule;
     if (vehiculeFinal.isEmpty) {
-      if (volumeSimule > 10 || poidsSimule > 400) {
+      if (volume > 10 || poids > 400) {
         vehiculeFinal = "Camion lourd";
-      } else if (volumeSimule > 2 || poidsSimule > 100) {
+      } else if (volume > 2 || poids > 100) {
         vehiculeFinal = "Camionnette";
       } else {
         vehiculeFinal = "Moto";
@@ -105,13 +137,14 @@ class ServiceEstimation {
     double prixBase = 2000.0;
     if (vehiculeFinal.toLowerCase().contains("camion")) prixBase = 15000.0;
 
-    final coutTotal = prixBase + (distanceSimulee * 500) + (volumeSimule * 1000);
+    // Prix basé sur la VRAIE distance
+    final coutTotal = prixBase + (distanceKm * 500) + (volume * 1000);
 
     return ResultatEstimation(
-      distanceKm: distanceSimulee,
-      dureeMinutes: dureeSimulee,
-      volumeM3: volumeSimule,
-      poidsKg: poidsSimule,
+      distanceKm: distanceKm,
+      dureeMinutes: dureeMinutes,
+      volumeM3: volume,
+      poidsKg: poids,
       vehiculeRecommande: vehiculeFinal.isNotEmpty ? vehiculeFinal : "Voiture",
       coutTotal: coutTotal,
     );
@@ -133,8 +166,33 @@ class ServiceEstimation {
         destination: arrivee,
       );
 
-      final distanceSimulee = (depart.length + arrivee.length) * 1.5;
-      final dureeSimulee = distanceSimulee * 1.2;
+      // 1. Géocodage
+      final locDepart = await _gps.obtenirCoordonnees(depart);
+      final locArrivee = await _gps.obtenirCoordonnees(arrivee);
+
+      double distanceKm = 10.0;
+      double dureeMinutes = 30.0;
+
+      if (locDepart != null && locArrivee != null) {
+        // 2. Routage réel OSRM
+        final infoTrajet = await _routage.obtenirItineraire(
+          LatLng(locDepart.latitude, locDepart.longitude),
+          LatLng(locArrivee.latitude, locArrivee.longitude),
+        );
+
+        if (infoTrajet != null && infoTrajet.distanceMetres > 0) {
+          distanceKm = infoTrajet.distanceMetres / 1000.0;
+          dureeMinutes = infoTrajet.dureeSecondes / 60.0;
+        } else {
+          distanceKm = _gps.calculerDistance(
+            latitudeDepart: locDepart.latitude,
+            longitudeDepart: locDepart.longitude,
+            latitudeArrivee: locArrivee.latitude,
+            longitudeArrivee: locArrivee.longitude,
+          );
+          dureeMinutes = distanceKm * 1.5;
+        }
+      }
 
       double volume = 1.0;
       if (estimationIA['volume'] != null) {
@@ -148,11 +206,12 @@ class ServiceEstimation {
         if (pStr.isNotEmpty) prixBase = double.parse(pStr);
       }
 
-      final coutTotal = prixBase > 5000 ? prixBase : prixBase + (distanceSimulee * 500);
+      // Calcul avec la vraie distance
+      final coutTotal = prixBase > 5000 ? prixBase : prixBase + (distanceKm * 500);
 
       return ResultatEstimation(
-        distanceKm: distanceSimulee,
-        dureeMinutes: dureeSimulee,
+        distanceKm: distanceKm,
+        dureeMinutes: dureeMinutes,
         volumeM3: volume,
         poidsKg: volume * 50,
         vehiculeRecommande: estimationIA['vehicule'] ?? "Camionnette",

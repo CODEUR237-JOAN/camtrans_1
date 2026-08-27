@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:update_camtrans/coeur/constantes/couleurs.dart';
 import 'package:update_camtrans/coeur/constantes/statuts.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+
 
 class TimelineStatut extends StatelessWidget {
   final String statutActuel;

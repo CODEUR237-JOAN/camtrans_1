@@ -4,11 +4,8 @@ import 'package:latlong2/latlong.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:update_camtrans/coeur/constantes/couleurs.dart';
-import 'package:update_camtrans/coeur/widgets/bouton_principal.dart';
 import 'package:update_camtrans/coeur/etat/transporteur_provider.dart';
 import 'package:update_camtrans/services/service_gps.dart';
-import 'package:update_camtrans/coeur/constantes/statuts.dart';
-import 'package:update_camtrans/modeles/course.dart';
 
 class NavigationTransporteur extends ConsumerStatefulWidget {
   const NavigationTransporteur({super.key});
@@ -99,9 +96,9 @@ class _NavigationTransporteurState extends ConsumerState<NavigationTransporteur>
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text(
-                        activeCourse.statut == StatutCourse.attribue ? "En route vers le client" : "Livraison en cours",
-                        style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      const Text(
+                        "Course en cours",
+                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 12),
                       LinearProgressIndicator(
@@ -167,19 +164,8 @@ class _NavigationTransporteurState extends ConsumerState<NavigationTransporteur>
                     const SizedBox(height: 16),
                     _buildStepInfo(Icons.inventory_2, "Marchandise", activeCourse.description, Colors.orange),
                     const SizedBox(height: 30),
-                    BoutonPrincipal(
-                      texte: activeCourse.statut == StatutCourse.attribue 
-                        ? "Démarrer la course" 
-                        : activeCourse.statut == StatutCourse.enRouteDepart 
-                          ? "Arrivé au départ" 
-                          : activeCourse.statut == StatutCourse.arriveDepart 
-                            ? "Charger la marchandise"
-                            : activeCourse.statut == StatutCourse.charge
-                              ? "Démarrer le transport"
-                              : "Arrivé à destination",
-                      icone: Icons.check_circle,
-                      auClic: () => _validerEtape(activeCourse),
-                    ),
+
+
                     const SizedBox(height: 15),
                     OutlinedButton.icon(
                       onPressed: () {
@@ -236,39 +222,4 @@ class _NavigationTransporteurState extends ConsumerState<NavigationTransporteur>
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Appel de $tel en cours...")));
   }
 
-  void _validerEtape(Course course) async {
-    final actions = ref.read(transporteurActionsProvider);
-    String nouveauStatut;
-    
-    // Cycle de vie complet Sprint 13
-    if (course.statut == StatutCourse.attribue) {
-      nouveauStatut = StatutCourse.enRouteDepart;
-    } else if (course.statut == StatutCourse.enRouteDepart) {
-      nouveauStatut = StatutCourse.arriveDepart;
-    } else if (course.statut == StatutCourse.arriveDepart) {
-      nouveauStatut = StatutCourse.charge;
-    } else if (course.statut == StatutCourse.charge) {
-      nouveauStatut = StatutCourse.enTransit;
-    } else {
-      nouveauStatut = StatutCourse.arriveDestination;
-    }
-    
-    try {
-      await actions.changerStatutCourse(course.id, nouveauStatut);
-      if (mounted) {
-        String message = "Étape validée !";
-        if (nouveauStatut == StatutCourse.enRouteDepart) message = "C'est parti ! En route vers le client.";
-        if (nouveauStatut == StatutCourse.arriveDepart) message = "Vous êtes arrivé chez le client.";
-        if (nouveauStatut == StatutCourse.charge) message = "Marchandise chargée. Bonne route !";
-        if (nouveauStatut == StatutCourse.enTransit) message = "En transit vers la destination.";
-        if (nouveauStatut == StatutCourse.arriveDestination) message = "Bravo ! Vous êtes arrivé à destination.";
-        
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Erreur: ${e.toString().replaceAll('Exception:', '')}"), backgroundColor: Colors.red));
-      }
-    }
-  }
 }

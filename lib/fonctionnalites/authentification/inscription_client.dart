@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
+import 'package:flutter/gestures.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -137,6 +137,36 @@ class _InscriptionClientState extends ConsumerState<InscriptionClient> {
     }
   }
 
+  void _afficherConditions(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("Conditions d'utilisation et Politique de confidentialité"),
+        content: const SingleChildScrollView(
+          child: Text(
+            "Bienvenue sur la plateforme CamTrans.\n\n"
+            "1. Utilisation du service\n"
+            "En utilisant notre plateforme, vous vous engagez à respecter les lois en vigueur et à ne pas utiliser nos services à des fins illégales.\n\n"
+            "2. Données personnelles et Confidentialité\n"
+            "Nous collectons et traitons vos données personnelles (nom, téléphone, adresse, position géographique) uniquement pour assurer la prestation de transport. "
+            "Vos données ne sont pas vendues à des tiers.\n\n"
+            "3. Paiements et Facturation\n"
+            "Les tarifs affichés sont des estimations. Le montant final peut varier en fonction des conditions réelles du trajet.\n\n"
+            "4. Responsabilité\n"
+            "CamTrans agit en tant qu'intermédiaire entre le client et le transporteur. Nous ne saurions être tenus responsables des retards ou des dommages causés pendant le transport.\n\n"
+            "(Ces conditions sont données à titre indicatif et doivent être complétées par vos conditions légales.)"
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text("Fermer"),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   void dispose() {
     _nom.dispose();
@@ -176,7 +206,7 @@ class _InscriptionClientState extends ConsumerState<InscriptionClient> {
                     fontWeight: FontWeight.w900,
                     letterSpacing: -0.5,
                   ),
-                ).animate().fadeIn(delay: 100.ms).slideY(begin: 0.2, end: 0),
+                ),
                 
                 const SizedBox(height: 30),
 
@@ -201,7 +231,7 @@ class _InscriptionClientState extends ConsumerState<InscriptionClient> {
                         libelle: TextesApp.nomComplet,
                         icone: Icons.person_outline,
                         validateur: Validateurs.nom,
-                      ).animate().fadeIn(delay: 200.ms).slideX(begin: -0.1),
+                      ),
 
                       const SizedBox(height: 16),
 
@@ -211,7 +241,7 @@ class _InscriptionClientState extends ConsumerState<InscriptionClient> {
                         icone: Icons.phone_outlined,
                         typeClavier: TextInputType.phone,
                         validateur: Validateurs.telephone,
-                      ).animate().fadeIn(delay: 300.ms).slideX(begin: -0.1),
+                      ),
 
                       const SizedBox(height: 16),
 
@@ -221,7 +251,7 @@ class _InscriptionClientState extends ConsumerState<InscriptionClient> {
                         icone: Icons.email_outlined,
                         typeClavier: TextInputType.emailAddress,
                         validateur: Validateurs.email,
-                      ).animate().fadeIn(delay: 400.ms).slideX(begin: -0.1),
+                      ),
 
                       const SizedBox(height: 16),
 
@@ -236,7 +266,7 @@ class _InscriptionClientState extends ConsumerState<InscriptionClient> {
                             ),
                           ),
                         ],
-                      ).animate().fadeIn(delay: 500.ms).slideX(begin: -0.1),
+                      ),
 
                       const SizedBox(height: 16),
 
@@ -246,7 +276,7 @@ class _InscriptionClientState extends ConsumerState<InscriptionClient> {
                         icone: Icons.home_outlined,
                         lignesMax: 2,
                         validateur: (valeur) => Validateurs.obligatoire(valeur, nomChamp: "L'adresse"),
-                      ).animate().fadeIn(delay: 600.ms).slideX(begin: -0.1),
+                      ),
                       
                       const SizedBox(height: 16),
 
@@ -256,7 +286,7 @@ class _InscriptionClientState extends ConsumerState<InscriptionClient> {
                         icone: Icons.lock_outline,
                         estMotDePasse: true,
                         validateur: Validateurs.motDePasse,
-                      ).animate().fadeIn(delay: 700.ms).slideX(begin: -0.1),
+                      ),
 
                       const SizedBox(height: 16),
 
@@ -266,7 +296,7 @@ class _InscriptionClientState extends ConsumerState<InscriptionClient> {
                         icone: Icons.lock_outline,
                         estMotDePasse: true,
                         validateur: (valeur) => Validateurs.confirmerMotDePasse(valeur, _motDePasse.text),
-                      ).animate().fadeIn(delay: 800.ms).slideX(begin: -0.1),
+                      ),
                     ],
                   ),
                 ),
@@ -281,13 +311,30 @@ class _InscriptionClientState extends ConsumerState<InscriptionClient> {
                       _conditionsAcceptees = valeur ?? false;
                     });
                   },
-                  title: const Text(
-                    "J'accepte les conditions d'utilisation et la politique de confidentialité.",
-                    style: TextStyle(fontSize: 14),
+                  title: RichText(
+                    text: TextSpan(
+                      text: "J'accepte les ",
+                      style: TextStyle(fontSize: 14, color: Theme.of(context).textTheme.bodyMedium?.color),
+                      children: [
+                        TextSpan(
+                          text: "conditions d'utilisation et la politique de confidentialité",
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: CouleursApp.primaire,
+                            decoration: TextDecoration.underline,
+                          ),
+                          recognizer: TapGestureRecognizer()
+                            ..onTap = () {
+                              _afficherConditions(context);
+                            },
+                        ),
+                        const TextSpan(text: "."),
+                      ],
+                    ),
                   ),
                   controlAffinity: ListTileControlAffinity.leading,
                   contentPadding: EdgeInsets.zero,
-                ).animate().fadeIn(delay: 900.ms),
+                ),
 
                 const SizedBox(height: 25),
 
@@ -296,7 +343,7 @@ class _InscriptionClientState extends ConsumerState<InscriptionClient> {
                   icone: Icons.person_add,
                   chargement: _chargement,
                   auClic: _creerCompte,
-                ).animate().fadeIn(delay: 1000.ms).scale(begin: const Offset(0.9, 0.9)),
+                ),
 
                 const SizedBox(height: 20),
 
@@ -312,7 +359,7 @@ class _InscriptionClientState extends ConsumerState<InscriptionClient> {
                       child: const Text("Se connecter", style: TextStyle(fontWeight: FontWeight.bold)),
                     ),
                   ],
-                ).animate().fadeIn(delay: 1100.ms),
+                ),
                 
                 const SizedBox(height: 30),
               ],

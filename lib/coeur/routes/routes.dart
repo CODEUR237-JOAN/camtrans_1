@@ -29,7 +29,11 @@ import 'package:update_camtrans/fonctionnalites/client/ecran_evaluation.dart';
 import 'package:update_camtrans/fonctionnalites/profil/modifier_profil.dart';
 import 'package:update_camtrans/fonctionnalites/profil/changer_mot_de_passe.dart';
 import 'package:update_camtrans/fonctionnalites/transporteur/historique_livraisons.dart';
+import 'package:update_camtrans/fonctionnalites/transporteur/revenus.dart';
+import 'package:update_camtrans/fonctionnalites/transporteur/portefeuille.dart';
+import 'package:update_camtrans/fonctionnalites/transporteur/documents.dart';
 import 'package:update_camtrans/modeles/transporteur.dart';
+import 'package:update_camtrans/modeles/course.dart';
 
 class RoutesApplication {
   RoutesApplication._();
@@ -63,6 +67,10 @@ class RoutesApplication {
   static const String adressesFavorites = "/adresses-favorites";
   static const String chat = "/chat";
   static const String historiqueLivraisonsTransporteur = "/historique-livraisons-transporteur";
+  static const String revenus = "/revenus";
+  static const String portefeuille = "/portefeuille";
+  static const String documents = "/documents";
+  static const String facture = "/facture";
 
   // ===========================
   // Routeur GoRouter
@@ -143,7 +151,7 @@ class RoutesApplication {
           state.pageKey,
         ),
       ),
-      // Route de suivi avec l'ID réel de la course ✅
+      // Route de suivi avec l'ID réel de la course 
       GoRoute(
         path: suiviAvecId,
         pageBuilder: (context, state) => _page(
@@ -173,12 +181,32 @@ class RoutesApplication {
       GoRoute(
         path: paiement,
         pageBuilder: (context, state) {
-          final args = state.extra as Map<String, dynamic>? ?? {};
+          final args = state.extra as Map<String, dynamic>?;
+          // Si les arguments sont absents, on ne peut pas afficher l'écran de paiement
+          if (args == null || args['courseId'] == null) {
+            return _page(
+              Scaffold(
+                body: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(Icons.error_outline, size: 60, color: Colors.red),
+                      const SizedBox(height: 16),
+                      const Text("Impossible d'accéder au paiement", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                      const SizedBox(height: 8),
+                      const Text("Veuillez relancer depuis votre course.", textAlign: TextAlign.center),
+                    ],
+                  ),
+                ),
+              ),
+              state.pageKey,
+            );
+          }
           return _page(
             EcranPaiement(
-              courseId: args['courseId'] ?? 'demo_course_123',
-              montant: (args['montant'] as num?)?.toDouble() ?? 15000.0,
-              transporteurId: args['transporteurId'] ?? 'transp_456',
+              courseId: args['courseId'] as String,
+              montant: (args['montant'] as num?)?.toDouble() ?? 0.0,
+              transporteurId: args['transporteurId'] as String? ?? '',
             ),
             state.pageKey,
           );
@@ -203,6 +231,28 @@ class RoutesApplication {
       GoRoute(
         path: admin,
         pageBuilder: (context, state) => _page(const TableauDeBordAdmin(), state.pageKey),
+      ),
+      GoRoute(
+        path: revenus,
+        pageBuilder: (context, state) => _page(const Revenus(), state.pageKey),
+      ),
+      GoRoute(
+        path: portefeuille,
+        pageBuilder: (context, state) => _page(const Portefeuille(), state.pageKey),
+      ),
+      GoRoute(
+        path: documents,
+        pageBuilder: (context, state) => _page(const Documents(), state.pageKey),
+      ),
+      GoRoute(
+        path: facture,
+        pageBuilder: (context, state) {
+          final course = state.extra as Course?;
+          return _page(
+            Facture(course: course),
+            state.pageKey,
+          );
+        },
       ),
     ],
     errorBuilder: (context, state) => Scaffold(

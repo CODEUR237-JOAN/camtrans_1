@@ -13,6 +13,8 @@ class Utilisateur {
   final bool actif;
   final bool emailVerifie;
   final DateTime dateCreation;
+  final bool estEnLigne;
+  final DateTime? derniereConnexion;
 
   const Utilisateur({
     required this.id,
@@ -27,6 +29,8 @@ class Utilisateur {
     required this.actif,
     required this.emailVerifie,
     required this.dateCreation,
+    this.estEnLigne = false,
+    this.derniereConnexion,
   });
 
   /// Copie de l'objet avec modification de certaines valeurs
@@ -43,6 +47,8 @@ class Utilisateur {
     bool? actif,
     bool? emailVerifie,
     DateTime? dateCreation,
+    bool? estEnLigne,
+    DateTime? derniereConnexion,
   }) {
     return Utilisateur(
       id: id ?? this.id,
@@ -57,6 +63,8 @@ class Utilisateur {
       actif: actif ?? this.actif,
       emailVerifie: emailVerifie ?? this.emailVerifie,
       dateCreation: dateCreation ?? this.dateCreation,
+      estEnLigne: estEnLigne ?? this.estEnLigne,
+      derniereConnexion: derniereConnexion ?? this.derniereConnexion,
     );
   }
 
@@ -75,6 +83,8 @@ class Utilisateur {
       "actif": actif,
       "emailVerifie": emailVerifie,
       "dateCreation": dateCreation.toIso8601String(),
+      "estEnLigne": estEnLigne,
+      "derniereConnexion": derniereConnexion?.toIso8601String(),
     };
   }
 
@@ -93,6 +103,8 @@ class Utilisateur {
       actif: map["actif"] ?? true,
       emailVerifie: map["emailVerifie"] ?? false,
       dateCreation: Parseur.toDateTime(map["dateCreation"]),
+      estEnLigne: map["estEnLigne"] ?? false,
+      derniereConnexion: map["derniereConnexion"] != null ? Parseur.toDateTime(map["derniereConnexion"]) : null,
     );
   }
 

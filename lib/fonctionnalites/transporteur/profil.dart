@@ -148,7 +148,7 @@ class ProfilTransporteur extends ConsumerWidget {
                     Expanded(
                       child: _statistique(
                         "Note",
-                        "${transporteur.noteMoyenne} ★",
+                        "${transporteur.noteMoyenne} ",
                         Icons.star,
                       ),
                     ),

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:update_camtrans/coeur/constantes/couleurs.dart';
@@ -8,6 +7,8 @@ import 'package:update_camtrans/coeur/constantes/tailles.dart';
 import 'package:update_camtrans/coeur/constantes/textes.dart';
 import 'package:update_camtrans/coeur/routes/routes.dart';
 import 'package:update_camtrans/coeur/widgets/effets_visuels.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+
 
 class Onboarding extends StatefulWidget {
   const Onboarding({super.key});
@@ -104,7 +105,7 @@ class _OnboardingState extends State<Onboarding> {
                     ),
                   ),
                 ),
-              ).animate().fadeIn(delay: 500.ms).slideY(begin: -0.2),
+              ),
             ),
             Positioned(
               left: TaillesApp.margePage,
@@ -179,7 +180,7 @@ class _OnboardingState extends State<Onboarding> {
                     ),
                   ),
                 ],
-              ).animate().fadeIn(delay: 700.ms).slideY(begin: 0.25),
+              ),
             ),
           ],
         ),

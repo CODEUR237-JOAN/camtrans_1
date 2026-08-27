@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
+
 /// =======================================================
 /// ANIMATIONS AVANCÉES
 /// Staggered list, pulse, scale bounce, parallax

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:latlong2/latlong.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 
 import 'package:update_camtrans/coeur/etat/transporteurs_provider.dart';
 import 'package:update_camtrans/coeur/etat/carte_provider.dart';
@@ -78,12 +78,11 @@ class CoucheTransporteurs extends ConsumerWidget {
                   color: CouleursApp.primaire,
                   size: 24,
                 ),
-              ).animate().fadeIn(duration: 400.ms).scale(
-                begin: const Offset(0.5, 0.5),
-                end: const Offset(1.0, 1.0),
-                duration: 400.ms,
-                curve: Curves.easeOutBack,
               ),
+            ).animate().scale(
+              end: const Offset(1.0, 1.0),
+              duration: 400.ms,
+              curve: Curves.easeOutBack,
             ),
           );
         }).toList();

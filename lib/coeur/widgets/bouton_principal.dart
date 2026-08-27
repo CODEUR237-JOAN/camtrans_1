@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:update_camtrans/coeur/constantes/couleurs.dart';
 import 'package:update_camtrans/coeur/constantes/tailles.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:update_camtrans/coeur/widgets/indicateur_chargement.dart';
+
 
 /// =======================================================
 /// BOUTON PRINCIPAL MODERNISÉ
@@ -131,9 +133,10 @@ class _BoutonPrincipalState extends State<BoutonPrincipal>
                         key: const ValueKey("chargement"),
                         width: 24,
                         height: 24,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2.5,
-                          color: fgColor,
+                        child: IndicateurChargement(
+                          taille: 24,
+                          afficherCarte: false,
+                          couleur: fgColor,
                         ),
                       )
                     : Row(

@@ -27,7 +27,6 @@ class ServiceNotification {
   static final FirebaseMessaging _messaging = FirebaseMessaging.instance;
   static final FlutterLocalNotificationsPlugin _notifications =
       FlutterLocalNotificationsPlugin();
-  static StreamSubscription<QuerySnapshot>? _abonnementCours;
 
   // ===========================
   // Initialisation
@@ -41,7 +40,7 @@ class ServiceNotification {
         sound: true,
       );
     } catch (e) {
-      debugPrint('⚠️ Permission notification: $e');
+      debugPrint('️ Permission notification: $e');
     }
 
     if (!kIsWeb) {
@@ -73,10 +72,10 @@ class ServiceNotification {
           'fcmToken': token,
           'derniereConnexion': FieldValue.serverTimestamp(),
         }, SetOptions(merge: true));
-        debugPrint('✅ Token FCM enregistré pour $userId dans $collection');
+        debugPrint(' Token FCM enregistré pour $userId dans $collection');
       }
     } catch (e) {
-      debugPrint("❌ Erreur lors de l'enregistrement du token FCM: $e");
+      debugPrint(" Erreur lors de l'enregistrement du token FCM: $e");
     }
   }
 
@@ -122,119 +121,11 @@ class ServiceNotification {
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       final titre = message.notification?.title ?? 'Notification';
       final corps = message.notification?.body ?? '';
-      debugPrint('🔔 FCM foreground: $titre');
+      debugPrint(' FCM foreground: $titre');
       afficherNotification(titre: titre, message: corps);
     });
   }
 
-  // ===========================
-  // Auto-Notification via Firestore (Temps réel)
-  // Écoute les changements de courses pour notifier les utilisateurs
-  // même sans FCM (fonctionne en arrière-plan dans l'onglet web)
-  // ===========================
-
-  static void demarrerEcouteAutomatique(
-      String userId, String typeUtilisateur) {
-    arreterEcouteAutomatique();
-    final db = FirebaseFirestore.instance;
-
-    if (typeUtilisateur == 'client') {
-      _abonnementCours = db
-          .collection('courses')
-          .where('clientId', isEqualTo: userId)
-          .snapshots()
-          .listen(
-        (snapshot) {
-          for (var change in snapshot.docChanges) {
-            if (change.type == DocumentChangeType.modified) {
-              final data = change.doc.data() as Map<String, dynamic>;
-              final statut = data['statut'] ?? '';
-              final code = data['codeSuivi'] ?? '---';
-
-              if (statut == 'attribue') {
-                afficherNotification(
-                  titre: '🚕 Chauffeur trouvé !',
-                  message: 'Un transporteur a accepté votre course $code.',
-                  type: 'succes',
-                );
-              } else if (statut == 'en_route_depart') {
-                afficherNotification(
-                  titre: '🚚 En route !',
-                  message: 'Votre transporteur est en route vers vous.',
-                  type: 'info',
-                );
-              } else if (statut == 'arrive_depart') {
-                afficherNotification(
-                  titre: '📍 Transporteur arrivé !',
-                  message: 'Votre transporteur est arrivé au point de départ.',
-                  type: 'info',
-                );
-              } else if (statut == 'en_transit') {
-                afficherNotification(
-                  titre: '📦 Livraison en cours',
-                  message: 'Votre marchandise $code est en cours de livraison.',
-                  type: 'info',
-                );
-              } else if (statut == 'arrive_destination') {
-                afficherNotification(
-                  titre: '🏁 Arrivée à destination !',
-                  message:
-                      'La course $code est terminée. Veuillez procéder au paiement.',
-                  type: 'paiement',
-                );
-              } else if (statut == 'terminee') {
-                afficherNotification(
-                  titre: '✅ Course terminée',
-                  message: 'Merci pour votre confiance ! Évaluez votre chauffeur.',
-                  type: 'succes',
-                );
-              }
-            }
-          }
-        },
-        onError: (e) => debugPrint('Erreur écoute courses client: $e'),
-      );
-    } else {
-      // Transporteur : écoute les nouvelles courses ET les paiements
-      _abonnementCours = db
-          .collection('courses')
-          .where('transporteurId', isEqualTo: userId)
-          .snapshots()
-          .listen(
-        (snapshot) {
-          for (var change in snapshot.docChanges) {
-            if (change.type == DocumentChangeType.added) {
-              final data = change.doc.data() as Map<String, dynamic>;
-              final depart = data['adresseDepart'] ?? 'Inconnu';
-              afficherNotification(
-                titre: '📦 Nouvelle course assignée !',
-                message: 'Départ depuis $depart. Ouvrez l\'app pour voir les détails.',
-                type: 'info',
-              );
-            } else if (change.type == DocumentChangeType.modified) {
-              final data = change.doc.data() as Map<String, dynamic>;
-              final paiementEffectue = data['paiementEffectue'] ?? false;
-              final statut = data['statut'] ?? '';
-              if (paiementEffectue == true && statut == 'terminee') {
-                final montant = data['prixFinal'] ?? data['prixEstime'] ?? 0;
-                afficherNotification(
-                  titre: '💰 Paiement reçu !',
-                  message: 'Vous avez reçu un paiement de $montant FCFA.',
-                  type: 'paiement',
-                );
-              }
-            }
-          }
-        },
-        onError: (e) => debugPrint('Erreur écoute courses transporteur: $e'),
-      );
-    }
-  }
-
-  static void arreterEcouteAutomatique() {
-    _abonnementCours?.cancel();
-    _abonnementCours = null;
-  }
 
   // ===========================
   // Écoute ouverture notification
@@ -242,7 +133,7 @@ class ServiceNotification {
 
   static void ecouterOuverture() {
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-      debugPrint('🔔 Notification ouverte : ${message.notification?.title}');
+      debugPrint(' Notification ouverte : ${message.notification?.title}');
     });
   }
 }

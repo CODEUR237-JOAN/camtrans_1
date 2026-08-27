@@ -11,8 +11,9 @@ import 'package:update_camtrans/coeur/etat/admin_provider.dart';
 import 'package:update_camtrans/coeur/constantes/couleurs.dart';
 import 'package:update_camtrans/modeles/transporteur.dart';
 import 'package:update_camtrans/modeles/course.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+
 
 class PageVueEnsemble extends ConsumerWidget {
   const PageVueEnsemble({super.key});
@@ -99,10 +100,10 @@ class PageVueEnsemble extends ConsumerWidget {
                           mainAxisSpacing: 24,
                           childAspectRatio: 2.2,
                           children: [
-                            _KpiCard(titre: "Revenus", valeur: "${NumberFormat.compact().format(stats.revenusTotaux)} F", icone: Iconsax.wallet_3_copy, couleur: CouleursApp.succes).animate().fadeIn(duration: 400.ms).slideY(begin: 0.1),
-                            _KpiCard(titre: "Clients Actifs", valeur: stats.totalClients.toString(), icone: Iconsax.user_copy, couleur: CouleursApp.secondaire).animate().fadeIn(duration: 400.ms, delay: 100.ms).slideY(begin: 0.1),
-                            _KpiCard(titre: "Transporteurs", valeur: stats.totalTransporteurs.toString(), icone: Iconsax.truck_fast_copy, couleur: CouleursApp.avertissement).animate().fadeIn(duration: 400.ms, delay: 200.ms).slideY(begin: 0.1),
-                            _KpiCard(titre: "Courses Totales", valeur: stats.totalCourses.toString(), icone: Iconsax.route_square_copy, couleur: CouleursApp.primaire).animate().fadeIn(duration: 400.ms, delay: 300.ms).slideY(begin: 0.1),
+                            _KpiCard(titre: "Revenus", valeur: "${NumberFormat.compact().format(stats.revenusTotaux)} F", icone: Iconsax.wallet_3_copy, couleur: CouleursApp.succes),
+                            _KpiCard(titre: "Clients Actifs", valeur: stats.totalClients.toString(), icone: Iconsax.user_copy, couleur: CouleursApp.secondaire),
+                            _KpiCard(titre: "Transporteurs", valeur: stats.totalTransporteurs.toString(), icone: Iconsax.truck_fast_copy, couleur: CouleursApp.avertissement),
+                            _KpiCard(titre: "Courses Totales", valeur: stats.totalCourses.toString(), icone: Iconsax.route_square_copy, couleur: CouleursApp.primaire),
                           ],
                         );
                       },
@@ -117,9 +118,9 @@ class PageVueEnsemble extends ConsumerWidget {
                           return Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Expanded(flex: 2, child: _buildGraphiqueRevenus(weeklyRevenuesAsync).animate().fadeIn(duration: 600.ms)),
+                              Expanded(flex: 2, child: _buildGraphiqueRevenus(weeklyRevenuesAsync)),
                               const SizedBox(width: 24),
-                              Expanded(flex: 1, child: _buildPieDistribution(distributionAsync).animate().fadeIn(duration: 600.ms, delay: 200.ms)),
+                              Expanded(flex: 1, child: _buildPieDistribution(distributionAsync)),
                             ],
                           );
                         } else {
@@ -143,9 +144,9 @@ class PageVueEnsemble extends ConsumerWidget {
                           return Row(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Expanded(flex: 1, child: _buildRecentActivities(activitiesAsync).animate().fadeIn(duration: 600.ms)),
+                              Expanded(flex: 1, child: _buildRecentActivities(activitiesAsync)),
                               const SizedBox(width: 24),
-                              Expanded(flex: 2, child: _buildCarteTransporteurs(transporteursAsync).animate().fadeIn(duration: 600.ms, delay: 200.ms)),
+                              Expanded(flex: 2, child: _buildCarteTransporteurs(transporteursAsync)),
                             ],
                           );
                         } else {
@@ -195,7 +196,7 @@ class PageVueEnsemble extends ConsumerWidget {
             ],
           ),
         ),
-      ).animate().shake(delay: 2.seconds) : const SizedBox.shrink(),
+      ) : const SizedBox.shrink(),
       orElse: () => const SizedBox.shrink(),
     );
   }
@@ -231,7 +232,7 @@ class PageVueEnsemble extends ConsumerWidget {
             sections: sections, 
             centerSpaceRadius: 50,
             sectionsSpace: 4,
-          )).animate().scale(delay: 300.ms, duration: 600.ms, curve: Curves.easeOutBack);
+          ));
         },
       ),
     );
@@ -282,7 +283,7 @@ class PageVueEnsemble extends ConsumerWidget {
                     Text("${c.prixFinal > 0 ? c.prixFinal : c.prixEstime} F", style: GoogleFonts.inter(fontWeight: FontWeight.bold, fontSize: 15, color: CouleursApp.succes)),
                   ],
                 ),
-              ).animate().fadeIn(delay: Duration(milliseconds: 100 * index)).slideX();
+              ).animate().slideX();
             },
           );
         },
@@ -357,7 +358,7 @@ class PageVueEnsemble extends ConsumerWidget {
                 ),
               ],
             ),
-          ).animate().fadeIn(duration: 800.ms, delay: 200.ms);
+          );
         },
       ),
     );

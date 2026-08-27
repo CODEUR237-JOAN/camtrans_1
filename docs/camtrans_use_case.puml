@@ -1,0 +1,160 @@
+@startuml CamTrans_Use_Case_Diagram
+
+' =========================================================
+'  DIAGRAMME DE CAS D'UTILISATION - PLATEFORME CAMTRANS
+'  Formalisme UML 2.x — Compatible PowerAMC via XMI
+' =========================================================
+
+skinparam handwritten false
+skinparam shadowing false
+
+skinparam actor {
+  BackgroundColor #FFFFFF
+  BorderColor #003366
+  FontColor #003366
+  FontStyle Bold
+  FontSize 12
+}
+
+skinparam usecase {
+  BackgroundColor #DDEEFF
+  BorderColor #003399
+  FontColor #000033
+  FontSize 11
+  ArrowColor #003399
+}
+
+left to right direction
+
+actor "Visiteur" as visiteur
+actor "Client" as client
+actor "Transporteur" as transporteur
+actor "Administrateur" as admin
+
+' Hiérarchie (généralisation)
+visiteur <|-- client
+visiteur <|-- transporteur
+
+actor "API\nGéolocalisation" as apiGeo #Technology
+actor "API\nPaiement" as apiPaiement #Technology
+actor "Firebase" as apiFirebase #Technology
+
+rectangle "Use Case Global — CamTrans" {
+
+  usecase "Créer un compte"          as UC01
+  usecase "Consulter l'application"  as UC02
+  usecase "S'authentifier"           as UC_AUTH
+
+  usecase "Gérer son profil"         as UC03
+
+  usecase "Créer une commande\nde transport" as UC10
+  usecase "Estimer le volume\nde marchandise"  as UC11
+  usecase "Choisir un véhicule"       as UC12
+  usecase "Effectuer un paiement"     as UC13
+  usecase "Payer en espèces"          as UC13a
+  usecase "Payer Mobile Money"        as UC13b
+  usecase "Suivre son transport\nen temps réel" as UC14
+  usecase "Évaluer un transporteur"   as UC15
+  usecase "Chatter avec le\ntransporteur" as UC16
+  usecase "Consulter l'historique\nde commandes" as UC17
+  usecase "Télécharger la facture"    as UC18
+  usecase "Gérer ses adresses\nfavorites" as UC19
+
+  usecase "Consulter les courses\ndisponibles" as UC20
+  usecase "Accepter/Refuser\nune course" as UC21
+  usecase "Mettre à jour le\nstatut du trajet" as UC22
+  usecase "Partager sa position GPS"  as UC23
+  usecase "Chatter avec le client"    as UC24
+  usecase "Gérer ses véhicules"       as UC25
+  usecase "Gérer ses documents" as UC26
+  usecase "Consulter ses revenus" as UC27
+  usecase "Consulter l'historique\ndes livraisons" as UC28
+
+  usecase "Consulter le tableau\nde bord (statistiques)" as UC30
+  usecase "Gérer les utilisateurs"    as UC31
+  usecase "Modérer les documents\nen attente" as UC32
+  usecase "Valider un document"       as UC32a
+  usecase "Refuser un document"       as UC32b
+  usecase "Suspendre / Réactiver\nun transporteur" as UC33
+  usecase "Envoyer des notifications\npush" as UC34
+  usecase "Surveiller la flotte\n(God Mode)" as UC35
+  usecase "Suivre une course\nen direct" as UC36
+}
+
+' VISITEUR
+visiteur --> UC01
+visiteur --> UC02
+visiteur --> UC_AUTH
+
+' CLIENT
+client --> UC03
+client --> UC10
+client --> UC13
+client --> UC14
+client --> UC15
+client --> UC16
+client --> UC17
+client --> UC18
+client --> UC19
+
+UC10 ..> UC_AUTH : <<include>>
+UC10 ..> UC11    : <<include>>
+UC10 ..> UC12    : <<include>>
+UC13 ..> UC_AUTH : <<include>>
+UC13 ..> apiPaiement : <<include>>
+UC14 ..> UC_AUTH : <<include>>
+UC14 ..> apiGeo  : <<include>>
+UC15 ..> UC_AUTH : <<include>>
+UC16 ..> UC_AUTH : <<include>>
+UC17 ..> UC_AUTH : <<include>>
+UC18 ..> UC_AUTH : <<include>>
+UC19 ..> UC_AUTH : <<include>>
+UC03 ..> UC_AUTH : <<include>>
+UC13a ..> UC13 : <<extend>>
+UC13b ..> UC13 : <<extend>>
+
+' TRANSPORTEUR
+transporteur --> UC20
+transporteur --> UC21
+transporteur --> UC22
+transporteur --> UC23
+transporteur --> UC24
+transporteur --> UC25
+transporteur --> UC26
+transporteur --> UC27
+transporteur --> UC28
+
+UC20 ..> UC_AUTH : <<include>>
+UC21 ..> UC_AUTH : <<include>>
+UC22 ..> UC_AUTH : <<include>>
+UC23 ..> apiGeo  : <<include>>
+UC24 ..> UC_AUTH : <<include>>
+UC25 ..> UC_AUTH : <<include>>
+UC26 ..> UC_AUTH : <<include>>
+UC27 ..> UC_AUTH : <<include>>
+UC28 ..> UC_AUTH : <<include>>
+
+' ADMINISTRATEUR
+admin --> UC30
+admin --> UC31
+admin --> UC32
+admin --> UC33
+admin --> UC34
+admin --> UC35
+admin --> UC36
+
+UC30 ..> UC_AUTH : <<include>>
+UC31 ..> UC_AUTH : <<include>>
+UC32 ..> UC_AUTH : <<include>>
+UC33 ..> UC_AUTH : <<include>>
+UC34 ..> UC_AUTH : <<include>>
+UC35 ..> UC_AUTH : <<include>>
+UC35 ..> apiGeo  : <<include>>
+UC36 ..> UC14    : <<include>>
+UC32a ..> UC32 : <<extend>>
+UC32b ..> UC32 : <<extend>>
+
+' FIREBASE
+UC_AUTH ..> apiFirebase : <<include>>
+
+@enduml

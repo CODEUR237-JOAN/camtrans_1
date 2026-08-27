@@ -131,7 +131,13 @@ class _EcranChatState extends ConsumerState<EcranChat> {
                   }
 
                   final docs = snapshot.data?.docs ?? [];
-                  if (docs.isEmpty) {
+                  // Tri explicite par date pour garantir l'ordre chronologique
+                  final messages = docs
+                      .map((doc) => Message.depuisMap(doc.data(), doc.id))
+                      .toList()
+                      ..sort((a, b) => b.dateEnvoi.compareTo(a.dateEnvoi)); // desc pour reverse:true
+
+                  if (messages.isEmpty) {
                     return Center(
                       child: Text(
                         "Dites bonjour à ${widget.transporteur.prenom} !",
@@ -144,10 +150,9 @@ class _EcranChatState extends ConsumerState<EcranChat> {
                     controller: _scrollController,
                     reverse: true, // Affiche les messages du bas vers le haut
                     padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
-                    itemCount: docs.length,
+                    itemCount: messages.length,
                     itemBuilder: (context, index) {
-                      final doc = docs[index];
-                      final msg = Message.depuisMap(doc.data(), doc.id);
+                      final msg = messages[index];
                       final isUser = msg.expediteurId == clientId;
                       
                       return Padding(

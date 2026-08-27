@@ -1,0 +1,327 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- XMI 1.2 / UML 1.4 compatible Sybase PowerAMC 15 -->
+<!-- Import: Fichier > Import > XMI dans PowerAMC -->
+<XMI xmi.version="1.2" xmlns:UML="org.omg.xmi.namespace.UML">
+  <XMI.header>
+    <XMI.documentation>
+      <XMI.owner>CamTrans Architecture Team</XMI.owner>
+      <XMI.contact>Diagramme de Cas d'Utilisation — CamTrans</XMI.contact>
+    </XMI.documentation>
+    <XMI.metamodel xmi.name="UML" xmi.version="1.4"/>
+  </XMI.header>
+
+  <XMI.content>
+    <UML:Model xmi.id="model_camtrans" name="CamTrans — Diagramme de Cas d'Utilisation">
+
+      <!-- ============================================ -->
+      <!--  ACTEURS                                      -->
+      <!-- ============================================ -->
+      <UML:Actor xmi.id="act_visiteur" name="Visiteur" isAbstract="false"/>
+      <UML:Actor xmi.id="act_client" name="Client" isAbstract="false"/>
+      <UML:Actor xmi.id="act_transporteur" name="Transporteur" isAbstract="false"/>
+      <UML:Actor xmi.id="act_admin" name="Administrateur" isAbstract="false"/>
+      <UML:Actor xmi.id="act_apiGeo" name="API Geolocalisation (OpenStreetMap)" isAbstract="false"/>
+      <UML:Actor xmi.id="act_apiPay" name="API Paiement (Mobile Money)" isAbstract="false"/>
+      <UML:Actor xmi.id="act_firebase" name="Firebase (Auth/Firestore)" isAbstract="false"/>
+
+      <!-- ============================================ -->
+      <!--  GÉNÉRALISATIONS DES ACTEURS                 -->
+      <!-- ============================================ -->
+      <!-- Client generalise Visiteur -->
+      <UML:Generalization xmi.id="gen01" child="act_client" parent="act_visiteur"/>
+      <!-- Transporteur generalise Visiteur -->
+      <UML:Generalization xmi.id="gen02" child="act_transporteur" parent="act_visiteur"/>
+
+      <!-- ============================================ -->
+      <!--  CAS D'UTILISATION                           -->
+      <!-- ============================================ -->
+
+      <!-- Communs -->
+      <UML:UseCase xmi.id="UC01" name="Creer un compte"/>
+      <UML:UseCase xmi.id="UC02" name="Consulter l'application"/>
+      <UML:UseCase xmi.id="UC_AUTH" name="S'authentifier"/>
+      <UML:UseCase xmi.id="UC03" name="Gerer son profil"/>
+
+      <!-- Client -->
+      <UML:UseCase xmi.id="UC10" name="Creer une commande de transport"/>
+      <UML:UseCase xmi.id="UC11" name="Estimer le volume de marchandise"/>
+      <UML:UseCase xmi.id="UC12" name="Choisir un vehicule"/>
+      <UML:UseCase xmi.id="UC13" name="Effectuer un paiement"/>
+      <UML:UseCase xmi.id="UC13a" name="Payer en especes"/>
+      <UML:UseCase xmi.id="UC13b" name="Payer Mobile Money (MTN/Orange)"/>
+      <UML:UseCase xmi.id="UC14" name="Suivre son transport en temps reel"/>
+      <UML:UseCase xmi.id="UC15" name="Evaluer un transporteur"/>
+      <UML:UseCase xmi.id="UC16" name="Chatter avec le transporteur"/>
+      <UML:UseCase xmi.id="UC17" name="Consulter l'historique de commandes"/>
+      <UML:UseCase xmi.id="UC18" name="Telecharger la facture"/>
+      <UML:UseCase xmi.id="UC19" name="Gerer ses adresses favorites"/>
+
+      <!-- Transporteur -->
+      <UML:UseCase xmi.id="UC20" name="Consulter les courses disponibles"/>
+      <UML:UseCase xmi.id="UC21" name="Accepter ou Refuser une course"/>
+      <UML:UseCase xmi.id="UC22" name="Mettre a jour le statut du trajet"/>
+      <UML:UseCase xmi.id="UC23" name="Partager sa position GPS"/>
+      <UML:UseCase xmi.id="UC24" name="Chatter avec le client"/>
+      <UML:UseCase xmi.id="UC25" name="Gerer ses vehicules"/>
+      <UML:UseCase xmi.id="UC26" name="Gerer ses documents (carte grise, permis)"/>
+      <UML:UseCase xmi.id="UC27" name="Consulter ses revenus et son portefeuille"/>
+      <UML:UseCase xmi.id="UC28" name="Consulter l'historique des livraisons"/>
+
+      <!-- Administrateur -->
+      <UML:UseCase xmi.id="UC30" name="Consulter le tableau de bord (statistiques)"/>
+      <UML:UseCase xmi.id="UC31" name="Gerer les utilisateurs"/>
+      <UML:UseCase xmi.id="UC32" name="Moderer les documents en attente"/>
+      <UML:UseCase xmi.id="UC32a" name="Valider un document"/>
+      <UML:UseCase xmi.id="UC32b" name="Refuser un document"/>
+      <UML:UseCase xmi.id="UC33" name="Suspendre ou Reactiver un transporteur"/>
+      <UML:UseCase xmi.id="UC34" name="Envoyer des notifications push"/>
+      <UML:UseCase xmi.id="UC35" name="Surveiller la flotte en temps reel (God Mode)"/>
+      <UML:UseCase xmi.id="UC36" name="Suivre une course en direct"/>
+
+      <!-- ============================================ -->
+      <!--  ASSOCIATIONS (Acteur <-> Use Case)          -->
+      <!-- ============================================ -->
+
+      <!-- VISITEUR -->
+      <UML:Association xmi.id="a01">
+        <UML:Association.connection>
+          <UML:AssociationEnd xmi.id="a01e1" type="act_visiteur"/>
+          <UML:AssociationEnd xmi.id="a01e2" type="UC01"/>
+        </UML:Association.connection>
+      </UML:Association>
+      <UML:Association xmi.id="a02">
+        <UML:Association.connection>
+          <UML:AssociationEnd xmi.id="a02e1" type="act_visiteur"/>
+          <UML:AssociationEnd xmi.id="a02e2" type="UC02"/>
+        </UML:Association.connection>
+      </UML:Association>
+      <UML:Association xmi.id="a03">
+        <UML:Association.connection>
+          <UML:AssociationEnd xmi.id="a03e1" type="act_visiteur"/>
+          <UML:AssociationEnd xmi.id="a03e2" type="UC_AUTH"/>
+        </UML:Association.connection>
+      </UML:Association>
+
+      <!-- CLIENT -->
+      <UML:Association xmi.id="a10">
+        <UML:Association.connection>
+          <UML:AssociationEnd xmi.id="a10e1" type="act_client"/>
+          <UML:AssociationEnd xmi.id="a10e2" type="UC03"/>
+        </UML:Association.connection>
+      </UML:Association>
+      <UML:Association xmi.id="a11">
+        <UML:Association.connection>
+          <UML:AssociationEnd xmi.id="a11e1" type="act_client"/>
+          <UML:AssociationEnd xmi.id="a11e2" type="UC10"/>
+        </UML:Association.connection>
+      </UML:Association>
+      <UML:Association xmi.id="a12">
+        <UML:Association.connection>
+          <UML:AssociationEnd xmi.id="a12e1" type="act_client"/>
+          <UML:AssociationEnd xmi.id="a12e2" type="UC13"/>
+        </UML:Association.connection>
+      </UML:Association>
+      <UML:Association xmi.id="a13">
+        <UML:Association.connection>
+          <UML:AssociationEnd xmi.id="a13e1" type="act_client"/>
+          <UML:AssociationEnd xmi.id="a13e2" type="UC14"/>
+        </UML:Association.connection>
+      </UML:Association>
+      <UML:Association xmi.id="a14">
+        <UML:Association.connection>
+          <UML:AssociationEnd xmi.id="a14e1" type="act_client"/>
+          <UML:AssociationEnd xmi.id="a14e2" type="UC15"/>
+        </UML:Association.connection>
+      </UML:Association>
+      <UML:Association xmi.id="a15">
+        <UML:Association.connection>
+          <UML:AssociationEnd xmi.id="a15e1" type="act_client"/>
+          <UML:AssociationEnd xmi.id="a15e2" type="UC16"/>
+        </UML:Association.connection>
+      </UML:Association>
+      <UML:Association xmi.id="a16">
+        <UML:Association.connection>
+          <UML:AssociationEnd xmi.id="a16e1" type="act_client"/>
+          <UML:AssociationEnd xmi.id="a16e2" type="UC17"/>
+        </UML:Association.connection>
+      </UML:Association>
+      <UML:Association xmi.id="a17">
+        <UML:Association.connection>
+          <UML:AssociationEnd xmi.id="a17e1" type="act_client"/>
+          <UML:AssociationEnd xmi.id="a17e2" type="UC18"/>
+        </UML:Association.connection>
+      </UML:Association>
+      <UML:Association xmi.id="a18">
+        <UML:Association.connection>
+          <UML:AssociationEnd xmi.id="a18e1" type="act_client"/>
+          <UML:AssociationEnd xmi.id="a18e2" type="UC19"/>
+        </UML:Association.connection>
+      </UML:Association>
+
+      <!-- TRANSPORTEUR -->
+      <UML:Association xmi.id="a20">
+        <UML:Association.connection>
+          <UML:AssociationEnd xmi.id="a20e1" type="act_transporteur"/>
+          <UML:AssociationEnd xmi.id="a20e2" type="UC20"/>
+        </UML:Association.connection>
+      </UML:Association>
+      <UML:Association xmi.id="a21">
+        <UML:Association.connection>
+          <UML:AssociationEnd xmi.id="a21e1" type="act_transporteur"/>
+          <UML:AssociationEnd xmi.id="a21e2" type="UC21"/>
+        </UML:Association.connection>
+      </UML:Association>
+      <UML:Association xmi.id="a22">
+        <UML:Association.connection>
+          <UML:AssociationEnd xmi.id="a22e1" type="act_transporteur"/>
+          <UML:AssociationEnd xmi.id="a22e2" type="UC22"/>
+        </UML:Association.connection>
+      </UML:Association>
+      <UML:Association xmi.id="a23">
+        <UML:Association.connection>
+          <UML:AssociationEnd xmi.id="a23e1" type="act_transporteur"/>
+          <UML:AssociationEnd xmi.id="a23e2" type="UC23"/>
+        </UML:Association.connection>
+      </UML:Association>
+      <UML:Association xmi.id="a24">
+        <UML:Association.connection>
+          <UML:AssociationEnd xmi.id="a24e1" type="act_transporteur"/>
+          <UML:AssociationEnd xmi.id="a24e2" type="UC24"/>
+        </UML:Association.connection>
+      </UML:Association>
+      <UML:Association xmi.id="a25">
+        <UML:Association.connection>
+          <UML:AssociationEnd xmi.id="a25e1" type="act_transporteur"/>
+          <UML:AssociationEnd xmi.id="a25e2" type="UC25"/>
+        </UML:Association.connection>
+      </UML:Association>
+      <UML:Association xmi.id="a26">
+        <UML:Association.connection>
+          <UML:AssociationEnd xmi.id="a26e1" type="act_transporteur"/>
+          <UML:AssociationEnd xmi.id="a26e2" type="UC26"/>
+        </UML:Association.connection>
+      </UML:Association>
+      <UML:Association xmi.id="a27">
+        <UML:Association.connection>
+          <UML:AssociationEnd xmi.id="a27e1" type="act_transporteur"/>
+          <UML:AssociationEnd xmi.id="a27e2" type="UC27"/>
+        </UML:Association.connection>
+      </UML:Association>
+      <UML:Association xmi.id="a28">
+        <UML:Association.connection>
+          <UML:AssociationEnd xmi.id="a28e1" type="act_transporteur"/>
+          <UML:AssociationEnd xmi.id="a28e2" type="UC28"/>
+        </UML:Association.connection>
+      </UML:Association>
+
+      <!-- ADMINISTRATEUR -->
+      <UML:Association xmi.id="a30">
+        <UML:Association.connection>
+          <UML:AssociationEnd xmi.id="a30e1" type="act_admin"/>
+          <UML:AssociationEnd xmi.id="a30e2" type="UC30"/>
+        </UML:Association.connection>
+      </UML:Association>
+      <UML:Association xmi.id="a31">
+        <UML:Association.connection>
+          <UML:AssociationEnd xmi.id="a31e1" type="act_admin"/>
+          <UML:AssociationEnd xmi.id="a31e2" type="UC31"/>
+        </UML:Association.connection>
+      </UML:Association>
+      <UML:Association xmi.id="a32">
+        <UML:Association.connection>
+          <UML:AssociationEnd xmi.id="a32e1" type="act_admin"/>
+          <UML:AssociationEnd xmi.id="a32e2" type="UC32"/>
+        </UML:Association.connection>
+      </UML:Association>
+      <UML:Association xmi.id="a33">
+        <UML:Association.connection>
+          <UML:AssociationEnd xmi.id="a33e1" type="act_admin"/>
+          <UML:AssociationEnd xmi.id="a33e2" type="UC33"/>
+        </UML:Association.connection>
+      </UML:Association>
+      <UML:Association xmi.id="a34">
+        <UML:Association.connection>
+          <UML:AssociationEnd xmi.id="a34e1" type="act_admin"/>
+          <UML:AssociationEnd xmi.id="a34e2" type="UC34"/>
+        </UML:Association.connection>
+      </UML:Association>
+      <UML:Association xmi.id="a35">
+        <UML:Association.connection>
+          <UML:AssociationEnd xmi.id="a35e1" type="act_admin"/>
+          <UML:AssociationEnd xmi.id="a35e2" type="UC35"/>
+        </UML:Association.connection>
+      </UML:Association>
+      <UML:Association xmi.id="a36">
+        <UML:Association.connection>
+          <UML:AssociationEnd xmi.id="a36e1" type="act_admin"/>
+          <UML:AssociationEnd xmi.id="a36e2" type="UC36"/>
+        </UML:Association.connection>
+      </UML:Association>
+
+      <!-- ============================================ -->
+      <!--  RELATIONS INCLUDE                           -->
+      <!-- ============================================ -->
+
+      <UML:Include xmi.id="inc01" base="UC03"    addition="UC_AUTH"/>
+      <UML:Include xmi.id="inc02" base="UC10"    addition="UC_AUTH"/>
+      <UML:Include xmi.id="inc03" base="UC10"    addition="UC11"/>
+      <UML:Include xmi.id="inc04" base="UC10"    addition="UC12"/>
+      <UML:Include xmi.id="inc05" base="UC13"    addition="UC_AUTH"/>
+      <UML:Include xmi.id="inc06" base="UC13"    addition="act_apiPay"/>
+      <UML:Include xmi.id="inc07" base="UC14"    addition="UC_AUTH"/>
+      <UML:Include xmi.id="inc08" base="UC14"    addition="act_apiGeo"/>
+      <UML:Include xmi.id="inc09" base="UC15"    addition="UC_AUTH"/>
+      <UML:Include xmi.id="inc10" base="UC16"    addition="UC_AUTH"/>
+      <UML:Include xmi.id="inc11" base="UC17"    addition="UC_AUTH"/>
+      <UML:Include xmi.id="inc12" base="UC18"    addition="UC_AUTH"/>
+      <UML:Include xmi.id="inc13" base="UC19"    addition="UC_AUTH"/>
+      <UML:Include xmi.id="inc14" base="UC20"    addition="UC_AUTH"/>
+      <UML:Include xmi.id="inc15" base="UC21"    addition="UC_AUTH"/>
+      <UML:Include xmi.id="inc16" base="UC22"    addition="UC_AUTH"/>
+      <UML:Include xmi.id="inc17" base="UC23"    addition="act_apiGeo"/>
+      <UML:Include xmi.id="inc18" base="UC24"    addition="UC_AUTH"/>
+      <UML:Include xmi.id="inc19" base="UC25"    addition="UC_AUTH"/>
+      <UML:Include xmi.id="inc20" base="UC26"    addition="UC_AUTH"/>
+      <UML:Include xmi.id="inc21" base="UC27"    addition="UC_AUTH"/>
+      <UML:Include xmi.id="inc22" base="UC28"    addition="UC_AUTH"/>
+      <UML:Include xmi.id="inc23" base="UC30"    addition="UC_AUTH"/>
+      <UML:Include xmi.id="inc24" base="UC31"    addition="UC_AUTH"/>
+      <UML:Include xmi.id="inc25" base="UC32"    addition="UC_AUTH"/>
+      <UML:Include xmi.id="inc26" base="UC33"    addition="UC_AUTH"/>
+      <UML:Include xmi.id="inc27" base="UC34"    addition="UC_AUTH"/>
+      <UML:Include xmi.id="inc28" base="UC35"    addition="UC_AUTH"/>
+      <UML:Include xmi.id="inc29" base="UC35"    addition="act_apiGeo"/>
+      <UML:Include xmi.id="inc30" base="UC36"    addition="UC14"/>
+      <UML:Include xmi.id="inc31" base="UC_AUTH" addition="act_firebase"/>
+
+      <!-- ============================================ -->
+      <!--  RELATIONS EXTEND                            -->
+      <!-- ============================================ -->
+
+      <!-- Modes de paiement -->
+      <UML:Extend xmi.id="ext01" base="UC13" extension="UC13a">
+        <UML:Extend.extensionPoint>
+          <UML:ExtensionPoint xmi.id="ep01" name="Si le client choisit le paiement en especes"/>
+        </UML:Extend.extensionPoint>
+      </UML:Extend>
+      <UML:Extend xmi.id="ext02" base="UC13" extension="UC13b">
+        <UML:Extend.extensionPoint>
+          <UML:ExtensionPoint xmi.id="ep02" name="Si le client choisit MTN MoMo ou Orange Money"/>
+        </UML:Extend.extensionPoint>
+      </UML:Extend>
+
+      <!-- Moderation documents -->
+      <UML:Extend xmi.id="ext03" base="UC32" extension="UC32a">
+        <UML:Extend.extensionPoint>
+          <UML:ExtensionPoint xmi.id="ep03" name="Si les documents sont conformes"/>
+        </UML:Extend.extensionPoint>
+      </UML:Extend>
+      <UML:Extend xmi.id="ext04" base="UC32" extension="UC32b">
+        <UML:Extend.extensionPoint>
+          <UML:ExtensionPoint xmi.id="ep04" name="Si les documents sont non conformes"/>
+        </UML:Extend.extensionPoint>
+      </UML:Extend>
+
+    </UML:Model>
+  </XMI.content>
+</XMI>

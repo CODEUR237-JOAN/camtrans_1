@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -179,7 +178,7 @@ class _EcranPaiementState extends ConsumerState<EcranPaiement> {
                                     style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.bold, color: CouleursApp.primaire, height: 1.5),
                                   ),
                                 ],
-                              ).animate().scale(delay: 200.ms, duration: 400.ms, curve: Curves.easeOutBack),
+                              ),
                             ],
                           ),
                         ),
@@ -199,7 +198,7 @@ class _EcranPaiementState extends ConsumerState<EcranPaiement> {
                             const SizedBox(height: 12),
                             _buildMethodeCard("especes", "Espèces", "Paiement direct au chauffeur", "", Iconsax.money_3_copy, CouleursApp.succes),
                           ],
-                        ).animate().fadeIn(delay: 300.ms).slideY(begin: 0.1),
+                        ),
 
                         const SizedBox(height: 40),
 
@@ -246,30 +245,11 @@ class _EcranPaiementState extends ConsumerState<EcranPaiement> {
                                   keyboardType: _methodeSelectionnee == "carte" ? TextInputType.name : TextInputType.phone,
                                 ),
                                 const SizedBox(height: 12),
-                                Container(
-                                  padding: const EdgeInsets.all(12),
-                                  decoration: BoxDecoration(
-                                    color: CouleursApp.avertissement.withValues(alpha: 0.1),
-                                    borderRadius: BorderRadius.circular(12),
-                                    border: Border.all(color: CouleursApp.avertissement.withValues(alpha: 0.2)),
-                                  ),
-                                  child: Row(
-                                    children: [
-                                      const Icon(Iconsax.info_circle_copy, color: CouleursApp.avertissement, size: 16),
-                                      const SizedBox(width: 8),
-                                      Expanded(
-                                        child: Text(
-                                          "Mode Test : Tapez '000000000' pour simuler un échec de transaction.",
-                                          style: GoogleFonts.poppins(color: CouleursApp.avertissement, fontSize: 10),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                )
+
                               ],
                             ),
                           ),
-                        ).animate().fadeIn(delay: 400.ms).slideY(begin: 0.1),
+                        ),
 
                         const SizedBox(height: 100), // Espace pour le bouton
                       ],
@@ -352,7 +332,7 @@ class _EcranPaiementState extends ConsumerState<EcranPaiement> {
                     ),
                   ),
                 ),
-              ).animate().fadeIn().slideY(begin: -0.2),
+              ),
             ),
 
           // Surcouche de reçu si succès (plein écran)
@@ -431,7 +411,7 @@ class _EcranPaiementState extends ConsumerState<EcranPaiement> {
                 padding: const EdgeInsets.all(4),
                 decoration: BoxDecoration(color: brandColor, shape: BoxShape.circle),
                 child: const Icon(Icons.check, color: Colors.white, size: 16),
-              ).animate().scale(duration: 200.ms, curve: Curves.easeOutBack),
+              ),
           ],
         ),
       ),

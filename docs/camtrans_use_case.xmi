@@ -1,0 +1,298 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Diagramme de Cas d'Utilisation UML 2.x — CamTrans
+  Format : XMI 2.1 compatible PowerAMC
+  Import : PowerAMC > File > Import > XMI
+  Auteur : CamTrans Architecture Team
+-->
+<xmi:XMI xmi:version="2.1"
+  xmlns:xmi="http://schema.omg.org/spec/XMI/2.1"
+  xmlns:uml="http://www.eclipse.org/uml2/5.0.0/UML">
+
+  <uml:Model xmi:id="camtrans_model" name="CamTrans" xmi:type="uml:Model">
+
+    <!-- ======================================================== -->
+    <!--  ACTEURS                                                  -->
+    <!-- ======================================================== -->
+    <packagedElement xmi:type="uml:Actor" xmi:id="actor_visiteur" name="Visiteur"/>
+    <packagedElement xmi:type="uml:Actor" xmi:id="actor_client" name="Client"/>
+    <packagedElement xmi:type="uml:Actor" xmi:id="actor_transporteur" name="Transporteur"/>
+    <packagedElement xmi:type="uml:Actor" xmi:id="actor_admin" name="Administrateur"/>
+    <packagedElement xmi:type="uml:Actor" xmi:id="actor_apiGeo" name="API Géolocalisation (OpenStreetMap)"/>
+    <packagedElement xmi:type="uml:Actor" xmi:id="actor_apiPaiement" name="API Paiement (Mobile Money)"/>
+    <packagedElement xmi:type="uml:Actor" xmi:id="actor_firebase" name="Firebase (Auth/Firestore/Storage)"/>
+
+    <!-- ======================================================== -->
+    <!--  GÉNÉRALISATIONS DES ACTEURS                              -->
+    <!-- ======================================================== -->
+    <!-- Client hérite de Visiteur -->
+    <packagedElement xmi:type="uml:Generalization" xmi:id="gen_client_visiteur"
+      general="actor_visiteur" specific="actor_client"/>
+    <!-- Transporteur hérite de Visiteur -->
+    <packagedElement xmi:type="uml:Generalization" xmi:id="gen_transporteur_visiteur"
+      general="actor_visiteur" specific="actor_transporteur"/>
+
+    <!-- ======================================================== -->
+    <!--  SYSTÈME PRINCIPAL (frontière)                            -->
+    <!-- ======================================================== -->
+    <packagedElement xmi:type="uml:Package" xmi:id="pkg_camtrans" name="Use Case Global — CamTrans">
+
+      <!-- ──────────────────────────────────── -->
+      <!--  CAS D'UTILISATION COMMUNS           -->
+      <!-- ──────────────────────────────────── -->
+      <packagedElement xmi:type="uml:UseCase" xmi:id="UC01" name="Créer un compte"/>
+      <packagedElement xmi:type="uml:UseCase" xmi:id="UC02" name="Consulter l'application"/>
+      <packagedElement xmi:type="uml:UseCase" xmi:id="UC_AUTH" name="S'authentifier"/>
+      <packagedElement xmi:type="uml:UseCase" xmi:id="UC03" name="Gérer son profil"/>
+
+      <!-- ──────────────────────────────────── -->
+      <!--  CAS D'UTILISATION — CLIENT          -->
+      <!-- ──────────────────────────────────── -->
+      <packagedElement xmi:type="uml:UseCase" xmi:id="UC10" name="Créer une commande de transport"/>
+      <packagedElement xmi:type="uml:UseCase" xmi:id="UC11" name="Estimer le volume de marchandise"/>
+      <packagedElement xmi:type="uml:UseCase" xmi:id="UC12" name="Choisir un véhicule"/>
+      <packagedElement xmi:type="uml:UseCase" xmi:id="UC13" name="Effectuer un paiement"/>
+      <packagedElement xmi:type="uml:UseCase" xmi:id="UC13a" name="Payer en espèces"/>
+      <packagedElement xmi:type="uml:UseCase" xmi:id="UC13b" name="Payer Mobile Money (MTN/Orange)"/>
+      <packagedElement xmi:type="uml:UseCase" xmi:id="UC14" name="Suivre son transport en temps réel"/>
+      <packagedElement xmi:type="uml:UseCase" xmi:id="UC15" name="Évaluer un transporteur"/>
+      <packagedElement xmi:type="uml:UseCase" xmi:id="UC16" name="Chatter avec le transporteur"/>
+      <packagedElement xmi:type="uml:UseCase" xmi:id="UC17" name="Consulter l'historique de commandes"/>
+      <packagedElement xmi:type="uml:UseCase" xmi:id="UC18" name="Télécharger la facture"/>
+      <packagedElement xmi:type="uml:UseCase" xmi:id="UC19" name="Gérer ses adresses favorites"/>
+
+      <!-- ──────────────────────────────────── -->
+      <!--  CAS D'UTILISATION — TRANSPORTEUR    -->
+      <!-- ──────────────────────────────────── -->
+      <packagedElement xmi:type="uml:UseCase" xmi:id="UC20" name="Consulter les courses disponibles"/>
+      <packagedElement xmi:type="uml:UseCase" xmi:id="UC21" name="Accepter ou Refuser une course"/>
+      <packagedElement xmi:type="uml:UseCase" xmi:id="UC22" name="Mettre à jour le statut du trajet"/>
+      <packagedElement xmi:type="uml:UseCase" xmi:id="UC23" name="Partager sa position GPS"/>
+      <packagedElement xmi:type="uml:UseCase" xmi:id="UC24" name="Chatter avec le client"/>
+      <packagedElement xmi:type="uml:UseCase" xmi:id="UC25" name="Gérer ses véhicules"/>
+      <packagedElement xmi:type="uml:UseCase" xmi:id="UC26" name="Gérer ses documents (carte grise, permis)"/>
+      <packagedElement xmi:type="uml:UseCase" xmi:id="UC27" name="Consulter ses revenus et son portefeuille"/>
+      <packagedElement xmi:type="uml:UseCase" xmi:id="UC28" name="Consulter l'historique des livraisons"/>
+      <packagedElement xmi:type="uml:UseCase" xmi:id="UC29" name="Planifier l'entretien du véhicule"/>
+
+      <!-- ──────────────────────────────────── -->
+      <!--  CAS D'UTILISATION — ADMINISTRATEUR  -->
+      <!-- ──────────────────────────────────── -->
+      <packagedElement xmi:type="uml:UseCase" xmi:id="UC30" name="Consulter le tableau de bord (statistiques)"/>
+      <packagedElement xmi:type="uml:UseCase" xmi:id="UC31" name="Gérer les utilisateurs"/>
+      <packagedElement xmi:type="uml:UseCase" xmi:id="UC32" name="Modérer les documents en attente"/>
+      <packagedElement xmi:type="uml:UseCase" xmi:id="UC32a" name="Valider un document"/>
+      <packagedElement xmi:type="uml:UseCase" xmi:id="UC32b" name="Refuser un document"/>
+      <packagedElement xmi:type="uml:UseCase" xmi:id="UC33" name="Suspendre ou Réactiver un transporteur"/>
+      <packagedElement xmi:type="uml:UseCase" xmi:id="UC34" name="Envoyer des notifications push"/>
+      <packagedElement xmi:type="uml:UseCase" xmi:id="UC35" name="Surveiller la flotte en temps réel (God Mode)"/>
+      <packagedElement xmi:type="uml:UseCase" xmi:id="UC36" name="Suivre une course en direct"/>
+
+    </packagedElement><!-- fin Package -->
+
+    <!-- ======================================================== -->
+    <!--  RELATIONS D'ASSOCIATION (Acteur → Cas d'utilisation)     -->
+    <!-- ======================================================== -->
+
+    <!-- VISITEUR -->
+    <packagedElement xmi:type="uml:Association" xmi:id="assoc_vis_UC01" name="">
+      <ownedEnd xmi:type="uml:Property" type="actor_visiteur"/>
+      <ownedEnd xmi:type="uml:Property" type="UC01"/>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Association" xmi:id="assoc_vis_UC02" name="">
+      <ownedEnd xmi:type="uml:Property" type="actor_visiteur"/>
+      <ownedEnd xmi:type="uml:Property" type="UC02"/>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Association" xmi:id="assoc_vis_UCAUTH" name="">
+      <ownedEnd xmi:type="uml:Property" type="actor_visiteur"/>
+      <ownedEnd xmi:type="uml:Property" type="UC_AUTH"/>
+    </packagedElement>
+
+    <!-- CLIENT -->
+    <packagedElement xmi:type="uml:Association" xmi:id="assoc_cli_UC03">
+      <ownedEnd xmi:type="uml:Property" type="actor_client"/>
+      <ownedEnd xmi:type="uml:Property" type="UC03"/>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Association" xmi:id="assoc_cli_UC10">
+      <ownedEnd xmi:type="uml:Property" type="actor_client"/>
+      <ownedEnd xmi:type="uml:Property" type="UC10"/>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Association" xmi:id="assoc_cli_UC13">
+      <ownedEnd xmi:type="uml:Property" type="actor_client"/>
+      <ownedEnd xmi:type="uml:Property" type="UC13"/>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Association" xmi:id="assoc_cli_UC14">
+      <ownedEnd xmi:type="uml:Property" type="actor_client"/>
+      <ownedEnd xmi:type="uml:Property" type="UC14"/>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Association" xmi:id="assoc_cli_UC15">
+      <ownedEnd xmi:type="uml:Property" type="actor_client"/>
+      <ownedEnd xmi:type="uml:Property" type="UC15"/>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Association" xmi:id="assoc_cli_UC16">
+      <ownedEnd xmi:type="uml:Property" type="actor_client"/>
+      <ownedEnd xmi:type="uml:Property" type="UC16"/>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Association" xmi:id="assoc_cli_UC17">
+      <ownedEnd xmi:type="uml:Property" type="actor_client"/>
+      <ownedEnd xmi:type="uml:Property" type="UC17"/>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Association" xmi:id="assoc_cli_UC18">
+      <ownedEnd xmi:type="uml:Property" type="actor_client"/>
+      <ownedEnd xmi:type="uml:Property" type="UC18"/>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Association" xmi:id="assoc_cli_UC19">
+      <ownedEnd xmi:type="uml:Property" type="actor_client"/>
+      <ownedEnd xmi:type="uml:Property" type="UC19"/>
+    </packagedElement>
+
+    <!-- TRANSPORTEUR -->
+    <packagedElement xmi:type="uml:Association" xmi:id="assoc_tra_UC20">
+      <ownedEnd xmi:type="uml:Property" type="actor_transporteur"/>
+      <ownedEnd xmi:type="uml:Property" type="UC20"/>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Association" xmi:id="assoc_tra_UC21">
+      <ownedEnd xmi:type="uml:Property" type="actor_transporteur"/>
+      <ownedEnd xmi:type="uml:Property" type="UC21"/>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Association" xmi:id="assoc_tra_UC22">
+      <ownedEnd xmi:type="uml:Property" type="actor_transporteur"/>
+      <ownedEnd xmi:type="uml:Property" type="UC22"/>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Association" xmi:id="assoc_tra_UC23">
+      <ownedEnd xmi:type="uml:Property" type="actor_transporteur"/>
+      <ownedEnd xmi:type="uml:Property" type="UC23"/>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Association" xmi:id="assoc_tra_UC24">
+      <ownedEnd xmi:type="uml:Property" type="actor_transporteur"/>
+      <ownedEnd xmi:type="uml:Property" type="UC24"/>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Association" xmi:id="assoc_tra_UC25">
+      <ownedEnd xmi:type="uml:Property" type="actor_transporteur"/>
+      <ownedEnd xmi:type="uml:Property" type="UC25"/>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Association" xmi:id="assoc_tra_UC26">
+      <ownedEnd xmi:type="uml:Property" type="actor_transporteur"/>
+      <ownedEnd xmi:type="uml:Property" type="UC26"/>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Association" xmi:id="assoc_tra_UC27">
+      <ownedEnd xmi:type="uml:Property" type="actor_transporteur"/>
+      <ownedEnd xmi:type="uml:Property" type="UC27"/>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Association" xmi:id="assoc_tra_UC28">
+      <ownedEnd xmi:type="uml:Property" type="actor_transporteur"/>
+      <ownedEnd xmi:type="uml:Property" type="UC28"/>
+    </packagedElement>
+
+    <!-- ADMINISTRATEUR -->
+    <packagedElement xmi:type="uml:Association" xmi:id="assoc_adm_UC30">
+      <ownedEnd xmi:type="uml:Property" type="actor_admin"/>
+      <ownedEnd xmi:type="uml:Property" type="UC30"/>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Association" xmi:id="assoc_adm_UC31">
+      <ownedEnd xmi:type="uml:Property" type="actor_admin"/>
+      <ownedEnd xmi:type="uml:Property" type="UC31"/>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Association" xmi:id="assoc_adm_UC32">
+      <ownedEnd xmi:type="uml:Property" type="actor_admin"/>
+      <ownedEnd xmi:type="uml:Property" type="UC32"/>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Association" xmi:id="assoc_adm_UC33">
+      <ownedEnd xmi:type="uml:Property" type="actor_admin"/>
+      <ownedEnd xmi:type="uml:Property" type="UC33"/>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Association" xmi:id="assoc_adm_UC34">
+      <ownedEnd xmi:type="uml:Property" type="actor_admin"/>
+      <ownedEnd xmi:type="uml:Property" type="UC34"/>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Association" xmi:id="assoc_adm_UC35">
+      <ownedEnd xmi:type="uml:Property" type="actor_admin"/>
+      <ownedEnd xmi:type="uml:Property" type="UC35"/>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Association" xmi:id="assoc_adm_UC36">
+      <ownedEnd xmi:type="uml:Property" type="actor_admin"/>
+      <ownedEnd xmi:type="uml:Property" type="UC36"/>
+    </packagedElement>
+
+    <!-- ======================================================== -->
+    <!--  RELATIONS D'INCLUSION <<include>>                        -->
+    <!-- ======================================================== -->
+
+    <!-- Profil include S'authentifier -->
+    <packagedElement xmi:type="uml:Include" xmi:id="inc_UC03_AUTH" includingCase="UC03" addition="UC_AUTH"/>
+
+    <!-- Créer commande include ... -->
+    <packagedElement xmi:type="uml:Include" xmi:id="inc_UC10_AUTH" includingCase="UC10" addition="UC_AUTH"/>
+    <packagedElement xmi:type="uml:Include" xmi:id="inc_UC10_UC11" includingCase="UC10" addition="UC11"/>
+    <packagedElement xmi:type="uml:Include" xmi:id="inc_UC10_UC12" includingCase="UC10" addition="UC12"/>
+
+    <!-- Paiement include ... -->
+    <packagedElement xmi:type="uml:Include" xmi:id="inc_UC13_AUTH" includingCase="UC13" addition="UC_AUTH"/>
+    <packagedElement xmi:type="uml:Include" xmi:id="inc_UC13_APIPAY" includingCase="UC13" addition="actor_apiPaiement"/>
+
+    <!-- Suivi include ... -->
+    <packagedElement xmi:type="uml:Include" xmi:id="inc_UC14_AUTH" includingCase="UC14" addition="UC_AUTH"/>
+    <packagedElement xmi:type="uml:Include" xmi:id="inc_UC14_GEO" includingCase="UC14" addition="actor_apiGeo"/>
+
+    <!-- Évaluer include S'authentifier -->
+    <packagedElement xmi:type="uml:Include" xmi:id="inc_UC15_AUTH" includingCase="UC15" addition="UC_AUTH"/>
+    <packagedElement xmi:type="uml:Include" xmi:id="inc_UC16_AUTH" includingCase="UC16" addition="UC_AUTH"/>
+    <packagedElement xmi:type="uml:Include" xmi:id="inc_UC17_AUTH" includingCase="UC17" addition="UC_AUTH"/>
+    <packagedElement xmi:type="uml:Include" xmi:id="inc_UC18_AUTH" includingCase="UC18" addition="UC_AUTH"/>
+    <packagedElement xmi:type="uml:Include" xmi:id="inc_UC19_AUTH" includingCase="UC19" addition="UC_AUTH"/>
+
+    <!-- Transporteur includes -->
+    <packagedElement xmi:type="uml:Include" xmi:id="inc_UC20_AUTH" includingCase="UC20" addition="UC_AUTH"/>
+    <packagedElement xmi:type="uml:Include" xmi:id="inc_UC21_AUTH" includingCase="UC21" addition="UC_AUTH"/>
+    <packagedElement xmi:type="uml:Include" xmi:id="inc_UC22_AUTH" includingCase="UC22" addition="UC_AUTH"/>
+    <packagedElement xmi:type="uml:Include" xmi:id="inc_UC23_GEO"  includingCase="UC23" addition="actor_apiGeo"/>
+    <packagedElement xmi:type="uml:Include" xmi:id="inc_UC24_AUTH" includingCase="UC24" addition="UC_AUTH"/>
+    <packagedElement xmi:type="uml:Include" xmi:id="inc_UC25_AUTH" includingCase="UC25" addition="UC_AUTH"/>
+    <packagedElement xmi:type="uml:Include" xmi:id="inc_UC26_AUTH" includingCase="UC26" addition="UC_AUTH"/>
+    <packagedElement xmi:type="uml:Include" xmi:id="inc_UC27_AUTH" includingCase="UC27" addition="UC_AUTH"/>
+    <packagedElement xmi:type="uml:Include" xmi:id="inc_UC28_AUTH" includingCase="UC28" addition="UC_AUTH"/>
+
+    <!-- Admin includes -->
+    <packagedElement xmi:type="uml:Include" xmi:id="inc_UC30_AUTH" includingCase="UC30" addition="UC_AUTH"/>
+    <packagedElement xmi:type="uml:Include" xmi:id="inc_UC31_AUTH" includingCase="UC31" addition="UC_AUTH"/>
+    <packagedElement xmi:type="uml:Include" xmi:id="inc_UC32_AUTH" includingCase="UC32" addition="UC_AUTH"/>
+    <packagedElement xmi:type="uml:Include" xmi:id="inc_UC33_AUTH" includingCase="UC33" addition="UC_AUTH"/>
+    <packagedElement xmi:type="uml:Include" xmi:id="inc_UC34_AUTH" includingCase="UC34" addition="UC_AUTH"/>
+    <packagedElement xmi:type="uml:Include" xmi:id="inc_UC35_AUTH" includingCase="UC35" addition="UC_AUTH"/>
+    <packagedElement xmi:type="uml:Include" xmi:id="inc_UC35_GEO"  includingCase="UC35" addition="actor_apiGeo"/>
+    <packagedElement xmi:type="uml:Include" xmi:id="inc_UC36_UC14" includingCase="UC36" addition="UC14"/>
+
+    <!-- S'authentifier include Firebase -->
+    <packagedElement xmi:type="uml:Include" xmi:id="inc_AUTH_FIREBASE" includingCase="UC_AUTH" addition="actor_firebase"/>
+
+    <!-- ======================================================== -->
+    <!--  RELATIONS D'EXTENSION <<extend>>                         -->
+    <!-- ======================================================== -->
+
+    <!-- Modes de paiement (extensions optionnelles) -->
+    <packagedElement xmi:type="uml:Extend" xmi:id="ext_UC13a_UC13" extendedCase="UC13" extension="UC13a">
+      <condition xmi:type="uml:Constraint" xmi:id="cond_especes">
+        <specification xmi:type="uml:LiteralString" value="Si le client choisit le paiement en espèces"/>
+      </condition>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Extend" xmi:id="ext_UC13b_UC13" extendedCase="UC13" extension="UC13b">
+      <condition xmi:type="uml:Constraint" xmi:id="cond_mobile_money">
+        <specification xmi:type="uml:LiteralString" value="Si le client choisit MTN MoMo ou Orange Money"/>
+      </condition>
+    </packagedElement>
+
+    <!-- Modération des documents (extensions) -->
+    <packagedElement xmi:type="uml:Extend" xmi:id="ext_UC32a_UC32" extendedCase="UC32" extension="UC32a">
+      <condition xmi:type="uml:Constraint" xmi:id="cond_valider">
+        <specification xmi:type="uml:LiteralString" value="Si les documents sont conformes"/>
+      </condition>
+    </packagedElement>
+    <packagedElement xmi:type="uml:Extend" xmi:id="ext_UC32b_UC32" extendedCase="UC32" extension="UC32b">
+      <condition xmi:type="uml:Constraint" xmi:id="cond_refuser">
+        <specification xmi:type="uml:LiteralString" value="Si les documents sont non conformes"/>
+      </condition>
+    </packagedElement>
+
+  </uml:Model>
+
+</xmi:XMI>

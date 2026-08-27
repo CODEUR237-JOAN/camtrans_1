@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -16,11 +15,14 @@ import 'package:update_camtrans/coeur/constantes/statuts.dart';
 import 'widgets/timeline_statut.dart';
 import 'widgets/carte_suivi_abstraite.dart';
 import 'widgets/bottom_sheet_paiement.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+
 
 class SuiviTransport extends ConsumerStatefulWidget {
   final String courseId;
+  final bool isFullScreen;
 
-  const SuiviTransport({super.key, required this.courseId});
+  const SuiviTransport({super.key, required this.courseId, this.isFullScreen = true});
 
   @override
   ConsumerState<SuiviTransport> createState() => _SuiviTransportState();
@@ -49,9 +51,24 @@ class _SuiviTransportState extends ConsumerState<SuiviTransport> {
 
   @override
   Widget build(BuildContext context) {
-    // Si widget.courseId est vide pour le mockup, on utilise une valeur par défaut, sinon on écoute la vraie base.
-    // L'idéal est de router avec un paramètre d'ID.
-    final String courseId = widget.courseId.isNotEmpty ? widget.courseId : "course_demo_id";
+    // Si aucun courseId fourni, afficher un état vide propre
+    if (widget.courseId.isEmpty) {
+      return Scaffold(
+        backgroundColor: Colors.white,
+        appBar: AppBar(title: const Text('Suivi')),
+        body: const Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.local_shipping_outlined, size: 80, color: Colors.grey),
+              SizedBox(height: 16),
+              Text('Aucune course active à suivre', style: TextStyle(fontSize: 16, color: Colors.black54)),
+            ],
+          ),
+        ),
+      );
+    }
+    final String courseId = widget.courseId;
     final etatSuivi = ref.watch(suiviProvider(courseId));
 
     if (etatSuivi.chargement) {
@@ -64,7 +81,7 @@ class _SuiviTransportState extends ConsumerState<SuiviTransport> {
     if (etatSuivi.erreur != null || etatSuivi.course == null) {
       return Scaffold(
         appBar: AppBar(),
-        body: Center(child: Text("Impossible de charger le suivi : ${etatSuivi.erreur}")),
+        body: const Center(child: Text('Course introuvable ou inaccessible.')),
       );
     }
 
@@ -75,9 +92,7 @@ class _SuiviTransportState extends ConsumerState<SuiviTransport> {
     final LatLng arrivee = LatLng(course.latitudeArrivee, course.longitudeArrivee);
     
     LatLng posTransporteur = depart;
-    if (etatSuivi.positionTransporteurSimule != null) {
-      posTransporteur = etatSuivi.positionTransporteurSimule!;
-    } else if (transporteur != null && transporteur.latitude != 0 && transporteur.longitude != 0) {
+    if (transporteur != null && transporteur.latitude != 0 && transporteur.longitude != 0) {
       posTransporteur = LatLng(transporteur.latitude, transporteur.longitude);
     }
 
@@ -95,11 +110,12 @@ class _SuiviTransportState extends ConsumerState<SuiviTransport> {
           ),
 
           // 2. BOUTON RETOUR
-          Positioned(
-            top: MediaQuery.of(context).padding.top + 10,
-            left: 20,
-            child: _buildBackButton(context),
-          ),
+          if (widget.isFullScreen)
+            Positioned(
+              top: MediaQuery.of(context).padding.top + 10,
+              left: 20,
+              child: _buildBackButton(context),
+            ),
 
           // 3. BOUTON RECENTRER
           Positioned(
@@ -191,7 +207,7 @@ class _SuiviTransportState extends ConsumerState<SuiviTransport> {
           ),
         ],
       ),
-    ).animate().fadeIn();
+    );
   }
 
   Widget _buildTransporteurInfo(BuildContext context, Transporteur transporteur, String? quartier) {
@@ -253,7 +269,7 @@ class _SuiviTransportState extends ConsumerState<SuiviTransport> {
           )
         ],
       ),
-    ).animate().slideY(begin: -0.2).fadeIn();
+    );
   }
 
   Widget _buildBottomSheet(BuildContext context, String codeSuivi, String statut, Transporteur? transporteur, String? quartier, double distanceMetres, double tempsSecondes) {
@@ -330,18 +346,62 @@ class _SuiviTransportState extends ConsumerState<SuiviTransport> {
                   statut == StatutCourse.arriveDestination ? "Confirmer la livraison" : "Valider l'arrivée", 
                   style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)
                 ),
-              ).animate().scale(delay: 200.ms),
+              ),
+            ),
+          ],
+
+          // Bouton d'annulation
+          if (statut == StatutCourse.recherche || statut == StatutCourse.attribue || statut == StatutCourse.enRouteDepart) ...[
+            const SizedBox(height: 8),
+            SizedBox(
+              width: double.infinity,
+              child: TextButton(
+                onPressed: () => _confirmerAnnulation(context),
+                style: TextButton.styleFrom(foregroundColor: CouleursApp.erreur),
+                child: const Text("Annuler l'expédition"),
+              ),
             ),
           ],
         ],
       ),
-    ).animate().slideY(begin: 0.2).fadeIn();
+    );
+  }
+
+  void _confirmerAnnulation(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text("Annuler l'expédition"),
+        content: const Text("Êtes-vous sûr de vouloir annuler cette expédition ?"),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx),
+            child: const Text("Non, garder"),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              Navigator.pop(ctx);
+              final courseId = widget.courseId;
+              await ref.read(serviceFirestoreProvider).modifierDocument(
+                collection: 'courses',
+                id: courseId,
+                donnees: {'statut': StatutCourse.annulee},
+              );
+              if (context.mounted) {
+                context.go('/');
+              }
+            },
+            style: ElevatedButton.styleFrom(backgroundColor: CouleursApp.erreur, foregroundColor: Colors.white),
+            child: const Text("Oui, annuler"),
+          ),
+        ],
+      ),
+    );
   }
 
   void _confirmerFinCourse(BuildContext context) {
     final course = ref
-        .read(suiviProvider(
-            widget.courseId.isNotEmpty ? widget.courseId : 'course_demo_id'))
+        .read(suiviProvider(widget.courseId))
         .course;
 
     if (course == null) return;

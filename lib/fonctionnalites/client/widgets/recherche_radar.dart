@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:update_camtrans/coeur/constantes/couleurs.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+
 
 class RechercheRadar extends StatelessWidget {
   const RechercheRadar({super.key});
@@ -64,10 +65,10 @@ class RechercheRadar extends StatelessWidget {
             
             const SizedBox(height: 12),
             Text(
-              "Nous attribuons le véhicule idéal\nselon vos critères et votre position.",
+              "Service d'Urgence 24h/24\nDélai d'intervention estimé : 30 minutes",
               textAlign: TextAlign.center,
-              style: GoogleFonts.poppins(color: Colors.white54, fontSize: 14),
-            ).animate().fadeIn(delay: const Duration(milliseconds: 500)),
+              style: GoogleFonts.poppins(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600),
+            ),
           ],
         ),
       ),

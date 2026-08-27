@@ -113,8 +113,14 @@ class ServiceGps {
     try {
       if (adresse.isEmpty) return null;
       
+      // Forcer la recherche au Cameroun pour éviter les homonymes dans d'autres pays
+      String requete = adresse;
+      if (!requete.toLowerCase().contains("cameroun") && !requete.toLowerCase().contains("cameroon")) {
+        requete = "$requete, Cameroun";
+      }
+
       final locations = await locationFromAddress(
-        adresse,
+        requete,
       );
 
       if (locations.isEmpty) {

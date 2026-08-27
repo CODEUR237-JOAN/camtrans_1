@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:update_camtrans/coeur/etat/admin_provider.dart';
@@ -11,6 +10,9 @@ import 'package:update_camtrans/coeur/constantes/couleurs.dart';
 import 'package:update_camtrans/coeur/constantes/statuts.dart';
 import 'package:update_camtrans/coeur/widgets/etats_ui.dart';
 import 'package:update_camtrans/modeles/course.dart';
+import 'package:update_camtrans/services/service_firestore.dart';
+import 'package:flutter_animate/flutter_animate.dart';
+
 
 class PageActivites extends ConsumerStatefulWidget {
   const PageActivites({super.key});
@@ -21,6 +23,37 @@ class PageActivites extends ConsumerStatefulWidget {
 
 class _PageActivitesState extends ConsumerState<PageActivites> {
   String _searchQuery = "";
+  bool _purgerEnCours = false;
+
+  Future<void> _purgerHistorique() async {
+    // Double confirmation : dialog + saisie
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (_) => _DialogPurge(),
+    );
+    if (confirm != true || !mounted) return;
+    setState(() => _purgerEnCours = true);
+    try {
+      final nb = await ref.read(serviceFirestoreProvider).purgerHistoriqueGlobal();
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text("$nb course(s) purgée(s) avec succès"),
+            backgroundColor: Colors.green,
+          ),
+        );
+        final _ = ref.refresh(adminCoursesProvider);
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Erreur : $e"), backgroundColor: Colors.red),
+        );
+      }
+    } finally {
+      if (mounted) setState(() => _purgerEnCours = false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -68,8 +101,63 @@ class _PageActivitesState extends ConsumerState<PageActivites> {
                       padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
                       itemCount: courses.length,
                       itemBuilder: (context, index) {
-                        return _CourseCard(course: courses[index])
-                            .animate().fadeIn(delay: Duration(milliseconds: 50 * index)).slideX();
+                        final course = courses[index];
+                        final estTerminee = StatutCourse.estTerminee(course.statut);
+                        final card = _CourseCard(course: course)
+                            .animate(delay: (index * 50).ms).slideX();
+
+                        if (estTerminee) {
+                          return Dismissible(
+                            key: Key(course.id),
+                            direction: DismissDirection.endToStart,
+                            background: Container(
+                              alignment: Alignment.centerRight,
+                              padding: const EdgeInsets.only(right: 24),
+                              margin: const EdgeInsets.only(bottom: 16),
+                              decoration: BoxDecoration(
+                                color: Colors.red.shade700,
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: const Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.delete_forever_rounded, color: Colors.white, size: 32),
+                                  SizedBox(height: 4),
+                                  Text("Supprimer", style: TextStyle(color: Colors.white, fontSize: 12)),
+                                ],
+                              ),
+                            ),
+                            confirmDismiss: (_) async {
+                              return await showDialog<bool>(
+                                context: context,
+                                builder: (_) => AlertDialog(
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+                                  title: const Text("Supprimer cette course ?", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                                  content: const Text("Cette action est irréversible."),
+                                  actions: [
+                                    TextButton(onPressed: () => Navigator.pop(context, false), child: const Text("Annuler")),
+                                    ElevatedButton(
+                                      style: ElevatedButton.styleFrom(backgroundColor: Colors.red, foregroundColor: Colors.white, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
+                                      onPressed: () => Navigator.pop(context, true),
+                                      child: const Text("Supprimer"),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
+                            onDismissed: (_) async {
+                              await ref.read(serviceFirestoreProvider)
+                                  .supprimerDocument(collection: 'courses', id: course.id);
+                              if (context.mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(content: Text("Course supprimée"), backgroundColor: Colors.green),
+                                );
+                              }
+                            },
+                            child: card,
+                          );
+                        }
+                        return card;
                       },
                     );
                   },
@@ -88,9 +176,32 @@ class _PageActivitesState extends ConsumerState<PageActivites> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            "Toutes les activités (Temps réel)",
-            style: GoogleFonts.inter(fontSize: 32, fontWeight: FontWeight.bold, color: Colors.white, letterSpacing: -1),
+          Row(
+            children: [
+              Expanded(
+                child: Text(
+                  "Toutes les activités (Temps réel)",
+                  style: GoogleFonts.inter(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.white, letterSpacing: -1),
+                ),
+              ),
+              // Bouton Purge Admin
+              Tooltip(
+                message: "Purger l'historique terminé/annulé",
+                child: ElevatedButton.icon(
+                  onPressed: _purgerEnCours ? null : _purgerHistorique,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.red.shade800,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  ),
+                  icon: _purgerEnCours
+                      ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                      : const Icon(Icons.cleaning_services_rounded, size: 18),
+                  label: Text(_purgerEnCours ? "Purge..." : "Purger", style: GoogleFonts.inter(fontWeight: FontWeight.bold)),
+                ),
+              ),
+            ],
           ),
           const SizedBox(height: 24),
           Container(
@@ -114,6 +225,78 @@ class _PageActivitesState extends ConsumerState<PageActivites> {
           ),
         ],
       ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────
+// Dialog de double-confirmation pour la purge admin
+// ─────────────────────────────────────────────────
+class _DialogPurge extends StatefulWidget {
+  @override
+  State<_DialogPurge> createState() => _DialogPurgeState();
+}
+
+class _DialogPurgeState extends State<_DialogPurge> {
+  final _ctrl = TextEditingController();
+  bool get _valid => _ctrl.text.trim() == 'CONFIRMER';
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      title: Row(
+        children: [
+          Icon(Icons.warning_amber_rounded, color: Colors.red.shade700),
+          const SizedBox(width: 10),
+          const Expanded(
+            child: Text("Purge globale de l'historique",
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+          ),
+        ],
+      ),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            "️ Cette action va supprimer définitivement TOUTES les courses terminées et annulées de TOUS les utilisateurs.",
+          ),
+          const SizedBox(height: 16),
+          const Text(
+            'Tapez CONFIRMER pour valider :',
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 8),
+          TextField(
+            controller: _ctrl,
+            autofocus: true,
+            decoration: InputDecoration(
+              hintText: 'CONFIRMER',
+              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+            ),
+            onChanged: (_) => setState(() {}),
+          ),
+        ],
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context, false),
+          child: const Text("Annuler"),
+        ),
+        ValueListenableBuilder(
+          valueListenable: _ctrl,
+          builder: (context, value, child) => ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: _valid ? Colors.red.shade700 : Colors.grey,
+              foregroundColor: Colors.white,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            ),
+            onPressed: _valid ? () => Navigator.pop(context, true) : null,
+            child: const Text("Purger"),
+          ),
+        ),
+      ],
     );
   }
 }

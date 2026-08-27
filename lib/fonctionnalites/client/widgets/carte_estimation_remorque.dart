@@ -114,7 +114,7 @@ class CarteEstimationRemorque extends StatelessWidget {
                     ),
                   ],
                 ),
-              ).animate().fadeIn(delay: 100.ms),
+              ),
 
               // ── Prix Total (count-up ~900ms, easeOutCubic) ────
               Padding(
@@ -129,7 +129,7 @@ class CarteEstimationRemorque extends StatelessWidget {
                         fontSize: 13,
                       ),
                       textAlign: TextAlign.center,
-                    ).animate().fadeIn(delay: 300.ms),
+                    ),
                     const SizedBox(height: 12),
                     // Compteur animé — seule valeur visible côté client
                     TweenAnimationBuilder<double>(
@@ -148,8 +148,7 @@ class CarteEstimationRemorque extends StatelessWidget {
                           textAlign: TextAlign.center,
                         );
                       },
-                    ).animate().fadeIn(delay: 400.ms).scale(
-                      begin: const Offset(0.85, 0.85),
+                    ).animate().scale(
                       delay: 400.ms,
                       duration: 600.ms,
                       curve: Curves.easeOutBack,
@@ -163,7 +162,7 @@ class CarteEstimationRemorque extends StatelessWidget {
                         fontSize: 11,
                       ),
                       textAlign: TextAlign.center,
-                    ).animate().fadeIn(delay: 700.ms),
+                    ),
                   ],
                 ),
               ),
@@ -192,11 +191,11 @@ class CarteEstimationRemorque extends StatelessWidget {
                     ],
                   ),
                 ),
-              ).animate().fadeIn(delay: 850.ms).slideY(begin: 0.15),
+              ),
             ],
           ),
         ),
       ),
-    ).animate().fadeIn(duration: 400.ms);
+    );
   }
 }

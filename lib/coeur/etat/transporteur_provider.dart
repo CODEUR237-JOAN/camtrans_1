@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:update_camtrans/services/service_firestore.dart';
 import 'package:update_camtrans/services/service_authentification.dart';
@@ -31,23 +32,7 @@ final currentTransporteurProvider = StreamProvider.autoDispose<Transporteur?>((r
 // 1. GESTION DES COURSES
 // ==========================================
 
-// Flux de TOUTES les courses en attente (statut normalisé)
-final fluxCoursesDisponiblesProvider =
-    StreamProvider.autoDispose<List<Course>>((ref) {
-  final firestore = ref.watch(serviceFirestoreProvider);
-  return firestore
-      .fluxCollectionCondition(
-        collection: 'courses',
-        champ: 'statut',
-        valeur: StatutCourse.recherche, // ✅ statut normalisé
-      )
-      .map((snapshot) =>
-          snapshot.docs.map((doc) {
-            final data = doc.data();
-            data['id'] = doc.id;
-            return Course.fromMap(data);
-          }).toList());
-});
+
 
 // Flux des courses assignées à ce transporteur
 final fluxMesCoursesProvider =
@@ -75,6 +60,52 @@ final fluxMesCoursesProvider =
   });
 });
 
+// Flux des courses en attente de transporteur (compatibles)
+final fluxCoursesDisponiblesProvider = StreamProvider.autoDispose<List<Course>>((ref) {
+  final firestore = ref.watch(serviceFirestoreProvider);
+  final transporteurAsync = ref.watch(currentTransporteurProvider);
+  
+  return transporteurAsync.when(
+    data: (transporteur) {
+      if (transporteur == null || !transporteur.disponible || !transporteur.documentsValides) {
+        return Stream.value(<Course>[]);
+      }
+      
+      return firestore
+          .fluxCollectionCondition(
+            collection: 'courses',
+            champ: 'statut',
+            valeur: StatutCourse.recherche,
+          )
+          .map((snapshot) {
+        final courses = snapshot.docs
+            .map((doc) {
+              final data = doc.data();
+              data['id'] = doc.id;
+              return Course.fromMap(data);
+            })
+            .where((c) {
+               // Ignore si transporteurId est déjà défini (sécurité)
+               if (c.transporteurId.isNotEmpty) return false;
+               
+               // Vérifier la compatibilité du véhicule
+               if (c.typeVehicule.isNotEmpty && transporteur.typeVehicule.isNotEmpty) {
+                 if (c.typeVehicule != transporteur.typeVehicule) return false;
+               }
+               
+               return true;
+            })
+            .toList();
+            
+        courses.sort((a, b) => b.dateCreation.compareTo(a.dateCreation));
+        return courses;
+      });
+    },
+    loading: () => Stream.value(<Course>[]),
+    error: (_, __) => Stream.value(<Course>[]),
+  );
+});
+
 // Course active (celle en cours de livraison)
 final activeCourseProvider = Provider.autoDispose<Course?>((ref) {
   final coursesAsync = ref.watch(fluxMesCoursesProvider);
@@ -82,7 +113,7 @@ final activeCourseProvider = Provider.autoDispose<Course?>((ref) {
     data: (courses) {
       try {
         return courses.firstWhere(
-            (c) => StatutCourse.estActive(c.statut)); // ✅ helper unifié
+            (c) => StatutCourse.estActive(c.statut)); //  helper unifié
       } catch (_) {
         return null;
       }
@@ -96,68 +127,117 @@ final transporteurActionsProvider = Provider<TransporteurActions>((ref) {
   return TransporteurActions(
     ref.read(serviceFirestoreProvider),
     ref.read(currentTransporteurIdProvider),
-    ref,
+    
   );
 });
 
 class TransporteurActions {
   final ServiceFirestore _firestore;
   final String _transporteurId;
-  final Ref _ref;
+  // final Ref _ref;
 
-  TransporteurActions(this._firestore, this._transporteurId, this._ref);
+  TransporteurActions(this._firestore, this._transporteurId, );
 
-  /// Accepte une course. Vérifie d'abord qu'aucune course n'est active.
+
+  /// Accepter une course (Dispatch automatique)
   Future<void> accepterCourse(String courseId) async {
-    // 1. Vérification : le transporteur n'a pas déjà une course active
-    final activeCourse = _ref.read(activeCourseProvider);
-    if (activeCourse != null) {
-      throw Exception(
-          "Vous avez déjà une course en cours (${activeCourse.id}). "
-          "Terminez-la avant d'en accepter une nouvelle.");
-    }
-
-    // 2. Récupérer les infos du transporteur pour les copier dans la course
-    final transporteurDoc = await _firestore.lireDocument(
-        collection: 'transporteurs', id: _transporteurId);
-    String nomTransporteur = '';
-    String telephoneTransporteur = '';
-    if (transporteurDoc.exists && transporteurDoc.data() != null) {
-      final data = transporteurDoc.data()!;
-      // ✅ Nouvelle vérification : bloquer si les documents ne sont pas validés
-      if (data['documentsValides'] != true) {
-        throw Exception(
-            "Votre compte est en attente de validation. Vous ne pouvez pas accepter de courses.");
-      }
-      
-      nomTransporteur =
-          "${data['nom'] ?? ''} ${data['prenom'] ?? ''}".trim();
-      telephoneTransporteur = data['telephone'] ?? '';
-    }
-
-    // 3. Vérifier que la course est toujours disponible (éviter les doubles acceptations)
     final courseDoc = await _firestore.lireDocument(
         collection: 'courses', id: courseId);
+        
     if (!courseDoc.exists || courseDoc.data() == null) {
-      throw Exception("Cette course n'existe plus.");
+      throw Exception("Course introuvable.");
     }
-    final statut = courseDoc.data()!['statut'];
-    if (statut != StatutCourse.recherche) {
-      throw Exception(
-          "Cette course a déjà été acceptée par un autre transporteur.");
-    }
+    
+    // On l'accepte et passe en route vers le départ
+    final Map<String, dynamic> miseAJour = {
+      'statut': StatutCourse.enRouteDepart,
+      'dateDebut': DateTime.now().toIso8601String(),
+    };
 
-    // 4. Mise à jour atomique
     await _firestore.modifierDocument(
       collection: 'courses',
       id: courseId,
-      donnees: {
-        'statut': StatutCourse.attribue,
-        'transporteurId': _transporteurId,
-        'nomTransporteur': nomTransporteur,
-        'telephoneTransporteur': telephoneTransporteur,
-        'dateAcceptation': DateTime.now().toIso8601String(),
-      },
+      donnees: miseAJour,
+    );
+  }
+
+  /// Refuser une course attribuée automatiquement (Cascade)
+  Future<void> refuserCourse(String courseId) async {
+    final courseDoc = await _firestore.lireDocument(
+        collection: 'courses', id: courseId);
+        
+    if (!courseDoc.exists || courseDoc.data() == null) {
+      throw Exception("Course introuvable.");
+    }
+    
+    final courseData = courseDoc.data()!;
+    final List<dynamic> declinesDyn = courseData['transporteursDeclines'] ?? [];
+    final Set<String> declines = declinesDyn.map((e) => e.toString()).toSet();
+    declines.add(_transporteurId);
+    
+    final double latDepart = courseData['latitudeDepart'] ?? 0.0;
+    final double lngDepart = courseData['longitudeDepart'] ?? 0.0;
+    final String typeVehicule = courseData['typeVehicule'] ?? '';
+
+    // Trouver le prochain chauffeur dispo
+    final transporteursSnapshot = await _firestore.transporteurs.get();
+    
+    String nextChauffeurId = '';
+    String nextNom = '';
+    String nextTel = '';
+    double minDist = double.infinity;
+
+    for (var doc in transporteursSnapshot.docs) {
+      final t = doc.data();
+      final id = doc.id;
+      if (declines.contains(id)) continue;
+      if (t['disponible'] != true) continue;
+      if (t['documentsValides'] != true) continue;
+      
+      final tVehicule = t['typeVehicule'] ?? '';
+      if (typeVehicule.isNotEmpty && tVehicule != typeVehicule && tVehicule != 'Tous') continue;
+      
+      final tLat = t['latitude'] ?? 0.0;
+      final tLng = t['longitude'] ?? 0.0;
+      
+      double dist = double.infinity;
+      if (latDepart != 0.0 && tLat != 0.0) {
+          // Haversine exact (assuming we import math, or just use simple Pythagoras for small distances)
+          final dLat = tLat - latDepart;
+          final dLng = tLng - lngDepart;
+          dist = dLat*dLat + dLng*dLng; // Distance au carré
+      }
+      
+      if (dist < minDist) {
+        minDist = dist;
+        nextChauffeurId = id;
+        nextNom = "${t['prenom']} ${t['nom']}";
+        nextTel = t['telephone'] ?? '';
+      }
+    }
+
+    final Map<String, dynamic> miseAJour = {
+      'transporteursDeclines': FieldValue.arrayUnion([_transporteurId]),
+    };
+
+    if (nextChauffeurId.isNotEmpty) {
+      // Assigner au prochain
+      miseAJour['transporteurId'] = nextChauffeurId;
+      miseAJour['nomTransporteur'] = nextNom;
+      miseAJour['telephoneTransporteur'] = nextTel;
+      miseAJour['statut'] = StatutCourse.attribue;
+    } else {
+      // Plus personne de disponible
+      miseAJour['transporteurId'] = '';
+      miseAJour['nomTransporteur'] = '';
+      miseAJour['telephoneTransporteur'] = '';
+      miseAJour['statut'] = StatutCourse.recherche;
+    }
+
+    await _firestore.modifierDocument(
+      collection: 'courses',
+      id: courseId,
+      donnees: miseAJour,
     );
   }
 
@@ -251,7 +331,7 @@ final statsRevenusProvider =
       double total = 0;
       double ceMois = 0;
       double cetteSemaine = 0;
-      double ceJour = 0; // ✅ nouveau : revenus du jour
+      double ceJour = 0; //  nouveau : revenus du jour
 
       final now = DateTime.now();
       final debutJour = DateTime(now.year, now.month, now.day);
@@ -269,7 +349,7 @@ final statsRevenusProvider =
             cetteSemaine += p.montantNet;
           }
 
-          // ✅ Revenus du jour (depuis minuit)
+          //  Revenus du jour (depuis minuit)
           if (p.datePaiement.isAfter(debutJour)) {
             ceJour += p.montantNet;
           }
@@ -279,7 +359,7 @@ final statsRevenusProvider =
         'total': total,
         'ceMois': ceMois,
         'cetteSemaine': cetteSemaine,
-        'ceJour': ceJour, // ✅ valeur correcte pour le dashboard
+        'ceJour': ceJour, //  valeur correcte pour le dashboard
       };
     },
     orElse: () =>
