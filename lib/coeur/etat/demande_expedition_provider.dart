@@ -256,15 +256,35 @@ class DemandeExpeditionNotifier extends StateNotifier<EtatDemandeExpedition> {
 
       // Utilisation de lngClient pour éviter le warning
       state = state.copierAvec(latitudeDepart: latClient, longitudeDepart: lngClient);
-      // ═══════════════════════════════════════════════════════
       // ALGORITHME DE MATCHING (version corrigée)
       // Conditions OBLIGATOIRES pour qu'un transporteur soit éligible :
+      Transporteur? chauffeur;
+      try {
+        final query = await serviceFirestore.transporteurs
+            .where('disponible', isEqualTo: true)
+            .where('documentsValides', isEqualTo: true)
+            .where('estEnLigne', isEqualTo: true)
+            .get();
+        
+        for (var doc in query.docs) {
+          final t = Transporteur.fromMap(doc.data() as Map<String, dynamic>);
+          // Vérifier si le transporteur est réellement en ligne (timeout < 1 minute)
+          if (t.estEnLigne) {
+            chauffeur = t;
+            break;
+          }
+        }
+      } catch (e) {
+        debugPrint("Erreur lors de la recherche du chauffeur: $e");
+      }
+
       state = state.copierAvec(
         estEnAttenteIA: false,
         categorieVehicule: estimation["vehicule"],
         volumeEstime: estimation["volume"],
         prixEstime: estimation["prix"],
         conseilIA: estimation["conseil"],
+        chauffeurPropose: chauffeur,
       );
   }
 }
