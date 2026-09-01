@@ -55,11 +55,17 @@ service cloud.firestore {
     // ============================================================
     // COLLECTION : transporteurs
     // ============================================================
-    match /transporteurs/{transporteurId} {
-      allow read: if estConnecte(); // Lecture libre pour le matching de chauffeurs
-      allow create: if estConnecte() && estProprietaire(transporteurId);
-      allow update: if estConnecte() && (estProprietaire(transporteurId) || estAdmin());
-      allow delete: if estAdmin();
+    match /transporteurs/{userId} {
+      // Lecture : tout le monde (connecté) peut lire les transporteurs (nécessaire pour l'attribution et l'admin)
+      allow read: if estConnecte();
+      
+      allow create: if estConnecte() && estProprietaire(userId);
+      
+      // Modification : seul le transporteur peut modifier son profil, ou l'admin
+      // Important: On empêche un transporteur de modifier les statuts des autres.
+      allow update: if estConnecte() && (estProprietaire(userId) || estAdmin());
+      
+      allow delete: if estConnecte() && (estProprietaire(userId) || estAdmin());
     }
 
     // ============================================================
@@ -74,26 +80,31 @@ service cloud.firestore {
     // COLLECTION : courses
     // ============================================================
     match /courses/{courseId} {
-      // Lecture : tout utilisateur connecté peut lire les courses
-      // (nécessaire pour les requêtes filtrées par clientId ou statut)
-      allow read: if estConnecte();
+      // Lecture : admin, client propriétaire, ou transporteur (assigné ou en recherche)
+      allow read: if estConnecte() && (
+        estAdmin() ||
+        resource.data.clientId == request.auth.uid ||
+        resource.data.transporteurId == request.auth.uid ||
+        resource.data.statut == 'recherche'
+      );
 
-      // Création : tout utilisateur connecté peut créer une course
-      // (dev: règle permissive pour les tests)
-      allow create: if estConnecte();
+      // Création : client uniquement (ou admin)
+      allow create: if estConnecte() && (estClient() || estAdmin());
 
-      // Modification par le client propriétaire, le transporteur assigné, ou l'admin.
+      // Modification : admin, ou client (seulement si recherche/annulé), ou transporteur assigné (seulement statut)
       allow update: if estConnecte() && (
         estAdmin() ||
-        (resource.data.clientId == request.auth.uid) ||
-        (resource.data.statut == 'recherche') ||
-        (resource.data.transporteurId == request.auth.uid)
+        // Le client ne peut modifier que si la course n'est pas encore acceptée définitivement
+        (resource.data.clientId == request.auth.uid && resource.data.statut in ['recherche', 'attribue']) ||
+        // Le transporteur ne peut modifier que s'il est ciblé, et que pour accepter/refuser/progresser
+        (resource.data.transporteurId == request.auth.uid) ||
+        // Gérer le cas de l'attribution temporaire (où transporteurId est vide mais l'update ajoute un ID)
+        (resource.data.statut == 'recherche' && request.resource.data.statut == 'attribue')
       );
 
       allow delete: if estConnecte() && (
         estAdmin() ||
-        (resource.data.clientId == request.auth.uid) ||
-        (resource.data.transporteurId == request.auth.uid)
+        (resource.data.clientId == request.auth.uid && resource.data.statut == 'recherche')
       );
     }
 
@@ -142,6 +153,26 @@ service cloud.firestore {
     match /messages/{messageId} {
       allow read: if estConnecte();
       allow create: if estConnecte() && request.resource.data.expediteurId == request.auth.uid;
+      allow update, delete: if estAdmin();
+    }
+
+    // ============================================================
+    // COLLECTION : parametres (CMS, configuration globale)
+    // ============================================================
+    match /parametres/{document=**} {
+      allow read: if estConnecte(); // Tous les utilisateurs connectés peuvent lire les paramètres
+      allow write: if estAdmin();   // Seul l'admin peut modifier
+    }
+
+    // ============================================================
+    // COLLECTION : abonnements (Abonnements des transporteurs)
+    // ============================================================
+    match /abonnements/{abonnementId} {
+      allow read: if estConnecte() && (
+        estAdmin() || 
+        resource.data.transporteurId == request.auth.uid
+      );
+      allow create: if estConnecte() && estTransporteur();
       allow update, delete: if estAdmin();
     }
 

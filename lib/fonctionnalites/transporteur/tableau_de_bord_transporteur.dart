@@ -12,16 +12,21 @@ import 'package:update_camtrans/coeur/widgets/carte_information.dart';
 import 'package:update_camtrans/coeur/widgets/effets_visuels.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:update_camtrans/coeur/constantes/statuts.dart';
-import 'package:update_camtrans/coeur/etat/transporteur_provider.dart';
+import '../../coeur/etat/transporteur_provider.dart';
+import '../../coeur/etat/textes_app_provider.dart';
+import '../../modeles/textes_app.dart';
 import 'package:update_camtrans/coeur/routes/routes.dart';
 import 'package:update_camtrans/coeur/etat/gps_provider.dart';
 import 'package:update_camtrans/services/service_authentification.dart';
 import 'package:update_camtrans/modeles/course.dart';
 
-import 'navigation.dart';
+import 'package:update_camtrans/fonctionnalites/transporteur/marche_demandes.dart';
+import 'package:update_camtrans/fonctionnalites/transporteur/navigation.dart';
 import 'package:update_camtrans/fonctionnalites/notifications/notifications.dart';
+import 'package:update_camtrans/services/service_notification.dart';
 import 'profil.dart';
 import 'package:update_camtrans/coeur/widgets/page_responsive.dart';
+import 'page_abonnement.dart';
 
 class TableauDeBordTransporteur extends ConsumerStatefulWidget {
   const TableauDeBordTransporteur({super.key});
@@ -38,12 +43,13 @@ class _TableauDeBordTransporteurState extends ConsumerState<TableauDeBordTranspo
   @override
   void initState() {
     super.initState();
-    // Charger la disponibilité depuis Firestore au démarrage
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final transporteurAsync = ref.read(currentTransporteurProvider);
       transporteurAsync.whenData((t) {
         if (t != null && mounted) {
           setState(() => estDisponible = t.disponible);
+          // Vérification d'expiration de l'abonnement
+          _verifierExpirationAbonnement(t.dateFinAbonnement);
         }
       });
       
@@ -52,15 +58,43 @@ class _TableauDeBordTransporteurState extends ConsumerState<TableauDeBordTranspo
     });
   }
 
+  void _verifierExpirationAbonnement(DateTime? dateFin) {
+    if (dateFin == null) return;
+    final now = DateTime.now();
+    final joursRestants = dateFin.difference(now).inDays;
+
+    if (joursRestants <= 0) {
+      // Abonnement expiré
+      ServiceNotification.afficherNotification(
+        titre: '⚠️ Abonnement expiré',
+        message: 'Votre abonnement est terminé. Renouvelez-le pour continuer à recevoir des courses.',
+        type: 'alerte',
+      );
+    } else if (joursRestants <= 3) {
+      // Expire bientôt
+      ServiceNotification.afficherNotification(
+        titre: '🕔 Abonnement bientôt expiré',
+        message: 'Votre abonnement expire dans $joursRestants jour(s). Pensez à le renouveler.',
+        type: 'alerte',
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final statsRevenus = ref.watch(statsRevenusProvider);
     final mesCoursesAsync = ref.watch(fluxMesCoursesProvider);
     final transporteurAsync = ref.watch(currentTransporteurProvider);
-    final documentsValides = transporteurAsync.valueOrNull?.documentsValides ?? false;
+    final transporteur = transporteurAsync.valueOrNull;
+    final documentsValides = transporteur?.documentsValides ?? false;
+
+    // Redirection si l'abonnement est expiré
+    if (transporteur != null && !transporteur.abonnementValide) {
+      return const PageAbonnement();
+    }
 
     return Scaffold(
-      backgroundColor: CouleursApp.fond,
+      backgroundColor: const Color(0xFF08111F),
       bottomNavigationBar: _buildBottomNav(),
       body: FondPremiumAnime(
         safeArea: true,
@@ -77,6 +111,7 @@ class _TableauDeBordTransporteurState extends ConsumerState<TableauDeBordTranspo
               child: _buildDashboardAccueil(statsRevenus, mesCoursesAsync, documentsValides),
             ),
             // 1: Demandes
+            const MarcheDemandes(),
             // 2: Suivi
             const NavigationTransporteur(),
             // 3: Notifications
@@ -93,10 +128,11 @@ class _TableauDeBordTransporteurState extends ConsumerState<TableauDeBordTranspo
   Widget _buildDashboardAccueil(Map<String, double> statsRevenus, AsyncValue<List<Course>> mesCoursesAsync, bool documentsValides) {
     final transporteurAsync = ref.watch(currentTransporteurProvider);
     final utilisateur = ref.watch(serviceAuthentificationProvider).utilisateur;
+    final textes = ref.watch(textesAppProvider);
 
     return transporteurAsync.when(
-      loading: () => const Center(child: CircularProgressIndicator()),
-      error: (err, _) => Center(child: Text("Erreur: $err")),
+      loading: () => const Center(child: CircularProgressIndicator(color: CouleursApp.primaire)),
+      error: (err, _) => Center(child: Text("Oups ! Chargement impossible : $err", style: const TextStyle(color: Colors.white70))),
       data: (transporteur) {
         final nomAffichage = transporteur != null ? transporteur.prenom : (utilisateur?.displayName ?? "Transporteur");
         final photoUrl = transporteur?.photo ?? utilisateur?.photoURL ?? "";
@@ -112,23 +148,23 @@ class _TableauDeBordTransporteurState extends ConsumerState<TableauDeBordTranspo
                   margin: const EdgeInsets.only(bottom: 20),
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: Colors.red.shade50,
+                    color: Colors.red.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: Colors.red.shade200),
+                    border: Border.all(color: Colors.red.withValues(alpha: 0.4)),
                   ),
                   child: Row(
                     children: [
-                      Icon(Icons.warning_amber_rounded, color: Colors.red.shade700, size: 32),
+                      const Icon(Icons.warning_amber_rounded, color: Colors.red, size: 32),
                       const SizedBox(width: 12),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            Text("Compte en attente de validation", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.red.shade900)),
+                            const Text("Compte en attente de validation", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
                             const SizedBox(height: 4),
-                            Text(
-                              "Vos documents sont en cours d'examen par l'administration. Vous ne pouvez pas encore accepter de courses.",
-                              style: TextStyle(fontSize: 12, color: Colors.red.shade700),
+                            const Text(
+                              "Vos documents sont en cours d'examen par l'administration.",
+                              style: TextStyle(fontSize: 12, color: Colors.white70),
                             ),
                           ],
                         ),
@@ -165,7 +201,7 @@ class _TableauDeBordTransporteurState extends ConsumerState<TableauDeBordTranspo
                       children: [
                         Text(
                           "Bienvenue,",
-                          style: GoogleFonts.inter(color: CouleursApp.texteSecondaire, fontSize: 14),
+                          style: GoogleFonts.inter(color: Colors.white60, fontSize: 14),
                         ),
                         const SizedBox(height: 2),
                         Text(
@@ -182,7 +218,7 @@ class _TableauDeBordTransporteurState extends ConsumerState<TableauDeBordTranspo
                     activeThumbColor: Colors.white,
                     activeTrackColor: Colors.green,
                     inactiveThumbColor: Colors.white,
-                    inactiveTrackColor: Colors.grey.shade300,
+                    inactiveTrackColor: Colors.white.withValues(alpha: 0.2),
                     onChanged: _chargementDisponibilite
                         ? null
                         : (value) async {
@@ -280,7 +316,7 @@ class _TableauDeBordTransporteurState extends ConsumerState<TableauDeBordTranspo
                     ...List.generate(2, (index) => Container(
                       height: 100, margin: const EdgeInsets.only(bottom: 10),
                       decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20)),
-                    ).animate(onPlay: (controller) => controller.repeat()).shimmer(color: Colors.grey.shade200, duration: 1.5.seconds)),
+                    ).animate(onPlay: (controller) => controller.repeat()).shimmer(color: Colors.white.withValues(alpha: 0.08), duration: 1.5.seconds)),
                   ],
                 ),
                 error: (err, _) => const SizedBox.shrink(),
@@ -379,16 +415,16 @@ class _TableauDeBordTransporteurState extends ConsumerState<TableauDeBordTranspo
                   children: <Widget>[
                     ...List.generate(3, (index) => Container(
                       height: 80, margin: const EdgeInsets.only(bottom: 10),
-                      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20)),
-                    ).animate(onPlay: (controller) => controller.repeat()).shimmer(color: Colors.grey.shade200, duration: 1.5.seconds)),
+                      decoration: BoxDecoration(color: const Color(0xFF08111F), borderRadius: BorderRadius.circular(20)),
+                    ).animate(onPlay: (controller) => controller.repeat()).shimmer(color: Colors.white.withValues(alpha: 0.08), duration: 1.5.seconds)),
                   ],
                 ),
-                error: (err, _) => Text("Erreur: $err"),
+                error: (err, _) => Text("Hmm, petit souci de chargement : $err 🔧"),
                 data: (courses) {
                   if (courses.isEmpty) {
                     return const Padding(
                       padding: EdgeInsets.all(20.0),
-                      child: Text("Aucune course assignée.", style: TextStyle(color: Colors.grey)),
+                      child: Text("Aucune course assignée.", style: TextStyle(color: Colors.white54)),
                     );
                   }
                   
@@ -422,10 +458,10 @@ class _TableauDeBordTransporteurState extends ConsumerState<TableauDeBordTranspo
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.grey.shade100),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.07)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.02),
+            color: Colors.white.withValues(alpha: 0.07),
             blurRadius: 10,
             offset: const Offset(0, 5),
           )
@@ -448,7 +484,7 @@ class _TableauDeBordTransporteurState extends ConsumerState<TableauDeBordTranspo
               children: [
                 Text(titre, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
                 const SizedBox(height: 6),
-                Text(sousTitre, style: const TextStyle(color: CouleursApp.texteSecondaire, fontSize: 13)),
+                Text(sousTitre, style: const TextStyle(color: Colors.white60, fontSize: 13)),
               ],
             ),
           ),
@@ -465,7 +501,7 @@ class _TableauDeBordTransporteurState extends ConsumerState<TableauDeBordTranspo
     return Container(
       decoration: BoxDecoration(
         color: Colors.white.withValues(alpha: 0.8),
-        boxShadow: [BoxShadow(color: CouleursApp.ombre, blurRadius: 30, offset: const Offset(0, -10))],
+        boxShadow: [BoxShadow(color: Colors.white.withValues(alpha: 0.07), blurRadius: 30, offset: const Offset(0, -10))],
       ),
       child: ClipRRect(
         child: BackdropFilter(

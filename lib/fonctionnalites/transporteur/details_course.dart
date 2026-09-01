@@ -11,7 +11,7 @@ class DetailsCourse extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: CouleursApp.fond,
+      backgroundColor: const Color(0xFF08111F),
       appBar: AppBar(
         title: const Text("Détails de la course"),
       ),
@@ -122,7 +122,7 @@ class DetailsCourse extends StatelessWidget {
                       "Akwa, Douala",
                     ),
                   ),
-                  Divider(),
+                  Divider(color: Colors.white.withValues(alpha: 0.08)),
                   ListTile(
                     leading: Icon(
                       Icons.flag,
@@ -163,7 +163,7 @@ class DetailsCourse extends StatelessWidget {
                     subtitle:
                     Text("Mobilier"),
                   ),
-                  Divider(),
+                  Divider(color: Colors.white.withValues(alpha: 0.08)),
                   ListTile(
                     leading:
                     Icon(Icons.scale),
@@ -172,7 +172,7 @@ class DetailsCourse extends StatelessWidget {
                     subtitle:
                     Text("850 Kg"),
                   ),
-                  Divider(),
+                  Divider(color: Colors.white.withValues(alpha: 0.08)),
                   ListTile(
                     leading:
                     Icon(Icons.all_inbox),
@@ -181,7 +181,7 @@ class DetailsCourse extends StatelessWidget {
                     subtitle:
                     Text("4.5 m³"),
                   ),
-                  Divider(),
+                  Divider(color: Colors.white.withValues(alpha: 0.08)),
                   ListTile(
                     leading:
                     Icon(Icons.route),
@@ -190,7 +190,7 @@ class DetailsCourse extends StatelessWidget {
                     subtitle:
                     Text("245 Km"),
                   ),
-                  Divider(),
+                  Divider(color: Colors.white.withValues(alpha: 0.08)),
                   ListTile(
                     leading:
                     Icon(Icons.timer),
@@ -232,7 +232,7 @@ class DetailsCourse extends StatelessWidget {
                     decoration:
                     BoxDecoration(
                       color:
-                      Colors.grey.shade200,
+                      const Color(0xFF1A2640),
                       borderRadius:
                       BorderRadius.circular(
                           15),
@@ -240,7 +240,7 @@ class DetailsCourse extends StatelessWidget {
                     child: const Icon(
                       Icons.image,
                       size: 50,
-                      color: Colors.grey,
+                      color: Colors.white54,
                     ),
                   ),
                 ),
@@ -251,7 +251,7 @@ class DetailsCourse extends StatelessWidget {
 
             Card(
               color:
-              Colors.green.shade50,
+              const Color(0xFF0D2A1A),
               child: const ListTile(
                 leading: Icon(
                   Icons.payments,

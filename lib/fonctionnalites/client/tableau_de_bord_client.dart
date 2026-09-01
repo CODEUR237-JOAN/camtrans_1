@@ -20,6 +20,8 @@ import 'package:update_camtrans/fonctionnalites/notifications/notifications.dart
 import 'profil.dart';
 import 'package:update_camtrans/coeur/etat/notification_provider.dart';
 
+import 'package:flutter/services.dart';
+import 'package:update_camtrans/coeur/etat/demande_expedition_provider.dart';
 import 'package:update_camtrans/coeur/constantes/couleurs.dart';
 import 'package:update_camtrans/coeur/constantes/statuts.dart';
 import 'package:update_camtrans/coeur/widgets/page_responsive.dart';
@@ -51,59 +53,103 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
     final coursesAsync = ref.watch(coursesClientProvider);
 
     return Scaffold(
-      backgroundColor: CouleursApp.fond,
+      backgroundColor: const Color(0xFF08111F),
       floatingActionButton: _bottomNavIndex == 0 ? _buildIAAssistantFAB() : null,
-      bottomNavigationBar: _buildBottomNav(),
-      body: SafeArea(
-        child: PageResponsive(
-          child: IndexedStack(
-            index: _bottomNavIndex,
-          children: [
-            // Onglet 0: Accueil (Tableau de bord dynamique)
-            _buildDashboardAccueil(coursesAsync),
-            
-            // Onglet 1: Demandes (Historique)
-            const Historique(),
-            
-            // Onglet 2: Suivi
-            coursesAsync.when(
-              data: (courses) {
-                final enCours = courses.where((c) => !StatutCourse.estTerminee(c.statut)).toList();
-                if (enCours.isEmpty) {
-                  return Container(
-                    color: Colors.white,
-                    child: Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Icon(Iconsax.location_copy, size: 80, color: Colors.grey),
-                          const SizedBox(height: 20),
-                          const Text("Aucune course en cours à suivre", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                          const SizedBox(height: 10),
-                          ElevatedButton(
-                            onPressed: () => setState(() => _bottomNavIndex = 0),
-                            style: ElevatedButton.styleFrom(backgroundColor: CouleursApp.primaire, foregroundColor: Colors.white),
-                            child: const Text("Retour à l'accueil"),
-                          )
-                        ],
-                      ),
+      body: Stack(
+        children: [
+          // Blob lumineux haut-gauche (comme admin)
+          Positioned(
+            top: -80,
+            left: -80,
+            child: Container(
+              width: 280,
+              height: 280,
+              decoration: BoxDecoration(
+                color: CouleursApp.primaire.withValues(alpha: 0.12),
+                shape: BoxShape.circle,
+              ),
+            ).animate(onPlay: (c) => c.repeat(reverse: true))
+             .scale(begin: const Offset(1, 1), end: const Offset(1.2, 1.2), duration: 4.seconds),
+          ),
+          // Blob lumineux bas-droite
+          Positioned(
+            bottom: -60,
+            right: -60,
+            child: Container(
+              width: 220,
+              height: 220,
+              decoration: BoxDecoration(
+                color: CouleursApp.secondaire.withValues(alpha: 0.12),
+                shape: BoxShape.circle,
+              ),
+            ).animate(onPlay: (c) => c.repeat(reverse: true))
+             .scale(begin: const Offset(1, 1), end: const Offset(1.3, 1.3), duration: 5.seconds),
+          ),
+
+          // Contenu principal
+          Positioned.fill(
+            child: SafeArea(
+              bottom: false,
+              child: PageResponsive(
+                child: IndexedStack(
+                  index: _bottomNavIndex,
+                  children: [
+                    // Onglet 0: Accueil (Tableau de bord dynamique)
+                    _buildDashboardAccueil(coursesAsync),
+                    
+                    // Onglet 1: Demandes (Historique)
+                    const Historique(),
+                    
+                    // Onglet 2: Suivi
+                    coursesAsync.when(
+                      data: (courses) {
+                        final enCours = courses.where((c) => !StatutCourse.estTerminee(c.statut)).toList();
+                        if (enCours.isEmpty) {
+                          return Container(
+                            color: Colors.white,
+                            child: Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  const Icon(Iconsax.location_copy, size: 80, color: CouleursApp.primaire),
+                                  const SizedBox(height: 20),
+                                  const Text("Aucune course en cours à suivre", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.white)),
+                                  const SizedBox(height: 10),
+                                  ElevatedButton(
+                                    onPressed: () => setState(() => _bottomNavIndex = 0),
+                                    style: ElevatedButton.styleFrom(backgroundColor: CouleursApp.primaire, foregroundColor: Colors.white),
+                                    child: const Text("Retour à l'accueil"),
+                                  )
+                                ],
+                              ),
+                            ),
+                          );
+                        }
+                        return SuiviTransport(courseId: enCours.first.id, isFullScreen: false);
+                      },
+                      loading: () => const Scaffold(body: Center(child: CircularProgressIndicator(color: CouleursApp.primaire))),
+                      error: (err, stack) => Scaffold(body: Center(child: Text("Erreur: $err"))),
                     ),
-                  );
-                }
-                return SuiviTransport(courseId: enCours.first.id, isFullScreen: false);
-              },
-              loading: () => const Scaffold(body: Center(child: CircularProgressIndicator())),
-              error: (err, stack) => Scaffold(body: Center(child: Text("Erreur: $err"))),
+                    
+                    // Onglet 3: Notifications
+                    const NotificationsPage(),
+                    
+                    // Onglet 4: Profil
+                    const Profil(),
+                  ],
+                ),
+              ),
             ),
-            
-            // Onglet 3: Notifications
-            const NotificationsPage(),
-            
-            // Onglet 4: Profil
-            const Profil(),
-          ],
-        ),
-        ),
+          ),
+          
+          // Floating Dock Bottom Navigation
+          Positioned(
+            left: 0,
+            right: 0,
+            bottom: 0,
+            child: _buildBottomNav(),
+          ),
+        ],
       ),
     );
   }
@@ -119,8 +165,7 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
         physics: const BouncingScrollPhysics(),
         slivers: [
           SliverToBoxAdapter(child: _buildHeader()),
-          SliverToBoxAdapter(child: _buildSearchBar()),
-          SliverToBoxAdapter(child: _buildMainAction(context)),
+          SliverToBoxAdapter(child: _buildServiceCategories(context)),
           SliverToBoxAdapter(child: _buildQuickServices()),
           
           coursesAsync.when(
@@ -193,11 +238,11 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
                     children: [
                       Text(
                         "Bienvenue, $nomAffichage",
-                        style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: CouleursApp.textePrincipal),
+                        style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Colors.white),
                       ),
                       const Text(
-                        "Prêt à expédier aujourd'hui ?",
-                        style: TextStyle(fontSize: 14, color: CouleursApp.texteSecondaire),
+                        "Prêt à commencer ?",
+                        style: TextStyle(fontSize: 14, color: Colors.white70),
                       ),
                     ],
                   ),
@@ -213,11 +258,11 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
                       Container(
                         padding: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
-                          color: CouleursApp.surface,
+                          color: const Color(0xFF10192A),
                           borderRadius: BorderRadius.circular(15),
-                          boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 10)],
+                          boxShadow: [BoxShadow(color: Colors.white.withValues(alpha: 0.07), blurRadius: 10)],
                         ),
-                        child: const Icon(Iconsax.notification_bing_copy, color: CouleursApp.textePrincipal),
+                        child: const Icon(Iconsax.notification_bing_copy, color: Colors.white),
                       ),
                       if (badgeCount > 0)
                         Positioned(
@@ -225,9 +270,9 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
                           right: -5,
                           child: Container(
                             padding: const EdgeInsets.all(5),
-                            decoration: const BoxDecoration(color: CouleursApp.erreur, shape: BoxShape.circle),
+                            decoration: const BoxDecoration(color: Colors.red, shape: BoxShape.circle),
                             child: Text(
-                              badgeCount > 9 ? "9+" : "$badgeCount",
+                              badgeCount > 9 ? "9+" : badgeCount.toString(),
                               style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
                             ),
                           ),
@@ -244,130 +289,65 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
   }
 
   // ==========================================
-  // BARRE DE RECHERCHE GLASSMORPHISM
+  // SELECTION DE SERVICES (ACCUEIL)
   // ==========================================
-  Widget _buildSearchBar() {
+  Widget _buildServiceCategories(BuildContext context) {
+    final categories = [
+      {"titre": "Déménagement", "desc": "Appart. & bureaux", "icon": Iconsax.home_2_copy},
+      {"titre": "Remorque", "desc": "Objets lourds", "icon": Iconsax.car_copy},
+      {"titre": "Marchandises", "desc": "Colis & palettes", "icon": Iconsax.box_copy},
+      {"titre": "Autre", "desc": "Sur mesure", "icon": Iconsax.category_copy},
+    ];
+
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-      child: GestureDetector(
-        onTap: () => context.push(RoutesApplication.creerDemande),
-        child: Container(
-          decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.8),
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(color: Colors.white, width: 2),
-            boxShadow: [
-              BoxShadow(color: CouleursApp.primaireFonce.withValues(alpha: 0.05), blurRadius: 20, offset: const Offset(0, 10))
-            ],
+      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            "Que souhaitez-vous transporter ?",
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
           ),
-          child: ClipRRect(
-            borderRadius: BorderRadius.circular(20),
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-              child: AbsorbPointer(
-                child: TextField(
-                  decoration: InputDecoration(
-                    hintText: "Où souhaitez-vous expédier ?",
-                    hintStyle: TextStyle(color: CouleursApp.texteSecondaire.withValues(alpha: 0.8), fontSize: 15),
-                    prefixIcon: const Icon(Iconsax.location_copy, color: CouleursApp.primaire),
-                    suffixIcon: Container(
-                      margin: const EdgeInsets.all(6),
-                      decoration: BoxDecoration(
-                        color: CouleursApp.primaireFonce,
-                        borderRadius: BorderRadius.circular(14),
-                      ),
-                      child: const Icon(Iconsax.arrow_right_3_copy, color: Colors.white, size: 18),
-                    ),
-                    border: InputBorder.none,
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 15),
-                  ),
-                ),
-              ),
+          const SizedBox(height: 16),
+          GridView.builder(
+            shrinkWrap: true,
+            physics: const NeverScrollableScrollPhysics(),
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              crossAxisSpacing: 16,
+              mainAxisSpacing: 16,
+              childAspectRatio: 1.05,
             ),
+            itemCount: categories.length,
+            itemBuilder: (context, index) {
+              final cat = categories[index];
+              return _ServiceCategoryCard(
+                titre: cat['titre'] as String,
+                desc: cat['desc'] as String,
+                icon: cat['icon'] as IconData,
+                onTap: () {
+                  HapticFeedback.lightImpact();
+                  ref.read(demandeExpeditionProvider.notifier).reinitialiser();
+                  ref.read(demandeExpeditionProvider.notifier).setCategorieService(cat['titre'] as String);
+                  context.push(RoutesApplication.creerDemande);
+                },
+              );
+            },
           ),
-        ),
+        ],
       ),
     );
   }
 
-  // ==========================================
-  // ACTION PRINCIPALE
-  // ==========================================
-  Widget _buildMainAction(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-      child: Material(
-        color: Colors.transparent,
-        child: Semantics(
-          button: true,
-          label: "Créer une nouvelle expédition",
-          hint: "Double tapez pour réserver un camion",
-          child: InkWell(
-          onTap: () => context.push(RoutesApplication.creerDemande),
-          borderRadius: BorderRadius.circular(24),
-          child: Ink(
-            padding: const EdgeInsets.symmetric(vertical: 25, horizontal: 20),
-            decoration: BoxDecoration(
-              gradient: const LinearGradient(
-                colors: [CouleursApp.primaire, CouleursApp.primaireFonce],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              borderRadius: BorderRadius.circular(24),
-              boxShadow: [
-                BoxShadow(color: CouleursApp.primaire.withValues(alpha: 0.4), blurRadius: 20, offset: const Offset(0, 10))
-              ]
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      "Nouvelle Expédition",
-                      style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.bold),
-                    ),
-                    const SizedBox(height: 8),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.2),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: const Text(
-                        "Réservez un camion en 2 min",
-                        style: TextStyle(color: Colors.white, fontSize: 13),
-                      ),
-                    ),
-                  ],
-                ),
-                Container(
-                  padding: const EdgeInsets.all(15),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withValues(alpha: 0.2),
-                    shape: BoxShape.circle,
-                  ),
-                  child: const Icon(Iconsax.truck_fast_copy, color: Colors.white, size: 30),
-                ).animate(onPlay: (controller) => controller.repeat(reverse: true)).moveY(begin: -2, end: 2, duration: 2.seconds)
-              ],
-            ),
-          ),
-          ), // Fermeture InkWell
-        ), // Fermeture Semantics
-      ),
-    );
-  }
 
   // ==========================================
   // SERVICES RAPIDES
   // ==========================================
   Widget _buildQuickServices() {
     final services = [
-      {"icon": Iconsax.box_time_copy, "title": "Mes Colis", "color": CouleursApp.avertissement, "action": () => setState(() => _bottomNavIndex = 1)},
-      {"icon": Iconsax.wallet_3_copy, "title": "Paiements", "color": CouleursApp.succes, "action": () => context.push(RoutesApplication.factures)},
-      {"icon": Iconsax.document_text_copy, "title": "Factures", "color": CouleursApp.primaire, "action": () => context.push(RoutesApplication.factures)},
-      {"icon": Iconsax.support_copy, "title": "Support", "color": CouleursApp.erreur, "action": () => context.push(RoutesApplication.assistantIA)},
+      {"icon": Iconsax.box_copy, "title": "Mes Colis", "color": CouleursApp.avertissement, "action": () => setState(() => _bottomNavIndex = 1)},
+      {"icon": Iconsax.document_copy, "title": "Factures", "color": CouleursApp.primaire, "action": () => context.push(RoutesApplication.factures)},
+      {"icon": Iconsax.messages_2_copy, "title": "Support", "color": CouleursApp.erreur, "action": () => context.push(RoutesApplication.assistantIA)},
     ];
 
     return Padding(
@@ -375,23 +355,11 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: services.map((s) {
-          return GestureDetector(
+          return _BoutonServiceRapide(
+            icon: s['icon'] as IconData,
+            title: s['title'] as String,
+            color: s['color'] as Color,
             onTap: s['action'] as VoidCallback,
-            child: Column(
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(15),
-                  decoration: BoxDecoration(
-                    color: CouleursApp.surface,
-                    borderRadius: BorderRadius.circular(18),
-                    boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 10, offset: const Offset(0, 5))],
-                  ),
-                  child: Icon(s['icon'] as IconData, color: s['color'] as Color, size: 28),
-                ).animate(onPlay: (controller) => controller.repeat(reverse: true)).moveY(begin: 0, end: -3, duration: 1.5.seconds).scale(delay: 600.ms),
-                const SizedBox(height: 8),
-                Text(s['title'] as String, style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 13, color: CouleursApp.textePrincipal))
-              ],
-            ),
           );
         }).toList(),
       ),
@@ -426,7 +394,7 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
       width: 155,
       padding: const EdgeInsets.all(15),
       decoration: BoxDecoration(
-        color: CouleursApp.surface,
+        color: const Color(0xFF10192A),
         borderRadius: BorderRadius.circular(20),
         boxShadow: [BoxShadow(color: color.withValues(alpha: 0.1), blurRadius: 15, offset: const Offset(0, 5))],
         border: Border.all(color: color.withValues(alpha: 0.1)),
@@ -443,7 +411,7 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
             ],
           ),
           const Spacer(),
-          Text(title, style: const TextStyle(fontSize: 14, color: CouleursApp.texteSecondaire, fontWeight: FontWeight.w600)),
+          Text(title, style: const TextStyle(fontSize: 14, color: Colors.white70, fontWeight: FontWeight.w600)),
         ],
       ),
     );
@@ -459,7 +427,7 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
       child: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: CouleursApp.surface,
+          color: const Color(0xFF10192A),
           borderRadius: BorderRadius.circular(24),
           boxShadow: [BoxShadow(color: CouleursApp.primaireFonce.withValues(alpha: 0.06), blurRadius: 20, offset: const Offset(0, 10))],
         ),
@@ -472,7 +440,7 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
               children: [
                 const Expanded(
                   child: Text("Expédition Active", 
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: CouleursApp.textePrincipal),
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
                   ),
                 ),
                 const SizedBox(width: 8),
@@ -499,14 +467,14 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text("Départ", style: TextStyle(color: CouleursApp.texteSecondaire, fontSize: 13)),
+                    const Text("Départ", style: TextStyle(color: Colors.white70, fontSize: 13)),
                     Text(course.adresseDepart.isNotEmpty ? course.adresseDepart : "Inconnu", style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
                   ],
                 ),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    const Text("Arrivée", style: TextStyle(color: CouleursApp.texteSecondaire, fontSize: 13)),
+                    const Text("Arrivée", style: TextStyle(color: Colors.white70, fontSize: 13)),
                     Text(course.adresseArrivee.isNotEmpty ? course.adresseArrivee : "Inconnu", style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
                   ],
                 ),
@@ -565,13 +533,14 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
   }
 
   Widget _buildTimelineDot(bool active, {bool isCurrent = false}) {
+    double size = isCurrent ? 20 : 12;
     return Container(
-      width: isCurrent ? 20 : 12,
-      height: isCurrent ? 20 : 12,
+      width: size,
+      height: size,
       decoration: BoxDecoration(
-        color: active ? CouleursApp.primaire : CouleursApp.fond,
+        color: active ? CouleursApp.primaire : Colors.transparent,
         shape: BoxShape.circle,
-        border: isCurrent ? Border.all(color: CouleursApp.primaire.withValues(alpha: 0.3), width: 4) : null,
+        border: Border.all(color: active ? CouleursApp.primaire : Colors.grey.withValues(alpha: 0.3), width: 2),
       ),
       child: active && !isCurrent ? const Icon(Icons.check, size: 8, color: Colors.white) : null,
     );
@@ -579,7 +548,7 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
 
   Widget _buildTimelineLine(bool active) {
     return Expanded(
-      child: Container(height: 3, color: active ? CouleursApp.primaire : CouleursApp.fond),
+      child: Container(height: 3, color: active ? CouleursApp.primaire : Colors.white.withValues(alpha: 0.1)),
     );
   }
 
@@ -593,7 +562,7 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
         height: 150,
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(24),
-          boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 15, offset: const Offset(0, 5))],
+          boxShadow: [BoxShadow(color: Colors.white.withValues(alpha: 0.07), blurRadius: 15, offset: const Offset(0, 5))],
         ),
         clipBehavior: Clip.antiAlias,
         child: Stack(
@@ -622,7 +591,7 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
               top: 10,
               child: FloatingActionButton.small(
                 heroTag: "btn_map",
-                backgroundColor: CouleursApp.surface,
+                backgroundColor: const Color(0xFF10192A),
                 onPressed: () => setState(() => _bottomNavIndex = 2),
                 child: const Icon(Iconsax.maximize_circle_copy, color: CouleursApp.primaireFonce),
               ),
@@ -645,7 +614,7 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text("Historique Récent", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: CouleursApp.textePrincipal)),
+              const Text("Historique Récent", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white)),
               TextButton(
                   onPressed: () {
                     context.push(RoutesApplication.historique);
@@ -663,16 +632,16 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
               margin: const EdgeInsets.only(bottom: 15),
               padding: const EdgeInsets.all(15),
               decoration: BoxDecoration(
-                color: CouleursApp.surface,
+                color: const Color(0xFF10192A),
                 borderRadius: BorderRadius.circular(20),
-                boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.02), blurRadius: 10, offset: const Offset(0, 5))],
+                boxShadow: [BoxShadow(color: Colors.white.withValues(alpha: 0.07), blurRadius: 10, offset: const Offset(0, 5))],
               ),
               child: Row(
                 children: [
                   Container(
                     padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(color: CouleursApp.fond, borderRadius: BorderRadius.circular(15)),
-                    child: const Icon(Iconsax.box_copy, color: CouleursApp.texteSecondaire),
+                    decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(15)),
+                    child: const Icon(Iconsax.box_copy, color: Colors.white70),
                   ),
                   const SizedBox(width: 15),
                   Expanded(
@@ -681,14 +650,14 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
                       children: [
                         Text(course.description.isNotEmpty ? course.description : "Marchandise", style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                         const SizedBox(height: 4),
-                        Text("${course.adresseDepart}  ${course.adresseArrivee}", style: const TextStyle(fontSize: 13, color: CouleursApp.texteSecondaire), overflow: TextOverflow.ellipsis),
+                        Text("${course.adresseDepart}  ${course.adresseArrivee}", style: const TextStyle(fontSize: 13, color: Colors.white70), overflow: TextOverflow.ellipsis),
                       ],
                     ),
                   ),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
-                      Text("${course.prixEstime} FCFA", style: const TextStyle(fontWeight: FontWeight.bold, color: CouleursApp.textePrincipal, fontSize: 14)),
+                      Text("${course.prixEstime} FCFA", style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white, fontSize: 14)),
                       const SizedBox(height: 5),
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
@@ -716,8 +685,8 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
         children: List.generate(3, (index) => Container(
           height: 100,
           margin: const EdgeInsets.only(bottom: 15),
-          decoration: BoxDecoration(color: CouleursApp.surface, borderRadius: BorderRadius.circular(20)),
-        ).animate(onPlay: (controller) => controller.repeat()).shimmer(duration: 1.5.seconds, color: CouleursApp.fond.withValues(alpha: 0.5))).cast<Widget>(),
+          decoration: BoxDecoration(color: const Color(0xFF10192A), borderRadius: BorderRadius.circular(20)),
+        ).animate(onPlay: (controller) => controller.repeat()).shimmer(duration: 1.5.seconds, color: const Color(0xFF08111F).withValues(alpha: 0.5))).cast<Widget>(),
       ),
     );
   }
@@ -760,13 +729,13 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
         children: [
           Container(
             padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(color: CouleursApp.fond, shape: BoxShape.circle),
-            child: const Icon(Iconsax.box_add_copy, size: 50, color: CouleursApp.texteSecondaire),
+            decoration: BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+            child: const Icon(Iconsax.box_add_copy, size: 50, color: Colors.white70),
           ),
           const SizedBox(height: 20),
-          const Text("Aucune expédition en cours", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: CouleursApp.textePrincipal)),
+          const Text("Aucune expédition en cours", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
           const SizedBox(height: 10),
-          const Text("Lancez votre première demande de transport dès maintenant.", textAlign: TextAlign.center, style: TextStyle(color: CouleursApp.texteSecondaire)),
+          const Text("Lancez votre première demande de transport dès maintenant.", textAlign: TextAlign.center, style: TextStyle(color: Colors.white70)),
           
           const SizedBox(height: 20),
         ],
@@ -779,12 +748,10 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
   // ==========================================
   Widget _buildIAAssistantFAB() {
     return FloatingActionButton.extended(
-      heroTag: "fab_ia",
       onPressed: () {
         context.push(RoutesApplication.assistantIA);
       },
-      backgroundColor: CouleursApp.primaireFonce,
-      tooltip: "Discuter avec l'assistant",
+      backgroundColor: CouleursApp.primaire,
       icon: const Icon(Iconsax.message_text_copy, color: Colors.white),
       label: const Text("Assistant", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
     );
@@ -795,31 +762,169 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
   // BOTTOM NAVIGATION
   // ==========================================
   Widget _buildBottomNav() {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.8),
-        boxShadow: [BoxShadow(color: CouleursApp.ombre, blurRadius: 30, offset: const Offset(0, -10))],
+    return SafeArea(
+      child: Padding(
+        padding: const EdgeInsets.only(bottom: 24),
+        child: Align(
+          alignment: Alignment.bottomCenter,
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+            decoration: BoxDecoration(
+              color: const Color(0xFF08111F),
+              borderRadius: BorderRadius.circular(40),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.3), width: 1.5),
+              boxShadow: [
+                BoxShadow(
+                  color: CouleursApp.primaire.withValues(alpha: 0.2),
+                  blurRadius: 30,
+                  offset: const Offset(0, 15),
+                  spreadRadius: 5,
+                ),
+              ],
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min, // Critical for the "dock" look
+              children: [
+                _buildNavItem(0, Iconsax.home_2_copy, Iconsax.home_2, "Accueil"),
+                _buildNavItem(1, Iconsax.truck_copy, Iconsax.truck, "Demandes"),
+                _buildNavItem(2, Iconsax.location_copy, Iconsax.location, "Suivi"),
+                _buildNavItem(3, Iconsax.notification_copy, Iconsax.notification, "Alerte"),
+                _buildNavItem(4, Iconsax.user_copy, Iconsax.user, "Profil"),
+              ],
+            ),
+          ),
+        ),
       ),
-      child: ClipRRect(
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-          child: BottomNavigationBar(
-            currentIndex: _bottomNavIndex,
-            onTap: (index) => setState(() => _bottomNavIndex = index),
-            type: BottomNavigationBarType.fixed,
-            backgroundColor: Colors.transparent,
-            selectedItemColor: CouleursApp.primaire,
-            unselectedItemColor: CouleursApp.texteSecondaire,
-            showUnselectedLabels: true,
-            selectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
-            unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w600, fontSize: 12),
-            elevation: 0,
-            items: const [
-              BottomNavigationBarItem(icon: Icon(Iconsax.home_2_copy), activeIcon: Icon(Iconsax.home_2), label: "Accueil", tooltip: "Retourner à l'accueil"),
-              BottomNavigationBarItem(icon: Icon(Iconsax.truck_copy), activeIcon: Icon(Iconsax.truck), label: "Demandes", tooltip: "Gérer vos expéditions"),
-              BottomNavigationBarItem(icon: Icon(Iconsax.location_copy), activeIcon: Icon(Iconsax.location), label: "Suivi", tooltip: "Suivre vos colis sur la carte"),
-              BottomNavigationBarItem(icon: Icon(Iconsax.notification_copy), activeIcon: Icon(Iconsax.notification), label: "Alerte", tooltip: "Voir les notifications"),
-              BottomNavigationBarItem(icon: Icon(Iconsax.user_copy), activeIcon: Icon(Iconsax.user), label: "Profil", tooltip: "Paramètres du profil"),
+    );
+  }
+
+  Widget _buildNavItem(int index, IconData icon, IconData activeIcon, String label) {
+    final bool isSelected = _bottomNavIndex == index;
+    return GestureDetector(
+      onTap: () => setState(() => _bottomNavIndex = index),
+      behavior: HitTestBehavior.opaque,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 400),
+        curve: Curves.easeOutCubic,
+        margin: const EdgeInsets.symmetric(horizontal: 4),
+        padding: EdgeInsets.symmetric(horizontal: isSelected ? 20 : 12, vertical: 12),
+        decoration: BoxDecoration(
+          color: isSelected ? CouleursApp.primaire : Colors.transparent,
+          borderRadius: BorderRadius.circular(30),
+          boxShadow: isSelected ? [
+            BoxShadow(
+              color: CouleursApp.primaire.withValues(alpha: 0.4),
+              blurRadius: 15,
+              offset: const Offset(0, 8),
+            )
+          ] : [],
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            AnimatedSwitcher(
+              duration: const Duration(milliseconds: 300),
+              transitionBuilder: (child, animation) => ScaleTransition(scale: animation, child: child),
+              child: Icon(
+                isSelected ? activeIcon : icon,
+                key: ValueKey<bool>(isSelected),
+                color: isSelected ? Colors.white : Colors.white54,
+                size: 24,
+              ),
+            ),
+            if (isSelected) ...[
+              const SizedBox(width: 10),
+              Text(
+                label,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 14,
+                ),
+              ),
+            ]
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _BoutonServiceRapide extends StatefulWidget {
+  final IconData icon;
+  final String title;
+  final Color color;
+  final VoidCallback onTap;
+
+  const _BoutonServiceRapide({
+    required this.icon,
+    required this.title,
+    required this.color,
+    required this.onTap,
+  });
+
+  @override
+  State<_BoutonServiceRapide> createState() => _BoutonServiceRapideState();
+}
+
+class _BoutonServiceRapideState extends State<_BoutonServiceRapide> {
+  bool _isHovered = false;
+  bool _isPressed = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final scale = _isPressed ? 0.92 : (_isHovered ? 1.05 : 1.0);
+    
+    return MouseRegion(
+      onEnter: (_) => setState(() => _isHovered = true),
+      onExit: (_) => setState(() => _isHovered = false),
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTapDown: (_) => setState(() => _isPressed = true),
+        onTapUp: (_) {
+          setState(() => _isPressed = false);
+          widget.onTap();
+        },
+        onTapCancel: () => setState(() => _isPressed = false),
+        child: AnimatedScale(
+          scale: scale,
+          duration: const Duration(milliseconds: 150),
+          curve: Curves.easeOutCubic,
+          child: Column(
+            children: [
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: _isHovered ? widget.color : CouleursApp.surface,
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    if (_isHovered)
+                      BoxShadow(color: widget.color.withValues(alpha: 0.4), blurRadius: 15, offset: const Offset(0, 8))
+                    else
+                      BoxShadow(color: Colors.white.withValues(alpha: 0.07), blurRadius: 10, offset: const Offset(0, 4)),
+                  ],
+                  border: Border.all(
+                    color: _isHovered ? widget.color.withValues(alpha: 0.5) : Colors.transparent,
+                    width: 1.5,
+                  ),
+                ),
+                child: Icon(
+                  widget.icon, 
+                  color: _isHovered ? Colors.white : widget.color, 
+                  size: 26,
+                ),
+              ),
+              const SizedBox(height: 10),
+              AnimatedDefaultTextStyle(
+                duration: const Duration(milliseconds: 200),
+                style: TextStyle(
+                  fontWeight: _isHovered ? FontWeight.w700 : FontWeight.w600, 
+                  fontSize: 13, 
+                  color: _isHovered ? widget.color : Colors.white70,
+                ),
+                child: Text(widget.title),
+              ),
             ],
           ),
         ),
@@ -827,3 +932,103 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
     );
   }
 }
+
+class _ServiceCategoryCard extends StatefulWidget {
+  final String titre;
+  final String desc;
+  final IconData icon;
+  final VoidCallback onTap;
+
+  const _ServiceCategoryCard({
+    required this.titre,
+    required this.desc,
+    required this.icon,
+    required this.onTap,
+  });
+
+  @override
+  State<_ServiceCategoryCard> createState() => _ServiceCategoryCardState();
+}
+
+class _ServiceCategoryCardState extends State<_ServiceCategoryCard> {
+  bool _isHovered = false;
+  bool _isPressed = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final scale = _isPressed ? 0.95 : (_isHovered ? 1.02 : 1.0);
+    
+    return MouseRegion(
+      onEnter: (_) => setState(() => _isHovered = true),
+      onExit: (_) => setState(() => _isHovered = false),
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTapDown: (_) => setState(() => _isPressed = true),
+        onTapUp: (_) {
+          setState(() => _isPressed = false);
+          widget.onTap();
+        },
+        onTapCancel: () => setState(() => _isPressed = false),
+        child: AnimatedScale(
+          scale: scale,
+          duration: const Duration(milliseconds: 150),
+          curve: Curves.easeOutCubic,
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 200),
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: _isHovered ? CouleursApp.primaire.withValues(alpha: 0.1) : CouleursApp.surface,
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(
+                color: _isHovered ? CouleursApp.primaire.withValues(alpha: 0.3) : Colors.transparent,
+                width: 1.5,
+              ),
+              boxShadow: [
+                if (_isHovered)
+                  BoxShadow(color: CouleursApp.primaire.withValues(alpha: 0.1), blurRadius: 20, offset: const Offset(0, 10))
+                else
+                  BoxShadow(color: Colors.white.withValues(alpha: 0.07), blurRadius: 10, offset: const Offset(0, 4)),
+              ],
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: _isHovered ? CouleursApp.primaire.withValues(alpha: 0.15) : CouleursApp.primaire.withValues(alpha: 0.05),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(
+                    widget.icon, 
+                    color: _isHovered ? CouleursApp.primaireFonce : CouleursApp.primaire, 
+                    size: 28,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  widget.titre,
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold, 
+                    fontSize: 14, 
+                    color: _isHovered ? CouleursApp.primaire : Colors.white,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  widget.desc,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                    fontSize: 11, 
+                    color: Colors.white70,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+

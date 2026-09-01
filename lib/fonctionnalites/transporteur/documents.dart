@@ -62,7 +62,7 @@ class _DocumentsState extends ConsumerState<Documents> {
     final transporteurId = ref.watch(currentTransporteurIdProvider);
     
     return Scaffold(
-      backgroundColor: CouleursApp.fond,
+      backgroundColor: const Color(0xFF08111F),
       appBar: AppBar(
         title: const Text("Mes documents"),
       ),
@@ -190,7 +190,7 @@ class _DocumentsState extends ConsumerState<Documents> {
                 const SizedBox(height: 25),
 
                 Card(
-                  color: Colors.blue.shade50,
+                  color: CouleursApp.primaire.withValues(alpha: 0.1),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
                   child: const ListTile(
                     leading: Icon(Icons.info, color: Colors.blue),

@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import 'package:update_camtrans/coeur/constantes/couleurs.dart';
 import 'package:update_camtrans/coeur/etat/admin_provider.dart';
+import 'package:update_camtrans/coeur/etat/notification_provider.dart';
 import 'package:update_camtrans/coeur/routes/routes.dart';
 
 class SidebarAdmin extends ConsumerWidget {
@@ -13,6 +14,7 @@ class SidebarAdmin extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final indexSelectionne = ref.watch(adminMenuIndexProvider);
     final pendingCount = ref.watch(adminPendingApprovalsCountProvider).valueOrNull ?? 0;
+    final notifAdminCount = ref.watch(badgeNotificationsAdminProvider);
     // La gestion Desktop/Mobile est faite dans le parent (TableauDeBordAdmin)
     // Nous retournons toujours le contenu du menu ici.
     return Container(
@@ -105,11 +107,41 @@ class SidebarAdmin extends ConsumerWidget {
                 _SectionTitle(titre: "SYSTÈME"),
                 _MenuItem(
                   titre: "Notifications Push",
-                  icone: Icons.campaign_outlined,
+                  icone: Icons.notifications_none,
                   index: 5,
                   currentIndex: indexSelectionne,
                   onTap: () => ref.read(adminMenuIndexProvider.notifier).state = 5,
                 ),
+                _MenuItem(
+                  titre: "Paramètres",
+                  icone: Icons.settings_outlined,
+                  index: 6,
+                  currentIndex: indexSelectionne,
+                  onTap: () => ref.read(adminMenuIndexProvider.notifier).state = 6,
+                ),
+                _MenuItem(
+                  titre: "Abonnements",
+                  icone: Icons.workspace_premium_outlined,
+                  index: 7,
+                  currentIndex: indexSelectionne,
+                  badge: notifAdminCount > 0 ? "$notifAdminCount" : null,
+                  onTap: () => ref.read(adminMenuIndexProvider.notifier).state = 7,
+                ),
+                _MenuItem(
+                  titre: "Supervision & Litiges",
+                  icone: Icons.gavel,
+                  index: 8,
+                  currentIndex: indexSelectionne,
+                  onTap: () => ref.read(adminMenuIndexProvider.notifier).state = 8,
+                ),
+                _MenuItem(
+                  titre: "Gestion des Textes",
+                  icone: Icons.text_fields_rounded,
+                  index: 9,
+                  currentIndex: indexSelectionne,
+                  onTap: () => ref.read(adminMenuIndexProvider.notifier).state = 9,
+                ),
+                const SizedBox(height: 30),
                 
                 // Add more items like signalements, paiements here in the future
               ],

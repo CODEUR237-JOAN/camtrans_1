@@ -104,3 +104,31 @@ class NotificationActions {
     }
   }
 }
+
+/// Stream des notifications Admin (id spécial 'ADMIN')
+final fluxNotificationsAdminProvider = StreamProvider.autoDispose<List<NotificationApp>>((ref) {
+  final firestore = ref.watch(serviceFirestoreProvider);
+
+  return firestore.fluxCollectionCondition(
+    collection: 'notifications',
+    champ: 'utilisateurId',
+    valeur: 'ADMIN',
+  ).map((snapshot) {
+    var notifications = snapshot.docs.map((doc) {
+      final data = doc.data();
+      data['id'] = doc.id;
+      return NotificationApp.fromMap(data);
+    }).toList();
+    notifications.sort((a, b) => b.dateCreation.compareTo(a.dateCreation));
+    return notifications;
+  });
+});
+
+/// Badge Admin : nombre de notifications non lues pour l'admin
+final badgeNotificationsAdminProvider = Provider.autoDispose<int>((ref) {
+  final notifs = ref.watch(fluxNotificationsAdminProvider);
+  return notifs.maybeWhen(
+    data: (list) => list.where((n) => !n.lue).length,
+    orElse: () => 0,
+  );
+});

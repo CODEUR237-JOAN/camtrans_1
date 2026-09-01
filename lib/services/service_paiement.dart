@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:update_camtrans/coeur/constantes/api_keys.dart';
@@ -164,6 +165,116 @@ class ServicePaiement {
       telephonePayeur: telephonePayeur,
       operateur: "MTN",
     );
+  }
+
+  /// Traitement d'un abonnement via CamPay
+  Future<bool> initierPaiementAbonnement({
+    required String transporteurId,
+    required String nomTransporteur,
+    required double montant,
+    required String telephonePayeur,
+    required String operateur,
+    required int dureeJours,
+  }) async {
+    try {
+      await _initierCollecteMobileMoney(
+        courseId: "SUB-$transporteurId",
+        clientId: "N/A",
+        transporteurId: transporteurId,
+        montant: montant,
+        telephonePayeur: telephonePayeur,
+        operateur: operateur,
+      );
+
+      // 1. Calculer la nouvelle date de fin
+      final now = DateTime.now();
+      final nouvelleDateFin = now.add(Duration(days: dureeJours));
+
+      // 2. Mettre à jour Firestore : prolonger l'abonnement
+      await _firestore.modifierDocument(
+        collection: 'transporteurs',
+        id: transporteurId,
+        donnees: {
+          'dateFinAbonnement': nouvelleDateFin.toIso8601String(),
+        },
+      );
+
+      // 3. Enregistrer le paiement d'abonnement dans une collection dédiée
+      final abonnementId = "ABN-${DateTime.now().millisecondsSinceEpoch}";
+      await FirebaseFirestore.instance.collection('abonnements').doc(abonnementId).set({
+        'id': abonnementId,
+        'transporteurId': transporteurId,
+        'nomTransporteur': nomTransporteur,
+        'montant': montant,
+        'dureeJours': dureeJours,
+        'operateur': operateur,
+        'telephone': telephonePayeur,
+        'dateDebut': now.toIso8601String(),
+        'dateFin': nouvelleDateFin.toIso8601String(),
+        'statut': 'actif',
+      });
+
+      // 4. Notification in-app pour le transporteur
+      final notifTransporteurId = "NOTIF-ABN-TRANS-${DateTime.now().millisecondsSinceEpoch}";
+      await _firestore.ajouterDocument(
+        collection: 'notifications',
+        id: notifTransporteurId,
+        donnees: {
+          'id': notifTransporteurId,
+          'utilisateurId': transporteurId,
+          'titre': '🎉 Abonnement activé !',
+          'message': 'Votre abonnement de $dureeJours jour(s) est actif. Bonne route !',
+          'type': 'succes',
+          'categorie': 'abonnement',
+          'lue': false,
+          'envoyee': true,
+          'dateCreation': DateTime.now().toIso8601String(),
+          'image': '',
+          'lien': '/abonnement',
+          'action': '',
+          'expediteurId': 'SYSTEM',
+          'expediteurNom': 'CamTrans',
+          'priorite': 'haute',
+          'notificationPush': true,
+          'notificationEmail': false,
+          'notificationSms': false,
+          'donnees': {'montant': montant, 'dureeJours': dureeJours},
+        },
+      );
+
+      // 5. Notification in-app pour l'Admin
+      final notifAdminId = "NOTIF-ABN-ADMIN-${DateTime.now().millisecondsSinceEpoch}";
+      await _firestore.ajouterDocument(
+        collection: 'notifications',
+        id: notifAdminId,
+        donnees: {
+          'id': notifAdminId,
+          'utilisateurId': 'ADMIN',
+          'titre': '💳 Nouveau paiement abonnement',
+          'message': '$nomTransporteur a souscrit un abonnement de ${montant.toInt()} FCFA ($dureeJours jours).',
+          'type': 'paiement',
+          'categorie': 'abonnement',
+          'lue': false,
+          'envoyee': true,
+          'dateCreation': DateTime.now().toIso8601String(),
+          'image': '',
+          'lien': '/admin/abonnements',
+          'action': '',
+          'expediteurId': transporteurId,
+          'expediteurNom': nomTransporteur,
+          'priorite': 'haute',
+          'notificationPush': true,
+          'notificationEmail': false,
+          'notificationSms': false,
+          'donnees': {'montant': montant, 'transporteurId': transporteurId},
+        },
+      );
+
+      return true;
+    } catch (e) {
+      debugPrint("Erreur paiement abonnement: $e");
+      throw Exception(e);
+    }
   }
 
   /// Traitement d'un paiement par Carte Bancaire

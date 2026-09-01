@@ -765,22 +765,15 @@ class _FondPremiumAnimeState extends State<FondPremiumAnime>
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     final gradient = widget.gradient ??
-        LinearGradient(
+        const LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: isDark
-              ? const [
-                  Color(0xFF0F1020),
-                  Color(0xFF17172B),
-                  Color(0xFF101827),
-                ]
-              : const [
-                  Color(0xFFF8FAFC),
-                  Color(0xFFF1F7FF),
-                  Color(0xFFEFF6FF),
-                ],
+          colors: [
+            Color(0xFF08111F),
+            Color(0xFF0D1828),
+            Color(0xFF08111F),
+          ],
         );
     final content = Padding(padding: widget.padding, child: widget.child);
 
@@ -796,7 +789,7 @@ class _FondPremiumAnimeState extends State<FondPremiumAnime>
                 return CustomPaint(
                   painter: _FondPremiumPainter(
                     progress: _controller.value,
-                    isDark: isDark,
+                    isDark: true,
                     patternColor: widget.patternColor,
                   ),
                 );

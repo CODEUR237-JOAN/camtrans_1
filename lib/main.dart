@@ -54,7 +54,7 @@ Future<void> main() async {
     runApp(MaterialApp(
       home: Scaffold(
         body: Center(
-          child: Text("Erreur de démarrage : $e"),
+          child: Text("Oups, un petit souci au démarrage : $e 🔧"),
         ),
       ),
     ));

@@ -22,11 +22,12 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
     final notificationsAsync = ref.watch(fluxNotificationsProvider);
 
     return Scaffold(
-      backgroundColor: CouleursApp.fond,
+      backgroundColor: const Color(0xFF08111F),
       appBar: AppBar(
-        title: const Text("Notifications", style: TextStyle(fontWeight: FontWeight.bold)),
-        backgroundColor: CouleursApp.fond,
+        title: const Text("Notifications", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+        backgroundColor: const Color(0xFF08111F),
         elevation: 0,
+        iconTheme: const IconThemeData(color: const Color(0xFF08111F)),
         automaticallyImplyLeading: false,
         actions: [
           notificationsAsync.maybeWhen(
@@ -60,7 +61,7 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
             const SizedBox(height: 20),
             Expanded(
               child: notificationsAsync.when(
-                loading: () => const Center(child: CircularProgressIndicator()),
+                loading: () => const Center(child: CircularProgressIndicator(color: Colors.blue)),
                 error: (err, stack) => Center(child: Text("Erreur: $err")),
                 data: (notifications) {
                   final notificationsFiltrees = notifications.where((n) {
@@ -74,9 +75,9 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.notifications_none, size: 80, color: Colors.grey.shade300),
+                          Icon(Icons.notifications_none, size: 80, color: Colors.white.withValues(alpha: 0.1)),
                           const SizedBox(height: 16),
-                          const Text("Aucune notification", style: TextStyle(color: Colors.grey, fontWeight: FontWeight.bold)),
+                          const Text("Aucune notification", style: TextStyle(color: Colors.white54, fontWeight: FontWeight.bold)),
                         ],
                       ),
                     );
@@ -125,11 +126,12 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
     final dateStr = DateFormat('dd/MM').format(notification.dateCreation);
 
     return Card(
+      color: const Color(0xFF10192A),
       margin: const EdgeInsets.only(bottom: 15),
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(18),
-        side: BorderSide(color: notification.lue ? Colors.grey.shade100 : couleur.withValues(alpha: 0.2)),
+        side: BorderSide(color: notification.lue ? Colors.white.withValues(alpha: 0.05) : couleur.withValues(alpha: 0.3)),
       ),
       child: ListTile(
         leading: CircleAvatar(
@@ -147,11 +149,11 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 4),
-            Text(notification.message, style: TextStyle(color: Colors.grey.shade700, fontSize: 13)),
+            Text(notification.message, style: TextStyle(color: Colors.white38, fontSize: 13)),
             const SizedBox(height: 8),
             Row(
               children: [
-                Text("$dateStr à $timeStr", style: const TextStyle(fontSize: 11, color: Colors.grey)),
+                Text("$dateStr à $timeStr", style: const TextStyle(fontSize: 11, color: Colors.white54)),
                 const Spacer(),
                 if (!notification.lue)
                   Container(
@@ -195,7 +197,7 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
           }
         },
         selectedColor: CouleursApp.primaire,
-        labelStyle: TextStyle(color: filtre == valeur ? Colors.white : Colors.black87),
+        labelStyle: TextStyle(color: filtre == valeur ? Colors.white : Colors.white54),
       ),
     );
   }

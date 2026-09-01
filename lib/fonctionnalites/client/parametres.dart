@@ -21,7 +21,7 @@ class _ParametresState extends State<Parametres> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: CouleursApp.fond,
+      backgroundColor: const Color(0xFF08111F),
       appBar: AppBar(
         title: const Text("Paramètres"),
       ),
@@ -241,7 +241,7 @@ class _ParametresState extends State<Parametres> {
           const SizedBox(height: 30),
 
           Card(
-            color: Colors.grey.shade100,
+            color: const Color(0xFF10192A).withValues(alpha: 0.07),
             child: const ListTile(
               leading: Icon(
                 Icons.verified,
@@ -282,6 +282,7 @@ class _ParametresState extends State<Parametres> {
       VoidCallback action,
       ) {
     return Card(
+      color: const Color(0xFF10192A),
       margin: const EdgeInsets.only(bottom: 12),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(15),

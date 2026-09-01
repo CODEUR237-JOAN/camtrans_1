@@ -34,121 +34,139 @@ class TicketRecu extends StatelessWidget {
         borderRadius: BorderRadius.circular(24),
         child: BackdropFilter(
           filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // En-tête vert néon
-              Container(
-                padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
-                decoration: BoxDecoration(
-                  color: CouleursApp.succes.withValues(alpha: 0.1),
-                  border: Border(bottom: BorderSide(color: CouleursApp.succes.withValues(alpha: 0.2))),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: CouleursApp.succes.withValues(alpha: 0.2),
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(Icons.check_circle_outline, color: CouleursApp.succes, size: 28),
-                    ),
-                    const SizedBox(width: 12),
-                    Text(
-                      "Paiement Réussi",
-                      style: GoogleFonts.poppins(
-                        color: CouleursApp.succes,
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              
-              Padding(
-                padding: const EdgeInsets.all(32.0),
-                child: Column(
-                  children: [
-                    Text(
-                      "${paiement.montant.toInt()} ${paiement.devise}",
-                      style: GoogleFonts.poppins(
-                        fontSize: 42,
-                        fontWeight: FontWeight.w900,
-                        color: Colors.white,
-                        letterSpacing: -1,
-                      ),
-                    ),
-                    const SizedBox(height: 32),
-                    
-                    _buildLigneDetails("Méthode", paiement.methodePaiement.toUpperCase()),
-                    const Divider(height: 32, color: Colors.white12),
-                    _buildLigneDetails("N° Transaction", paiement.numeroTransaction),
-                    const Divider(height: 32, color: Colors.white12),
-                    _buildLigneDetails("Réf. Course", paiement.reference),
-                    const Divider(height: 32, color: Colors.white12),
-                    _buildLigneDetails("Date", "${paiement.datePaiement.day.toString().padLeft(2, '0')}/${paiement.datePaiement.month.toString().padLeft(2, '0')}/${paiement.datePaiement.year} à ${paiement.datePaiement.hour.toString().padLeft(2, '0')}:${paiement.datePaiement.minute.toString().padLeft(2, '0')}"),
-                    
-                    const SizedBox(height: 40),
-                    
-                    // QR Code inversé (Blanc sur transparent)
-                    Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: QrImageView(
-                        data: paiement.numeroTransaction,
-                        version: QrVersions.auto,
-                        size: 140.0,
-                        dataModuleStyle: const QrDataModuleStyle(
-                          dataModuleShape: QrDataModuleShape.square,
-                          color: Color(0xFF08111F),
+          child: SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // En-tête vert néon
+                Container(
+                  padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+                  decoration: BoxDecoration(
+                    color: CouleursApp.succes.withValues(alpha: 0.1),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(8),
+                        decoration: BoxDecoration(
+                          color: CouleursApp.succes.withValues(alpha: 0.2),
+                          shape: BoxShape.circle,
                         ),
-                        eyeStyle: const QrEyeStyle(
-                          eyeShape: QrEyeShape.square,
-                          color: Color(0xFF08111F),
+                        child: const Icon(Icons.check_circle_outline, color: CouleursApp.succes, size: 28),
+                      ),
+                      const SizedBox(width: 12),
+                      Text(
+                        "Paiement Réussi",
+                        style: GoogleFonts.poppins(
+                          color: CouleursApp.succes,
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
-                    ),
-                    const SizedBox(height: 12),
-                    Text(
-                      "Scannez pour valider avec le transporteur",
-                      style: GoogleFonts.poppins(color: Colors.white54, fontSize: 10),
-                    ),
-                    
-                    const SizedBox(height: 40),
-                    
-                    SizedBox(
-                      width: double.infinity,
-                      height: 56,
-                      child: ElevatedButton(
-                        onPressed: () {
-                          HapticFeedback.mediumImpact();
-                          onFermer();
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.white.withValues(alpha: 0.1),
-                          foregroundColor: Colors.white,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
-                            side: BorderSide(color: Colors.white.withValues(alpha: 0.1)),
+                    ],
+                  ),
+                ),
+                
+                // Ligne de découpe (Dashed line) moderne
+                Row(
+                  children: List.generate(30, (index) {
+                    return Expanded(
+                      child: Container(
+                        margin: const EdgeInsets.symmetric(horizontal: 2),
+                        height: 2,
+                        color: index % 2 == 0 ? CouleursApp.succes.withValues(alpha: 0.3) : Colors.transparent,
+                      ),
+                    );
+                  }),
+                ),
+                
+                Padding(
+                  padding: const EdgeInsets.all(32.0),
+                  child: Column(
+                    children: [
+                      Text(
+                        "${paiement.montant.toInt()} ${paiement.devise}",
+                        style: GoogleFonts.poppins(
+                          fontSize: 42,
+                          fontWeight: FontWeight.w900,
+                          color: Colors.white,
+                          letterSpacing: -1,
+                        ),
+                      ),
+                      const SizedBox(height: 32),
+                      
+                      _buildLigneDetails("Méthode", paiement.methodePaiement.toUpperCase()),
+                      const Divider(height: 32, color: Colors.white12),
+                      _buildLigneDetails("N° Transaction", paiement.numeroTransaction),
+                      const Divider(height: 32, color: Colors.white12),
+                      _buildLigneDetails("Réf. Course", paiement.reference),
+                      const Divider(height: 32, color: Colors.white12),
+                      _buildLigneDetails("Date", "${paiement.datePaiement.day.toString().padLeft(2, '0')}/${paiement.datePaiement.month.toString().padLeft(2, '0')}/${paiement.datePaiement.year} à ${paiement.datePaiement.hour.toString().padLeft(2, '0')}:${paiement.datePaiement.minute.toString().padLeft(2, '0')}"),
+                      
+                      const SizedBox(height: 40),
+                      
+                      // QR Code inversé (Blanc sur transparent)
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(20),
+                          boxShadow: [
+                            BoxShadow(color: Colors.white.withValues(alpha: 0.2), blurRadius: 20, offset: const Offset(0, 5))
+                          ]
+                        ),
+                        child: QrImageView(
+                          data: paiement.numeroTransaction,
+                          version: QrVersions.auto,
+                          size: 140.0,
+                          dataModuleStyle: const QrDataModuleStyle(
+                            dataModuleShape: QrDataModuleShape.square,
+                            color: Colors.white,
                           ),
-                          elevation: 0,
-                        ),
-                        child: Text(
-                          "Continuer",
-                          style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.bold),
+                          eyeStyle: const QrEyeStyle(
+                            eyeShape: QrEyeShape.square,
+                            color: Color(0xFF08111F),
+                          ),
                         ),
                       ),
-                    )
-                  ],
-                ),
-              )
-            ],
+                      const SizedBox(height: 16),
+                      Text(
+                        "Scannez pour valider avec le transporteur",
+                        style: GoogleFonts.poppins(color: Colors.white54, fontSize: 11, fontWeight: FontWeight.w500),
+                      ),
+                      
+                      const SizedBox(height: 40),
+                      
+                      SizedBox(
+                        width: double.infinity,
+                        height: 56,
+                        child: ElevatedButton(
+                          onPressed: () {
+                            HapticFeedback.mediumImpact();
+                            onFermer();
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: CouleursApp.succes.withValues(alpha: 0.15),
+                            foregroundColor: CouleursApp.succes,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                              side: BorderSide(color: CouleursApp.succes.withValues(alpha: 0.3)),
+                            ),
+                            elevation: 0,
+                          ),
+                          child: Text(
+                            "Terminer",
+                            style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.bold, letterSpacing: 1),
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
+                )
+              ],
+            ),
           ),
         ),
       ),

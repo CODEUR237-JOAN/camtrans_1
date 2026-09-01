@@ -94,10 +94,10 @@ class _HistoriqueState extends ConsumerState<Historique> {
     final coursesAsync = ref.watch(coursesClientProvider);
 
     return Scaffold(
-      backgroundColor: CouleursApp.fond,
+      backgroundColor: const Color(0xFF08111F),
       appBar: AppBar(
         title: const Text("Historique des demandes", style: TextStyle(fontWeight: FontWeight.bold)),
-        backgroundColor: CouleursApp.fond,
+        backgroundColor: const Color(0xFF08111F),
         elevation: 0,
         automaticallyImplyLeading: false,
         actions: [
@@ -144,7 +144,7 @@ class _HistoriqueState extends ConsumerState<Historique> {
                   borderSide: BorderSide.none,
                 ),
                 filled: true,
-                fillColor: Colors.grey.shade100,
+                fillColor: const Color(0xFF1A2640),
               ),
             ),
           ),
@@ -244,7 +244,7 @@ class _HistoriqueState extends ConsumerState<Historique> {
                 );
               },
               loading: () => const Center(child: IndicateurChargement(taille: 30)),
-              error: (err, stack) => Center(child: Text("Erreur: $err")),
+              error: (err, stack) => Center(child: Text("Oups ! Impossible de charger l'historique : $err 🔧")),
             ),
           ),
         ],
@@ -264,7 +264,7 @@ class _HistoriqueState extends ConsumerState<Historique> {
           color: estSelectionne ? CouleursApp.primaire : Colors.white,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-              color: estSelectionne ? CouleursApp.primaire : Colors.grey.shade300),
+              color: estSelectionne ? CouleursApp.primaire : Colors.white38),
           boxShadow: estSelectionne
               ? [
                   BoxShadow(
@@ -307,12 +307,12 @@ class _HistoriqueState extends ConsumerState<Historique> {
     return Container(
       margin: const EdgeInsets.only(bottom: 18),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: const Color(0xFF10192A),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.grey.shade100),
+        border: Border.all(color: const Color(0xFFEEEEEE)),
         boxShadow: [
           BoxShadow(
-              color: Colors.black.withValues(alpha: 0.03),
+              color: Colors.white.withValues(alpha: 0.07),
               blurRadius: 10,
               offset: const Offset(0, 5))
         ],
@@ -345,7 +345,7 @@ class _HistoriqueState extends ConsumerState<Historique> {
                       const SizedBox(height: 5),
                       Text(dateStr,
                           style: const TextStyle(
-                              color: CouleursApp.texteSecondaire,
+                              color: Colors.white70,
                               fontSize: 13)),
                     ],
                   ),

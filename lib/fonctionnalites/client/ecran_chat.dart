@@ -64,13 +64,13 @@ class _EcranChatState extends ConsumerState<EcranChat> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: const Color(0xFF08111F),
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: const Color(0xFF08111F),
         elevation: 0,
         systemOverlayStyle: SystemUiOverlayStyle.dark,
         leading: IconButton(
-          icon: const Icon(Iconsax.arrow_left_2_copy, color: Colors.black87),
+          icon: const Icon(Iconsax.arrow_left_2_copy, color: Colors.white),
           onPressed: () => context.pop(),
         ),
         title: Row(
@@ -88,7 +88,7 @@ class _EcranChatState extends ConsumerState<EcranChat> {
                 children: [
                   Text(
                     "${widget.transporteur.prenom} ${widget.transporteur.nom}",
-                    style: GoogleFonts.inter(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.black87),
+                    style: GoogleFonts.inter(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.white),
                     overflow: TextOverflow.ellipsis,
                   ),
                   Row(
@@ -141,7 +141,7 @@ class _EcranChatState extends ConsumerState<EcranChat> {
                     return Center(
                       child: Text(
                         "Dites bonjour à ${widget.transporteur.prenom} !",
-                        style: GoogleFonts.inter(color: Colors.grey),
+                        style: GoogleFonts.inter(color: Colors.white54),
                       ),
                     );
                   }
@@ -181,7 +181,7 @@ class _EcranChatState extends ConsumerState<EcranChat> {
                                     bottomRight: isUser ? const Radius.circular(4) : const Radius.circular(20),
                                   ),
                                   boxShadow: [
-                                    if (!isUser) BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 10, offset: const Offset(0, 4))
+                                    if (!isUser) BoxShadow(color: Colors.white.withValues(alpha: 0.07), blurRadius: 10, offset: const Offset(0, 4))
                                   ]
                                 ),
                                 child: Column(
@@ -221,9 +221,9 @@ class _EcranChatState extends ConsumerState<EcranChat> {
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: const Color(0xFF10192A),
                 boxShadow: [
-                  BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 20, offset: const Offset(0, -5))
+                  BoxShadow(color: Colors.white.withValues(alpha: 0.07), blurRadius: 20, offset: const Offset(0, -5))
                 ],
               ),
               child: Row(
@@ -236,17 +236,17 @@ class _EcranChatState extends ConsumerState<EcranChat> {
                     child: Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: Colors.grey.shade100,
+                        color: const Color(0xFFEEEEEE),
                         shape: BoxShape.circle,
                       ),
-                      child: const Icon(Iconsax.camera_copy, color: Colors.grey, size: 22),
+                      child: const Icon(Iconsax.camera_copy, color: Colors.white54, size: 22),
                     ),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
                     child: Container(
                       decoration: BoxDecoration(
-                        color: Colors.grey.shade100,
+                        color: const Color(0xFFEEEEEE),
                         borderRadius: BorderRadius.circular(24),
                       ),
                       child: TextField(
@@ -254,7 +254,7 @@ class _EcranChatState extends ConsumerState<EcranChat> {
                         style: GoogleFonts.inter(fontSize: 15),
                         decoration: InputDecoration(
                           hintText: "Écrire un message...",
-                          hintStyle: GoogleFonts.inter(color: Colors.grey),
+                          hintStyle: GoogleFonts.inter(color: Colors.white54),
                           border: InputBorder.none,
                           contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
                         ),

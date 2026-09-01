@@ -15,10 +15,10 @@ class Revenus extends ConsumerWidget {
     return Scaffold(
       backgroundColor: const Color(0xFFF4F7FB),
       appBar: AppBar(
-        title: const Text("Revenus & Portefeuille", style: TextStyle(color: Colors.black87, fontWeight: FontWeight.bold)),
-        backgroundColor: Colors.white,
+        title: const Text("Revenus & Portefeuille", style: TextStyle(color: Colors.white70, fontWeight: FontWeight.bold)),
+        backgroundColor: const Color(0xFF08111F),
         elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.black87),
+        iconTheme: const IconThemeData(color: Colors.white70),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
@@ -101,7 +101,7 @@ class Revenus extends ConsumerWidget {
                   return const Center(
                     child: Padding(
                       padding: EdgeInsets.all(40.0),
-                      child: Text("Aucun revenu enregistré pour le moment.", style: TextStyle(color: Colors.grey)),
+                      child: Text("Aucun revenu enregistré pour le moment.", style: TextStyle(color: Colors.white54)),
                     ),
                   );
                 }
@@ -114,7 +114,7 @@ class Revenus extends ConsumerWidget {
                     return Card(
                       elevation: 0,
                       margin: const EdgeInsets.only(bottom: 12),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15), side: BorderSide(color: Colors.grey.shade200)),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15), side: BorderSide(color: Colors.white.withValues(alpha: 0.08))),
                       child: ListTile(
                         contentPadding: const EdgeInsets.all(16),
                         leading: CircleAvatar(
@@ -124,7 +124,7 @@ class Revenus extends ConsumerWidget {
                         title: const Text("Paiement reçu", style: TextStyle(fontWeight: FontWeight.bold)),
                         subtitle: Text(
                           "${paiement.datePaiement.day}/${paiement.datePaiement.month}/${paiement.datePaiement.year}",
-                          style: const TextStyle(color: Colors.grey),
+                          style: const TextStyle(color: Colors.white54),
                         ),
                         trailing: Text(
                           "+${paiement.montantNet.toStringAsFixed(0)} FCFA",

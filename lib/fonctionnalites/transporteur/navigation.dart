@@ -41,16 +41,16 @@ class _NavigationTransporteurState extends ConsumerState<NavigationTransporteur>
 
     if (activeCourse == null) {
       return Scaffold(
-        backgroundColor: CouleursApp.fond,
+        backgroundColor: const Color(0xFF08111F),
         body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.map_outlined, size: 80, color: Colors.grey),
+              const Icon(Icons.map_outlined, size: 80, color: Colors.white54),
               const SizedBox(height: 20),
               const Text("Aucune course active", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
               const SizedBox(height: 10),
-              const Text("Acceptez une course sur le marché pour commencer.", textAlign: TextAlign.center, style: TextStyle(color: Colors.grey)),
+              const Text("Acceptez une course sur le marché pour commencer.", textAlign: TextAlign.center, style: TextStyle(color: Colors.white54)),
             ],
           ),
         ),
@@ -88,6 +88,7 @@ class _NavigationTransporteurState extends ConsumerState<NavigationTransporteur>
             child: Align(
               alignment: Alignment.topCenter,
               child: Card(
+                color: const Color(0xFF10192A),
                 margin: const EdgeInsets.all(15),
                 elevation: 5,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
@@ -105,7 +106,7 @@ class _NavigationTransporteurState extends ConsumerState<NavigationTransporteur>
                         value: progression,
                         minHeight: 8,
                         borderRadius: BorderRadius.circular(20),
-                        backgroundColor: Colors.grey.shade200,
+                        backgroundColor: const Color(0xFF1A2640),
                         color: CouleursApp.primaire,
                       ),
                       const SizedBox(height: 10),
@@ -125,14 +126,14 @@ class _NavigationTransporteurState extends ConsumerState<NavigationTransporteur>
               return Container(
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.1), blurRadius: 20)],
+                  boxShadow: [BoxShadow(color: Colors.white.withValues(alpha: 0.07), blurRadius: 20)],
                   borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
                 ),
                 child: ListView(
                   controller: scrollController,
                   padding: const EdgeInsets.all(24),
                   children: [
-                    Center(child: Container(width: 50, height: 5, decoration: BoxDecoration(color: Colors.grey.shade300, borderRadius: BorderRadius.circular(10)))),
+                    Center(child: Container(width: 50, height: 5, decoration: BoxDecoration(color: Colors.white.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(10)))),
                     const SizedBox(height: 20),
                     ListTile(
                       contentPadding: EdgeInsets.zero,
@@ -186,7 +187,7 @@ class _NavigationTransporteurState extends ConsumerState<NavigationTransporteur>
             bottom: 330,
             right: 20,
             child: FloatingActionButton(
-              backgroundColor: Colors.white,
+              backgroundColor: const Color(0xFF08111F),
               onPressed: () => controleurCarte.move(depart, 14),
               child: const Icon(Icons.my_location, color: CouleursApp.primaire),
             ),
@@ -205,7 +206,7 @@ class _NavigationTransporteurState extends ConsumerState<NavigationTransporteur>
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(titre, style: const TextStyle(fontSize: 12, color: Colors.grey, fontWeight: FontWeight.bold)),
+              Text(titre, style: const TextStyle(fontSize: 12, color: Colors.white54, fontWeight: FontWeight.bold)),
               Text(valeur, style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w600)),
             ],
           ),

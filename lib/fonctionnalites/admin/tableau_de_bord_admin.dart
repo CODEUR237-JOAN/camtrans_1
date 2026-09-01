@@ -9,6 +9,10 @@ import 'pages/page_moderation.dart';
 import 'pages/page_activites.dart';
 import 'pages/page_notifications.dart';
 import 'pages/page_carte_flotte.dart';
+import 'pages/page_parametres.dart';
+import 'pages/page_abonnements_admin.dart';
+import 'pages/page_litiges.dart';
+import 'pages/page_gestion_textes.dart';
 
 
 class TableauDeBordAdmin extends ConsumerStatefulWidget {
@@ -78,6 +82,10 @@ class _TableauDeBordAdminState extends ConsumerState<TableauDeBordAdmin> {
                 const PageCarteFlotte(),
                 const PageActivites(),
                 const PageNotifications(),
+                const PageParametres(),
+                const PageAbonnementsAdmin(),
+                const PageLitiges(),
+                const PageGestionTextes(),
               ],
             ),
           ),

@@ -60,6 +60,7 @@ final fluxMesCoursesProvider =
   });
 });
 
+
 // Flux des courses en attente de transporteur (compatibles)
 final fluxCoursesDisponiblesProvider = StreamProvider.autoDispose<List<Course>>((ref) {
   final firestore = ref.watch(serviceFirestoreProvider);
@@ -139,106 +140,54 @@ class TransporteurActions {
   TransporteurActions(this._firestore, this._transporteurId, );
 
 
-  /// Accepter une course (Dispatch automatique)
+  /// Accepter une course (Transaction sécurisée)
   Future<void> accepterCourse(String courseId) async {
-    final courseDoc = await _firestore.lireDocument(
-        collection: 'courses', id: courseId);
-        
-    if (!courseDoc.exists || courseDoc.data() == null) {
-      throw Exception("Course introuvable.");
-    }
+    final docRef = FirebaseFirestore.instance.collection('courses').doc(courseId);
     
-    // On l'accepte et passe en route vers le départ
-    final Map<String, dynamic> miseAJour = {
-      'statut': StatutCourse.enRouteDepart,
-      'dateDebut': DateTime.now().toIso8601String(),
-    };
-
-    await _firestore.modifierDocument(
-      collection: 'courses',
-      id: courseId,
-      donnees: miseAJour,
-    );
+    await FirebaseFirestore.instance.runTransaction((transaction) async {
+      final courseSnapshot = await transaction.get(docRef);
+      if (!courseSnapshot.exists || courseSnapshot.data() == null) {
+        throw Exception("Course introuvable.");
+      }
+      
+      final data = courseSnapshot.data()!;
+      // Vérifier que la course est toujours attribuée à CE transporteur
+      if (data['statut'] != StatutCourse.attribue || data['transporteurId'] != _transporteurId) {
+        throw Exception("Cette course n'est plus disponible ou a été annulée.");
+      }
+      
+      transaction.update(docRef, {
+        'statut': StatutCourse.enRouteDepart,
+        'dateDebut': DateTime.now().toIso8601String(),
+      });
+    });
   }
 
-  /// Refuser une course attribuée automatiquement (Cascade)
+  /// Refuser une course attribuée automatiquement (Transaction sécurisée)
   Future<void> refuserCourse(String courseId) async {
-    final courseDoc = await _firestore.lireDocument(
-        collection: 'courses', id: courseId);
-        
-    if (!courseDoc.exists || courseDoc.data() == null) {
-      throw Exception("Course introuvable.");
-    }
+    final docRef = FirebaseFirestore.instance.collection('courses').doc(courseId);
     
-    final courseData = courseDoc.data()!;
-    final List<dynamic> declinesDyn = courseData['transporteursDeclines'] ?? [];
-    final Set<String> declines = declinesDyn.map((e) => e.toString()).toSet();
-    declines.add(_transporteurId);
-    
-    final double latDepart = courseData['latitudeDepart'] ?? 0.0;
-    final double lngDepart = courseData['longitudeDepart'] ?? 0.0;
-    final String typeVehicule = courseData['typeVehicule'] ?? '';
-
-    // Trouver le prochain chauffeur dispo
-    final transporteursSnapshot = await _firestore.transporteurs.get();
-    
-    String nextChauffeurId = '';
-    String nextNom = '';
-    String nextTel = '';
-    double minDist = double.infinity;
-
-    for (var doc in transporteursSnapshot.docs) {
-      final t = doc.data();
-      final id = doc.id;
-      if (declines.contains(id)) continue;
-      if (t['disponible'] != true) continue;
-      if (t['documentsValides'] != true) continue;
-      
-      final tVehicule = t['typeVehicule'] ?? '';
-      if (typeVehicule.isNotEmpty && tVehicule != typeVehicule && tVehicule != 'Tous') continue;
-      
-      final tLat = t['latitude'] ?? 0.0;
-      final tLng = t['longitude'] ?? 0.0;
-      
-      double dist = double.infinity;
-      if (latDepart != 0.0 && tLat != 0.0) {
-          // Haversine exact (assuming we import math, or just use simple Pythagoras for small distances)
-          final dLat = tLat - latDepart;
-          final dLng = tLng - lngDepart;
-          dist = dLat*dLat + dLng*dLng; // Distance au carré
+    await FirebaseFirestore.instance.runTransaction((transaction) async {
+      final courseSnapshot = await transaction.get(docRef);
+      if (!courseSnapshot.exists || courseSnapshot.data() == null) {
+        throw Exception("Course introuvable.");
       }
       
-      if (dist < minDist) {
-        minDist = dist;
-        nextChauffeurId = id;
-        nextNom = "${t['prenom']} ${t['nom']}";
-        nextTel = t['telephone'] ?? '';
+      final data = courseSnapshot.data()!;
+      if (data['statut'] != StatutCourse.attribue || data['transporteurId'] != _transporteurId) {
+        throw Exception("Cette course n'est plus disponible.");
       }
-    }
-
-    final Map<String, dynamic> miseAJour = {
-      'transporteursDeclines': FieldValue.arrayUnion([_transporteurId]),
-    };
-
-    if (nextChauffeurId.isNotEmpty) {
-      // Assigner au prochain
-      miseAJour['transporteurId'] = nextChauffeurId;
-      miseAJour['nomTransporteur'] = nextNom;
-      miseAJour['telephoneTransporteur'] = nextTel;
-      miseAJour['statut'] = StatutCourse.attribue;
-    } else {
-      // Plus personne de disponible
-      miseAJour['transporteurId'] = '';
-      miseAJour['nomTransporteur'] = '';
-      miseAJour['telephoneTransporteur'] = '';
-      miseAJour['statut'] = StatutCourse.recherche;
-    }
-
-    await _firestore.modifierDocument(
-      collection: 'courses',
-      id: courseId,
-      donnees: miseAJour,
-    );
+      
+      // On retire le transporteur et on remet la course en recherche.
+      // La Cloud Function prendra le relais pour trouver le prochain !
+      transaction.update(docRef, {
+        'transporteurId': '',
+        'nomTransporteur': '',
+        'telephoneTransporteur': '',
+        'statut': StatutCourse.recherche,
+        'transporteursDeclines': FieldValue.arrayUnion([_transporteurId]),
+      });
+    });
   }
 
   /// Change le statut d'une course en validant la transition

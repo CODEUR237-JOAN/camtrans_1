@@ -45,10 +45,10 @@ class Facture extends ConsumerWidget {
     final fluxPaiements = ref.watch(listePaiementsProvider);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF4F7FB),
+      backgroundColor: const Color(0xFF08111F),
       appBar: AppBar(
         title: const Text("Mes Transactions", style: TextStyle(fontWeight: FontWeight.bold)),
-        backgroundColor: Colors.white,
+        backgroundColor: const Color(0xFF08111F),
         elevation: 0,
         foregroundColor: Colors.black87,
         leading: IconButton(
@@ -65,9 +65,9 @@ class Facture extends ConsumerWidget {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Icon(Icons.receipt_long, size: 80, color: Colors.grey.shade400),
+                  Icon(Icons.receipt_long, size: 80, color: Colors.white38),
                   const SizedBox(height: 16),
-                  const Text("Aucune transaction trouvée", style: TextStyle(color: Colors.black54, fontSize: 16)),
+                  const Text("Aucune transaction trouvée", style: TextStyle(color: Colors.white70, fontSize: 16)),
                 ],
               ),
             );
@@ -89,10 +89,10 @@ class Facture extends ConsumerWidget {
   /// Vue détaillée d'une course spécifique
   Widget _buildDetailCourse(BuildContext context, Course c) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF4F7FB),
+      backgroundColor: const Color(0xFF08111F),
       appBar: AppBar(
         title: const Text("Détail de la course", style: TextStyle(fontWeight: FontWeight.bold)),
-        backgroundColor: Colors.white,
+        backgroundColor: const Color(0xFF08111F),
         elevation: 0,
         foregroundColor: Colors.black87,
         leading: IconButton(icon: const Icon(Icons.arrow_back), onPressed: () => context.pop()),
@@ -140,9 +140,9 @@ class Facture extends ConsumerWidget {
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: const Color(0xFF10192A),
         borderRadius: BorderRadius.circular(14),
-        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.04), blurRadius: 8)],
+        boxShadow: [BoxShadow(color: Colors.white.withValues(alpha: 0.07), blurRadius: 8)],
       ),
       child: Row(
         children: [
@@ -155,9 +155,9 @@ class Facture extends ConsumerWidget {
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(label, style: const TextStyle(color: Colors.black45, fontSize: 12)),
+              Text(label, style: const TextStyle(color: Colors.white54, fontSize: 12)),
               Text(value.isNotEmpty ? value : "-",
-                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Colors.black87)),
+                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Colors.white)),
             ],
           ),
         ],
@@ -197,10 +197,10 @@ class Facture extends ConsumerWidget {
         margin: const EdgeInsets.only(bottom: 16),
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: const Color(0xFF10192A),
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
-            BoxShadow(color: Colors.black.withValues(alpha: 0.05), blurRadius: 10, offset: const Offset(0, 5))
+            BoxShadow(color: Colors.white.withValues(alpha: 0.07), blurRadius: 10, offset: const Offset(0, 5))
           ]
         ),
         child: Row(
@@ -218,9 +218,9 @@ class Facture extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(paiement.methodePaiement, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.black87)),
+                  Text(paiement.methodePaiement, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.white)),
                   const SizedBox(height: 4),
-                  Text("${paiement.datePaiement.day}/${paiement.datePaiement.month}/${paiement.datePaiement.year}", style: const TextStyle(color: Colors.black54, fontSize: 13)),
+                  Text("${paiement.datePaiement.day}/${paiement.datePaiement.month}/${paiement.datePaiement.year}", style: const TextStyle(color: Colors.white70, fontSize: 13)),
                 ],
               ),
             ),

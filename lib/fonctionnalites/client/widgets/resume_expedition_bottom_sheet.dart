@@ -202,7 +202,7 @@ class _ResumeExpeditionBottomSheetState extends ConsumerState<ResumeExpeditionBo
                       child: CircularProgressIndicator(color: CouleursApp.primaire),
                     ))
                   else if (etatEstimation.erreur != null)
-                    Text("Erreur: ${etatEstimation.erreur}", style: const TextStyle(color: Colors.red))
+                    Text("Oups ! Un petit imprévu : ${etatEstimation.erreur} 🔧", style: const TextStyle(color: Colors.red))
                   else if (etatEstimation.resultat != null)
                     etat.categorieService == "Remorque"
                       ? CarteEstimationRemorque(
@@ -229,7 +229,7 @@ class _ResumeExpeditionBottomSheetState extends ConsumerState<ResumeExpeditionBo
                 borderRadius: BorderRadius.circular(16),
                 gradient: etat.categorieService == "Remorque"
                     ? const LinearGradient(
-                        colors: [Color(0xFF12B76A), Color(0xFF0E9456)],
+                        colors: [CouleursApp.succes, Color(0xFF0E9456)],
                       )
                     : const LinearGradient(
                         colors: [Color(0xFF3B82F6), Color(0xFF2563EB)],
@@ -237,7 +237,7 @@ class _ResumeExpeditionBottomSheetState extends ConsumerState<ResumeExpeditionBo
                 boxShadow: [
                   BoxShadow(
                     color: etat.categorieService == "Remorque"
-                        ? const Color(0xFF12B76A).withValues(alpha: 0.35)
+                        ? CouleursApp.succes.withValues(alpha: 0.35)
                         : const Color(0xFF3B82F6).withValues(alpha: 0.35),
                     blurRadius: 16,
                     offset: const Offset(0, 6),
@@ -250,7 +250,7 @@ class _ResumeExpeditionBottomSheetState extends ConsumerState<ResumeExpeditionBo
                   final user = ref.read(serviceAuthentificationProvider).utilisateur;
                   if (user == null) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text("Erreur: Vous n'êtes pas connecté.")),
+                      const SnackBar(content: Text("Hmm, il semblerait que vous ne soyez pas connecté. 🤔")),
                     );
                     return;
                   }
@@ -388,7 +388,7 @@ class _ResumeExpeditionBottomSheetState extends ConsumerState<ResumeExpeditionBo
                       Navigator.pop(context); // Fermer le radar
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                          content: Text("Erreur : ${e.toString()}"),
+                          content: Text("Hmm, quelque chose s'est mal passé : ${e.toString()} 🔧"),
                           backgroundColor: CouleursApp.erreur,
                         ),
                       );

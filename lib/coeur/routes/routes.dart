@@ -34,6 +34,7 @@ import 'package:update_camtrans/fonctionnalites/transporteur/portefeuille.dart';
 import 'package:update_camtrans/fonctionnalites/transporteur/documents.dart';
 import 'package:update_camtrans/modeles/transporteur.dart';
 import 'package:update_camtrans/modeles/course.dart';
+import 'package:update_camtrans/fonctionnalites/transporteur/page_abonnement.dart';
 
 class RoutesApplication {
   RoutesApplication._();
@@ -71,6 +72,7 @@ class RoutesApplication {
   static const String portefeuille = "/portefeuille";
   static const String documents = "/documents";
   static const String facture = "/facture";
+  static const String abonnement = "/abonnement";
 
   // ===========================
   // Routeur GoRouter
@@ -253,6 +255,10 @@ class RoutesApplication {
             state.pageKey,
           );
         },
+      ),
+      GoRoute(
+        path: abonnement,
+        pageBuilder: (context, state) => _page(const PageAbonnement(), state.pageKey),
       ),
     ],
     errorBuilder: (context, state) => Scaffold(

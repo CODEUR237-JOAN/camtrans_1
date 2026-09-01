@@ -15,7 +15,7 @@ class Portefeuille extends ConsumerWidget {
     final fluxRevenus = ref.watch(fluxMesRevenusProvider);
 
     return Scaffold(
-      backgroundColor: CouleursApp.fond,
+      backgroundColor: const Color(0xFF08111F),
       appBar: AppBar(
         title: const Text("Mon portefeuille"),
       ),
@@ -126,7 +126,7 @@ class Portefeuille extends ConsumerWidget {
                 if (paiements.isEmpty) {
                   return const Padding(
                     padding: EdgeInsets.all(20.0),
-                    child: Center(child: Text("Aucune transaction.", style: TextStyle(color: Colors.grey))),
+                    child: Center(child: Text("Aucune transaction.", style: TextStyle(color: Colors.white54))),
                   );
                 }
                 return ListView.builder(
@@ -174,6 +174,7 @@ class Portefeuille extends ConsumerWidget {
 
   Widget _transaction(String titre, String sousTitre, String montant, Color couleur, IconData icone) {
     return Card(
+      color: const Color(0xFF10192A),
       margin: const EdgeInsets.only(bottom: 12),
       child: ListTile(
         leading: CircleAvatar(

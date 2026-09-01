@@ -45,7 +45,7 @@ class _EntretienState extends State<Entretien> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: CouleursApp.fond,
+      backgroundColor: const Color(0xFF08111F),
       appBar: AppBar(
         title: const Text("Entretien du véhicule"),
       ),
@@ -136,6 +136,7 @@ class _EntretienState extends State<Entretien> {
 
             ...entretiens.map<Widget>(
                   (entretien) => Card(
+                color: const Color(0xFF10192A),
                 margin:
                 const EdgeInsets.only(bottom: 15),
                 elevation: 3,
@@ -190,7 +191,7 @@ class _EntretienState extends State<Entretien> {
             const SizedBox(height: 25),
 
             Card(
-              color: Colors.orange.shade50,
+              color: Colors.orange.withValues(alpha: 0.1),
               shape: RoundedRectangleBorder(
                 borderRadius:
                 BorderRadius.circular(18),
@@ -212,7 +213,7 @@ class _EntretienState extends State<Entretien> {
             const SizedBox(height: 25),
 
             Card(
-              color: Colors.green.shade50,
+              color: Colors.green.withValues(alpha: 0.1),
               shape: RoundedRectangleBorder(
                 borderRadius:
                 BorderRadius.circular(18),

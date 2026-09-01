@@ -6,6 +6,8 @@ import 'package:update_camtrans/coeur/constantes/couleurs.dart';
 import 'package:update_camtrans/coeur/constantes/tailles.dart';
 import 'package:update_camtrans/coeur/etat/transporteur_provider.dart';
 import 'package:update_camtrans/services/service_authentification.dart';
+import 'package:update_camtrans/coeur/routes/routes.dart';
+import 'package:intl/intl.dart';
 
 class ProfilTransporteur extends ConsumerWidget {
   const ProfilTransporteur({super.key});
@@ -16,10 +18,10 @@ class ProfilTransporteur extends ConsumerWidget {
     final auth = ref.watch(serviceAuthentificationProvider);
 
     return Scaffold(
-      backgroundColor: CouleursApp.fond,
+      backgroundColor: const Color(0xFF08111F),
       appBar: AppBar(
         title: const Text("Mon profil", style: TextStyle(fontWeight: FontWeight.bold)),
-        backgroundColor: CouleursApp.fond,
+        backgroundColor: const Color(0xFF08111F),
         elevation: 0,
         automaticallyImplyLeading: false,
       ),
@@ -62,12 +64,17 @@ class ProfilTransporteur extends ConsumerWidget {
                 ),
 
                 const SizedBox(height: 25),
+                
+                // === SECTION ABONNEMENT ===
+                _buildAbonnementCard(context, transporteur),
+
+                const SizedBox(height: 25),
 
                 Card(
                   elevation: 0,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(20),
-                    side: BorderSide(color: Colors.grey.shade200),
+                    side: BorderSide(color: Colors.white.withValues(alpha: 0.08)),
                   ),
                   child: Column(
                     children: [
@@ -108,7 +115,7 @@ class ProfilTransporteur extends ConsumerWidget {
                   elevation: 0,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(20),
-                    side: BorderSide(color: Colors.grey.shade200),
+                    side: BorderSide(color: Colors.white.withValues(alpha: 0.08)),
                   ),
                   child: Column(
                     children: [
@@ -157,8 +164,9 @@ class ProfilTransporteur extends ConsumerWidget {
 
                 const SizedBox(height: 30),
 
-                _boutonOption(Icons.edit, "Modifier le profil", () => context.push("/modifier-profil")),
-                _boutonOption(Icons.lock, "Changer le mot de passe", () => context.push("/changer-mot-de-passe")),
+                _boutonOption(Icons.workspace_premium, "Mes abonnements", () => context.push(RoutesApplication.abonnement)),
+                _boutonOption(Icons.edit, "Modifier le profil", () => context.push(RoutesApplication.modifierProfil)),
+                _boutonOption(Icons.lock, "Changer le mot de passe", () => context.push(RoutesApplication.changerMotDePasse)),
                 _boutonOption(Icons.settings, "Paramètres", () {}),
                 _boutonOption(Icons.help, "Aide & Support", () {}),
 
@@ -168,13 +176,13 @@ class ProfilTransporteur extends ConsumerWidget {
                   width: double.infinity,
                   child: ElevatedButton.icon(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.red.shade50,
+                      backgroundColor: Colors.red.withValues(alpha: 0.15),
                       foregroundColor: Colors.red,
                       minimumSize: const Size(double.infinity, 55),
                       elevation: 0,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(15),
-                        side: BorderSide(color: Colors.red.shade100),
+                        side: BorderSide(color: Colors.red.withValues(alpha: 0.3)),
                       ),
                     ),
                     onPressed: () async {
@@ -201,12 +209,12 @@ class ProfilTransporteur extends ConsumerWidget {
       margin: const EdgeInsets.only(bottom: 12),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(15),
-        side: BorderSide(color: Colors.grey.shade100),
+        side: BorderSide(color: Colors.white.withValues(alpha: 0.07)),
       ),
       child: ListTile(
         leading: Icon(icone, color: CouleursApp.primaire),
         title: Text(texte, style: const TextStyle(fontWeight: FontWeight.w600)),
-        trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+        trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.white54),
         onTap: action,
       ),
     );
@@ -218,7 +226,7 @@ class ProfilTransporteur extends ConsumerWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: Colors.grey.shade200),
+        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
       ),
       child: Column(
         children: [
@@ -226,7 +234,85 @@ class ProfilTransporteur extends ConsumerWidget {
           const SizedBox(height: 10),
           Text(valeur, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
           const SizedBox(height: 4),
-          Text(titre, style: const TextStyle(color: Colors.grey, fontSize: 12)),
+          Text(titre, style: const TextStyle(color: Colors.white54, fontSize: 12)),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildAbonnementCard(BuildContext context, transporteur) {
+    bool estValide = transporteur.abonnementValide;
+    int joursRestants = 0;
+    
+    if (transporteur.dateFinAbonnement != null) {
+      joursRestants = transporteur.dateFinAbonnement!.difference(DateTime.now()).inDays;
+    }
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(20),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: estValide 
+              ? [CouleursApp.primaire.withValues(alpha: 0.8), CouleursApp.primaire]
+              : [Colors.orange.shade400, Colors.red.shade400],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(20),
+        boxShadow: [
+          BoxShadow(
+            color: (estValide ? CouleursApp.primaire : Colors.red).withValues(alpha: 0.3),
+            blurRadius: 10,
+            offset: const Offset(0, 5),
+          )
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(estValide ? Icons.verified : Icons.warning_amber_rounded, color: Colors.white, size: 28),
+              const SizedBox(width: 10),
+              Text(
+                "Statut de l'abonnement",
+                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18),
+              ),
+            ],
+          ),
+          const SizedBox(height: 15),
+          if (estValide) ...[
+            Text(
+              "Il vous reste $joursRestants jour(s)",
+              style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900),
+            ),
+            const SizedBox(height: 5),
+            Text(
+              "Valide jusqu'au ${DateFormat('dd/MM/yyyy à HH:mm').format(transporteur.dateFinAbonnement!)}",
+              style: const TextStyle(color: Colors.white70, fontSize: 13),
+            ),
+          ] else ...[
+            const Text(
+              "Abonnement expiré",
+              style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900),
+            ),
+            const SizedBox(height: 5),
+            const Text(
+              "Veuillez renouveler votre abonnement pour continuer à recevoir des courses.",
+              style: TextStyle(color: Colors.white70, fontSize: 13),
+            ),
+          ],
+          const SizedBox(height: 15),
+          ElevatedButton(
+            onPressed: () => context.push(RoutesApplication.abonnement),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFF08111F),
+              foregroundColor: estValide ? CouleursApp.primaire : Colors.red,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            ),
+            child: Text(estValide ? "Prolonger l'abonnement" : "Renouveler maintenant", style: const TextStyle(fontWeight: FontWeight.bold)),
+          ),
         ],
       ),
     );

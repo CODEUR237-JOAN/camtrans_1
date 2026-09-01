@@ -1,4 +1,5 @@
 import 'package:update_camtrans/coeur/utilitaires/parseur.dart';
+import 'package:update_camtrans/coeur/constantes/statuts.dart';
 
 class Course {
   final String id;
@@ -173,7 +174,7 @@ class Course {
       prixFinal: Parseur.toDouble(map["prixFinal"]),
       modePaiement: map["modePaiement"] ?? "",
       paiementEffectue: map["paiementEffectue"] ?? false,
-      statut: map["statut"] ?? "En attente",
+      statut: _normalizeStatut(map["statut"] ?? "En attente"),
       description: map["description"] ?? "",
       photos: List<String>.from(map["photos"] ?? []),
       dateCreation: Parseur.toDateTime(map["dateCreation"]),
@@ -201,4 +202,14 @@ class Course {
 
   Map<String, dynamic> toJson() => toMap();
   factory Course.fromJson(Map<String, dynamic> json) => Course.fromMap(json);
+
+  static String _normalizeStatut(String rawStatut) {
+    String l = rawStatut.toLowerCase();
+    if (l.contains('termin') || l.contains('livr')) return StatutCourse.terminee;
+    if (l.contains('annul')) return StatutCourse.annulee;
+    if (l.contains('cours') || l.contains('transit') || l.contains('rout') || l.contains('charge')) return StatutCourse.enTransit;
+    if (l.contains('attent') || l.contains('recherch')) return StatutCourse.recherche;
+    if (l.contains('accept') || l.contains('attribu')) return StatutCourse.attribue;
+    return rawStatut; // Fallback
+  }
 }

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/widgets.dart';
@@ -13,16 +14,19 @@ class ServicePresence with WidgetsBindingObserver {
   final FirebaseAuth _auth = FirebaseAuth.instance;
 
   String? _collection; // 'clients' ou 'transporteurs'
+  Timer? _heartbeatTimer;
 
   /// A appeler apres la connexion de l utilisateur
   void demarrer({required String role}) {
     _collection = role == 'transporteur' ? 'transporteurs' : 'clients';
     WidgetsBinding.instance.addObserver(this);
     _setEnLigne(true);
+    _demarrerHeartbeat();
   }
 
   /// A appeler lors de la deconnexion
   void arreter() {
+    _arreterHeartbeat();
     _setEnLigne(false);
     WidgetsBinding.instance.removeObserver(this);
     _collection = null;
@@ -33,14 +37,39 @@ class ServicePresence with WidgetsBindingObserver {
     switch (state) {
       case AppLifecycleState.resumed:
         _setEnLigne(true);
+        _demarrerHeartbeat();
         break;
       case AppLifecycleState.paused:
       case AppLifecycleState.inactive:
       case AppLifecycleState.detached:
       case AppLifecycleState.hidden:
+        _arreterHeartbeat();
         _setEnLigne(false);
         break;
     }
+  }
+
+  void _demarrerHeartbeat() {
+    _arreterHeartbeat();
+    // Met à jour la dernière connexion toutes les 3 minutes pour indiquer que l'app est toujours ouverte
+    _heartbeatTimer = Timer.periodic(const Duration(minutes: 3), (_) {
+      _pingPresence();
+    });
+  }
+
+  void _arreterHeartbeat() {
+    _heartbeatTimer?.cancel();
+    _heartbeatTimer = null;
+  }
+
+  void _pingPresence() {
+    final user = _auth.currentUser;
+    final collection = _collection;
+    if (user == null || collection == null) return;
+    _firestore.collection(collection).doc(user.uid).update({
+      'derniereConnexion': FieldValue.serverTimestamp(),
+      'estEnLigne': true,
+    }).catchError((_) {});
   }
 
   void _setEnLigne(bool enLigne) {

@@ -34,19 +34,19 @@ class _AdressesFavoritesPageState extends ConsumerState<AdressesFavoritesPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC), // Fond clair premium
+      backgroundColor: const Color(0xFF08111F), // Fond clair premium
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: const Color(0xFF08111F),
         elevation: 0,
         systemOverlayStyle: SystemUiOverlayStyle.dark,
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(Iconsax.arrow_left_2_copy, color: Colors.black87),
+          icon: const Icon(Iconsax.arrow_left_2_copy, color: Colors.white),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
           "Adresses favorites",
-          style: GoogleFonts.inter(color: Colors.black87, fontWeight: FontWeight.bold, fontSize: 18),
+          style: GoogleFonts.inter(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18),
         ),
       ),
       body: SafeArea(
@@ -57,12 +57,12 @@ class _AdressesFavoritesPageState extends ConsumerState<AdressesFavoritesPage> {
             children: [
               Text(
                 "Vos lieux enregistrés",
-                style: GoogleFonts.inter(fontSize: 22, fontWeight: FontWeight.w700, color: CouleursApp.textePrincipal),
+                style: GoogleFonts.inter(fontSize: 22, fontWeight: FontWeight.w700, color: Colors.white),
               ),
               const SizedBox(height: 8),
               Text(
                 "Accédez rapidement à vos destinations récurrentes lors de vos prochaines expéditions.",
-                style: GoogleFonts.inter(fontSize: 14, color: CouleursApp.texteSecondaire, height: 1.5),
+                style: GoogleFonts.inter(fontSize: 14, color: Colors.white70, height: 1.5),
               ),
               const SizedBox(height: 32),
               
@@ -110,12 +110,12 @@ class _AdressesFavoritesPageState extends ConsumerState<AdressesFavoritesPage> {
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: const Color(0xFF10192A),
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
-          BoxShadow(color: Colors.black.withValues(alpha: 0.03), blurRadius: 15, offset: const Offset(0, 5))
+          BoxShadow(color: Colors.white.withValues(alpha: 0.07), blurRadius: 15, offset: const Offset(0, 5))
         ],
-        border: Border.all(color: Colors.grey.shade100),
+        border: Border.all(color: const Color(0xFFEEEEEE)),
       ),
       child: Row(
         children: [
@@ -134,19 +134,19 @@ class _AdressesFavoritesPageState extends ConsumerState<AdressesFavoritesPage> {
               children: [
                 Text(
                   adr.label,
-                  style: GoogleFonts.inter(fontWeight: FontWeight.bold, fontSize: 16, color: CouleursApp.textePrincipal),
+                  style: GoogleFonts.inter(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.white),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   adr.adresse,
-                  style: GoogleFonts.inter(fontSize: 13, color: CouleursApp.texteSecondaire),
+                  style: GoogleFonts.inter(fontSize: 13, color: Colors.white70),
                   overflow: TextOverflow.ellipsis,
                 ),
               ],
             ),
           ),
           IconButton(
-            icon: const Icon(Iconsax.more_copy, color: CouleursApp.texteSecondaire),
+            icon: const Icon(Iconsax.more_copy, color: Colors.white70),
             onPressed: () {
               // Options: modifier, supprimer
             },
@@ -167,7 +167,7 @@ class _AdressesFavoritesPageState extends ConsumerState<AdressesFavoritesPage> {
           top: 32, left: 24, right: 24,
         ),
         decoration: const BoxDecoration(
-          color: Colors.white,
+          color: const Color(0xFF10192A),
           borderRadius: BorderRadius.only(topLeft: Radius.circular(32), topRight: Radius.circular(32)),
         ),
         child: Column(
@@ -175,7 +175,7 @@ class _AdressesFavoritesPageState extends ConsumerState<AdressesFavoritesPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Center(
-              child: Container(width: 50, height: 5, decoration: BoxDecoration(color: Colors.grey.shade300, borderRadius: BorderRadius.circular(10))),
+              child: Container(width: 50, height: 5, decoration: BoxDecoration(color: Colors.white38, borderRadius: BorderRadius.circular(10))),
             ),
             const SizedBox(height: 24),
             Text("Nouvelle adresse", style: GoogleFonts.inter(fontSize: 20, fontWeight: FontWeight.bold)),
@@ -185,10 +185,10 @@ class _AdressesFavoritesPageState extends ConsumerState<AdressesFavoritesPage> {
             TextField(
               decoration: InputDecoration(
                 hintText: "Label (ex: Maison, Parents...)",
-                hintStyle: GoogleFonts.inter(color: Colors.grey),
+                hintStyle: GoogleFonts.inter(color: Colors.white54),
                 filled: true,
-                fillColor: Colors.grey.shade50,
-                prefixIcon: const Icon(Iconsax.tag_copy, color: Colors.grey),
+                fillColor: const Color(0xFF1A2640),
+                prefixIcon: const Icon(Iconsax.tag_copy, color: Colors.white54),
                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
               ),
             ),
@@ -198,10 +198,10 @@ class _AdressesFavoritesPageState extends ConsumerState<AdressesFavoritesPage> {
             TextField(
               decoration: InputDecoration(
                 hintText: "Adresse complète",
-                hintStyle: GoogleFonts.inter(color: Colors.grey),
+                hintStyle: GoogleFonts.inter(color: Colors.white54),
                 filled: true,
-                fillColor: Colors.grey.shade50,
-                prefixIcon: const Icon(Iconsax.location_copy, color: Colors.grey),
+                fillColor: const Color(0xFF1A2640),
+                prefixIcon: const Icon(Iconsax.location_copy, color: Colors.white54),
                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide.none),
               ),
             ),

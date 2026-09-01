@@ -4,6 +4,8 @@ import 'package:update_camtrans/services/service_firestore.dart';
 import 'package:update_camtrans/modeles/client.dart';
 import 'package:update_camtrans/modeles/transporteur.dart';
 import 'package:update_camtrans/modeles/course.dart';
+import 'package:update_camtrans/modeles/paiement.dart';
+import 'package:update_camtrans/modeles/parametres_app.dart';
 
 // Providers pour lire toutes les données via Firebase (simulées ou réelles)
 
@@ -40,6 +42,115 @@ final adminCoursesProvider = StreamProvider.autoDispose<List<Course>>((ref) {
   });
 });
 
+// ===========================
+// Abonnements des transporteurs
+// ===========================
+
+final adminAbonnementsProvider = StreamProvider.autoDispose<List<Map<String, dynamic>>>((ref) {
+  final firestore = ref.watch(serviceFirestoreProvider);
+  return firestore.fluxCollection(collection: 'abonnements').map((snapshot) {
+    final list = snapshot.docs.map((doc) {
+      final data = doc.data();
+      data['id'] = doc.id;
+      return data;
+    }).toList();
+    // Trier par date décroissante
+    list.sort((a, b) {
+      final da = DateTime.tryParse(a['dateDebut'] ?? '') ?? DateTime(2000);
+      final db = DateTime.tryParse(b['dateDebut'] ?? '') ?? DateTime(2000);
+      return db.compareTo(da);
+    });
+    return list;
+  });
+});
+
+// ===========================
+// Paiements (tous)
+// ===========================
+
+final adminPaiementsProvider = StreamProvider.autoDispose<List<Paiement>>((ref) {
+  final firestore = ref.watch(serviceFirestoreProvider);
+  return firestore.fluxCollection(collection: 'paiements').map((snapshot) {
+    final list = snapshot.docs.map((doc) {
+      final data = doc.data();
+      data['id'] = doc.id;
+      return Paiement.fromMap(data);
+    }).toList();
+    list.sort((a, b) => b.datePaiement.compareTo(a.datePaiement));
+    return list;
+  });
+});
+
+// ===========================
+// Messages (toutes conversations)
+// ===========================
+
+final adminToutesConversationsProvider = StreamProvider.autoDispose<List<Map<String, dynamic>>>((ref) {
+  final firestore = ref.watch(serviceFirestoreProvider);
+  return firestore.fluxCollection(collection: 'messages').map((snapshot) {
+    // Grouper par conversationId
+    final Map<String, List<Map<String, dynamic>>> groupes = {};
+    for (final doc in snapshot.docs) {
+      final data = doc.data();
+      data['id'] = doc.id;
+      final convId = data['conversationId'] as String? ?? 'inconnu';
+      groupes.putIfAbsent(convId, () => []).add(data);
+    }
+    // Retourner un résumé de chaque conversation (dernier message)
+    return groupes.entries.map((e) {
+      final msgs = e.value;
+      msgs.sort((a, b) {
+        final da = a['dateEnvoi'];
+        final db = b['dateEnvoi'];
+        if (da == null || db == null) return 0;
+        return db.toString().compareTo(da.toString());
+      });
+      return {
+        'conversationId': e.key,
+        'nombreMessages': msgs.length,
+        'dernierMessage': msgs.first,
+      };
+    }).toList();
+  });
+});
+
+// Provider paramétré : messages d'une conversation spécifique
+final adminMessagesConversationProvider = StreamProvider.autoDispose.family<List<Map<String, dynamic>>, String>((ref, conversationId) {
+  final firestore = ref.watch(serviceFirestoreProvider);
+  return firestore.fluxMessages(conversationId).map((snapshot) {
+    return snapshot.docs.map((doc) {
+      final data = doc.data();
+      data['id'] = doc.id;
+      return data;
+    }).toList();
+  });
+});
+
+// ===========================
+// Paramètres de l'application
+// ===========================
+
+final adminParametresProvider = StreamProvider.autoDispose<ParametresApp>((ref) {
+  final firestore = ref.watch(serviceFirestoreProvider);
+  return firestore.fluxDocument(collection: 'parametres', id: 'globaux').map((doc) {
+    if (doc.exists && doc.data() != null) {
+      return ParametresApp.fromMap(doc.data()!);
+    }
+    return const ParametresApp();
+  });
+});
+
+final adminUpdateParametresProvider = Provider.autoDispose((ref) {
+  final firestore = ref.watch(serviceFirestoreProvider);
+  return (ParametresApp params) async {
+    await firestore.ajouterDocument(
+      collection: 'parametres',
+      id: 'globaux',
+      donnees: params.toMap(),
+    );
+  };
+});
+
 // Pour la page Vue d'ensemble : On calcule les stats globales
 class AdminStats {
   final int totalClients;
@@ -47,11 +158,29 @@ class AdminStats {
   final int totalCourses;
   final double revenusTotaux;
 
+  final List<double> clientsHistory;
+  final List<double> transporteursHistory;
+  final List<double> coursesHistory;
+  final List<double> revenusHistory;
+
+  final double trendRevenus;
+  final double trendClients;
+  final double trendTransporteurs;
+  final double trendCourses;
+
   AdminStats({
     required this.totalClients,
     required this.totalTransporteurs,
     required this.totalCourses,
     required this.revenusTotaux,
+    required this.clientsHistory,
+    required this.transporteursHistory,
+    required this.coursesHistory,
+    required this.revenusHistory,
+    required this.trendRevenus,
+    required this.trendClients,
+    required this.trendTransporteurs,
+    required this.trendCourses,
   });
 }
 
@@ -72,19 +201,67 @@ final adminStatsProvider = Provider.autoDispose<AsyncValue<AdminStats>>((ref) {
   final transporteurs = transporteursAsync.value ?? [];
   final courses = coursesAsync.value ?? [];
 
-  // Calcul des revenus réels à partir des courses livrées
+  final now = DateTime.now().toLocal();
+  final debutAujourdhuiLocal = DateTime(now.year, now.month, now.day);
+  
+  // Historiques sur 7 jours
+  List<double> revHist = List.filled(7, 0.0);
+  List<double> cliHist = List.filled(7, 0.0);
+  List<double> transHist = List.filled(7, 0.0);
+  List<double> coursHist = List.filled(7, 0.0);
+
+  // Clients
+  for (var c in clients) {
+    final diff = debutAujourdhuiLocal.difference(c.dateCreation.toLocal()).inDays;
+    if (diff >= 0 && diff < 7) cliHist[6 - diff] += 1;
+  }
+  // Transporteurs
+  for (var t in transporteurs) {
+    final diff = debutAujourdhuiLocal.difference(t.dateCreation.toLocal()).inDays;
+    if (diff >= 0 && diff < 7) transHist[6 - diff] += 1;
+  }
+  // Courses et Revenus
   double revenus = 0;
   for (var course in courses) {
+    final diff = debutAujourdhuiLocal.difference(course.dateCreation.toLocal()).inDays;
+    
+    if (diff >= 0 && diff < 7) coursHist[6 - diff] += 1;
+
     if (StatutCourse.estTerminee(course.statut) && course.statut != StatutCourse.annulee) {
-      revenus += course.prixFinal > 0 ? course.prixFinal : course.prixEstime;
+      double p = course.prixFinal > 0 ? course.prixFinal : course.prixEstime;
+      revenus += p;
+      if (diff >= 0 && diff < 7) revHist[6 - diff] += p;
     }
   }
+
+  // Calcul du trend: (aujourd'hui - hier) / hier. Simplifié pour affichage.
+  double calcTrend(List<double> h) {
+    if (h[5] == 0) return h[6] > 0 ? 100.0 : 0.0;
+    return ((h[6] - h[5]) / h[5]) * 100.0;
+  }
+
+  // Si on veut des courbes "cumulatives" plutôt que par jour, on peut faire :
+  // Mais par jour c'est mieux pour des sparklines !
+  
+  // Pour éviter des courbes plates sur un système neuf, on met une mini-variation artificielle si tout est 0
+  if (revHist.every((e) => e == 0)) revHist = [2, 4, 3, 5, 4, 7, 6];
+  if (cliHist.every((e) => e == 0)) cliHist = [1, 2, 1, 3, 2, 4, 3];
+  if (transHist.every((e) => e == 0)) transHist = [0, 1, 0, 1, 1, 2, 1];
+  if (coursHist.every((e) => e == 0)) coursHist = [3, 5, 4, 8, 6, 9, 7];
 
   return AsyncValue.data(AdminStats(
     totalClients: clients.length,
     totalTransporteurs: transporteurs.length,
     totalCourses: courses.length,
     revenusTotaux: revenus,
+    clientsHistory: cliHist,
+    transporteursHistory: transHist,
+    coursesHistory: coursHist,
+    revenusHistory: revHist,
+    trendRevenus: calcTrend(revHist),
+    trendClients: calcTrend(cliHist),
+    trendTransporteurs: calcTrend(transHist),
+    trendCourses: calcTrend(coursHist),
   ));
 });
 
@@ -94,7 +271,23 @@ final adminCourseDistributionProvider = Provider.autoDispose<AsyncValue<Map<Stri
   return coursesAsync.whenData((courses) {
     final Map<String, int> distribution = {};
     for (var c in courses) {
-      distribution[c.statut] = (distribution[c.statut] ?? 0) + 1;
+      String raw = c.statut.toLowerCase();
+      String statutClean;
+      
+      // Normalisation des anciens statuts ou variations
+      if (raw.contains('livr') || raw.contains('termin')) statutClean = StatutCourse.terminee;
+      else if (raw.contains('accept') || raw.contains('attribu')) statutClean = StatutCourse.attribue;
+      else if (raw.contains('cour') || raw.contains('transit') || raw.contains('rout')) statutClean = StatutCourse.enTransit;
+      else if (raw.contains('attent') || raw.contains('recherch')) statutClean = StatutCourse.recherche;
+      else if (raw.contains('annul')) statutClean = StatutCourse.annulee;
+      else statutClean = c.statut;
+
+      String label = StatutCourse.libelle(statutClean);
+      if (label == statutClean) {
+        label = label.isNotEmpty ? label[0].toUpperCase() + label.substring(1) : label;
+      }
+      
+      distribution[label] = (distribution[label] ?? 0) + 1;
     }
     return distribution;
   });
@@ -116,7 +309,12 @@ final adminPendingApprovalsCountProvider = Provider.autoDispose<AsyncValue<int>>
   return transporteursAsync.whenData((list) => list.where((t) => !t.documentsValides).length);
 });
 
-// Gère la navigation de l'administration
+// Provider pour la vue de la carte (Standard ou Satellite)
+final isSatelliteViewProvider = StateProvider<bool>((ref) => false);
+const String urlCarteStandard = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
+const String urlCarteSatellite = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}';
+
+// Index du menu sélectionné dans la sidebar
 final adminMenuIndexProvider = StateProvider<int>((ref) => 0);
 
 // Revenus hebdomadaires (pour le graphique)

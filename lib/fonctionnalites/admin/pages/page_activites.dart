@@ -47,7 +47,7 @@ class _PageActivitesState extends ConsumerState<PageActivites> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Erreur : $e"), backgroundColor: Colors.red),
+          SnackBar(content: Text("Aïe, impossible de purger l'historique : $e 🧹"), backgroundColor: Colors.red),
         );
       }
     } finally {
@@ -84,7 +84,7 @@ class _PageActivitesState extends ConsumerState<PageActivites> {
               Expanded(
                 child: coursesAsync.when(
                   loading: () => const EtatChargement(message: "Chargement de l'historique..."),
-                  error: (err, _) => EtatErreur(erreur: err.toString(), onRetry: () => ref.refresh(adminCoursesProvider)),
+                  error: (err, _) => EtatErreur(erreur: "Impossible de charger les activités : ${err.toString()} 🔧", onRetry: () => ref.refresh(adminCoursesProvider)),
                   data: (toutesCourses) {
                     final courses = toutesCourses.where((c) {
                       final texte = "${c.adresseDepart} ${c.adresseArrivee} ${c.statut}".toLowerCase();
@@ -150,7 +150,7 @@ class _PageActivitesState extends ConsumerState<PageActivites> {
                                   .supprimerDocument(collection: 'courses', id: course.id);
                               if (context.mounted) {
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  const SnackBar(content: Text("Course supprimée"), backgroundColor: Colors.green),
+                                   SnackBar(content: Text("L'historique a été nettoyé avec succès ! ✨"), backgroundColor: CouleursApp.succes),
                                 );
                               }
                             },

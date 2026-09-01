@@ -1,5 +1,5 @@
-import 'dart:ui';
 import 'dart:async';
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -79,8 +79,7 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
   void _etapeSuivante(EtatDemandeExpedition etat, DemandeExpeditionNotifier notifier) {
     if (!etat.estEtapeValide(_etapeCourante)) {
       String message = "Veuillez remplir les informations requises.";
-      if (_etapeCourante == 1) message = "Veuillez sélectionner une catégorie de service.";
-      if (_etapeCourante == 2) {
+      if (_etapeCourante == 1) {
         if (etat.categorieService == "Remorque") {
           if (etat.marqueVehiculeRemorque.isEmpty) {
             message = "Veuillez sélectionner la marque du véhicule.";
@@ -91,14 +90,14 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
           message = "Veuillez remplir les détails obligatoires.";
         }
       }
-      if (_etapeCourante == 3) message = "Veuillez choisir une gamme de service.";
-      if (_etapeCourante == 4) message = "L'itinéraire est incomplet.";
+      if (_etapeCourante == 2) message = "Veuillez choisir une gamme de service.";
+      if (_etapeCourante == 3) message = "L'itinéraire est incomplet.";
       
       _montrerErreur(message);
       return;
     }
 
-    if (_etapeCourante == 4) {
+    if (_etapeCourante == 3) {
       // Auto-assignation de la date et de l'heure (Commande immédiate)
       notifier.setDateTransport(DateTime.now());
       notifier.setHeureTransport(TimeOfDay.now());
@@ -260,11 +259,10 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
                     _buildProgressBar(_etapeCourante),
                     const SizedBox(height: 32),
                     
-                    if (_etapeCourante == 1) _buildEtape1Categorie(etat, notifier),
-                    if (_etapeCourante == 2) _buildEtape2Formulaire(etat, notifier),
-                    if (_etapeCourante == 3) _buildEtape3Gamme(etat, notifier),
-                    if (_etapeCourante == 4) _buildEtape4Itineraire(context, etat, notifier),
-                    if (_etapeCourante == 5) _buildEtape5Matching(context, etat),
+                    if (_etapeCourante == 1) _buildEtape2Formulaire(etat, notifier),
+                    if (_etapeCourante == 2) _buildEtape3Gamme(etat, notifier),
+                    if (_etapeCourante == 3) _buildEtape4Itineraire(context, etat, notifier),
+                    if (_etapeCourante == 4) _buildEtape5Matching(context, etat),
                   ],
                 ),
               ),
@@ -276,7 +274,7 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
             bottom: 0,
             left: 0,
             right: 0,
-            child: _buildBottomCTA(etat, notifier),
+            child: _etapeCourante == 4 ? const SizedBox.shrink() : _buildBottomCTA(etat, notifier),
           ),
         ],
       ),
@@ -284,7 +282,7 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
   }
 
   Widget _buildProgressBar(int currentStep) {
-    final steps = ["Service", "Détails", "Gamme", "Trajet", "Offre"];
+    final steps = ["Détails", "Gamme", "Trajet", "Offre"];
     return LayoutBuilder(
       builder: (context, constraints) {
         return Row(
@@ -293,7 +291,7 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
             final isActive = stepNum == currentStep;
             final isCompleted = stepNum < currentStep;
 
-            Color circleColor = const Color(0xFF1E293B);
+            Color circleColor = const Color(0xFF10192A);
             Color textColor = const Color(0xFF475569);
             
             if (isCompleted) {
@@ -355,7 +353,7 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
                                   colors: [Color(0xFF12B76A), Color(0xFF3B82F6)],
                                 )
                               : null,
-                          color: isCompleted ? null : const Color(0xFF1E293B),
+                          color: isCompleted ? null : const Color(0xFF10192A),
                         ),
                       ),
                     ),
@@ -382,85 +380,6 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
           style: GoogleFonts.poppins(fontSize: 14, color: Colors.white54),
         ),
         const SizedBox(height: 24),
-      ],
-    );
-  }
-
-  // ==========================================
-  // ETAPE 1 : CATEGORIE
-  // ==========================================
-  Widget _buildEtape1Categorie(EtatDemandeExpedition etat, DemandeExpeditionNotifier notifier) {
-    final categories = [
-      {"titre": "Déménagement", "desc": "Appartement, maison, bureaux", "icon": Iconsax.home_2_copy},
-      {"titre": "Remorque", "desc": "Véhicules, objets très lourds", "icon": Iconsax.car_copy},
-      {"titre": "Marchandises", "desc": "Colis, palettes, matériaux", "icon": Iconsax.box_copy},
-      {"titre": "Autre", "desc": "Besoins spécifiques", "icon": Iconsax.category_copy},
-    ];
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _buildSectionTitle("Que souhaitez-vous transporter ?", "Sélectionnez le service adapté à votre besoin."),
-        GridView.builder(
-          shrinkWrap: true,
-          physics: const NeverScrollableScrollPhysics(),
-          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-            crossAxisCount: 2,
-            crossAxisSpacing: 16,
-            mainAxisSpacing: 16,
-            childAspectRatio: 0.9, // Augmenté pour donner plus de hauteur (ratio largeur/hauteur)
-          ),
-          itemCount: categories.length,
-          itemBuilder: (context, index) {
-            final cat = categories[index];
-            final isSelected = etat.categorieService == cat["titre"];
-
-            return GestureDetector(
-              onTap: () {
-                HapticFeedback.lightImpact();
-                notifier.setCategorieService(cat["titre"] as String);
-                notifier.setDetailsSpecifiques(""); // Reset du formulaire
-                _detailsController.clear();
-              },
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 300),
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 16),
-                decoration: BoxDecoration(
-                  color: isSelected ? CouleursApp.primaire.withValues(alpha: 0.15) : const Color(0xFF1E293B).withValues(alpha: 0.5),
-                  borderRadius: BorderRadius.circular(24),
-                  border: Border.all(
-                    color: isSelected ? CouleursApp.primaire : Colors.white.withValues(alpha: 0.05),
-                    width: isSelected ? 2 : 1,
-                  ),
-                ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  mainAxisSize: MainAxisSize.min, // Utilise le minimum d'espace
-                  children: [
-                    Icon(cat["icon"] as IconData, size: 28, color: isSelected ? CouleursApp.primaire : Colors.white), // Réduit de 32 à 28
-                    const SizedBox(height: 6), // Réduit de 8 à 6
-                    Flexible(
-                      child: Text(
-                        cat["titre"] as String,
-                        style: GoogleFonts.poppins(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.white), // Réduit de 13 à 12
-                        textAlign: TextAlign.center,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                    const SizedBox(height: 2), // Réduit de 4 à 2
-                    Text(
-                      cat["desc"] as String,
-                      style: GoogleFonts.poppins(fontSize: 9, color: Colors.white54),
-                      textAlign: TextAlign.center,
-                      maxLines: 1, // Limité à 1 ligne pour éviter l'overflow vertical
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ],
-                ),
-              ).animate(delay: (index * 100).ms).scale(begin: const Offset(0.9, 0.9)),
-            );
-          },
-        ),
       ],
     );
   }
@@ -539,7 +458,7 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
                           decoration: BoxDecoration(
                             color: isSelected
                                 ? const Color(0xFF12B76A).withValues(alpha: 0.18)
-                                : const Color(0xFF1E293B),
+                                : const Color(0xFF10192A),
                             borderRadius: BorderRadius.circular(24),
                             border: Border.all(
                               color: isSelected
@@ -741,7 +660,7 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
                                 child: Image.network(
                                   etat.photos[index].path,
                                   width: 80, height: 80, fit: BoxFit.cover,
-                                  errorBuilder: (context, error, stackTrace) => Container(width: 80, height: 80, color: Colors.grey.withValues(alpha: 0.3), child: const Icon(Icons.image, color: Colors.white54)),
+                                  errorBuilder: (context, error, stackTrace) => Container(width: 80, height: 80, color: Colors.white.withValues(alpha: 0.3), child: const Icon(Icons.image, color: Colors.white54)),
                                 ),
                               ),
                               Positioned(
@@ -750,7 +669,7 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
                                   onTap: () => notifier.supprimerPhoto(index),
                                   child: Container(
                                     padding: const EdgeInsets.all(4),
-                                    decoration: const BoxDecoration(color: Colors.black54, shape: BoxShape.circle),
+                                    decoration: const BoxDecoration(color: Colors.white54, shape: BoxShape.circle),
                                     child: const Icon(Icons.close, size: 14, color: Colors.white),
                                   ),
                                 ),
@@ -811,7 +730,7 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
         duration: const Duration(milliseconds: 300),
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: isSelected ? color.withValues(alpha: 0.1) : const Color(0xFF1E293B).withValues(alpha: 0.5),
+          color: isSelected ? color.withValues(alpha: 0.1) : const Color(0xFF10192A).withValues(alpha: 0.5),
           borderRadius: BorderRadius.circular(24),
           border: Border.all(
             color: isSelected ? color : Colors.white.withValues(alpha: 0.05),
@@ -954,14 +873,14 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
                       hintStyle: const TextStyle(color: Colors.white54),
                       prefixIcon: const Icon(Iconsax.location_add_copy, color: Colors.white70),
                       filled: true,
-                      fillColor: const Color(0xFF1E293B),
+                      fillColor: const Color(0xFF10192A),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(16),
                         borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.1)),
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(16),
-                        borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.05)),
+                        borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.07)),
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(16),
@@ -976,7 +895,7 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
                     child: Material(
                       elevation: 4.0,
                       borderRadius: BorderRadius.circular(16),
-                      color: const Color(0xFF1E293B),
+                      color: const Color(0xFF10192A),
                       child: Container(
                         width: MediaQuery.of(context).size.width - 64, // Ajustement largeur
                         constraints: const BoxConstraints(maxHeight: 200),
@@ -1008,171 +927,24 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
   // ==========================================
   // ETAPE 5 : MATCHING & PROPOSITION
   // ==========================================
-  Widget _buildEtape5Matching(BuildContext context, EtatDemandeExpedition etat) {
-    if (etat.estEnAttenteIA) {
-      return Center(
-        child: Column(
-          children: [
-            const SizedBox(height: 40),
-            const CircularProgressIndicator(color: CouleursApp.primaire),
-            const SizedBox(height: 24),
-            Text("Recherche du meilleur chauffeur...", style: GoogleFonts.poppins(color: Colors.white, fontSize: 16)),
-            const SizedBox(height: 8),
-            Text("Calcul de l'itinéraire et de l'estimation en cours", style: GoogleFonts.poppins(color: Colors.white54, fontSize: 12)),
-          ],
-        ),
-      );
-    }
-
-    final chauffeur = etat.chauffeurPropose;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        _buildSectionTitle("Proposition", "Voici l'offre trouvée pour votre trajet."),
-        
-        // Carte Chauffeur
-        if (chauffeur != null) ...[
-          _GlassCard(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-            child: Row(
-              children: [
-                CircleAvatar(
-                  radius: 28, // Réduit de 30 à 28
-                  backgroundImage: chauffeur.photo.isNotEmpty ? NetworkImage(chauffeur.photo) : null,
-                  backgroundColor: CouleursApp.primaire.withValues(alpha: 0.2),
-                  child: chauffeur.photo.isEmpty ? const Icon(Iconsax.user_copy, color: CouleursApp.primaire) : null,
-                ),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Text(
-                        "${chauffeur.prenom} ${chauffeur.nom}",
-                        style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      const SizedBox(height: 4),
-                      Wrap( // Utilisation de Wrap au lieu de Row pour éviter l'overflow
-                        spacing: 8,
-                        runSpacing: 4,
-                        children: [
-                          Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const Icon(Icons.star, color: CouleursApp.avertissement, size: 14),
-                              const SizedBox(width: 4),
-                              Text("4.8", style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 12)),
-                            ],
-                          ),
-                          Row(
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              const Icon(Icons.drive_eta, color: Colors.white54, size: 14),
-                              const SizedBox(width: 4),
-                              Flexible(
-                                child: Text(
-                                  chauffeur.typeVehicule.isNotEmpty ? chauffeur.typeVehicule : "Camionnette",
-                                  style: GoogleFonts.poppins(color: Colors.white54, fontSize: 11),
-                                  overflow: TextOverflow.ellipsis,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ),
-              ],
+    Widget _buildEtape5Matching(
+    BuildContext context,
+    EtatDemandeExpedition etat,
+  ) {
+    return AnimatedRadarSearch(
+      onSearchComplete: () {
+        showModalBottomSheet(
+          context: context,
+          isScrollControlled: true,
+          backgroundColor: Colors.transparent,
+          builder: (context) => Padding(
+            padding: EdgeInsets.only(
+              bottom: MediaQuery.of(context).viewInsets.bottom,
             ),
+            child: const ResumeExpeditionBottomSheet(),
           ),
-          
-          const SizedBox(height: 16),
-          // Distance & Temps
-          Row(
-            children: [
-              Expanded(
-                child: _GlassCard(
-                  child: Column(
-                    children: [
-                      const Icon(Iconsax.routing_2_copy, color: CouleursApp.primaire),
-                      const SizedBox(height: 8),
-                      Text("À ${etat.distanceApprocheKm.toStringAsFixed(1)} km", style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.bold)),
-                      Text("Distance d'approche", style: GoogleFonts.poppins(color: Colors.white54, fontSize: 10)),
-                    ],
-                  ),
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: _GlassCard(
-                  child: Column(
-                    children: [
-                      const Icon(Iconsax.clock_copy, color: CouleursApp.avertissement),
-                      const SizedBox(height: 8),
-                      Text("${etat.tempsApprocheMin} min", style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.bold)),
-                      Text("Temps estimé", style: GoogleFonts.poppins(color: Colors.white54, fontSize: 10)),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ] else ...[
-          _GlassCard(
-            child: Padding(
-              padding: const EdgeInsets.all(24.0),
-              child: Center(
-                child: Text("Aucun chauffeur disponible pour le moment. La commande sera mise en file d'attente.", textAlign: TextAlign.center, style: GoogleFonts.poppins(color: CouleursApp.avertissement)),
-              ),
-            ),
-          ),
-        ],
-
-        const SizedBox(height: 24),
-        // Résumé IA (Prix, Volume, Conseil)
-        _GlassCard(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text("Estimation Automatique", style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
-              const Divider(color: Colors.white12, height: 32),
-              _buildEstimationRow(
-                "Véhicule Recommandé",
-                etat.categorieService == "Remorque"
-                    ? (etat.chauffeurPropose?.typeVehicule.isNotEmpty == true
-                        ? etat.chauffeurPropose!.typeVehicule
-                        : "Dépanneuse")
-                    : etat.categorieVehicule.isNotEmpty
-                        ? etat.categorieVehicule
-                        : "Adapté à votre charge",
-                Iconsax.truck_fast_copy,
-              ),
-              const SizedBox(height: 12),
-              _buildEstimationRow("Volume", etat.volumeEstime, Iconsax.box_copy),
-              const SizedBox(height: 12),
-              _buildEstimationRow("Prix Estimé", etat.prixEstime, Iconsax.wallet_3_copy, isHighlight: true),
-              const SizedBox(height: 24),
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(color: CouleursApp.succes.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(12)),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Icon(Iconsax.info_circle_copy, color: CouleursApp.succes, size: 20),
-                    const SizedBox(width: 12),
-                    Expanded(child: Text(etat.conseilIA, style: GoogleFonts.poppins(color: CouleursApp.succes, fontSize: 12))),
-                  ],
-                ),
-              )
-            ],
-          ),
-        ),
-      ],
+        );
+      },
     );
   }
 
@@ -1214,7 +986,7 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: const Color(0xFF0F172A).withValues(alpha: 0.9),
+        color: const Color(0xFF08111F).withValues(alpha: 0.9),
         border: Border(top: BorderSide(color: Colors.white.withValues(alpha: 0.06))),
       ),
       child: SafeArea(
@@ -1272,7 +1044,7 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    _etapeCourante < 4
+                    _etapeCourante < 3
                         ? "Continuer"
                         : _etapeCourante == 4
                             ? "Rechercher un chauffeur"
@@ -1325,10 +1097,10 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
               )
             : null,
         filled: true,
-        fillColor: const Color(0xFF0F172A).withValues(alpha: 0.7),
+        fillColor: const Color(0xFF08111F).withValues(alpha: 0.7),
         contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.05))),
-        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.05))),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.07))),
+        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.07))),
         focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: const BorderSide(color: Color(0xFF3B82F6), width: 1.5)),
       ),
     );
@@ -1349,14 +1121,14 @@ class _GlassCard extends StatelessWidget {
         child: Container(
           padding: padding,
           decoration: BoxDecoration(
-            color: const Color(0xFF1E293B).withValues(alpha: 0.45),
+            color: const Color(0xFF10192A).withValues(alpha: 0.45),
             borderRadius: BorderRadius.circular(24),
             border: Border.all(
               color: Colors.white.withValues(alpha: 0.08),
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 0.2),
+                color: Colors.white.withValues(alpha: 0.05),
                 blurRadius: 20,
                 spreadRadius: -5,
               ),
@@ -1388,6 +1160,172 @@ class _GlassButton extends StatelessWidget {
         ),
         child: Icon(icon, color: Colors.white, size: 20),
       ),
+    );
+  }
+}
+class AnimatedRadarSearch extends StatefulWidget {
+  final VoidCallback onSearchComplete;
+
+  const AnimatedRadarSearch({super.key, required this.onSearchComplete});
+
+  @override
+  State<AnimatedRadarSearch> createState() => _AnimatedRadarSearchState();
+}
+
+class _AnimatedRadarSearchState extends State<AnimatedRadarSearch> {
+  int _step = 0;
+  Timer? _timer;
+
+  final List<String> _messages = [
+    "Recherche de transporteurs à proximité...",
+    "Analyse du trafic en temps réel...",
+    "Contact des chauffeurs les mieux notés...",
+    "Négociation du meilleur tarif...",
+    "Chauffeur trouvé ! Finalisation...",
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+    _timer = Timer.periodic(const Duration(seconds: 3), (timer) {
+      if (!mounted) {
+        timer.cancel();
+        return;
+      }
+      if (_step < _messages.length - 1) {
+        setState(() {
+          _step++;
+        });
+      } else {
+        timer.cancel();
+        widget.onSearchComplete();
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _timer?.cancel();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isFinished = _step == _messages.length - 1;
+    
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.center,
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        const SizedBox(height: 60),
+        Stack(
+          alignment: Alignment.center,
+          children: [
+            if (!isFinished)
+              ...List.generate(3, (index) {
+                return Container(
+                  width: 100.0 + (index * 80),
+                  height: 100.0 + (index * 80),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: CouleursApp.primaire.withValues(alpha: 0.3),
+                      width: 2,
+                    ),
+                  ),
+                )
+                    .animate(onPlay: (controller) => controller.repeat())
+                    .scale(
+                      duration: const Duration(seconds: 2),
+                      begin: const Offset(0.5, 0.5),
+                      end: const Offset(1.5, 1.5),
+                    )
+                    .fade(
+                      duration: const Duration(seconds: 2),
+                      begin: 0.8,
+                      end: 0.0,
+                    );
+              }),
+
+            Container(
+              width: 60,
+              height: 60,
+              decoration: BoxDecoration(
+                color: isFinished ? CouleursApp.succes : CouleursApp.primaire,
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: (isFinished ? CouleursApp.succes : CouleursApp.primaire)
+                        .withValues(alpha: 0.5),
+                    blurRadius: 20,
+                    spreadRadius: 5,
+                  )
+                ],
+              ),
+              child: Icon(
+                isFinished ? Icons.check : Icons.search, 
+                color: Colors.white, 
+                size: 30
+              ),
+            )
+                .animate(
+                  target: isFinished ? 0 : 1,
+                  onPlay: (controller) => controller.repeat(reverse: true),
+                )
+                .scale(
+                  duration: const Duration(milliseconds: 800),
+                  begin: const Offset(0.9, 0.9),
+                  end: const Offset(1.1, 1.1),
+                ),
+          ],
+        ),
+        const SizedBox(height: 60),
+
+        AnimatedSwitcher(
+          duration: const Duration(milliseconds: 500),
+          child: Text(
+            _messages[_step],
+            key: ValueKey<int>(_step),
+            textAlign: TextAlign.center,
+            style: GoogleFonts.poppins(
+              color: isFinished ? CouleursApp.succes : Colors.white,
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+        const SizedBox(height: 12),
+
+        if (isFinished)
+          Padding(
+            padding: const EdgeInsets.only(top: 16),
+            child: ElevatedButton.icon(
+              onPressed: widget.onSearchComplete,
+              icon: const Icon(Icons.receipt_long, color: Colors.white),
+              label: Text(
+                "Voir la proposition",
+                style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.bold),
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: CouleursApp.primaire,
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(24),
+                ),
+              ),
+            ).animate().fadeIn().scale(),
+          )
+        else
+          Text(
+            "Un instant, nous trouvons le meilleur chauffeur pour votre trajet.",
+            textAlign: TextAlign.center,
+            style: GoogleFonts.poppins(
+              color: Colors.white70,
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+      ],
     );
   }
 }

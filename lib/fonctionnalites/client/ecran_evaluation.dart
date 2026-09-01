@@ -23,12 +23,12 @@ class _EcranEvaluationState extends ConsumerState<EcranEvaluation> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF0F172A), // Fond sombre premium
+      backgroundColor: const Color(0xFF08111F),
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.close, color: Colors.white),
+          icon: const Icon(Icons.close, color: CouleursApp.primaire),
           onPressed: () => context.go('/'),
         ),
       ),
@@ -97,7 +97,7 @@ class _EcranEvaluationState extends ConsumerState<EcranEvaluation> {
                     hintText: "Laissez un commentaire (optionnel)",
                     hintStyle: GoogleFonts.poppins(color: Colors.white38),
                     filled: true,
-                    fillColor: Colors.white.withValues(alpha: 0.05),
+                    fillColor: const Color(0xFF1A2640).withValues(alpha: 0.05),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(16),
                       borderSide: BorderSide.none,

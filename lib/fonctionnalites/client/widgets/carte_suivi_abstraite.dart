@@ -56,7 +56,9 @@ class _CarteSuiviAbstraiteState extends State<CarteSuiviAbstraite> with SingleTi
           (widget.depart.longitude + widget.arrivee.longitude) / 2,
         );
 
-    return FlutterMap(
+    return Stack(
+      children: [
+        FlutterMap(
       mapController: _mapController,
       options: MapOptions(
         initialCenter: centre,
@@ -65,10 +67,8 @@ class _CarteSuiviAbstraiteState extends State<CarteSuiviAbstraite> with SingleTi
       ),
       children: [
         TileLayer(
-          urlTemplate: widget.isRemorque 
-              ? 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png'
-              : 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-          subdomains: widget.isRemorque ? const ['a', 'b', 'c', 'd'] : const [],
+          urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+          subdomains: const [],
           userAgentPackageName: 'com.joan.update_camtrans',
         ),
         // Tracé
@@ -128,6 +128,38 @@ class _CarteSuiviAbstraiteState extends State<CarteSuiviAbstraite> with SingleTi
                 ),
               ),
           ],
+        ),
+      ],
+        ),
+        // Contrôles de zoom
+        Positioned(
+          right: 16,
+          bottom: 32,
+          child: Column(
+            children: [
+              FloatingActionButton(
+                heroTag: 'zoomIn',
+                mini: true,
+                backgroundColor: CouleursApp.primaire,
+                onPressed: () {
+                  final zoom = _mapController.camera.zoom + 1;
+                  _mapController.move(_mapController.camera.center, zoom);
+                },
+                child: const Icon(Icons.add, color: Colors.white),
+              ),
+              const SizedBox(height: 8),
+              FloatingActionButton(
+                heroTag: 'zoomOut',
+                mini: true,
+                backgroundColor: CouleursApp.primaire,
+                onPressed: () {
+                  final zoom = _mapController.camera.zoom - 1;
+                  _mapController.move(_mapController.camera.center, zoom);
+                },
+                child: const Icon(Icons.remove, color: Colors.white),
+              ),
+            ],
+          ),
         ),
       ],
     );

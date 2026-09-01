@@ -25,7 +25,7 @@ class _PageUtilisateursState extends ConsumerState<PageUtilisateurs> with Single
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
+    _tabController = TabController(length: 3, vsync: this);
   }
 
   @override
@@ -64,6 +64,7 @@ class _PageUtilisateursState extends ConsumerState<PageUtilisateurs> with Single
                   children: [
                     _buildListeClients(ref),
                     _buildListeTransporteurs(ref),
+                    _buildDemandesConfort(ref),
                   ],
                 ),
               ),
@@ -111,7 +112,7 @@ class _PageUtilisateursState extends ConsumerState<PageUtilisateurs> with Single
               const SizedBox(width: 24),
               Container(
                 height: 50,
-                width: 300,
+                width: 450,
                 decoration: BoxDecoration(
                   color: Colors.white.withValues(alpha: 0.05),
                   borderRadius: BorderRadius.circular(16),
@@ -129,6 +130,7 @@ class _PageUtilisateursState extends ConsumerState<PageUtilisateurs> with Single
                   tabs: const [
                     Tab(text: "Clients"),
                     Tab(text: "Transporteurs"),
+                    Tab(text: "Validations Confort"),
                   ],
                 ),
               ),
@@ -323,6 +325,140 @@ class _PageUtilisateursState extends ConsumerState<PageUtilisateurs> with Single
       ),
     );
   }
+  
+  Widget _buildDemandesConfort(WidgetRef ref) {
+    final transporteursAsync = ref.watch(adminTransporteursProvider);
+
+    return transporteursAsync.when(
+      loading: () => const EtatChargement(),
+      error: (err, _) => EtatErreur(erreur: err.toString(), onRetry: () => ref.refresh(adminTransporteursProvider)),
+      data: (tousTransporteurs) {
+        final demandes = tousTransporteurs.where((t) {
+          final isMatchSearch = ("${t.prenom} ${t.nom}".toLowerCase().contains(_searchQuery) || t.email.toLowerCase().contains(_searchQuery));
+          return t.gamme == "Confort" && !t.gammeValidee && isMatchSearch;
+        }).toList();
+
+        if (demandes.isEmpty) {
+          return Center(child: Text("Aucune demande de validation Confort en attente.", style: GoogleFonts.inter(color: Colors.white54)));
+        }
+
+        return ListView.builder(
+          padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+          itemCount: demandes.length,
+          itemBuilder: (context, index) {
+            final t = demandes[index];
+            final initiale = (t.nom.isNotEmpty ? t.nom[0] : (t.prenom.isNotEmpty ? t.prenom[0] : '?')).toUpperCase();
+            return _GlassListItem(
+              titre: "${t.prenom} ${t.nom}".trim().isNotEmpty ? "${t.prenom} ${t.nom}".trim() : t.email,
+              sousTitre: "Immatriculation: ${t.immatriculation} | Véhicule: ${t.typeVehicule}",
+              initiale: initiale,
+              couleurInitiale: Colors.amber,
+              estActif: t.actif,
+              estEnLigne: t.estEnLigne,
+              onToggleActif: () {},
+              onTap: () {
+                _afficherDetailsDemandeConfort(context, ref, t);
+              },
+            );
+          },
+        );
+      },
+    );
+  }
+
+  void _afficherDetailsDemandeConfort(BuildContext context, WidgetRef ref, Transporteur t) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: const Color(0xFF0F172A),
+        title: Text("Validation Confort : ${t.prenom} ${t.nom}", style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+        content: SingleChildScrollView(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text("Véhicule: ${t.typeVehicule}", style: const TextStyle(color: Colors.white70)),
+              Text("Immatriculation: ${t.immatriculation}", style: const TextStyle(color: Colors.white70)),
+              const SizedBox(height: 15),
+              const Text("Photos de vérification :", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 10),
+              if (t.photosInspectionVehicule.isEmpty)
+                const Text("Aucune photo fournie.", style: TextStyle(color: Colors.redAccent))
+              else
+                Wrap(
+                  spacing: 10,
+                  runSpacing: 10,
+                  children: t.photosInspectionVehicule.map((url) {
+                    return ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: Image.network(url, width: 120, height: 120, fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) => Container(
+                          width: 120, height: 120, color: Colors.grey[800],
+                          child: const Icon(Icons.broken_image, color: Colors.white54),
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                ),
+            ],
+          ),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              _rejeterDemandeConfort(context, ref, t);
+            },
+            child: const Text("Rejeter (Gamme Éco)", style: TextStyle(color: Colors.redAccent)),
+          ),
+          ElevatedButton(
+            style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
+            onPressed: () {
+              Navigator.pop(context);
+              _validerDemandeConfort(context, ref, t);
+            },
+            child: const Text("Valider Confort", style: TextStyle(color: Colors.white)),
+          )
+        ],
+      ),
+    );
+  }
+
+  Future<void> _validerDemandeConfort(BuildContext context, WidgetRef ref, Transporteur t) async {
+    try {
+      final db = ref.read(serviceFirestoreProvider);
+      await db.modifierDocument(
+        collection: 'transporteurs',
+        id: t.id,
+        donnees: {'gammeValidee': true},
+      );
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Statut Confort validé avec succès."), backgroundColor: Colors.green));
+      }
+    } catch(e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Erreur : $e"), backgroundColor: Colors.red));
+      }
+    }
+  }
+
+  Future<void> _rejeterDemandeConfort(BuildContext context, WidgetRef ref, Transporteur t) async {
+    try {
+      final db = ref.read(serviceFirestoreProvider);
+      await db.modifierDocument(
+        collection: 'transporteurs',
+        id: t.id,
+        donnees: {'gamme': 'Éco', 'gammeValidee': true},
+      );
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Demande rejetée, le transporteur passe en Éco."), backgroundColor: Colors.orange));
+      }
+    } catch(e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Erreur : $e"), backgroundColor: Colors.red));
+      }
+    }
+  }
 }
 
 class _GlassListItem extends StatelessWidget {
@@ -396,7 +532,7 @@ class _GlassListItem extends StatelessWidget {
                             decoration: BoxDecoration(
                               color: CouleursApp.succes,
                               shape: BoxShape.circle,
-                              border: Border.all(color: const Color(0xFF08111F), width: 2),
+                              border: Border.all(color: Colors.white, width: 2),
                             ),
                           ).animate(onPlay: (c) => c.repeat(reverse: true)).scale(
                             begin: const Offset(0.8, 0.8),

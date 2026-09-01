@@ -155,7 +155,7 @@ class _ModifierProfilState extends ConsumerState<ModifierProfil> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Erreur lors de la mise à jour: $e"), backgroundColor: Colors.red),
+          SnackBar(content: Text("Oups ! Échec de la mise à jour : $e 🔧"), backgroundColor: Colors.red),
         );
       }
     } finally {
@@ -176,7 +176,7 @@ class _ModifierProfilState extends ConsumerState<ModifierProfil> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: CouleursApp.fond,
+      backgroundColor: const Color(0xFF08111F),
       appBar: AppBar(
         title: const Text("Modifier mon profil"),
         actions: [
@@ -223,7 +223,7 @@ class _ModifierProfilState extends ConsumerState<ModifierProfil> {
                               decoration: BoxDecoration(
                                 color: CouleursApp.primaire,
                                 shape: BoxShape.circle,
-                                border: Border.all(color: Colors.white, width: 3),
+                                border: Border.all(color: const Color(0xFF08111F), width: 3),
                               ),
                               child: const Icon(Icons.camera_alt, color: Colors.white, size: 20),
                             ),
@@ -260,7 +260,7 @@ class _ModifierProfilState extends ConsumerState<ModifierProfil> {
           ),
           if (_chargement)
             Container(
-              color: Colors.black.withValues(alpha: 0.3),
+              color: Colors.white.withValues(alpha: 0.07),
               child: const Center(child: CircularProgressIndicator()),
             )
         ],
@@ -277,14 +277,14 @@ class _ModifierProfilState extends ConsumerState<ModifierProfil> {
         labelText: label,
         prefixIcon: Icon(icon, color: CouleursApp.primaire),
         filled: true,
-        fillColor: Colors.white,
+        fillColor: const Color(0xFF1A2640),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(15),
-          borderSide: BorderSide(color: Colors.grey.shade200),
+          borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.08)),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(15),
-          borderSide: BorderSide(color: Colors.grey.shade200),
+          borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.08)),
         ),
       ),
       validator: (v) => (v == null || v.isEmpty) ? "Ce champ est requis" : null,

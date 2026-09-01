@@ -123,3 +123,88 @@ exports.onCourseUpdated = functions.firestore
       return null;
     }
   });
+
+
+// ============================================================================
+// Attribution Automatique avec algorithme en cascade (OSRM)
+// ============================================================================
+exports.processusAttribution = functions.firestore
+  .document('courses/{courseId}')
+  .onWrite(async (change, context) => {
+    if (!change.after.exists) return null; // Suppression
+
+    const courseData = change.after.data();
+    
+    // Uniquement quand la course est en 'recherche'
+    if (courseData.statut !== 'recherche') return null;
+
+    // Éviter les boucles si on vient de lui attribuer
+    if (courseData.transporteurId && courseData.transporteurId !== '') return null;
+
+    console.log(\Lancement de l'attribution pour la course \\);
+
+    const latDepart = courseData.latitudeDepart || 0;
+    const lngDepart = courseData.longitudeDepart || 0;
+    const typeVehicule = courseData.typeVehicule || '';
+    const transporteursDeclines = courseData.transporteursDeclines || [];
+
+    try {
+      const transporteursSnapshot = await admin.firestore().collection('transporteurs')
+        .where('disponible', '==', true)
+        .where('documentsValides', '==', true)
+        .get();
+
+      let nextChauffeurId = '';
+      let nextNom = '';
+      let nextTel = '';
+      let minDuration = Infinity;
+
+      for (const doc of transporteursSnapshot.docs) {
+        if (transporteursDeclines.includes(doc.id)) continue;
+        const t = doc.data();
+
+        const tVehicule = t.typeVehicule || '';
+        if (typeVehicule && tVehicule !== typeVehicule && tVehicule !== 'Tous') continue;
+
+        const tLat = t.latitude || 0;
+        const tLng = t.longitude || 0;
+
+        if (latDepart !== 0 && tLat !== 0) {
+           try {
+              const url = \http://router.project-osrm.org/route/v1/driving/\,\;\,\?overview=false\;
+              const response = await fetch(url);
+              if (response.ok) {
+                 const data = await response.json();
+                 if (data.routes && data.routes.length > 0) {
+                    const duration = data.routes[0].duration; // en secondes
+                    if (duration < minDuration) {
+                       minDuration = duration;
+                       nextChauffeurId = doc.id;
+                       nextNom = \\ \\;
+                       nextTel = t.telephone || '';
+                    }
+                 }
+              }
+           } catch(e) {
+              console.error('Erreur OSRM', e);
+           }
+        }
+      }
+
+      if (nextChauffeurId !== '') {
+        console.log(\Course \ attribuée à \ (ETA: \ min)\);
+        await change.after.ref.update({
+          transporteurId: nextChauffeurId,
+          nomTransporteur: nextNom,
+          telephoneTransporteur: nextTel,
+          statut: 'attribue'
+        });
+      } else {
+        console.log(\Aucun chauffeur disponible pour la course \\);
+      }
+    } catch (error) {
+      console.error('Erreur lors de attribution :', error);
+    }
+    return null;
+  });
+

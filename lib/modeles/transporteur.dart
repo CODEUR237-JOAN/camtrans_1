@@ -6,6 +6,13 @@ class Transporteur extends Utilisateur {
   final String marqueVehicule;
   final String modeleVehicule;
   final String immatriculation;
+  final String gamme;
+  final bool gammeValidee;
+  final String etatVehicule;
+  final int anneeVehicule;
+  final List<String> photosInspectionVehicule;
+  final DateTime? dateDerniereInspection;
+  final int signalementsEtatVehicule;
   final double capaciteM3;
   final double chargeMaxKg;
 
@@ -29,6 +36,13 @@ class Transporteur extends Utilisateur {
   final double latitude;
   final double longitude;
 
+  final DateTime? dateFinAbonnement;
+
+  bool get abonnementValide {
+    if (dateFinAbonnement == null) return false;
+    return dateFinAbonnement!.isAfter(DateTime.now());
+  }
+
   const Transporteur({
     required super.id,
     required super.nom,
@@ -47,6 +61,13 @@ class Transporteur extends Utilisateur {
     this.marqueVehicule = "",
     this.modeleVehicule = "",
     this.immatriculation = "",
+    this.gamme = "Éco",
+      this.gammeValidee = true,
+    this.etatVehicule = "Standard",
+    this.anneeVehicule = 0,
+    this.photosInspectionVehicule = const [],
+    this.dateDerniereInspection,
+    this.signalementsEtatVehicule = 0,
 
     this.capaciteM3 = 0,
     this.chargeMaxKg = 0,
@@ -71,6 +92,7 @@ class Transporteur extends Utilisateur {
 
     this.latitude = 0,
     this.longitude = 0,
+    this.dateFinAbonnement,
     super.estEnLigne = false,
     super.derniereConnexion,
   });
@@ -96,6 +118,13 @@ class Transporteur extends Utilisateur {
     String? marqueVehicule,
     String? modeleVehicule,
     String? immatriculation,
+    String? gamme,
+      bool? gammeValidee,
+    String? etatVehicule,
+    int? anneeVehicule,
+    List<String>? photosInspectionVehicule,
+    DateTime? dateDerniereInspection,
+    int? signalementsEtatVehicule,
 
     double? capaciteM3,
     double? chargeMaxKg,
@@ -120,6 +149,7 @@ class Transporteur extends Utilisateur {
 
     double? latitude,
     double? longitude,
+    DateTime? dateFinAbonnement,
   }) {
     return Transporteur(
       id: id ?? this.id,
@@ -141,6 +171,13 @@ class Transporteur extends Utilisateur {
       marqueVehicule: marqueVehicule ?? this.marqueVehicule,
       modeleVehicule: modeleVehicule ?? this.modeleVehicule,
       immatriculation: immatriculation ?? this.immatriculation,
+      gamme: gamme ?? this.gamme,
+        gammeValidee: gammeValidee ?? this.gammeValidee,
+      etatVehicule: etatVehicule ?? this.etatVehicule,
+      anneeVehicule: anneeVehicule ?? this.anneeVehicule,
+      photosInspectionVehicule: photosInspectionVehicule ?? this.photosInspectionVehicule,
+      dateDerniereInspection: dateDerniereInspection ?? this.dateDerniereInspection,
+      signalementsEtatVehicule: signalementsEtatVehicule ?? this.signalementsEtatVehicule,
 
       capaciteM3: capaciteM3 ?? this.capaciteM3,
       chargeMaxKg: chargeMaxKg ?? this.chargeMaxKg,
@@ -165,6 +202,7 @@ class Transporteur extends Utilisateur {
 
       latitude: latitude ?? this.latitude,
       longitude: longitude ?? this.longitude,
+      dateFinAbonnement: dateFinAbonnement ?? this.dateFinAbonnement,
     );
   }
 
@@ -177,6 +215,13 @@ class Transporteur extends Utilisateur {
       "marqueVehicule": marqueVehicule,
       "modeleVehicule": modeleVehicule,
       "immatriculation": immatriculation,
+      "gamme": gamme,
+        "gammeValidee": gammeValidee,
+      "etatVehicule": etatVehicule,
+      "anneeVehicule": anneeVehicule,
+      "photosInspectionVehicule": photosInspectionVehicule,
+      "dateDerniereInspection": dateDerniereInspection?.millisecondsSinceEpoch,
+      "signalementsEtatVehicule": signalementsEtatVehicule,
       "capaciteM3": capaciteM3,
       "chargeMaxKg": chargeMaxKg,
       "disponible": disponible,
@@ -194,6 +239,7 @@ class Transporteur extends Utilisateur {
       "photoVehicule": photoVehicule,
       "latitude": latitude,
       "longitude": longitude,
+      "dateFinAbonnement": dateFinAbonnement?.millisecondsSinceEpoch,
     });
 
     return map;
@@ -218,6 +264,15 @@ class Transporteur extends Utilisateur {
       marqueVehicule: map["marqueVehicule"] ?? "",
       modeleVehicule: map["modeleVehicule"] ?? "",
       immatriculation: map["immatriculation"] ?? "",
+      gamme: map["gamme"] ?? "Éco",
+        gammeValidee: map["gammeValidee"] ?? true,
+      etatVehicule: map["etatVehicule"] ?? "Standard",
+      anneeVehicule: map["anneeVehicule"] ?? 0,
+      photosInspectionVehicule: List<String>.from(map["photosInspectionVehicule"] ?? []),
+      dateDerniereInspection: map["dateDerniereInspection"] != null 
+          ? DateTime.fromMillisecondsSinceEpoch(map["dateDerniereInspection"]) 
+          : null,
+      signalementsEtatVehicule: map["signalementsEtatVehicule"] ?? 0,
 
       capaciteM3: Parseur.toDouble(map["capaciteM3"]),
       chargeMaxKg: Parseur.toDouble(map["chargeMaxKg"]),
@@ -242,6 +297,9 @@ class Transporteur extends Utilisateur {
 
       latitude: Parseur.toDouble(map["latitude"]),
       longitude: Parseur.toDouble(map["longitude"]),
+      dateFinAbonnement: map["dateFinAbonnement"] != null 
+          ? DateTime.fromMillisecondsSinceEpoch(map["dateFinAbonnement"]) 
+          : null,
       estEnLigne: map["estEnLigne"] ?? false,
       derniereConnexion: map["derniereConnexion"] != null ? Parseur.toDateTime(map["derniereConnexion"]) : null,
     );
@@ -252,4 +310,21 @@ class Transporteur extends Utilisateur {
 
   factory Transporteur.fromJson(Map<String, dynamic> json) =>
       Transporteur.fromMap(json);
+
+  /// Méthode métier : Traiter un signalement client concernant l'état du véhicule.
+  /// Si le nombre de signalements atteint ou dépasse 2, le transporteur perd son statut "Confort".
+  Transporteur traiterSignalementClient() {
+    int nouveauxSignalements = signalementsEtatVehicule + 1;
+    String nouvelleGamme = gamme ?? "Éco";
+    
+    if (nouveauxSignalements >= 2 && nouvelleGamme == "Confort") {
+      nouvelleGamme = "Éco"; // Rétrogradation automatique
+    }
+    
+    return copyWith(
+      signalementsEtatVehicule: nouveauxSignalements,
+      gamme: nouvelleGamme,
+      gammeValidee: nouvelleGamme == "Confort" ? gammeValidee : true,
+    );
+  }
 }

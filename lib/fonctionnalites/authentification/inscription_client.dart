@@ -16,6 +16,7 @@ import 'package:update_camtrans/services/service_authentification.dart';
 import 'package:update_camtrans/services/service_firestore.dart';
 import 'package:update_camtrans/services/service_notification.dart';
 import 'package:update_camtrans/modeles/client.dart';
+import 'package:update_camtrans/coeur/etat/textes_app_provider.dart';
 
 class InscriptionClient extends ConsumerStatefulWidget {
   const InscriptionClient({super.key});
@@ -124,7 +125,7 @@ class _InscriptionClientState extends ConsumerState<InscriptionClient> {
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text("Erreur lors de l'inscription : ${e.toString().replaceAll('Exception:', '')}"),
+          content: Text("Oups ! L'inscription a échoué : ${e.toString().replaceAll('Exception:', '')} 🛠️"),
           backgroundColor: Colors.red,
         ),
       );
@@ -138,29 +139,70 @@ class _InscriptionClientState extends ConsumerState<InscriptionClient> {
   }
 
   void _afficherConditions(BuildContext context) {
+    // Texte par défaut si l'admin n'a pas encore configuré les conditions
+    const texteParDefaut =
+        "Bienvenue sur la plateforme CamTrans.\n\n"
+        "1. Utilisation du service\n"
+        "En utilisant notre plateforme, vous vous engagez à respecter les lois en vigueur et à ne pas utiliser nos services à des fins illégales.\n\n"
+        "2. Données personnelles et Confidentialité\n"
+        "Nous collectons et traitons vos données personnelles (nom, téléphone, adresse, position géographique) uniquement pour assurer la prestation de transport. "
+        "Vos données ne sont pas vendues à des tiers.\n\n"
+        "3. Paiements et Facturation\n"
+        "Les tarifs affichés sont des estimations. Le montant final peut varier en fonction des conditions réelles du trajet.\n\n"
+        "4. Responsabilité\n"
+        "CamTrans agit en tant qu'intermédiaire entre le client et le transporteur. Nous ne saurions être tenus responsables des retards ou des dommages causés pendant le transport.";
+
+    final textesAsync = ref.read(textesAppProvider);
+    final texteConditions = textesAsync.whenOrNull(
+      data: (textes) => textes.get('conditions_client', texteParDefaut),
+    ) ?? texteParDefaut;
+
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text("Conditions d'utilisation et Politique de confidentialité"),
-        content: const SingleChildScrollView(
-          child: Text(
-            "Bienvenue sur la plateforme CamTrans.\n\n"
-            "1. Utilisation du service\n"
-            "En utilisant notre plateforme, vous vous engagez à respecter les lois en vigueur et à ne pas utiliser nos services à des fins illégales.\n\n"
-            "2. Données personnelles et Confidentialité\n"
-            "Nous collectons et traitons vos données personnelles (nom, téléphone, adresse, position géographique) uniquement pour assurer la prestation de transport. "
-            "Vos données ne sont pas vendues à des tiers.\n\n"
-            "3. Paiements et Facturation\n"
-            "Les tarifs affichés sont des estimations. Le montant final peut varier en fonction des conditions réelles du trajet.\n\n"
-            "4. Responsabilité\n"
-            "CamTrans agit en tant qu'intermédiaire entre le client et le transporteur. Nous ne saurions être tenus responsables des retards ou des dommages causés pendant le transport.\n\n"
-            "(Ces conditions sont données à titre indicatif et doivent être complétées par vos conditions légales.)"
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+        titlePadding: const EdgeInsets.fromLTRB(24, 24, 24, 8),
+        contentPadding: const EdgeInsets.fromLTRB(24, 8, 24, 0),
+        title: const Row(
+          children: [
+            Icon(Icons.gavel, color: CouleursApp.primaire, size: 22),
+            SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                "Conditions d'utilisation",
+                style: TextStyle(color: CouleursApp.primaire, fontWeight: FontWeight.bold, fontSize: 17),
+              ),
+            ),
+          ],
+        ),
+        content: ConstrainedBox(
+          constraints: const BoxConstraints(maxHeight: 400),
+          child: SingleChildScrollView(
+            child: Text(
+              texteConditions,
+              style: const TextStyle(height: 1.6, fontSize: 14, color: Colors.black87),
+            ),
           ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
-            child: const Text("Fermer"),
+            child: const Text("Fermer", style: TextStyle(color: Colors.grey)),
+          ),
+          ElevatedButton.icon(
+            icon: const Icon(Icons.check_circle_outline, size: 18, color: Colors.white),
+            label: const Text("J'accepte", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+            onPressed: () {
+              Navigator.of(context).pop();
+              setState(() {
+                _conditionsAcceptees = true;
+              });
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: CouleursApp.primaire,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            ),
           ),
         ],
       ),

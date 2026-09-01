@@ -16,10 +16,10 @@ class Profil extends ConsumerWidget {
     final clientAsync = ref.watch(currentClientProvider);
 
     return Scaffold(
-      backgroundColor: CouleursApp.fond,
+      backgroundColor: const Color(0xFF08111F),
       appBar: AppBar(
         title: const Text("Mon Profil", style: TextStyle(fontWeight: FontWeight.bold)),
-        backgroundColor: CouleursApp.fond,
+        backgroundColor: const Color(0xFF08111F),
         elevation: 0,
         automaticallyImplyLeading: false,
       ),
@@ -73,7 +73,7 @@ class Profil extends ConsumerWidget {
 
                 const Text(
                   "Client TransConnect",
-                  style: TextStyle(color: CouleursApp.texteSecondaire, fontWeight: FontWeight.w500),
+                  style: TextStyle(color: Colors.white70, fontWeight: FontWeight.w500),
                 ),
 
                 const SizedBox(height: 30),
@@ -97,13 +97,13 @@ class Profil extends ConsumerWidget {
                   width: double.infinity,
                   child: ElevatedButton.icon(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.red.shade50,
+                      backgroundColor: Colors.red.withValues(alpha: 0.15),
                       foregroundColor: Colors.red,
                       minimumSize: const Size(double.infinity, 55),
                       elevation: 0,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(15),
-                        side: BorderSide(color: Colors.red.shade100),
+                        side: BorderSide(color: Colors.red.withValues(alpha: 0.3)),
                       ),
                     ),
                     onPressed: () async {
@@ -132,7 +132,7 @@ class Profil extends ConsumerWidget {
       margin: const EdgeInsets.only(bottom: 15),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(18),
-        side: BorderSide(color: Colors.grey.shade200),
+        side: BorderSide(color: Colors.white.withValues(alpha: 0.08)),
       ),
       child: ListTile(
         leading: Container(
@@ -140,8 +140,8 @@ class Profil extends ConsumerWidget {
           decoration: BoxDecoration(color: CouleursApp.primaire.withValues(alpha: 0.1), shape: BoxShape.circle),
           child: Icon(icone, color: CouleursApp.primaire, size: 20),
         ),
-        title: Text(titre, style: const TextStyle(fontSize: 12, color: Colors.grey)),
-        subtitle: Text(valeur, style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.black87)),
+        title: Text(titre, style: const TextStyle(fontSize: 12, color: Colors.white54)),
+        subtitle: Text(valeur, style: const TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
       ),
     );
   }
@@ -152,12 +152,12 @@ class Profil extends ConsumerWidget {
       margin: const EdgeInsets.only(bottom: 12),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(15),
-        side: BorderSide(color: Colors.grey.shade100),
+        side: BorderSide(color: const Color(0xFFEEEEEE)),
       ),
       child: ListTile(
-        leading: Icon(icone, color: Colors.black87),
+        leading: Icon(icone, color: Colors.white),
         title: Text(texte, style: const TextStyle(fontWeight: FontWeight.w600)),
-        trailing: const Icon(Icons.arrow_forward_ios, size: 14, color: Colors.grey),
+        trailing: const Icon(Icons.arrow_forward_ios, size: 14, color: Colors.white54),
         onTap: action,
       ),
     );

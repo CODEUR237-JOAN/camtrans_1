@@ -13,6 +13,10 @@ import 'package:update_camtrans/modeles/transporteur.dart';
 import 'package:update_camtrans/modeles/course.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:update_camtrans/coeur/utilitaires/telechargement/telechargement.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:pdf/pdf.dart';
+import 'package:pdf/widgets.dart' as pw;
 
 
 class PageVueEnsemble extends ConsumerWidget {
@@ -23,6 +27,7 @@ class PageVueEnsemble extends ConsumerWidget {
     final statsAsync = ref.watch(adminStatsProvider);
     final weeklyRevenuesAsync = ref.watch(adminWeeklyRevenuesProvider);
     final transporteursAsync = ref.watch(adminTransporteursProvider);
+    final isSatellite = ref.watch(isSatelliteViewProvider);
     final distributionAsync = ref.watch(adminCourseDistributionProvider);
     final activitiesAsync = ref.watch(adminRecentActivitiesProvider);
     final pendingApprovalsAsync = ref.watch(adminPendingApprovalsCountProvider);
@@ -59,7 +64,7 @@ class PageVueEnsemble extends ConsumerWidget {
           
           statsAsync.when(
             loading: () => const _SkeletonVueEnsemble(),
-            error: (err, _) => Center(child: Text("Erreur: $err", style: const TextStyle(color: Colors.white))),
+            error: (err, _) => Center(child: Text("Oups ! Chargement des stats impossible : $err 🔧", style: const TextStyle(color: Colors.white))),
             data: (stats) {
               return SingleChildScrollView(
                 padding: const EdgeInsets.all(32.0),
@@ -83,7 +88,49 @@ class PageVueEnsemble extends ConsumerWidget {
                             ),
                           ],
                         ),
-                        _buildPendingBadge(pendingApprovalsAsync, ref),
+                        Row(
+                          children: [
+                            _buildPendingBadge(pendingApprovalsAsync, ref),
+                            const SizedBox(width: 16),
+                            PopupMenuButton<String>(
+                              onSelected: (val) {
+                                if (val == 'rapport') {
+                                  _telechargerRapport(ref);
+                                }
+                              },
+                              color: const Color(0xFF10192A),
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8), side: BorderSide(color: Colors.white.withValues(alpha: 0.1))),
+                              offset: const Offset(0, 50),
+                              itemBuilder: (context) => [
+                                PopupMenuItem(
+                                  value: 'rapport',
+                                  child: Row(
+                                    children: [
+                                      const Icon(Icons.download, color: Colors.white),
+                                      const SizedBox(width: 8),
+                                      Text("Télécharger le rapport", style: GoogleFonts.inter(color: Colors.white)),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFF10192A),
+                                  borderRadius: BorderRadius.circular(8),
+                                  border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+                                ),
+                                child: Row(
+                                  children: [
+                                    Text("Actions", style: GoogleFonts.inter(color: Colors.white, fontWeight: FontWeight.w600)),
+                                    const SizedBox(width: 8),
+                                    const Icon(Icons.keyboard_arrow_down, color: Colors.white54, size: 20),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
                       ],
                     ),
                     const SizedBox(height: 32),
@@ -100,10 +147,10 @@ class PageVueEnsemble extends ConsumerWidget {
                           mainAxisSpacing: 24,
                           childAspectRatio: 2.2,
                           children: [
-                            _KpiCard(titre: "Revenus", valeur: "${NumberFormat.compact().format(stats.revenusTotaux)} F", icone: Iconsax.wallet_3_copy, couleur: CouleursApp.succes),
-                            _KpiCard(titre: "Clients Actifs", valeur: stats.totalClients.toString(), icone: Iconsax.user_copy, couleur: CouleursApp.secondaire),
-                            _KpiCard(titre: "Transporteurs", valeur: stats.totalTransporteurs.toString(), icone: Iconsax.truck_fast_copy, couleur: CouleursApp.avertissement),
-                            _KpiCard(titre: "Courses Totales", valeur: stats.totalCourses.toString(), icone: Iconsax.route_square_copy, couleur: CouleursApp.primaire),
+                            _KpiCard(titre: "Revenus", valeur: "${NumberFormat.compact().format(stats.revenusTotaux)} F", icone: Iconsax.wallet_3_copy, couleur: CouleursApp.succes, sparklineData: stats.revenusHistory, trend: stats.trendRevenus),
+                            _KpiCard(titre: "Clients Actifs", valeur: stats.totalClients.toString(), icone: Iconsax.user_copy, couleur: CouleursApp.secondaire, sparklineData: stats.clientsHistory, trend: stats.trendClients),
+                            _KpiCard(titre: "Transporteurs", valeur: stats.totalTransporteurs.toString(), icone: Iconsax.truck_fast_copy, couleur: CouleursApp.avertissement, sparklineData: stats.transporteursHistory, trend: stats.trendTransporteurs),
+                            _KpiCard(titre: "Courses Totales", valeur: stats.totalCourses.toString(), icone: Iconsax.route_square_copy, couleur: CouleursApp.primaire, sparklineData: stats.coursesHistory, trend: stats.trendCourses),
                           ],
                         );
                       },
@@ -146,7 +193,7 @@ class PageVueEnsemble extends ConsumerWidget {
                             children: [
                               Expanded(flex: 1, child: _buildRecentActivities(activitiesAsync)),
                               const SizedBox(width: 24),
-                              Expanded(flex: 2, child: _buildCarteTransporteurs(transporteursAsync)),
+                              Expanded(flex: 2, child: _buildCarteTransporteurs(transporteursAsync, ref, isSatellite)),
                             ],
                           );
                         } else {
@@ -154,7 +201,7 @@ class PageVueEnsemble extends ConsumerWidget {
                             children: [
                               _buildRecentActivities(activitiesAsync),
                               const SizedBox(height: 24),
-                              _buildCarteTransporteurs(transporteursAsync),
+                              _buildCarteTransporteurs(transporteursAsync, ref, isSatellite),
                             ],
                           );
                         }
@@ -167,6 +214,120 @@ class PageVueEnsemble extends ConsumerWidget {
           ),
         ],
       )
+    );
+  }
+
+  void _telechargerRapport(WidgetRef ref) async {
+    final coursesAsync = ref.read(adminCoursesProvider);
+    if (coursesAsync is! AsyncData) return;
+    
+    final courses = coursesAsync.value!;
+    
+    final pdf = pw.Document();
+
+    pdf.addPage(
+      pw.MultiPage(
+        pageFormat: PdfPageFormat.a4,
+        build: (pw.Context context) {
+          return [
+            pw.Header(level: 0, child: pw.Text("Rapport CamTrans - Courses")),
+            pw.TableHelper.fromTextArray(
+              context: context,
+              headers: <String>['ID', 'Date', 'Client ID', 'Transporteur ID', 'Statut', 'Prix'],
+              data: courses.map((c) => <String>[
+                  c.id.length > 8 ? c.id.substring(0, 8) : c.id,
+                  "${c.dateCreation.day}/${c.dateCreation.month}/${c.dateCreation.year}",
+                  c.clientId.length > 8 ? c.clientId.substring(0, 8) : c.clientId,
+                  c.transporteurId.isEmpty ? 'Aucun' : (c.transporteurId.length > 8 ? c.transporteurId.substring(0, 8) : c.transporteurId),
+                  c.statut,
+                  "${c.prixFinal > 0 ? c.prixFinal : c.prixEstime} F"
+                ]).toList(),
+            ),
+          ];
+        },
+      ),
+    );
+
+    final bytes = await pdf.save();
+    telechargerFichier(bytes, "rapport_camtrans_${DateTime.now().millisecondsSinceEpoch}.pdf");
+  }
+
+  void _afficherDetailsCourse(BuildContext context, Course course) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: const Color(0xFF10192A),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16), side: BorderSide(color: Colors.white.withValues(alpha: 0.1))),
+          title: Text("Détails de la course", style: GoogleFonts.inter(color: Colors.white, fontWeight: FontWeight.bold)),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text("ID: ${course.id}", style: GoogleFonts.inter(color: Colors.white54, fontSize: 12)),
+              const SizedBox(height: 16),
+              Row(children: [
+                const Icon(Icons.my_location, color: CouleursApp.primaire, size: 18),
+                const SizedBox(width: 8),
+                Expanded(child: Text("Départ: ${course.adresseDepart}", style: GoogleFonts.inter(color: Colors.white70))),
+              ]),
+              const SizedBox(height: 8),
+              Row(children: [
+                const Icon(Icons.location_on, color: Colors.redAccent, size: 18),
+                const SizedBox(width: 8),
+                Expanded(child: Text("Arrivée: ${course.adresseArrivee}", style: GoogleFonts.inter(color: Colors.white70))),
+              ]),
+              const SizedBox(height: 16),
+              Text("Prix: ${course.prixFinal > 0 ? course.prixFinal : course.prixEstime} F", style: GoogleFonts.inter(color: CouleursApp.succes, fontWeight: FontWeight.bold, fontSize: 16)),
+              const SizedBox(height: 8),
+              Text("Statut: ${course.statut}", style: GoogleFonts.inter(color: Colors.white70)),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("Fermer", style: TextStyle(color: Colors.white)),
+            ),
+          ],
+        );
+      }
+    );
+  }
+
+  void _confirmerAnnulation(BuildContext context, Course course) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          backgroundColor: const Color(0xFF10192A),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16), side: BorderSide(color: Colors.white.withValues(alpha: 0.1))),
+          title: Text("Annuler la course ?", style: GoogleFonts.inter(color: Colors.redAccent, fontWeight: FontWeight.bold)),
+          content: Text("Êtes-vous sûr de vouloir annuler cette course ? Cette action est irréversible.", style: GoogleFonts.inter(color: Colors.white70)),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text("Retour", style: TextStyle(color: Colors.white54)),
+            ),
+            ElevatedButton(
+              style: ElevatedButton.styleFrom(backgroundColor: Colors.redAccent),
+              onPressed: () async {
+                try {
+                  await FirebaseFirestore.instance.collection('courses').doc(course.id).update({'statut': 'annulee'});
+                  if (context.mounted) {
+                    Navigator.pop(context);
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Course annulée avec succès")));
+                  }
+                } catch (e) {
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Erreur: $e")));
+                  }
+                }
+              },
+              child: const Text("Annuler la course", style: TextStyle(color: Colors.white)),
+            ),
+          ],
+        );
+      }
     );
   }
 
@@ -207,32 +368,98 @@ class PageVueEnsemble extends ConsumerWidget {
       hauteur: 420,
       enfant: distributionAsync.when(
         loading: () => const Center(child: CircularProgressIndicator(color: CouleursApp.primaire)),
-        error: (err, _) => Center(child: Text("Erreur: $err", style: const TextStyle(color: Colors.white))),
+        error: (err, _) => Center(child: Text("Impossible de charger les activités : $err 🔧", style: const TextStyle(color: Colors.white))),
         data: (data) {
-          if (data.isEmpty) return const Center(child: Text("Pas de données", style: TextStyle(color: Colors.white54)));
-          
-          final List<PieChartSectionData> sections = [];
-          final colors = [CouleursApp.secondaire, CouleursApp.primaire, CouleursApp.succes, CouleursApp.avertissement, CouleursApp.erreur];
-          int i = 0;
-          
+          // Normalisation des données pour regrouper les statuts similaires
+          final Map<String, int> normalizedData = {};
           data.forEach((key, value) {
+            String l = key.toLowerCase();
+            String label;
+            if (l.contains('termin') || l.contains('livr')) label = 'Terminée';
+            else if (l.contains('annul')) label = 'Annulée';
+            else if (l.contains('cours') || l.contains('transit') || l.contains('rout')) label = 'En cours';
+            else if (l.contains('attent') || l.contains('recherch')) label = 'En attente';
+            else if (l.contains('accept') || l.contains('attribu')) label = 'Attribué';
+            else label = key;
+
+            normalizedData[label] = (normalizedData[label] ?? 0) + value;
+          });
+
+          final List<PieChartSectionData> sections = [];
+          
+          Color getColorForLabel(String label) {
+            String l = label.toLowerCase();
+            if (l.contains('termin') || l.contains('livr')) return CouleursApp.succes; // Green
+            if (l.contains('annul')) return CouleursApp.erreur; // Red
+            if (l.contains('cours') || l.contains('transit') || l.contains('rout')) return Colors.blueAccent;
+            if (l.contains('attent') || l.contains('recherch')) return Colors.orange;
+            if (l.contains('accept') || l.contains('attribu')) return Colors.purpleAccent;
+            // Fallbacks if unknown
+            final fallbackColors = [Colors.teal, Colors.pink, Colors.amber, Colors.cyan, Colors.indigo];
+            return fallbackColors[label.hashCode % fallbackColors.length];
+          }
+
+          normalizedData.forEach((key, value) {
             sections.add(PieChartSectionData(
               value: value.toDouble(),
               title: "$value",
-              color: colors[i % colors.length],
-              radius: 60,
-              titleStyle: GoogleFonts.inter(fontWeight: FontWeight.bold, color: Colors.white, fontSize: 14),
-              badgeWidget: _Badge(key, colors[i % colors.length]),
-              badgePositionPercentageOffset: 1.3,
+              color: getColorForLabel(key),
+              radius: 30, // Slightly thicker ring
+              titleStyle: GoogleFonts.inter(fontWeight: FontWeight.bold, color: Colors.white, fontSize: 14), // Show internal value
             ));
-            i++;
           });
 
-          return PieChart(PieChartData(
-            sections: sections, 
-            centerSpaceRadius: 50,
-            sectionsSpace: 4,
-          ));
+          return Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Expanded(
+                child: Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text("Total", style: GoogleFonts.inter(color: Colors.white54, fontSize: 14)),
+                        Text("${normalizedData.values.fold(0, (a, b) => a + b)}", style: GoogleFonts.inter(color: Colors.white, fontSize: 32, fontWeight: FontWeight.bold)),
+                      ],
+                    ),
+                    PieChart(PieChartData(
+                      sections: sections, 
+                      centerSpaceRadius: 70, // Slightly smaller center space
+                      sectionsSpace: 4,
+                    )),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 16),
+              // Légende
+              Wrap(
+                alignment: WrapAlignment.center,
+                spacing: 16,
+                runSpacing: 12,
+                children: normalizedData.entries.toList().asMap().entries.map((entry) {
+                  final _ = entry.key;  // index non utilisé
+                  final key = entry.value.key;
+                  return Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        width: 12,
+                        height: 12,
+                        decoration: BoxDecoration(
+                          color: getColorForLabel(key),
+                          shape: BoxShape.circle,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(key, style: GoogleFonts.inter(color: Colors.white70, fontSize: 13)),
+                    ],
+                  );
+                }).toList(),
+              ),
+              const SizedBox(height: 16),
+            ],
+          );
         },
       ),
     );
@@ -244,7 +471,7 @@ class PageVueEnsemble extends ConsumerWidget {
       hauteur: 450,
       enfant: activitiesAsync.when(
         loading: () => const Center(child: CircularProgressIndicator(color: CouleursApp.primaire)),
-        error: (err, _) => Center(child: Text("Erreur: $err", style: const TextStyle(color: Colors.white))),
+        error: (err, _) => Center(child: Text("Données financières inaccessibles : $err 🔧", style: const TextStyle(color: Colors.white))),
         data: (list) {
           if (list.isEmpty) return const Center(child: Text("Aucune activité", style: TextStyle(color: Colors.white54)));
           return ListView.builder(
@@ -252,35 +479,70 @@ class PageVueEnsemble extends ConsumerWidget {
             itemBuilder: (context, index) {
               final c = list[index];
               return Container(
-                margin: const EdgeInsets.only(bottom: 16),
-                padding: const EdgeInsets.all(16),
+                margin: const EdgeInsets.only(bottom: 8), // Tighter spacing
+                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.03),
-                  borderRadius: BorderRadius.circular(16),
+                  color: const Color(0xFF10192A), // Dark blue
+                  borderRadius: BorderRadius.circular(8),
                   border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
                 ),
                 child: Row(
                   children: [
-                    Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: CouleursApp.secondaire.withValues(alpha: 0.15),
-                        shape: BoxShape.circle,
-                      ),
-                      child: const Icon(Iconsax.box_copy, color: CouleursApp.secondaire, size: 20),
+                    CircleAvatar(
+                      radius: 18,
+                      backgroundColor: CouleursApp.primaire.withValues(alpha: 0.2),
+                      child: const Icon(Iconsax.box_copy, color: CouleursApp.primaire, size: 16),
                     ),
-                    const SizedBox(width: 16),
+                    const SizedBox(width: 12),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(c.adresseArrivee, style: GoogleFonts.inter(fontWeight: FontWeight.bold, fontSize: 14, color: Colors.white), overflow: TextOverflow.ellipsis),
-                          const SizedBox(height: 4),
-                          Text(DateFormat('HH:mm - dd MMM').format(c.dateCreation), style: GoogleFonts.inter(fontSize: 12, color: Colors.white54)),
+                          RichText(
+                            text: TextSpan(
+                              children: [
+                                TextSpan(text: "Course ", style: GoogleFonts.inter(fontWeight: FontWeight.bold, fontSize: 13, color: Colors.white)),
+                                TextSpan(text: c.adresseArrivee, style: GoogleFonts.inter(fontSize: 13, color: Colors.white70)),
+                              ],
+                            ),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          const SizedBox(height: 2),
+                          Text("${DateFormat('dd MMM').format(c.dateCreation)} • ${c.prixFinal > 0 ? c.prixFinal : c.prixEstime} F", style: GoogleFonts.inter(fontSize: 11, color: Colors.white38)),
                         ],
                       ),
                     ),
-                    Text("${c.prixFinal > 0 ? c.prixFinal : c.prixEstime} F", style: GoogleFonts.inter(fontWeight: FontWeight.bold, fontSize: 15, color: CouleursApp.succes)),
+                    // Action Buttons
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Tooltip(
+                          message: "Voir les détails",
+                          child: InkWell(
+                            onTap: () => _afficherDetailsCourse(context, c),
+                            borderRadius: BorderRadius.circular(20),
+                            child: const Padding(
+                              padding: EdgeInsets.all(6.0),
+                              child: Icon(Iconsax.eye_copy, color: Colors.white54, size: 18),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 4),
+                        if (c.statut != 'annulee' && c.statut != 'terminee')
+                          Tooltip(
+                            message: "Annuler la course",
+                            child: InkWell(
+                              onTap: () => _confirmerAnnulation(context, c),
+                              borderRadius: BorderRadius.circular(20),
+                              child: const Padding(
+                                padding: EdgeInsets.all(6.0),
+                                child: Icon(Iconsax.close_circle_copy, color: CouleursApp.erreur, size: 18),
+                              ),
+                            ),
+                          ),
+                      ],
+                    ),
                   ],
                 ),
               ).animate().slideX();
@@ -297,7 +559,7 @@ class PageVueEnsemble extends ConsumerWidget {
       hauteur: 420,
       enfant: weeklyRevenuesAsync.when(
         loading: () => Container(color: Colors.white.withValues(alpha: 0.05)).animate(onPlay: (controller) => controller.repeat()).shimmer(color: Colors.white.withValues(alpha: 0.1), duration: 1.5.seconds),
-        error: (err, _) => Center(child: Text("Erreur chart: $err", style: const TextStyle(color: Colors.white))),
+        error: (err, _) => Center(child: Text("Oups ! Graphe indisponible : $err 📊", style: const TextStyle(color: Colors.white))),
         data: (data) {
           final spots = data.asMap().entries.map((e) => FlSpot(e.key.toDouble(), e.value)).toList();
           
@@ -322,7 +584,11 @@ class PageVueEnsemble extends ConsumerWidget {
                   sideTitles: SideTitles(
                     showTitles: true,
                     reservedSize: 30,
+                    interval: 1, // Fix fractional values creating duplicate labels
                     getTitlesWidget: (value, meta) {
+                      // Only show titles for integer values
+                      if (value != value.toInt()) return const Text('');
+                      
                       const jours = ['J-6', 'J-5', 'J-4', 'J-3', 'J-2', 'Hier', 'Auj'];
                       if (value.toInt() >= 0 && value.toInt() < jours.length) {
                         return Padding(
@@ -364,7 +630,7 @@ class PageVueEnsemble extends ConsumerWidget {
     );
   }
 
-  Widget _buildCarteTransporteurs(AsyncValue<List<Transporteur>> transporteursAsync) {
+  Widget _buildCarteTransporteurs(AsyncValue<List<Transporteur>> transporteursAsync, WidgetRef ref, bool isSatellite) {
     return Container(
       decoration: BoxDecoration(
         color: Colors.white.withValues(alpha: 0.03),
@@ -377,40 +643,69 @@ class PageVueEnsemble extends ConsumerWidget {
         children: [
           transporteursAsync.when(
             loading: () => Container(color: Colors.white.withValues(alpha: 0.05)).animate(onPlay: (controller) => controller.repeat()).shimmer(color: Colors.white.withValues(alpha: 0.1), duration: 1.5.seconds),
-            error: (err, _) => Center(child: Text("Erreur map: $err", style: const TextStyle(color: Colors.white))),
+            error: (err, _) => Center(child: Text("Oups ! Carte indisponible : $err 🗺️", style: const TextStyle(color: Colors.white))),
             data: (transporteurs) {
               final markers = transporteurs
                   .where((t) => t.latitude != 0 && t.longitude != 0)
-                  .map<Marker>((t) => Marker(
+                  .map<Marker>((t) {
+                      IconData iconData = Icons.directions_car;
+                      final type = t.typeVehicule.toLowerCase();
+                      if (type.contains('moto')) iconData = Icons.two_wheeler;
+                      else if (type.contains('camion')) iconData = Icons.local_shipping;
+                      else if (type.contains('fourgon') || type.contains('van')) iconData = Icons.airport_shuttle;
+
+                      return Marker(
                         point: LatLng(t.latitude, t.longitude),
-                        width: 40,
-                        height: 40,
+                        width: 44,
+                        height: 44,
                         child: Container(
                           decoration: BoxDecoration(
-                            color: t.disponible ? CouleursApp.succes.withValues(alpha: 0.2) : Colors.orange.withValues(alpha: 0.2),
+                            color: t.disponible ? Colors.blue.withValues(alpha: 0.2) : Colors.grey.withValues(alpha: 0.2),
                             shape: BoxShape.circle,
+                            border: Border.all(color: t.disponible ? Colors.blue : Colors.grey, width: 2),
+                            boxShadow: [
+                              BoxShadow(color: (t.disponible ? Colors.blue : Colors.grey).withValues(alpha: 0.3), blurRadius: 8, spreadRadius: 2)
+                            ]
                           ),
-                          child: Icon(Iconsax.truck_fast_copy, color: t.disponible ? CouleursApp.succes : Colors.orange, size: 20),
+                          child: Icon(iconData, color: t.disponible ? Colors.white : Colors.white70, size: 22),
                         ),
-                      ))
-                  .toList();
+                      );
+                    }).toList();
 
-              return FlutterMap(
-                options: const MapOptions(
-                  initialCenter: LatLng(4.0511, 9.7679), // Douala
-                  initialZoom: 12,
-                ),
-                children: [
-                  TileLayer(
-                    // Utilisation d'une carte sombre (CartoDB Dark Matter) pour coller au thème Neo Premium
-                    urlTemplate: 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',
-                    subdomains: const ['a', 'b', 'c', 'd'],
-                    userAgentPackageName: 'com.joan.update_camtrans',
-                  ),
-                  MarkerLayer(markers: markers),
-                ],
+              return _MiniCarteStateful(
+                markers: markers,
+                isSatellite: isSatellite,
               );
             },
+          ),
+          Positioned(
+            top: 24,
+            right: 24,
+            child: InkWell(
+              onTap: () {
+                ref.read(isSatelliteViewProvider.notifier).state = !isSatellite;
+              },
+              borderRadius: BorderRadius.circular(12),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: BackdropFilter(
+                  filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+                  child: Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: Colors.black.withValues(alpha: 0.4),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+                    ),
+                    child: Icon(
+                      isSatellite ? Icons.map : Icons.satellite_alt,
+                      color: Colors.white,
+                      size: 20,
+                    ),
+                  ),
+                ),
+              ),
+            ),
           ),
           Positioned(
             top: 24,
@@ -430,7 +725,7 @@ class PageVueEnsemble extends ConsumerWidget {
                     children: [
                       Container(width: 8, height: 8, decoration: const BoxDecoration(color: Colors.redAccent, shape: BoxShape.circle)).animate(onPlay: (controller) => controller.repeat(reverse: true)).fade(begin: 0.4, end: 1),
                       const SizedBox(width: 10),
-                      Text("Direct Tracker", style: GoogleFonts.inter(fontWeight: FontWeight.bold, color: Colors.white)),
+                      Text("Suivi en direct", style: GoogleFonts.inter(fontWeight: FontWeight.bold, color: Colors.white)),
                     ],
                   ),
                 ),
@@ -448,57 +743,88 @@ class _KpiCard extends StatelessWidget {
   final String valeur;
   final IconData icone;
   final Color couleur;
+  final List<double> sparklineData;
+  final double trend;
 
-  const _KpiCard({required this.titre, required this.valeur, required this.icone, required this.couleur});
+  const _KpiCard({
+    required this.titre, 
+    required this.valeur, 
+    required this.icone, 
+    required this.couleur,
+    required this.sparklineData,
+    required this.trend,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(24),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
-        child: Container(
-          padding: const EdgeInsets.all(24),
-          decoration: BoxDecoration(
-            color: Colors.white.withValues(alpha: 0.03),
-            borderRadius: BorderRadius.circular(24),
-            border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.2),
-                blurRadius: 30,
-                offset: const Offset(0, 10),
-              )
-            ]
-          ),
-          child: Row(
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0xFF10192A), // Darker blue/grey background matching reference
+        borderRadius: BorderRadius.circular(12), // Less rounded, more professional
+        border: Border.all(color: Colors.white.withValues(alpha: 0.05), width: 1),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.3),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          )
+        ]
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Container(
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: couleur.withValues(alpha: 0.15),
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(color: couleur.withValues(alpha: 0.2), blurRadius: 15)
-                  ]
-                ),
-                child: Icon(icone, color: couleur, size: 28),
-              ),
-              const SizedBox(width: 20),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(titre, style: GoogleFonts.inter(color: Colors.white54, fontSize: 14, fontWeight: FontWeight.w500), overflow: TextOverflow.ellipsis),
-                    const SizedBox(height: 6),
-                    FittedBox(fit: BoxFit.scaleDown, child: Text(valeur, style: GoogleFonts.inter(color: Colors.white, fontSize: 26, fontWeight: FontWeight.bold, letterSpacing: -0.5))),
-                  ],
-                ),
-              )
+              Text(titre.toUpperCase(), style: GoogleFonts.inter(color: Colors.white54, fontSize: 11, fontWeight: FontWeight.w600, letterSpacing: 0.5)),
+              Icon(icone, color: couleur.withValues(alpha: 0.7), size: 16),
             ],
           ),
-        ),
+          const SizedBox(height: 4),
+          Expanded(
+            child: FittedBox(
+              alignment: Alignment.centerLeft,
+              fit: BoxFit.scaleDown,
+              child: Text(valeur, style: GoogleFonts.inter(color: Colors.white, fontSize: 30, fontWeight: FontWeight.bold, letterSpacing: -1)),
+            ),
+          ),
+          const SizedBox(height: 4),
+          Row(
+            children: [
+              Icon(trend >= 0 ? Icons.arrow_drop_up : Icons.arrow_drop_down, color: trend >= 0 ? CouleursApp.succes : CouleursApp.erreur, size: 18),
+              Text("${trend >= 0 ? '+' : ''}${trend.toStringAsFixed(1)}%", style: GoogleFonts.inter(color: trend >= 0 ? CouleursApp.succes : CouleursApp.erreur, fontSize: 11, fontWeight: FontWeight.bold)),
+              const SizedBox(width: 4),
+              Text("vs mois dernier", style: GoogleFonts.inter(color: Colors.white38, fontSize: 11)),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Expanded(
+            child: LineChart(
+              LineChartData(
+                gridData: FlGridData(show: false),
+                titlesData: FlTitlesData(show: false),
+                borderData: FlBorderData(show: false),
+                lineTouchData: LineTouchData(enabled: false),
+                lineBarsData: [
+                  LineChartBarData(
+                    spots: sparklineData.asMap().entries.map((e) => FlSpot(e.key.toDouble(), e.value)).toList(),
+                    isCurved: true,
+                    color: couleur,
+                    barWidth: 2,
+                    isStrokeCapRound: true,
+                    dotData: FlDotData(show: false),
+                    belowBarData: BarAreaData(
+                      show: true,
+                      color: couleur.withValues(alpha: 0.1),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -575,29 +901,78 @@ class _SkeletonVueEnsemble extends StatelessWidget {
   }
 }
 
-class _Badge extends StatelessWidget {
-  final String texte;
-  final Color couleur;
 
-  const _Badge(this.texte, this.couleur);
+class _MiniCarteStateful extends StatefulWidget {
+  final List<Marker> markers;
+  final bool isSatellite;
+
+  const _MiniCarteStateful({required this.markers, required this.isSatellite});
+
+  @override
+  State<_MiniCarteStateful> createState() => _MiniCarteStatefulState();
+}
+
+class _MiniCarteStatefulState extends State<_MiniCarteStateful> {
+  final MapController _mapController = MapController();
+
+  Widget _buildZoomButton(IconData icon, VoidCallback onTap) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(
+          color: const Color(0xFF0F172A).withValues(alpha: 0.9),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.2),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            )
+          ],
+        ),
+        child: Icon(icon, color: Colors.white, size: 20),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      decoration: BoxDecoration(
-        color: Colors.black.withValues(alpha: 0.6),
-        borderRadius: BorderRadius.circular(8),
-        border: Border.all(color: couleur.withValues(alpha: 0.5)),
-      ),
-      child: Text(
-        texte,
-        style: GoogleFonts.inter(
-          fontSize: 12,
-          color: Colors.white,
-          fontWeight: FontWeight.bold,
+    return Stack(
+      children: [
+        FlutterMap(
+          mapController: _mapController,
+          options: const MapOptions(
+            initialCenter: LatLng(3.8480, 11.5021),
+            initialZoom: 12,
+          ),
+          children: [
+            TileLayer(
+              urlTemplate: widget.isSatellite ? urlCarteSatellite : urlCarteStandard,
+              userAgentPackageName: 'com.joan.update_camtrans',
+            ),
+            MarkerLayer(markers: widget.markers),
+          ],
         ),
-      ),
+        Positioned(
+          bottom: 16,
+          right: 16,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _buildZoomButton(Icons.add, () {
+                _mapController.move(_mapController.camera.center, _mapController.camera.zoom + 1);
+              }),
+              const SizedBox(height: 8),
+              _buildZoomButton(Icons.remove, () {
+                _mapController.move(_mapController.camera.center, _mapController.camera.zoom - 1);
+              }),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }

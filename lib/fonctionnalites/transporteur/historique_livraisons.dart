@@ -61,14 +61,14 @@ class _HistoriquelivraisonsState
     final coursesAsync = ref.watch(fluxMesCoursesProvider);
 
     return Scaffold(
-      backgroundColor: CouleursApp.fond,
+      backgroundColor: const Color(0xFF08111F),
       appBar: AppBar(
         title: const Text("Historique des livraisons"),
-        backgroundColor: Colors.white,
+        backgroundColor: const Color(0xFF08111F),
         elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.black87),
+        iconTheme: const IconThemeData(color: Colors.white70),
         titleTextStyle: const TextStyle(
-            color: Colors.black87, fontWeight: FontWeight.bold, fontSize: 18),
+            color: Colors.white70, fontWeight: FontWeight.bold, fontSize: 18),
         actions: [
           Tooltip(
             message: "Supprimer les livraisons terminées/annulées",
@@ -123,12 +123,12 @@ class _HistoriquelivraisonsState
                     child: CircularProgressIndicator(
                         color: CouleursApp.primaire)),
                 error: (error, _) =>
-                    Center(child: Text("Erreur : $error")),
+                    Center(child: Text("Impossible de charger l'historique : $error 🔧")),
                 data: (courses) {
                   if (courses.isEmpty) {
                     return const Center(
                         child:
-                            Text("Aucune livraison dans votre historique."));
+                            Text("Aucune livraison complétée. C'est le moment de prendre la route ! 🚚"));
                   }
 
                   return ListView.builder(
@@ -147,8 +147,8 @@ class _HistoriquelivraisonsState
                           leading: CircleAvatar(
                             radius: 28,
                             backgroundColor: peutSuppr
-                                ? Colors.green.shade100
-                                : Colors.orange.shade100,
+                                ? Colors.green.withValues(alpha: 0.2)
+                                : Colors.orange.withValues(alpha: 0.2),
                             child: Icon(
                               peutSuppr
                                   ? Icons.check_circle

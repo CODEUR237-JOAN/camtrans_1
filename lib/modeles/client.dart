@@ -116,11 +116,11 @@ class Client extends Utilisateur {
       ville: map["ville"] ?? "",
       role: map["role"] ?? "client",
       actif: map["actif"] ?? true,
-      emailVerifie:
-      map["emailVerifie"] ?? false,
+      emailVerifie: map["emailVerifie"] ?? false,
       dateCreation: Parseur.toDateTime(map["dateCreation"]),
-      nombreCourses:
-      map["nombreCourses"] ?? 0,
+      estEnLigne: map["estEnLigne"] ?? false,
+      derniereConnexion: map["derniereConnexion"] != null ? Parseur.toDateTime(map["derniereConnexion"]) : null,
+      nombreCourses: map["nombreCourses"] ?? 0,
       nombreDemenagements:
       map["nombreDemenagements"] ?? 0,
       adressesFavorites:

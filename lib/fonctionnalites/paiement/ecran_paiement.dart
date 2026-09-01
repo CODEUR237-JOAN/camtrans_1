@@ -341,7 +341,7 @@ class _EcranPaiementState extends ConsumerState<EcranPaiement> {
               child: BackdropFilter(
                 filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
                 child: Container(
-                  color: const Color(0xFF08111F).withValues(alpha: 0.8),
+                  color: Colors.white.withValues(alpha: 0.8),
                   child: SafeArea(
                     child: Center(
                       child: TicketRecu(
