@@ -243,7 +243,13 @@ class _PageAbonnementState extends ConsumerState<PageAbonnement> {
                 children: [
                   Row(
                     children: [
-                      Text(titre, style: GoogleFonts.inter(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
+                      Flexible(
+                        child: Text(
+                          titre, 
+                          style: GoogleFonts.inter(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
                       if (recommande) ...[
                         const SizedBox(width: 8),
                         Container(
