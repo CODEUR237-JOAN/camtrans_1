@@ -46,7 +46,7 @@ class ServiceAuthentification {
   Future<void> deconnexion() async {
     // 1. Arreter la presence avant de se deconnecter car on a besoin de currentUser
     try {
-      ServicePresence().arreter();
+      await ServicePresence().arreter();
     } catch(e) {}
     // 2. Se deconnecter
     await _auth.signOut();

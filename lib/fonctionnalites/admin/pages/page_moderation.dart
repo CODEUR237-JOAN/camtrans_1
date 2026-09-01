@@ -48,7 +48,7 @@ class PageModeration extends ConsumerWidget {
       backgroundColor: Colors.transparent, // Sera géré par le parent
       body: Stack(
         children: [
-          Container(color: Colors.white),
+          Container(color: const Color(0xFF08111F)),
           Positioned(
             bottom: -100,
             right: -100,

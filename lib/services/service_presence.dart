@@ -25,9 +25,9 @@ class ServicePresence with WidgetsBindingObserver {
   }
 
   /// A appeler lors de la deconnexion
-  void arreter() {
+  Future<void> arreter() async {
     _arreterHeartbeat();
-    _setEnLigne(false);
+    await _setEnLigne(false);
     WidgetsBinding.instance.removeObserver(this);
     _collection = null;
   }
@@ -72,7 +72,7 @@ class ServicePresence with WidgetsBindingObserver {
     }).catchError((_) {});
   }
 
-  void _setEnLigne(bool enLigne) {
+  Future<void> _setEnLigne(bool enLigne) async {
     final user = _auth.currentUser;
     final collection = _collection;
     if (user == null || collection == null) return;
@@ -82,6 +82,6 @@ class ServicePresence with WidgetsBindingObserver {
       'derniereConnexion': FieldValue.serverTimestamp(),
     };
 
-    _firestore.collection(collection).doc(user.uid).update(donnees).catchError((_) {});
+    await _firestore.collection(collection).doc(user.uid).update(donnees).catchError((_) {});
   }
 }
