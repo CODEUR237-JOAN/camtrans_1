@@ -52,7 +52,7 @@ class ServicePresence with WidgetsBindingObserver {
   void _demarrerHeartbeat() {
     _arreterHeartbeat();
     // Met à jour la dernière connexion toutes les 3 minutes pour indiquer que l'app est toujours ouverte
-    _heartbeatTimer = Timer.periodic(const Duration(minutes: 3), (_) {
+    _heartbeatTimer = Timer.periodic(const Duration(seconds: 30), (_) {
       _pingPresence();
     });
   }

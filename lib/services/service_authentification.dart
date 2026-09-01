@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'service_presence.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final serviceAuthentificationProvider = Provider<ServiceAuthentification>((ref) {
@@ -43,6 +44,11 @@ class ServiceAuthentification {
 
   /// Déconnexion
   Future<void> deconnexion() async {
+    // 1. Arreter la presence avant de se deconnecter car on a besoin de currentUser
+    try {
+      ServicePresence().arreter();
+    } catch(e) {}
+    // 2. Se deconnecter
     await _auth.signOut();
   }
 

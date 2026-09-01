@@ -301,10 +301,10 @@ class Transporteur extends Utilisateur {
           ? DateTime.fromMillisecondsSinceEpoch(map["dateFinAbonnement"]) 
           : null,
       
-      // LOGIQUE DE PRESENCE : Si pas de signal depuis 5 minutes, on force a hors ligne
+      // LOGIQUE DE PRESENCE : Si pas de signal depuis 1 minute, on force a hors ligne
       estEnLigne: (map["estEnLigne"] ?? false) && 
                   (map["derniereConnexion"] != null && 
-                   DateTime.now().difference(Parseur.toDateTime(map["derniereConnexion"])).inMinutes <= 5),
+                   DateTime.now().difference(Parseur.toDateTime(map["derniereConnexion"])).inSeconds <= 60),
 
       derniereConnexion: map["derniereConnexion"] != null ? Parseur.toDateTime(map["derniereConnexion"]) : null,
     );
