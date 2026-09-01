@@ -300,7 +300,12 @@ class Transporteur extends Utilisateur {
       dateFinAbonnement: map["dateFinAbonnement"] != null 
           ? DateTime.fromMillisecondsSinceEpoch(map["dateFinAbonnement"]) 
           : null,
-      estEnLigne: map["estEnLigne"] ?? false,
+      
+      // LOGIQUE DE PRESENCE : Si pas de signal depuis 5 minutes, on force a hors ligne
+      estEnLigne: (map["estEnLigne"] ?? false) && 
+                  (map["derniereConnexion"] != null && 
+                   DateTime.now().difference(Parseur.toDateTime(map["derniereConnexion"])).inMinutes <= 5),
+
       derniereConnexion: map["derniereConnexion"] != null ? Parseur.toDateTime(map["derniereConnexion"]) : null,
     );
   }

@@ -118,7 +118,12 @@ class Client extends Utilisateur {
       actif: map["actif"] ?? true,
       emailVerifie: map["emailVerifie"] ?? false,
       dateCreation: Parseur.toDateTime(map["dateCreation"]),
-      estEnLigne: map["estEnLigne"] ?? false,
+      
+      // LOGIQUE DE PRESENCE : Si pas de signal depuis 5 minutes, on force a hors ligne
+      estEnLigne: (map["estEnLigne"] ?? false) && 
+                  (map["derniereConnexion"] != null && 
+                   DateTime.now().difference(Parseur.toDateTime(map["derniereConnexion"])).inMinutes <= 5),
+
       derniereConnexion: map["derniereConnexion"] != null ? Parseur.toDateTime(map["derniereConnexion"]) : null,
       nombreCourses: map["nombreCourses"] ?? 0,
       nombreDemenagements:
