@@ -806,8 +806,8 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 400),
         curve: Curves.easeOutCubic,
-        margin: const EdgeInsets.symmetric(horizontal: 4),
-        padding: EdgeInsets.symmetric(horizontal: isSelected ? 20 : 12, vertical: 12),
+        margin: const EdgeInsets.symmetric(horizontal: 2), // Reduced from 4 to 2
+        padding: EdgeInsets.symmetric(horizontal: isSelected ? 16 : 8, vertical: 12), // Reduced from 20/12 to 16/8
         decoration: BoxDecoration(
           color: isSelected ? CouleursApp.primaire : Colors.transparent,
           borderRadius: BorderRadius.circular(30),
