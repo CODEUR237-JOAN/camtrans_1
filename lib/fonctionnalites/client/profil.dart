@@ -6,6 +6,7 @@ import 'package:update_camtrans/coeur/constantes/couleurs.dart';
 import 'package:update_camtrans/coeur/constantes/tailles.dart';
 import 'package:update_camtrans/coeur/etat/utilisateur_provider.dart';
 import 'package:update_camtrans/services/service_authentification.dart';
+import 'package:update_camtrans/coeur/widgets/loader_premium.dart';
 
 class Profil extends ConsumerWidget {
   const Profil({super.key});
@@ -24,7 +25,7 @@ class Profil extends ConsumerWidget {
         automaticallyImplyLeading: false,
       ),
       body: clientAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
+        loading: () => Center(child: LoaderPremium()),
         error: (err, stack) => Center(child: Text("Erreur: $err")),
         data: (client) {
           final user = auth.utilisateur;
@@ -117,7 +118,7 @@ class Profil extends ConsumerWidget {
                   ),
                 ),
 
-                const SizedBox(height: 30),
+                const SizedBox(height: 120),
               ],
             ),
           );

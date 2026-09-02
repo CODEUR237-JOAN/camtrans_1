@@ -228,7 +228,7 @@ class _InscriptionTransporteurState extends ConsumerState<InscriptionTransporteu
   void _afficherConditions() {
     // Texte par défaut si aucun texte n'a encore été défini par l'admin
     const texteParDefaut =
-        "Bienvenue sur Camtrans !\n\n"
+        "Bienvenue sur CamTrans !\n\n"
         "1. Engagements du Transporteur\n"
         "Vous vous engagez à maintenir votre véhicule en bon état et à respecter les délais de livraison.\n\n"
         "2. Gammes et Tarification\n"

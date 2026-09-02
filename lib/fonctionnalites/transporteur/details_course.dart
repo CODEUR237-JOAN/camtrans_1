@@ -4,6 +4,7 @@ import 'package:latlong2/latlong.dart';
 
 import 'package:update_camtrans/coeur/constantes/couleurs.dart';
 import 'package:update_camtrans/coeur/constantes/tailles.dart';
+import 'package:update_camtrans/coeur/widgets/marqueur_premium.dart';
 
 class DetailsCourse extends StatelessWidget {
   const DetailsCourse({super.key});
@@ -32,7 +33,7 @@ class DetailsCourse extends StatelessWidget {
               clipBehavior: Clip.antiAlias,
               child: FlutterMap(
                 options: const MapOptions(
-                  initialCenter: LatLng(4.0511, 9.7679),
+                  initialCenter: LatLng(3.8824, 11.5079),
                   initialZoom: 7,
                 ),
                 children: [
@@ -43,12 +44,12 @@ class DetailsCourse extends StatelessWidget {
                   const MarkerLayer(
                     markers: [
                       Marker(
-                        point: LatLng(4.0511, 9.7679),
-                        child: Icon(Icons.location_on, color: Colors.red),
+                        point: LatLng(3.8824, 11.5079),
+                        child: MarqueurPremium(type: TypeMarqueur.depart),
                       ),
                       Marker(
                         point: LatLng(3.8480, 11.5021),
-                        child: Icon(Icons.flag, color: Colors.green),
+                        child: MarqueurPremium(type: TypeMarqueur.arrivee),
                       ),
                     ],
                   ),
@@ -109,7 +110,7 @@ class DetailsCourse extends StatelessWidget {
 
             Card(
               child: Column(
-                children: const [
+                children: [
                   ListTile(
                     leading: Icon(
                       Icons.location_on,
@@ -154,7 +155,7 @@ class DetailsCourse extends StatelessWidget {
 
             Card(
               child: Column(
-                children: const [
+                children: [
                   ListTile(
                     leading:
                     Icon(Icons.inventory),

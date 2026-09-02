@@ -107,6 +107,35 @@ final fluxCoursesDisponiblesProvider = StreamProvider.autoDispose<List<Course>>(
   );
 });
 
+// ✅ PHASE 4: DISPATCH AUTOMATIQUE - Écoute de la course proposée
+final fluxCourseProposeeProvider = StreamProvider.autoDispose<Course?>((ref) {
+  final firestore = ref.watch(serviceFirestoreProvider);
+  final transporteurId = ref.watch(currentTransporteurIdProvider);
+  
+  if (transporteurId.isEmpty) return Stream.value(null);
+
+  // On écoute les courses "propose" où transporteurId == moi
+  // Et dont la date d'expiration n'est pas dépassée (le filtrage exact du temps se fera côté client/app)
+  return firestore.fluxCoursesProposeesTransporteur(transporteurId).map((snapshot) {
+    try {
+      final docs = snapshot.docs;
+      if (docs.isEmpty) return null;
+      
+      final data = docs.first.data();
+      data['id'] = docs.first.id;
+      final course = Course.fromMap(data);
+      
+      // Vérifier l'expiration
+      if (course.expirationProposition != null && DateTime.now().isAfter(course.expirationProposition!)) {
+        return null;
+      }
+      return course;
+    } catch (_) {
+      return null;
+    }
+  });
+});
+
 // Course active (celle en cours de livraison)
 final activeCourseProvider = Provider.autoDispose<Course?>((ref) {
   final coursesAsync = ref.watch(fluxMesCoursesProvider);
@@ -178,8 +207,6 @@ class TransporteurActions {
         throw Exception("Cette course n'est plus disponible.");
       }
       
-      // On retire le transporteur et on remet la course en recherche.
-      // La Cloud Function prendra le relais pour trouver le prochain !
       transaction.update(docRef, {
         'transporteurId': '',
         'nomTransporteur': '',
@@ -187,6 +214,77 @@ class TransporteurActions {
         'statut': StatutCourse.recherche,
         'transporteursDeclines': FieldValue.arrayUnion([_transporteurId]),
       });
+    });
+  }
+
+  // ✅ PHASE 4: DISPATCH AUTOMATIQUE - Accepter une proposition
+  Future<void> accepterPropositionCourse(String courseId) async {
+    final docRef = FirebaseFirestore.instance.collection('courses').doc(courseId);
+    final tDoc = await _firestore.lireDocument(collection: 'transporteurs', id: _transporteurId);
+    final nomComplet = tDoc.exists && tDoc.data() != null ? "${tDoc.data()!['prenom']} ${tDoc.data()!['nom']}" : "";
+    final telephone = tDoc.exists && tDoc.data() != null ? tDoc.data()!['telephone'] : "";
+    
+    await FirebaseFirestore.instance.runTransaction((transaction) async {
+      final courseSnapshot = await transaction.get(docRef);
+      if (!courseSnapshot.exists || courseSnapshot.data() == null) throw Exception("Course introuvable.");
+      
+      final data = courseSnapshot.data()!;
+      // Vérifications de base
+      if (data['statut'] != StatutCourse.propose || data['transporteurId'] != _transporteurId) {
+        throw Exception("Proposition expirée ou course déjà assignée.");
+      }
+      
+      // Attribution
+      transaction.update(docRef, {
+        'statut': StatutCourse.attribue,
+        'nomTransporteur': nomComplet,
+        'telephoneTransporteur': telephone,
+      });
+    });
+  }
+
+  // ✅ PHASE 4: DISPATCH AUTOMATIQUE - Refuser une proposition (Fallback au suivant ou marché)
+  Future<void> refuserPropositionCourse(String courseId) async {
+    final docRef = FirebaseFirestore.instance.collection('courses').doc(courseId);
+    
+    await FirebaseFirestore.instance.runTransaction((transaction) async {
+      final courseSnapshot = await transaction.get(docRef);
+      if (!courseSnapshot.exists || courseSnapshot.data() == null) return;
+      
+      final data = courseSnapshot.data()!;
+      if (data['statut'] != StatutCourse.propose || data['transporteurId'] != _transporteurId) return;
+      
+      final List<dynamic> candidats = data['candidats'] ?? [];
+      final int index = data['indexCandidatActuel'] ?? 0;
+      final int nextIndex = index + 1;
+      
+      if (nextIndex < candidats.length) {
+        // Passer au candidat suivant
+        final prochainId = candidats[nextIndex] as String;
+        transaction.update(docRef, {
+          'indexCandidatActuel': nextIndex,
+          'transporteurId': prochainId,
+          'expirationProposition': DateTime.now().add(const Duration(seconds: 30)).toIso8601String(),
+        });
+        
+        // Déclencher une notification Push pour le prochain
+        final notifRef = FirebaseFirestore.instance.collection('notifications_push').doc();
+        transaction.set(notifRef, {
+           'titre': '🚨 NOUVELLE COURSE !',
+           'message': 'Une course à proximité vous est proposée. Acceptez vite !',
+           'cible': 'transporteur',
+           'cibleId': prochainId,
+           'status': 'pending',
+           'createdAt': FieldValue.serverTimestamp(),
+        });
+      } else {
+        // Fallback: Retour au marché public
+        transaction.update(docRef, {
+          'statut': StatutCourse.recherche,
+          'transporteurId': '',
+          'indexCandidatActuel': nextIndex, // pour la forme
+        });
+      }
     });
   }
 

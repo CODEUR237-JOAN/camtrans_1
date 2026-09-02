@@ -10,6 +10,7 @@ import 'package:update_camtrans/coeur/constantes/tailles.dart';
 import 'package:update_camtrans/services/service_authentification.dart';
 import 'package:update_camtrans/services/service_firestore.dart';
 import 'package:update_camtrans/services/service_stockage.dart';
+import 'package:update_camtrans/coeur/widgets/loader_premium.dart';
 
 class ModifierProfil extends ConsumerStatefulWidget {
   const ModifierProfil({super.key});
@@ -261,7 +262,7 @@ class _ModifierProfilState extends ConsumerState<ModifierProfil> {
           if (_chargement)
             Container(
               color: Colors.white.withValues(alpha: 0.07),
-              child: const Center(child: CircularProgressIndicator()),
+              child: Center(child: LoaderPremium()),
             )
         ],
       ),
@@ -312,7 +313,7 @@ class BoutonPrincipal extends StatelessWidget {
           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
         ),
         child: chargement 
-          ? const CircularProgressIndicator(color: Colors.white)
+          ? const LoaderPremium(size: 24)
           : Text(texte, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
       ),
     );

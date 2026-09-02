@@ -12,6 +12,8 @@ import 'widgets/resume_expedition_bottom_sheet.dart';
 import 'package:update_camtrans/coeur/widgets/page_responsive.dart';
 import 'package:update_camtrans/coeur/constantes/couleurs.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'dart:math' as math;
+import 'package:update_camtrans/coeur/widgets/loader_premium.dart';
 
 
 /// =================================================================
@@ -27,17 +29,22 @@ const List<String> _marquesVehicules = [
   'Mazda', 'Volvo', 'Scania', 'DAF', 'Autre',
 ];
 
-// Liste statique de quartiers populaires (Yaoundé / Douala) pour l'autocomplétion
+// Liste exhaustive de quartiers de Yaoundé pour l'autocomplétion
 const List<String> _quartiersCameroun = [
-  // Yaoundé
-  'Bastos, Yaoundé', 'Biyem-Assi, Yaoundé', 'Melen, Yaoundé', 'Omnisport, Yaoundé', 
-  'Essos, Yaoundé', 'Ekounou, Yaoundé', 'Nkolbisson, Yaoundé', 'Odza, Yaoundé', 
-  'Ngousso, Yaoundé', 'Mimboman, Yaoundé', 'Etoudi, Yaoundé', 'Mvog-Mbi, Yaoundé', 
-  'Centre-ville, Yaoundé', 'Mokolo, Yaoundé', 'Tsinga, Yaoundé', 'Nlongkak, Yaoundé',
-  // Douala
-  'Akwa, Douala', 'Bonanjo, Douala', 'Bonapriso, Douala', 'Deido, Douala',
-  'Bonabéri, Douala', 'Makepe, Douala', 'Logpom, Douala', 'Kotto, Douala',
-  'Ndokoti, Douala', 'Bépanda, Douala', 'New Bell, Douala', 'Cité des Palmiers, Douala'
+  'Bastos, Yaoundé', 'Centre-ville, Yaoundé', 'Melen, Yaoundé', 'Nlongkak, Yaoundé', 
+  'Tsinga, Yaoundé', 'Elig-Essono, Yaoundé', 'Mballa 2, Yaoundé', 'Hippodrome, Yaoundé', 
+  'Quartier du Lac, Yaoundé', 'Messa, Yaoundé', 'Omnisport, Yaoundé', 'Mfandena, Yaoundé', 
+  'Essos, Yaoundé', 'Mimboman, Yaoundé', 'Kondengui, Yaoundé', 'Ekounou, Yaoundé', 
+  'Awae, Yaoundé', 'Mvog-Mbi, Yaoundé', 'Mvog-Ada, Yaoundé', 'Nkoldongo, Yaoundé', 
+  'Anguissa, Yaoundé', 'Nkomo, Yaoundé', 'Odza, Yaoundé', 'Mvan, Yaoundé', 
+  'Ahala, Yaoundé', 'Meyo, Yaoundé', 'Nsimalen, Yaoundé', 'Tropicana, Yaoundé', 
+  'Biyem-Assi, Yaoundé', 'Obili, Yaoundé', 'Ngoa-Ekélé, Yaoundé', 'Etoug-Ebe, Yaoundé', 
+  'Mendong, Yaoundé', 'Simbock, Yaoundé', 'Jouvence, Yaoundé', 'Mokolo, Yaoundé', 
+  'Madagascar, Yaoundé', 'Cité Verte, Yaoundé', 'Nkolbisson, Yaoundé', 'Oyom-Abang, Yaoundé', 
+  'Carrière, Yaoundé', 'Etoudi, Yaoundé', 'Emana, Yaoundé', 'Messassi, Yaoundé', 
+  'Olembe, Yaoundé', 'Nkolmesseng, Yaoundé', 'Ngousso, Yaoundé', 'Biteng, Yaoundé', 
+  'Ndamvout, Yaoundé', 'Ekoumdoum, Yaoundé', 'Damase, Yaoundé', 'Briqueterie, Yaoundé',
+  'Mbankolo, Yaoundé', 'Febe, Yaoundé', 'Tonga, Yaoundé', 'Nsimeyong, Yaoundé'
 ];
 class CreerDemande extends ConsumerStatefulWidget {
   const CreerDemande({super.key});
@@ -779,54 +786,78 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Indicateur Position Actuelle (Départ)
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: CouleursApp.primaire.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: CouleursApp.primaire.withValues(alpha: 0.3)),
-                ),
-                child: Row(
-                  children: [
-                    const Icon(Icons.my_location, color: CouleursApp.primaire),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          const Text("Position de départ", style: TextStyle(color: Colors.white54, fontSize: 12)),
-                          _isLoadingGps 
-                            ? const Text("Recherche GPS en cours...", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold))
-                            : Text(etat.depart.isNotEmpty ? etat.depart : "Localisation introuvable", style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
-                        ],
+              // Départ avec Autocomplete
+              Row(
+                children: [
+                  const Icon(Icons.my_location, color: CouleursApp.primaire, size: 16),
+                  const SizedBox(width: 6),
+                  Text("Quartier de Départ", style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 14)),
+                ],
+              ),
+              const SizedBox(height: 8),
+              
+              Autocomplete<String>(
+                optionsBuilder: (TextEditingValue textEditingValue) {
+                  if (textEditingValue.text.isEmpty) return const Iterable<String>.empty();
+                  return _quartiersCameroun.where((String option) => option.toLowerCase().contains(textEditingValue.text.toLowerCase()));
+                },
+                onSelected: (String selection) {
+                  notifier.setDepart(selection);
+                  _departController.text = selection;
+                },
+                fieldViewBuilder: (context, controller, focusNode, onFieldSubmitted) {
+                  if (controller.text.isEmpty && _departController.text.isNotEmpty) controller.text = _departController.text;
+                  controller.addListener(() {
+                    if (controller.text != _departController.text) {
+                      _departController.text = controller.text;
+                      notifier.setDepart(controller.text);
+                    }
+                  });
+                  return TextField(
+                    controller: controller,
+                    focusNode: focusNode,
+                    style: const TextStyle(color: Colors.white),
+                    decoration: InputDecoration(
+                      hintText: _isLoadingGps ? "Recherche GPS en cours..." : "Entrez votre quartier exact",
+                      hintStyle: TextStyle(color: _isLoadingGps ? CouleursApp.primaire : Colors.white54),
+                      prefixIcon: _isLoadingGps 
+                          ? const Padding(padding: EdgeInsets.all(12), child: SizedBox(width: 16, height: 16, child: LoaderPremium(size: 20)))
+                          : const Icon(Iconsax.location, color: Colors.white70),
+                      filled: true,
+                      fillColor: const Color(0xFF10192A),
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.1))),
+                      enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.07))),
+                      focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide(color: CouleursApp.primaire.withValues(alpha: 0.5))),
+                    ),
+                  );
+                },
+                optionsViewBuilder: (context, onSelected, options) {
+                  return Align(
+                    alignment: Alignment.topLeft,
+                    child: Material(
+                      elevation: 4.0,
+                      borderRadius: BorderRadius.circular(16),
+                      color: const Color(0xFF10192A),
+                      child: Container(
+                        width: MediaQuery.of(context).size.width - 64,
+                        constraints: const BoxConstraints(maxHeight: 200),
+                        child: ListView.builder(
+                          padding: EdgeInsets.zero,
+                          shrinkWrap: true,
+                          itemCount: options.length,
+                          itemBuilder: (BuildContext context, int index) {
+                            final String option = options.elementAt(index);
+                            return ListTile(
+                              leading: const Icon(Icons.location_on, color: Colors.white54),
+                              title: Text(option, style: const TextStyle(color: Colors.white)),
+                              onTap: () => onSelected(option),
+                            );
+                          },
+                        ),
                       ),
                     ),
-                    if (!_isLoadingGps && etat.depart.isEmpty)
-                      IconButton(
-                        icon: const Icon(Icons.edit_location_alt, color: Colors.white54),
-                        onPressed: () {
-                          // Fallback manuel si GPS échoue
-                          showDialog(
-                            context: context,
-                            builder: (ctx) => AlertDialog(
-                              title: const Text("Entrer le départ"),
-                              content: TextField(
-                                controller: _departController,
-                                decoration: const InputDecoration(hintText: "Saisissez votre quartier"),
-                                onChanged: (val) => notifier.setDepart(val),
-                              ),
-                              actions: [
-                                TextButton(onPressed: () => Navigator.pop(ctx), child: const Text("OK"))
-                              ],
-                            ),
-                          );
-                        },
-                      )
-                    else if (!_isLoadingGps)
-                      const Icon(Icons.check_circle, color: CouleursApp.succes, size: 20)
-                  ],
-                ),
+                  );
+                },
               ),
               const SizedBox(height: 16),
               
@@ -1091,7 +1122,7 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
                 child: Padding(
                   padding: const EdgeInsets.all(12.0),
                   child: isLoadingSuffix
-                      ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFF3B82F6)))
+                      ? const SizedBox(width: 20, height: 20, child: LoaderPremium(size: 20))
                       : const Icon(Icons.my_location, color: Color(0xFF3B82F6), size: 22),
                 ),
               )
@@ -1196,9 +1227,12 @@ class _AnimatedRadarSearchState extends State<AnimatedRadarSearch> {
         setState(() {
           _step++;
         });
-      } else {
-        timer.cancel();
-        widget.onSearchComplete();
+        if (_step == _messages.length - 1) {
+          timer.cancel();
+          Future.delayed(const Duration(milliseconds: 1500), () {
+            if (mounted) widget.onSearchComplete();
+          });
+        }
       }
     });
   }
@@ -1246,6 +1280,30 @@ class _AnimatedRadarSearchState extends State<AnimatedRadarSearch> {
                       end: 0.0,
                     );
               }),
+
+            // Balayage Radar (Sweep)
+            if (!isFinished)
+              Container(
+                width: 260,
+                height: 260,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  gradient: SweepGradient(
+                    center: Alignment.center,
+                    startAngle: 0.0,
+                    endAngle: math.pi * 2,
+                    colors: [
+                      Colors.transparent,
+                      CouleursApp.primaire.withValues(alpha: 0.2),
+                      CouleursApp.primaire.withValues(alpha: 0.6),
+                      Colors.transparent,
+                    ],
+                    stops: const [0.0, 0.7, 0.75, 0.75],
+                  ),
+                ),
+              )
+                  .animate(onPlay: (controller) => controller.repeat())
+                  .rotate(duration: const Duration(milliseconds: 1500)),
 
             Container(
               width: 60,
@@ -1296,26 +1354,7 @@ class _AnimatedRadarSearchState extends State<AnimatedRadarSearch> {
         ),
         const SizedBox(height: 12),
 
-        if (isFinished)
-          Padding(
-            padding: const EdgeInsets.only(top: 16),
-            child: ElevatedButton.icon(
-              onPressed: widget.onSearchComplete,
-              icon: const Icon(Icons.receipt_long, color: Colors.white),
-              label: Text(
-                "Voir la proposition",
-                style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.bold),
-              ),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: CouleursApp.primaire,
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(24),
-                ),
-              ),
-            ).animate().fadeIn().scale(),
-          )
-        else
+        if (!isFinished)
           Text(
             "Un instant, nous trouvons le meilleur chauffeur pour votre trajet.",
             textAlign: TextAlign.center,

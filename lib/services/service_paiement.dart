@@ -75,7 +75,7 @@ class ServicePaiement {
         "amount": montant.toInt().toString(), // Campay demande souvent un entier
         "currency": "XAF",
         "from": phone,
-        "description": "Paiement Course Camtrans",
+        "description": "Paiement Course CamTrans",
         "external_reference": refExterne
       }),
     );

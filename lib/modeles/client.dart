@@ -122,7 +122,7 @@ class Client extends Utilisateur {
       // LOGIQUE DE PRESENCE : Si pas de signal depuis 1 minute, on force a hors ligne
       estEnLigne: (map["estEnLigne"] ?? false) && 
                   (map["derniereConnexion"] != null && 
-                   DateTime.now().difference(Parseur.toDateTime(map["derniereConnexion"])).inSeconds <= 60),
+                   DateTime.now().difference(Parseur.toDateTime(map["derniereConnexion"])).inSeconds <= 90),
 
       derniereConnexion: map["derniereConnexion"] != null ? Parseur.toDateTime(map["derniereConnexion"]) : null,
       nombreCourses: map["nombreCourses"] ?? 0,

@@ -8,10 +8,12 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../coeur/etat/demande_expedition_provider.dart';
 import '../../coeur/etat/textes_app_provider.dart';
+import '../../coeur/etat/utilisateur_provider.dart';
 import '../../modeles/textes_app.dart';
 import 'package:update_camtrans/coeur/etat/suivi_provider.dart';
 import 'package:update_camtrans/services/service_gps.dart';
 import 'package:update_camtrans/modeles/transporteur.dart';
+import 'package:update_camtrans/modeles/course.dart';
 import 'package:update_camtrans/services/service_firestore.dart';
 import 'package:update_camtrans/coeur/constantes/couleurs.dart';
 import 'package:update_camtrans/coeur/constantes/statuts.dart';
@@ -79,6 +81,22 @@ class _SuiviTransportState extends ConsumerState<SuiviTransport> {
     }
     final String courseId = widget.courseId;
     final etatSuivi = ref.watch(suiviProvider(courseId));
+    final roleAsync = ref.watch(userRoleProvider);
+    final estClient = roleAsync.valueOrNull == 'client';
+
+    // ✅ Paiement automatique : dès que la course passe à 'terminee', ouvrir le volet de paiement (client uniquement)
+    ref.listen<EtatSuivi>(suiviProvider(courseId), (previous, next) {
+      if (!estClient) return;
+      final ancienStatut = previous?.course?.statut;
+      final nouveauStatut = next.course?.statut;
+      if (ancienStatut != StatutCourse.terminee && nouveauStatut == StatutCourse.terminee) {
+        if (next.course?.paiementEffectue == false) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted) _confirmerFinCourse(context);
+          });
+        }
+      }
+    });
 
     if (etatSuivi.chargement) {
       return const Scaffold(
@@ -146,8 +164,7 @@ class _SuiviTransportState extends ConsumerState<SuiviTransport> {
             bottom: 0,
             child: _buildBottomSheet(
               context, 
-              course.codeSuivi, 
-              course.statut, 
+              course,
               transporteur, 
               etatSuivi.quartierTransporteur,
               etatSuivi.distanceRestante, 
@@ -287,9 +304,9 @@ class _SuiviTransportState extends ConsumerState<SuiviTransport> {
     );
   }
 
-  Widget _buildBottomSheet(BuildContext context, String codeSuivi, String statut, Transporteur? transporteur, String? quartier, double distanceMetres, double tempsSecondes) {
+  Widget _buildBottomSheet(BuildContext context, Course course, Transporteur? transporteur, String? quartier, double distanceMetres, double tempsSecondes) {
     return Container(
-      height: MediaQuery.of(context).size.height * 0.65,
+      height: MediaQuery.of(context).size.height * 0.70,
       padding: const EdgeInsets.fromLTRB(24, 12, 24, 24),
       decoration: BoxDecoration(color: Colors.white, borderRadius: const BorderRadius.vertical(top: Radius.circular(32)), boxShadow: [BoxShadow(color: Colors.white.withValues(alpha: 0.07), blurRadius: 20, offset: const Offset(0, -5))]),
       child: Column(
@@ -300,7 +317,7 @@ class _SuiviTransportState extends ConsumerState<SuiviTransport> {
             child: Container(
               width: 40, height: 5,
               margin: const EdgeInsets.only(bottom: 16),
-              decoration: BoxDecoration(color: Colors.white38, borderRadius: BorderRadius.circular(10)),
+              decoration: BoxDecoration(color: Colors.black26, borderRadius: BorderRadius.circular(10)),
             ),
           ),
           
@@ -311,8 +328,8 @@ class _SuiviTransportState extends ConsumerState<SuiviTransport> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text("Course", style: TextStyle(color: Colors.white70, fontSize: 13)),
-                  Text(codeSuivi, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.white)),
+                  const Text("Course", style: TextStyle(color: Colors.black54, fontSize: 13)),
+                  Text(course.codeSuivi, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.black)),
                 ],
               ),
               Container(
@@ -322,7 +339,29 @@ class _SuiviTransportState extends ConsumerState<SuiviTransport> {
               ).animate(onPlay: (controller) => controller.repeat(reverse: true)).fade(begin: 0.5, end: 1.0, duration: 1.seconds),
             ],
           ),
-          const Divider(height: 32),
+          const SizedBox(height: 12),
+
+          // Adresses de la course
+          Row(
+            children: [
+              const Icon(Icons.location_on, color: Colors.redAccent, size: 20),
+              const SizedBox(width: 8),
+              Expanded(child: Text(course.adresseDepart, style: const TextStyle(color: Colors.black87, fontSize: 13, fontWeight: FontWeight.w500))),
+            ],
+          ),
+          Padding(
+            padding: const EdgeInsets.only(left: 9.0, top: 2, bottom: 2),
+            child: Container(width: 2, height: 12, color: Colors.grey.shade300),
+          ),
+          Row(
+            children: [
+              const Icon(Icons.flag, color: Colors.green, size: 20),
+              const SizedBox(width: 8),
+              Expanded(child: Text(course.adresseArrivee, style: const TextStyle(color: Colors.black87, fontSize: 13, fontWeight: FontWeight.w500))),
+            ],
+          ),
+
+          const Divider(height: 24),
 
           // Infos Chauffeur
           if (transporteur != null) ...[
@@ -339,12 +378,12 @@ class _SuiviTransportState extends ConsumerState<SuiviTransport> {
           // Timeline (Scrollable)
           Expanded(
             child: SingleChildScrollView(
-              child: TimelineStatut(statutActuel: statut),
+              child: TimelineStatut(statutActuel: course.statut),
             ),
           ),
 
           // Bouton "Terminer la course" ou "Je suis arrivé"
-          if (statut == StatutCourse.arriveDestination || (statut == StatutCourse.enTransit && distanceMetres < 200)) ...[
+          if (course.statut == StatutCourse.arriveDestination || (course.statut == StatutCourse.enTransit && distanceMetres < 200)) ...[
             const SizedBox(height: 16),
             SizedBox(
               width: double.infinity,
@@ -352,13 +391,13 @@ class _SuiviTransportState extends ConsumerState<SuiviTransport> {
               child: ElevatedButton(
                 onPressed: () => _confirmerFinCourse(context),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: statut == StatutCourse.arriveDestination ? CouleursApp.primaire : CouleursApp.succes,
+                  backgroundColor: course.statut == StatutCourse.arriveDestination ? CouleursApp.primaire : CouleursApp.succes,
                   foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                   elevation: 0,
                 ),
                 child: Text(
-                  statut == StatutCourse.arriveDestination ? "Confirmer la livraison" : "Valider l'arrivée", 
+                  course.statut == StatutCourse.arriveDestination ? "Confirmer la livraison" : "Valider l'arrivée", 
                   style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)
                 ),
               ),
@@ -366,7 +405,7 @@ class _SuiviTransportState extends ConsumerState<SuiviTransport> {
           ],
 
           // Bouton d'annulation
-          if (statut == StatutCourse.recherche || statut == StatutCourse.attribue || statut == StatutCourse.enRouteDepart) ...[
+          if (course.statut == StatutCourse.recherche || course.statut == StatutCourse.attribue || course.statut == StatutCourse.enRouteDepart) ...[
             const SizedBox(height: 8),
             SizedBox(
               width: double.infinity,

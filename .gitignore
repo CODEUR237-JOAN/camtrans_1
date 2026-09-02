@@ -1,3 +1,15 @@
+# ============================================================
+# 🔐 SÉCURITÉ — Fichiers sensibles à ne JAMAIS committer
+# ============================================================
+serviceAccountKey.json
+google-services.json
+GoogleService-Info.plist
+.env
+*.env
+*.env.local
+*.env.production
+# ============================================================
+
 # Miscellaneous
 *.class
 *.log

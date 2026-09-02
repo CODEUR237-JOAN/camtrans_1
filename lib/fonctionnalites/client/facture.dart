@@ -1,13 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:iconsax_flutter/iconsax_flutter.dart';
 
 import 'package:update_camtrans/coeur/constantes/couleurs.dart';
+import 'package:update_camtrans/coeur/constantes/statuts.dart';
 import 'package:update_camtrans/services/service_authentification.dart';
 import 'package:update_camtrans/services/service_firestore.dart';
 import 'package:update_camtrans/modeles/paiement.dart';
 import 'package:update_camtrans/modeles/course.dart';
 import 'package:update_camtrans/fonctionnalites/paiement/widgets/ticket_recu.dart';
+import 'package:update_camtrans/coeur/widgets/loader_premium.dart';
 
 // Provider filtré par l'UID de l'utilisateur connecté
 final listePaiementsProvider = StreamProvider.autoDispose<List<Paiement>>((ref) {
@@ -47,28 +52,73 @@ class Facture extends ConsumerWidget {
     return Scaffold(
       backgroundColor: const Color(0xFF08111F),
       appBar: AppBar(
-        title: const Text("Mes Transactions", style: TextStyle(fontWeight: FontWeight.bold)),
+        // ✅ CORRECTION 1.3: foregroundColor blanc (était Colors.black87 invisible sur fond sombre)
+        title: Text(
+          "Mes Transactions",
+          style: GoogleFonts.inter(fontWeight: FontWeight.bold, color: Colors.white),
+        ),
         backgroundColor: const Color(0xFF08111F),
         elevation: 0,
-        foregroundColor: Colors.black87,
+        foregroundColor: Colors.white,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () => context.pop(),
         ),
       ),
       body: fluxPaiements.when(
-        loading: () => const Center(child: CircularProgressIndicator(color: CouleursApp.primaire)),
-        error: (err, stack) => Center(child: Text("Erreur : $err")),
+        loading: () => Center(child: LoaderPremium()),
+        error: (err, stack) => Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.wifi_off_rounded, size: 60, color: Colors.white38),
+              const SizedBox(height: 16),
+              Text("Problème de connexion 📡",
+                  style: GoogleFonts.inter(color: Colors.white70, fontSize: 16, fontWeight: FontWeight.bold)),
+              const SizedBox(height: 8),
+              Text("Réessayez dans quelques instants",
+                  style: GoogleFonts.inter(color: Colors.white38, fontSize: 13)),
+            ],
+          ),
+        ),
         data: (paiements) {
           if (paiements.isEmpty) {
+            // ✅ HUMANISATION 3.3: État vide enrichi et chaleureux
             return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(Icons.receipt_long, size: 80, color: Colors.white38),
-                  const SizedBox(height: 16),
-                  const Text("Aucune transaction trouvée", style: TextStyle(color: Colors.white70, fontSize: 16)),
-                ],
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 32),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      width: 100,
+                      height: 100,
+                      decoration: BoxDecoration(
+                        color: CouleursApp.primaire.withValues(alpha: 0.08),
+                        shape: BoxShape.circle,
+                        border: Border.all(color: CouleursApp.primaire.withValues(alpha: 0.15), width: 2),
+                      ),
+                      child: const Icon(Iconsax.receipt_copy, size: 48, color: CouleursApp.primaire),
+                    ).animate(onPlay: (c) => c.repeat(reverse: true))
+                      .scale(begin: const Offset(1, 1), end: const Offset(1.05, 1.05), duration: 2.seconds),
+                    const SizedBox(height: 24),
+                    Text(
+                      "Votre historique est vierge ✨",
+                      style: GoogleFonts.inter(
+                        color: Colors.white,
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      "Vos transactions apparaîtront ici après votre première course. Lancez-vous ! 🚀",
+                      style: GoogleFonts.inter(color: Colors.white54, fontSize: 14, height: 1.5),
+                      textAlign: TextAlign.center,
+                    ),
+                  ],
+                ),
               ),
             );
           }
@@ -91,11 +141,16 @@ class Facture extends ConsumerWidget {
     return Scaffold(
       backgroundColor: const Color(0xFF08111F),
       appBar: AppBar(
-        title: const Text("Détail de la course", style: TextStyle(fontWeight: FontWeight.bold)),
+        // ✅ CORRECTION 1.3: foregroundColor blanc
+        title: Text("Détail de la course",
+            style: GoogleFonts.inter(fontWeight: FontWeight.bold, color: Colors.white)),
         backgroundColor: const Color(0xFF08111F),
         elevation: 0,
-        foregroundColor: Colors.black87,
-        leading: IconButton(icon: const Icon(Icons.arrow_back), onPressed: () => context.pop()),
+        foregroundColor: Colors.white,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.white),
+          onPressed: () => context.pop(),
+        ),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.all(24),
@@ -166,7 +221,9 @@ class Facture extends ConsumerWidget {
   }
 
   Widget _buildTransactionCard(BuildContext context, Paiement paiement, int index) {
-    bool isSucces = paiement.statut == "Succès" || paiement.statut == "Confirmé";
+    // ✅ CORRECTION 1.2: Utilise StatutPaiement.succes au lieu de chaînes littérales
+    // (le statut réel en DB est "succes", pas "Succès" ou "Confirmé")
+    final bool isSucces = paiement.statut == StatutPaiement.succes;
     
     IconData getIcon() {
       if (paiement.methodePaiement.toLowerCase().contains("orange")) return Icons.account_balance_wallet;
@@ -229,12 +286,21 @@ class Facture extends ConsumerWidget {
               children: [
                 Text(
                   "${paiement.montant.toInt()} FCFA",
-                  style: TextStyle(fontWeight: FontWeight.w900, fontSize: 16, color: isSucces ? Colors.green : Colors.black87),
+                  style: GoogleFonts.inter(
+                    fontWeight: FontWeight.w900,
+                    fontSize: 16,
+                    // ✅ Couleur correcte : vert si succes, orange sinon (plus de Colors.black87 invisible)
+                    color: isSucces ? CouleursApp.succes : CouleursApp.avertissement,
+                  ),
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  paiement.statut,
-                  style: TextStyle(color: isSucces ? Colors.green : Colors.orange, fontSize: 12, fontWeight: FontWeight.bold),
+                  StatutPaiement.libelle(paiement.statut),
+                  style: GoogleFonts.inter(
+                    color: isSucces ? CouleursApp.succes : CouleursApp.avertissement,
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ],
             ),

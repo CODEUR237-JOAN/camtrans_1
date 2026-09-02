@@ -9,6 +9,7 @@ import 'package:update_camtrans/modeles/transporteur.dart';
 import 'package:update_camtrans/coeur/widgets/etats_ui.dart';
 import 'package:update_camtrans/services/service_firestore.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:update_camtrans/coeur/widgets/loader_premium.dart';
 
 
 class PageModeration extends ConsumerWidget {
@@ -308,7 +309,7 @@ class _DossierCard extends ConsumerWidget {
                   if (loadingProgress == null) return child;
                   return const SizedBox(
                     height: 300,
-                    child: Center(child: CircularProgressIndicator(color: CouleursApp.primaire)),
+                    child: Center(child: LoaderPremium(size: 24)),
                   );
                 },
                 errorBuilder: (context, error, stackTrace) {

@@ -8,6 +8,7 @@ import 'package:update_camtrans/coeur/etat/transporteur_provider.dart';
 import 'package:update_camtrans/services/service_authentification.dart';
 import 'package:update_camtrans/coeur/routes/routes.dart';
 import 'package:intl/intl.dart';
+import 'package:update_camtrans/coeur/widgets/loader_premium.dart';
 
 class ProfilTransporteur extends ConsumerWidget {
   const ProfilTransporteur({super.key});
@@ -26,7 +27,7 @@ class ProfilTransporteur extends ConsumerWidget {
         automaticallyImplyLeading: false,
       ),
       body: transporteurAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator()),
+        loading: () => Center(child: LoaderPremium()),
         error: (err, stack) => Center(child: Text("Erreur: $err")),
         data: (transporteur) {
           if (transporteur == null) {

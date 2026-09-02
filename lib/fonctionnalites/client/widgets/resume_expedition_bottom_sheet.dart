@@ -18,9 +18,11 @@ import 'package:update_camtrans/services/service_gps.dart';
 import 'package:update_camtrans/modeles/course.dart';
 import 'package:update_camtrans/coeur/constantes/statuts.dart';
 import 'package:uuid/uuid.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'carte_estimation.dart';
 import 'recherche_radar.dart';
 import 'carte_estimation_remorque.dart';
+import 'package:update_camtrans/coeur/widgets/loader_premium.dart';
 
 class ResumeExpeditionBottomSheet extends ConsumerStatefulWidget {
   const ResumeExpeditionBottomSheet({super.key});
@@ -199,23 +201,61 @@ class _ResumeExpeditionBottomSheetState extends ConsumerState<ResumeExpeditionBo
                   if (etatEstimation.enCours)
                     const Center(child: Padding(
                       padding: EdgeInsets.all(20.0),
-                      child: CircularProgressIndicator(color: CouleursApp.primaire),
+                      child: LoaderPremium(size: 24),
                     ))
                   else if (etatEstimation.erreur != null)
                     Text("Oups ! Un petit imprévu : ${etatEstimation.erreur} 🔧", style: const TextStyle(color: Colors.red))
                   else if (etatEstimation.resultat != null)
-                    etat.categorieService == "Remorque"
-                      ? CarteEstimationRemorque(
-                          resultat: etatEstimation.resultat!,
-                          marque: etat.marqueVehiculeRemorque,
-                          modele: etat.modeleVehiculeRemorque,
-                          masseKg: etat.masseEstimeeKg,
-                          latitudeDepart: etat.latitudeDepart,
-                          longitudeDepart: etat.longitudeDepart,
-                          latitudeArrivee: etat.latitudeArrivee,
-                          longitudeArrivee: etat.longitudeArrivee,
-                        )
-                      : CarteEstimationIntelligente(resultat: etatEstimation.resultat!),
+                    Column(
+                      children: [
+                        etat.categorieService == "Remorque"
+                          ? CarteEstimationRemorque(
+                              resultat: etatEstimation.resultat!,
+                              marque: etat.marqueVehiculeRemorque,
+                              modele: etat.modeleVehiculeRemorque,
+                              masseKg: etat.masseEstimeeKg,
+                              latitudeDepart: etat.latitudeDepart,
+                              longitudeDepart: etat.longitudeDepart,
+                              latitudeArrivee: etat.latitudeArrivee,
+                              longitudeArrivee: etat.longitudeArrivee,
+                            )
+                          : CarteEstimationIntelligente(resultat: etatEstimation.resultat!),
+                          
+                        const SizedBox(height: 16),
+                        
+                        // Badge de Tarification Standardisée
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                          decoration: BoxDecoration(
+                            color: CouleursApp.succes.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: CouleursApp.succes.withValues(alpha: 0.3)),
+                          ),
+                          child: Row(
+                            children: [
+                              const Icon(Icons.verified, color: CouleursApp.succes, size: 20),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    const Text(
+                                      "Tarif Standardisé CamTrans",
+                                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: CouleursApp.succes),
+                                    ),
+                                    const SizedBox(height: 2),
+                                    Text(
+                                      "Calculé équitablement selon la distance et le volume. Sans négociation.",
+                                      style: TextStyle(color: Colors.grey.shade700, fontSize: 11),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
                   const SizedBox(height: 30),
                 ],
               ),
@@ -308,16 +348,94 @@ class _ResumeExpeditionBottomSheetState extends ConsumerState<ResumeExpeditionBo
                       );
                     }
 
+                    // ✅ PHASE 4: ALGORTIHME DE DISPATCH - Recherche des transporteurs à proximité
+                    final typeVehiculeRequis = etatEstimation.resultat?.vehiculeRecommande ?? etat.categorieVehicule;
+                    
+                    // 1. Récupérer tous les transporteurs en ligne et valides
+                    final transporteursSnap = await FirebaseFirestore.instance
+                        .collection('transporteurs')
+                        .where('disponible', isEqualTo: true)
+                        .where('documentsValides', isEqualTo: true)
+                        .get();
+                        
+                    // 2. Filtrer par type de véhicule et calculer la distance au départ
+                    final List<Map<String, dynamic>> candidatsDispo = [];
+                    for (var doc in transporteursSnap.docs) {
+                      final t = doc.data();
+                      // Filtrer type
+                      if (typeVehiculeRequis.isNotEmpty && t['typeVehicule'] != typeVehiculeRequis) continue;
+                      
+                      final double tLat = t['latitude'] ?? 0.0;
+                      final double tLng = t['longitude'] ?? 0.0;
+                      
+                      if (tLat != 0.0) {
+                        final dist = serviceGps.calculerDistance(
+                          latitudeDepart: latDepart, longitudeDepart: lngDepart,
+                          latitudeArrivee: tLat, longitudeArrivee: tLng,
+                        );
+                        final int nbCourses = t['nombreCourses'] ?? 0;
+                        candidatsDispo.add({'id': doc.id, 'distance': dist, 'nom': t['prenom'], 'nombreCourses': nbCourses});
+                      } else {
+                        // S'il n'a pas de GPS, on le met loin par défaut
+                        final int nbCourses = t['nombreCourses'] ?? 0;
+                        candidatsDispo.add({'id': doc.id, 'distance': 9999.0, 'nom': t['prenom'], 'nombreCourses': nbCourses});
+                      }
+                    }
+                    
+                    // 3. Trier avec équité : Distance d'abord, mais si la différence est faible (< 3 km), prioriser celui avec le moins de courses.
+                    candidatsDispo.sort((a, b) {
+                      final distA = a['distance'] as double;
+                      final distB = b['distance'] as double;
+                      final coursesA = a['nombreCourses'] as int;
+                      final coursesB = b['nombreCourses'] as int;
+
+                      // Si les deux transporteurs sont proches de la course (ex: à moins de 3km l'un de l'autre)
+                      if ((distA - distB).abs() <= 3.0) {
+                        // Si A a au moins 2 courses de plus que B, on choisit B (équité)
+                        if (coursesA - coursesB >= 2) return 1;
+                        // Si B a au moins 2 courses de plus que A, on choisit A
+                        if (coursesB - coursesA >= 2) return -1;
+                      }
+
+                      // Sinon, tri standard par distance
+                      return distA.compareTo(distB);
+                    });
+                    
+                    // 4. Extraire uniquement les IDs
+                    final List<String> candidatsFinaux = candidatsDispo.map((e) => e['id'] as String).toList();
+                    
+                    // Si un chauffeur avait été spécifiquement proposé par le client, on le met en premier (priorité)
+                    if (etat.chauffeurPropose != null) {
+                      candidatsFinaux.remove(etat.chauffeurPropose!.id);
+                      candidatsFinaux.insert(0, etat.chauffeurPropose!.id);
+                    }
+                    
+                    // 5. Déterminer le statut initial de la course
+                    String statutInitial = StatutCourse.recherche;
+                    String premierTransporteurId = '';
+                    DateTime? expiration;
+                    
+                    if (candidatsFinaux.isNotEmpty) {
+                      statutInitial = StatutCourse.propose;
+                      premierTransporteurId = candidatsFinaux.first;
+                      expiration = DateTime.now().add(const Duration(seconds: 30));
+                      // (Le nom/tel du transporteur reste vide jusqu'à ce qu'il accepte vraiment)
+                    }
+
+                    // Générer un code PIN à 4 chiffres
+                    final String pin = (1000 + (DateTime.now().millisecondsSinceEpoch % 9000)).toString();
+                    
+                    // Prix final imposé par le système (IA)
+                    final double prixImpose = etatEstimation.resultat?.coutTotal ?? 0.0;
+
                     final course = Course(
                       id: courseId,
                       clientId: user.uid,
-                      transporteurId: etat.chauffeurPropose?.id ?? '',
+                      transporteurId: premierTransporteurId, // Attribué provisoirement
                       nomClient: user.displayName ?? "Client Anonyme",
-                      nomTransporteur: etat.chauffeurPropose != null
-                          ? "${etat.chauffeurPropose!.prenom} ${etat.chauffeurPropose!.nom}"
-                          : '',
+                      nomTransporteur: '',
                       telephoneClient: '',
-                      telephoneTransporteur: etat.chauffeurPropose?.telephone ?? '',
+                      telephoneTransporteur: '',
                       adresseDepart: etat.depart,
                       adresseArrivee: etat.destination,
                       latitudeDepart: latDepart,
@@ -327,13 +445,13 @@ class _ResumeExpeditionBottomSheetState extends ConsumerState<ResumeExpeditionBo
                       distanceKm: distanceKm,
                       volumeM3: etatEstimation.resultat?.volumeM3 ?? 0.0,
                       poidsKg: 0.0,
-                      typeVehicule: etatEstimation.resultat?.vehiculeRecommande ?? etat.categorieVehicule,
+                      typeVehicule: typeVehiculeRequis,
                       typeMarchandise: etat.typeMarchandise.isNotEmpty ? etat.typeMarchandise : etat.categorieService,
-                      prixEstime: etatEstimation.resultat?.coutTotal ?? 0.0,
+                      prixEstime: prixImpose,
                       prixFinal: 0.0,
                       modePaiement: '',
                       paiementEffectue: false,
-                      statut: etat.chauffeurPropose != null ? StatutCourse.attribue : StatutCourse.recherche,
+                      statut: statutInitial,
                       description: etat.description,
                       photos: photosUrl,
                       dateCreation: DateTime.now(),
@@ -355,6 +473,11 @@ class _ResumeExpeditionBottomSheetState extends ConsumerState<ResumeExpeditionBo
                       detailsSpecifiques: etat.detailsSpecifiques,
                       distanceApprocheKm: etat.distanceApprocheKm,
                       tempsApprocheMin: etat.tempsApprocheMin,
+                      candidats: candidatsFinaux,
+                      indexCandidatActuel: 0,
+                      expirationProposition: expiration,
+                      codePinLivraison: pin,
+                      fondsDebloques: false,
                     );
 
                     await ref.read(serviceFirestoreProvider).ajouterDocument(
@@ -362,6 +485,26 @@ class _ResumeExpeditionBottomSheetState extends ConsumerState<ResumeExpeditionBo
                       id: course.id,
                       donnees: course.toMap(),
                     );
+                    
+                    // ✅ PHASE 4: DISPATCH - Déclencher la notification Push
+                    if (premierTransporteurId.isNotEmpty) {
+                      try {
+                        await ref.read(serviceFirestoreProvider).ajouterDocument(
+                          collection: 'notifications_push',
+                          id: 'notif_${const Uuid().v4()}',
+                          donnees: {
+                            'titre': '🚨 NOUVELLE COURSE !',
+                            'message': 'Course à ${distanceKm.toStringAsFixed(1)} km. Acceptez vite !',
+                            'cible': 'transporteur',
+                            'cibleId': premierTransporteurId,
+                            'status': 'pending',
+                            'createdAt': FieldValue.serverTimestamp(),
+                          }
+                        );
+                      } catch (e) {
+                        debugPrint("Erreur notification push ignorée : $e");
+                      }
+                    }
 
                     if (context.mounted) {
                       Navigator.pop(context); // Fermer le radar

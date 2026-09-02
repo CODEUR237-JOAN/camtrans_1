@@ -8,6 +8,7 @@ import 'package:update_camtrans/coeur/etat/transporteur_provider.dart';
 import 'package:update_camtrans/services/service_stockage.dart';
 import 'package:update_camtrans/services/service_firestore.dart';
 import 'package:update_camtrans/modeles/transporteur.dart';
+import 'package:update_camtrans/coeur/widgets/loader_premium.dart';
 
 class Documents extends ConsumerStatefulWidget {
   const Documents({super.key});
@@ -70,7 +71,7 @@ class _DocumentsState extends ConsumerState<Documents> {
         stream: ref.watch(serviceFirestoreProvider).fluxDocument(collection: 'transporteurs', id: transporteurId),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting && !_chargement) {
-            return const Center(child: CircularProgressIndicator());
+            return Center(child: LoaderPremium());
           }
           
           if (snapshot.hasError || !snapshot.hasData || !snapshot.data!.exists) {
@@ -119,7 +120,7 @@ class _DocumentsState extends ConsumerState<Documents> {
                     ],
                   ),
                 ),
-                trailing: _chargement ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator()) : IconButton(
+                trailing: _chargement ? const SizedBox(width: 20, height: 20, child: LoaderPremium()) : IconButton(
                   icon: Icon(estImporte ? Icons.edit : Icons.upload),
                   color: CouleursApp.primaire,
                   onPressed: () => _uploaderDocument(label, label, fieldName, transporteurId),

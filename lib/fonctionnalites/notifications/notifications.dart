@@ -6,6 +6,7 @@ import 'package:update_camtrans/coeur/constantes/couleurs.dart';
 import 'package:update_camtrans/coeur/constantes/tailles.dart';
 import 'package:update_camtrans/coeur/etat/notification_provider.dart';
 import 'package:update_camtrans/modeles/notification.dart';
+import 'package:update_camtrans/coeur/widgets/loader_premium.dart';
 
 class NotificationsPage extends ConsumerStatefulWidget {
   const NotificationsPage({super.key});
@@ -61,7 +62,7 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
             const SizedBox(height: 20),
             Expanded(
               child: notificationsAsync.when(
-                loading: () => const Center(child: CircularProgressIndicator(color: Colors.blue)),
+                loading: () => Center(child: LoaderPremium()),
                 error: (err, stack) => Center(child: Text("Erreur: $err")),
                 data: (notifications) {
                   final notificationsFiltrees = notifications.where((n) {
@@ -84,6 +85,7 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
                   }
 
                   return ListView.builder(
+                    padding: const EdgeInsets.only(bottom: 120),
                     itemCount: notificationsFiltrees.length,
                     itemBuilder: (context, index) {
                       final notification = notificationsFiltrees[index];

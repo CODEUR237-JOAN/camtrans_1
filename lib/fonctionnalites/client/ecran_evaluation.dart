@@ -5,6 +5,7 @@ import 'package:update_camtrans/coeur/constantes/couleurs.dart';
 import 'package:update_camtrans/services/service_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:update_camtrans/coeur/widgets/loader_premium.dart';
 
 
 class EcranEvaluation extends ConsumerStatefulWidget {
@@ -145,7 +146,7 @@ class _EcranEvaluationState extends ConsumerState<EcranEvaluation> {
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                   ),
                   child: _chargement 
-                    ? const CircularProgressIndicator(color: Colors.white)
+                    ? const LoaderPremium(size: 24)
                     : Text("Envoyer mon avis", style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.bold)),
                 ),
               ),

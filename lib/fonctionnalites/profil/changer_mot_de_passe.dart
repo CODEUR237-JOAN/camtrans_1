@@ -6,6 +6,7 @@ import 'package:update_camtrans/coeur/constantes/couleurs.dart';
 import 'package:update_camtrans/coeur/constantes/tailles.dart';
 import 'package:update_camtrans/coeur/utilitaires/validateurs.dart';
 import 'package:update_camtrans/services/service_authentification.dart';
+import 'package:update_camtrans/coeur/widgets/loader_premium.dart';
 
 class ChangerMotDePasse extends ConsumerStatefulWidget {
   const ChangerMotDePasse({super.key});
@@ -138,7 +139,7 @@ class _ChangerMotDePasseState extends ConsumerState<ChangerMotDePasse> {
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
                   ),
                   child: _chargement 
-                    ? const CircularProgressIndicator(color: Colors.white)
+                    ? const LoaderPremium(size: 24)
                     : const Text("Mettre à jour le mot de passe", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
                 ),
               ),

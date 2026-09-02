@@ -10,6 +10,7 @@ import 'package:update_camtrans/coeur/etat/paiement_provider.dart';
 import 'package:update_camtrans/coeur/constantes/couleurs.dart';
 import 'package:update_camtrans/services/service_authentification.dart';
 import 'widgets/ticket_recu.dart';
+import 'package:update_camtrans/coeur/widgets/loader_premium.dart';
 
 class EcranPaiement extends ConsumerStatefulWidget {
   final String courseId;
@@ -285,7 +286,7 @@ class _EcranPaiementState extends ConsumerState<EcranPaiement> {
                       elevation: 0,
                     ),
                     child: etatPaiement.enCours
-                        ? const CircularProgressIndicator(color: Colors.white)
+                        ? const LoaderPremium(size: 24)
                         : Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [

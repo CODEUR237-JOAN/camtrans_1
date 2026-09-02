@@ -246,6 +246,18 @@ class ServiceFirestore {
   }
 
   // ===========================
+  // Flux des courses proposees (Transporteur)
+  // ===========================
+
+  Stream<QuerySnapshot<Map<String, dynamic>>> fluxCoursesProposeesTransporteur(String transporteurId) {
+    return _db
+        .collection("courses")
+        .where("statut", isEqualTo: "propose")
+        .where("transporteurId", isEqualTo: transporteurId)
+        .snapshots();
+  }
+
+  // ===========================
   // Vérifier l'existence
   // ===========================
 

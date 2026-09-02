@@ -9,6 +9,7 @@ import 'package:update_camtrans/coeur/etat/transporteur_provider.dart';
 import 'package:update_camtrans/modeles/course.dart';
 import 'package:update_camtrans/services/service_authentification.dart';
 import 'package:update_camtrans/services/service_firestore.dart';
+import 'package:update_camtrans/coeur/widgets/loader_premium.dart';
 
 class HistoriqueLivraisons extends ConsumerStatefulWidget {
   const HistoriqueLivraisons({super.key});
@@ -77,7 +78,7 @@ class _HistoriquelivraisonsState
                   ? const SizedBox(
                       width: 20,
                       height: 20,
-                      child: CircularProgressIndicator(strokeWidth: 2))
+                      child: LoaderPremium(size: 20))
                   : const Icon(Icons.delete_sweep_rounded,
                       color: CouleursApp.erreur),
               onPressed: _suppressionEnCours ? null : _supprimerTout,
@@ -119,9 +120,7 @@ class _HistoriquelivraisonsState
             const SizedBox(height: 25),
             Expanded(
               child: coursesAsync.when(
-                loading: () => const Center(
-                    child: CircularProgressIndicator(
-                        color: CouleursApp.primaire)),
+                loading: () => Center(child: LoaderPremium()),
                 error: (error, _) =>
                     Center(child: Text("Impossible de charger l'historique : $error 🔧")),
                 data: (courses) {

@@ -5,6 +5,7 @@ import 'package:intl/intl.dart';
 
 import 'package:update_camtrans/coeur/constantes/couleurs.dart';
 import 'package:update_camtrans/coeur/etat/admin_provider.dart';
+import 'package:update_camtrans/coeur/widgets/loader_premium.dart';
 
 class PageAbonnementsAdmin extends ConsumerWidget {
   const PageAbonnementsAdmin({super.key});
@@ -25,7 +26,7 @@ class PageAbonnementsAdmin extends ConsumerWidget {
         foregroundColor: Colors.white,
       ),
       body: abonnementsAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator(color: CouleursApp.primaire)),
+        loading: () => Center(child: LoaderPremium()),
         error: (err, _) => Center(child: Text("Oups ! Les données sont introuvables : $err 🔧", style: const TextStyle(color: Colors.red))),
         data: (abonnements) {
           // ===== CALCUL DES STATISTIQUES =====

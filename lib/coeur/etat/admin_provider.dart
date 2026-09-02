@@ -11,8 +11,9 @@ import 'package:update_camtrans/modeles/parametres_app.dart';
 
 final adminClientsProvider = StreamProvider.autoDispose<List<Client>>((ref) {
   final firestore = ref.watch(serviceFirestoreProvider);
+  // ✅ AMÉLIORATION 2.1: Limité à 200 entrées pour éviter les surcharges mémoire
   return firestore.fluxCollection(collection: 'clients').map((snapshot) {
-    return snapshot.docs.map((doc) {
+    return snapshot.docs.take(200).map((doc) {
       final data = doc.data();
       data['id'] = doc.id;
       return Client.fromMap(data);
@@ -22,8 +23,9 @@ final adminClientsProvider = StreamProvider.autoDispose<List<Client>>((ref) {
 
 final adminTransporteursProvider = StreamProvider.autoDispose<List<Transporteur>>((ref) {
   final firestore = ref.watch(serviceFirestoreProvider);
+  // ✅ AMÉLIORATION 2.1: Limité à 200 entrées
   return firestore.fluxCollection(collection: 'transporteurs').map((snapshot) {
-    return snapshot.docs.map((doc) {
+    return snapshot.docs.take(200).map((doc) {
       final data = doc.data();
       data['id'] = doc.id;
       return Transporteur.fromMap(data);
@@ -33,12 +35,16 @@ final adminTransporteursProvider = StreamProvider.autoDispose<List<Transporteur>
 
 final adminCoursesProvider = StreamProvider.autoDispose<List<Course>>((ref) {
   final firestore = ref.watch(serviceFirestoreProvider);
+  // ✅ AMÉLIORATION 2.1: Limité à 500 courses (les plus récentes)
   return firestore.fluxCollection(collection: 'courses').map((snapshot) {
-    return snapshot.docs.map((doc) {
+    final courses = snapshot.docs.map((doc) {
       final data = doc.data();
       data['id'] = doc.id;
       return Course.fromMap(data);
     }).toList();
+    // Trier par date décroissante et prendre les 500 plus récentes
+    courses.sort((a, b) => b.dateCreation.compareTo(a.dateCreation));
+    return courses.take(500).toList();
   });
 });
 
@@ -243,11 +249,10 @@ final adminStatsProvider = Provider.autoDispose<AsyncValue<AdminStats>>((ref) {
   // Si on veut des courbes "cumulatives" plutôt que par jour, on peut faire :
   // Mais par jour c'est mieux pour des sparklines !
   
-  // Pour éviter des courbes plates sur un système neuf, on met une mini-variation artificielle si tout est 0
-  if (revHist.every((e) => e == 0)) revHist = [2, 4, 3, 5, 4, 7, 6];
-  if (cliHist.every((e) => e == 0)) cliHist = [1, 2, 1, 3, 2, 4, 3];
-  if (transHist.every((e) => e == 0)) transHist = [0, 1, 0, 1, 1, 2, 1];
-  if (coursHist.every((e) => e == 0)) coursHist = [3, 5, 4, 8, 6, 9, 7];
+  // ✅ CORRECTION 1.5: Suppression des données fictives injectées quand tout = 0
+  // Ces données étaient trompeuses pour l'admin (il voyait de faux graphiques).
+  // Désormais, si aucune donnée réelle, les historiques restent à 0 (honnête).
+  // Cela permet à l'admin de voir le vrai état du système au démarrage.
 
   return AsyncValue.data(AdminStats(
     totalClients: clients.length,

@@ -73,6 +73,10 @@ class SuiviNotifier extends StateNotifier<EtatSuivi> {
   StreamSubscription? _transporteurSubscription;
   Timer? _simulateurTimer;
 
+  // ✅ AMÉLIORATION 2.3: Dernier point de géocodage — évite les appels redondants
+  LatLng? _dernierePositionGeocodee;
+  static const double _seuilGeocodingMetres = 100.0;
+
   SuiviNotifier(this._firestore, this._gps, String courseId) : super(EtatSuivi()) {
     _initialiserEcoute(courseId);
   }
@@ -132,12 +136,28 @@ class SuiviNotifier extends StateNotifier<EtatSuivi> {
           tempsRestantSeconds: tempsRestant,
         );
 
-        // Mettre à jour le quartier si la position a changé significativement
+        // ✅ AMÉLIORATION 2.3: Ne géocoder que si la position a changé de >100m
+        // Cela réduit massivement les appels API inutiles à chaque update Firestore
         if (transporteur.latitude != 0 && transporteur.longitude != 0) {
-           _gps.obtenirAdresse(latitude: transporteur.latitude, longitude: transporteur.longitude).then((adresse) {
-            final quartier = adresse.split(',').first;
-            state = state.copierAvec(quartierTransporteur: quartier);
-          }).catchError((_) {});
+          final positionActuelle = LatLng(transporteur.latitude, transporteur.longitude);
+          final bool doitGeocoderDernierePosition = _dernierePositionGeocodee == null;
+          final bool positionChangeeSignificativement = !doitGeocoderDernierePosition &&
+              const Distance().as(
+                LengthUnit.Meter,
+                _dernierePositionGeocodee!,
+                positionActuelle,
+              ) > _seuilGeocodingMetres;
+
+          if (doitGeocoderDernierePosition || positionChangeeSignificativement) {
+            _dernierePositionGeocodee = positionActuelle;
+            _gps.obtenirAdresse(
+              latitude: transporteur.latitude,
+              longitude: transporteur.longitude,
+            ).then((adresse) {
+              final quartier = adresse.split(',').first.trim();
+              if (mounted) state = state.copierAvec(quartierTransporteur: quartier);
+            }).catchError((_) {});
+          }
         }
       }
     }, onError: (e) {

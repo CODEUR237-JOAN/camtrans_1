@@ -9,6 +9,8 @@ import 'package:update_camtrans/coeur/etat/carte_provider.dart';
 import 'package:update_camtrans/services/service_gps.dart';
 import 'widgets/couche_transporteurs.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:update_camtrans/coeur/widgets/loader_premium.dart';
+import 'package:update_camtrans/coeur/widgets/marqueur_premium.dart';
 
 
 class VueCarte extends ConsumerStatefulWidget {
@@ -126,7 +128,7 @@ class _VueCarteState extends ConsumerState<VueCarte> with TickerProviderStateMix
             ),
           Expanded(
             child: etatCarte.chargement
-                ? const Center(child: CircularProgressIndicator())
+                ? Center(child: LoaderPremium())
                 : FlutterMap(
                     mapController: _mapController,
                     options: MapOptions(
@@ -149,25 +151,7 @@ class _VueCarteState extends ConsumerState<VueCarte> with TickerProviderStateMix
                               point: etatCarte.positionActuelle!,
                               width: 60,
                               height: 60,
-                              child: const Icon(
-                                Icons.person_pin_circle,
-                                color: CouleursApp.primaire,
-                                size: 50,
-                              )
-                                  .animate(onPlay: (controller) => controller.repeat())
-                                  .scale(
-                                    begin: const Offset(0.9, 0.9),
-                                    end: const Offset(1.1, 1.1),
-                                    duration: 1.seconds,
-                                    curve: Curves.easeInOut,
-                                  )
-                                  .then()
-                                  .scale(
-                                    begin: const Offset(1.1, 1.1),
-                                    end: const Offset(0.9, 0.9),
-                                    duration: 1.seconds,
-                                    curve: Curves.easeInOut,
-                                  ),
+                              child: const MarqueurPremium(type: TypeMarqueur.depart),
                             ),
                           ],
                         ),

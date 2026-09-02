@@ -12,6 +12,7 @@ import 'package:update_camtrans/coeur/widgets/etats_ui.dart';
 import 'package:update_camtrans/modeles/course.dart';
 import 'package:update_camtrans/services/service_firestore.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:update_camtrans/coeur/widgets/loader_premium.dart';
 
 
 class PageActivites extends ConsumerStatefulWidget {
@@ -196,7 +197,7 @@ class _PageActivitesState extends ConsumerState<PageActivites> {
                     padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                   ),
                   icon: _purgerEnCours
-                      ? const SizedBox(width: 18, height: 18, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                      ? const SizedBox(width: 18, height: 18, child: LoaderPremium(size: 20))
                       : const Icon(Icons.cleaning_services_rounded, size: 18),
                   label: Text(_purgerEnCours ? "Purge..." : "Purger", style: GoogleFonts.inter(fontWeight: FontWeight.bold)),
                 ),

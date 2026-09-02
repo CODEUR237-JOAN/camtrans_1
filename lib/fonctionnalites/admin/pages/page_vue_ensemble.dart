@@ -17,6 +17,7 @@ import 'package:update_camtrans/coeur/utilitaires/telechargement/telechargement.
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
+import 'package:update_camtrans/coeur/widgets/loader_premium.dart';
 
 
 class PageVueEnsemble extends ConsumerWidget {
@@ -367,7 +368,7 @@ class PageVueEnsemble extends ConsumerWidget {
       titre: "Répartition des Courses",
       hauteur: 420,
       enfant: distributionAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator(color: CouleursApp.primaire)),
+        loading: () => Center(child: LoaderPremium()),
         error: (err, _) => Center(child: Text("Impossible de charger les activités : $err 🔧", style: const TextStyle(color: Colors.white))),
         data: (data) {
           // Normalisation des données pour regrouper les statuts similaires
@@ -470,7 +471,7 @@ class PageVueEnsemble extends ConsumerWidget {
       titre: "Activités Récentes",
       hauteur: 450,
       enfant: activitiesAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator(color: CouleursApp.primaire)),
+        loading: () => Center(child: LoaderPremium()),
         error: (err, _) => Center(child: Text("Données financières inaccessibles : $err 🔧", style: const TextStyle(color: Colors.white))),
         data: (list) {
           if (list.isEmpty) return const Center(child: Text("Aucune activité", style: TextStyle(color: Colors.white54)));

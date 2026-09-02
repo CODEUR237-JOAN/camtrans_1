@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:update_camtrans/coeur/constantes/couleurs.dart';
+import 'package:update_camtrans/coeur/widgets/loader_premium.dart';
 
 class PageNotifications extends ConsumerStatefulWidget {
   const PageNotifications({super.key});
@@ -161,7 +162,7 @@ class _PageNotificationsState extends ConsumerState<PageNotifications> {
                     ),
                     onPressed: _enCours ? null : _envoyerNotification,
                     icon: _enCours 
-                      ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                      ? const SizedBox(width: 20, height: 20, child: LoaderPremium(size: 24))
                       : const Icon(Icons.send, color: Colors.white),
                     label: Text(
                       _enCours ? "Envoi en cours..." : "Envoyer le Push",

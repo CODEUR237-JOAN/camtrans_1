@@ -62,7 +62,7 @@ class Transporteur extends Utilisateur {
     this.modeleVehicule = "",
     this.immatriculation = "",
     this.gamme = "Éco",
-      this.gammeValidee = true,
+    this.gammeValidee = true,
     this.etatVehicule = "Standard",
     this.anneeVehicule = 0,
     this.photosInspectionVehicule = const [],
@@ -119,7 +119,7 @@ class Transporteur extends Utilisateur {
     String? modeleVehicule,
     String? immatriculation,
     String? gamme,
-      bool? gammeValidee,
+    bool? gammeValidee,
     String? etatVehicule,
     int? anneeVehicule,
     List<String>? photosInspectionVehicule,
@@ -172,7 +172,7 @@ class Transporteur extends Utilisateur {
       modeleVehicule: modeleVehicule ?? this.modeleVehicule,
       immatriculation: immatriculation ?? this.immatriculation,
       gamme: gamme ?? this.gamme,
-        gammeValidee: gammeValidee ?? this.gammeValidee,
+      gammeValidee: gammeValidee ?? this.gammeValidee,
       etatVehicule: etatVehicule ?? this.etatVehicule,
       anneeVehicule: anneeVehicule ?? this.anneeVehicule,
       photosInspectionVehicule: photosInspectionVehicule ?? this.photosInspectionVehicule,
@@ -216,7 +216,7 @@ class Transporteur extends Utilisateur {
       "modeleVehicule": modeleVehicule,
       "immatriculation": immatriculation,
       "gamme": gamme,
-        "gammeValidee": gammeValidee,
+      "gammeValidee": gammeValidee,
       "etatVehicule": etatVehicule,
       "anneeVehicule": anneeVehicule,
       "photosInspectionVehicule": photosInspectionVehicule,
@@ -265,7 +265,7 @@ class Transporteur extends Utilisateur {
       modeleVehicule: map["modeleVehicule"] ?? "",
       immatriculation: map["immatriculation"] ?? "",
       gamme: map["gamme"] ?? "Éco",
-        gammeValidee: map["gammeValidee"] ?? true,
+      gammeValidee: map["gammeValidee"] ?? true,
       etatVehicule: map["etatVehicule"] ?? "Standard",
       anneeVehicule: map["anneeVehicule"] ?? 0,
       photosInspectionVehicule: List<String>.from(map["photosInspectionVehicule"] ?? []),
@@ -301,10 +301,10 @@ class Transporteur extends Utilisateur {
           ? DateTime.fromMillisecondsSinceEpoch(map["dateFinAbonnement"]) 
           : null,
       
-      // LOGIQUE DE PRESENCE : Si pas de signal depuis 1 minute, on force a hors ligne
+      // LOGIQUE DE PRESENCE : Tolérance de 90 secondes pour équilibrer déconnexion rapide et décalage d'horloge
       estEnLigne: (map["estEnLigne"] ?? false) && 
                   (map["derniereConnexion"] != null && 
-                   DateTime.now().difference(Parseur.toDateTime(map["derniereConnexion"])).inSeconds <= 60),
+                   DateTime.now().difference(Parseur.toDateTime(map["derniereConnexion"])).inSeconds <= 90),
 
       derniereConnexion: map["derniereConnexion"] != null ? Parseur.toDateTime(map["derniereConnexion"]) : null,
     );
@@ -319,13 +319,14 @@ class Transporteur extends Utilisateur {
   /// Méthode métier : Traiter un signalement client concernant l'état du véhicule.
   /// Si le nombre de signalements atteint ou dépasse 2, le transporteur perd son statut "Confort".
   Transporteur traiterSignalementClient() {
-    int nouveauxSignalements = signalementsEtatVehicule + 1;
-    String nouvelleGamme = gamme ?? "Éco";
-    
+    final int nouveauxSignalements = signalementsEtatVehicule + 1;
+    // ✅ CORRECTION 1.6: gamme est déjà non-nullable (String), ?? était superflu
+    String nouvelleGamme = gamme;
+
     if (nouveauxSignalements >= 2 && nouvelleGamme == "Confort") {
       nouvelleGamme = "Éco"; // Rétrogradation automatique
     }
-    
+
     return copyWith(
       signalementsEtatVehicule: nouveauxSignalements,
       gamme: nouvelleGamme,

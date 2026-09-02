@@ -10,6 +10,7 @@ import 'package:update_camtrans/modeles/transporteur.dart';
 import 'package:update_camtrans/services/service_authentification.dart';
 import 'package:update_camtrans/services/service_firestore.dart';
 import 'package:update_camtrans/modeles/message.dart';
+import 'package:update_camtrans/coeur/widgets/loader_premium.dart';
 
 class EcranChat extends ConsumerStatefulWidget {
   final Transporteur transporteur;
@@ -123,7 +124,7 @@ class _EcranChatState extends ConsumerState<EcranChat> {
                 stream: ref.watch(serviceFirestoreProvider).fluxMessages(conversationId),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(child: CircularProgressIndicator(color: CouleursApp.primaire));
+                    return Center(child: LoaderPremium());
                   }
                   
                   if (snapshot.hasError) {

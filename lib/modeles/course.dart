@@ -52,6 +52,15 @@ class Course {
   final double distanceApprocheKm;
   final int tempsApprocheMin;
 
+  //---------------- Phase 4 (Dispatch Automatique) ---------//
+  final List<String> candidats;
+  final int indexCandidatActuel;
+  final DateTime? expirationProposition;
+
+  //---------------- Escrow PIN -------------//
+  final String codePinLivraison;
+  final bool fondsDebloques;
+
   const Course({
     required this.id,
     required this.clientId,
@@ -98,7 +107,118 @@ class Course {
     this.detailsSpecifiques = "",
     this.distanceApprocheKm = 0.0,
     this.tempsApprocheMin = 0,
+    this.candidats = const [],
+    this.indexCandidatActuel = 0,
+    this.expirationProposition,
+    this.codePinLivraison = "",
+    this.fondsDebloques = false,
   });
+
+  Course copyWith({
+    String? id,
+    String? clientId,
+    String? transporteurId,
+    String? nomClient,
+    String? nomTransporteur,
+    String? telephoneClient,
+    String? telephoneTransporteur,
+    String? adresseDepart,
+    String? adresseArrivee,
+    double? latitudeDepart,
+    double? longitudeDepart,
+    double? latitudeArrivee,
+    double? longitudeArrivee,
+    double? distanceKm,
+    double? volumeM3,
+    double? poidsKg,
+    String? typeVehicule,
+    String? typeMarchandise,
+    double? prixEstime,
+    double? prixFinal,
+    String? modePaiement,
+    bool? paiementEffectue,
+    String? statut,
+    String? description,
+    List<String>? photos,
+    DateTime? dateCreation,
+    DateTime? dateDebut,
+    DateTime? dateFin,
+    bool? fragile,
+    bool? aideChargement,
+    bool? aideDechargement,
+    String? codeSuivi,
+    double? noteClient,
+    double? noteTransporteur,
+    String? commentaireClient,
+    String? commentaireTransporteur,
+    double? scoreIA,
+    String? vehiculeRecommandeIA,
+    double? volumeEstimeIA,
+    String? conseilIA,
+    String? categorieService,
+    String? optionGamme,
+    String? detailsSpecifiques,
+    double? distanceApprocheKm,
+    int? tempsApprocheMin,
+    List<String>? candidats,
+    int? indexCandidatActuel,
+    DateTime? expirationProposition,
+    String? codePinLivraison,
+    bool? fondsDebloques,
+  }) {
+    return Course(
+      id: id ?? this.id,
+      clientId: clientId ?? this.clientId,
+      transporteurId: transporteurId ?? this.transporteurId,
+      nomClient: nomClient ?? this.nomClient,
+      nomTransporteur: nomTransporteur ?? this.nomTransporteur,
+      telephoneClient: telephoneClient ?? this.telephoneClient,
+      telephoneTransporteur: telephoneTransporteur ?? this.telephoneTransporteur,
+      adresseDepart: adresseDepart ?? this.adresseDepart,
+      adresseArrivee: adresseArrivee ?? this.adresseArrivee,
+      latitudeDepart: latitudeDepart ?? this.latitudeDepart,
+      longitudeDepart: longitudeDepart ?? this.longitudeDepart,
+      latitudeArrivee: latitudeArrivee ?? this.latitudeArrivee,
+      longitudeArrivee: longitudeArrivee ?? this.longitudeArrivee,
+      distanceKm: distanceKm ?? this.distanceKm,
+      volumeM3: volumeM3 ?? this.volumeM3,
+      poidsKg: poidsKg ?? this.poidsKg,
+      typeVehicule: typeVehicule ?? this.typeVehicule,
+      typeMarchandise: typeMarchandise ?? this.typeMarchandise,
+      prixEstime: prixEstime ?? this.prixEstime,
+      prixFinal: prixFinal ?? this.prixFinal,
+      modePaiement: modePaiement ?? this.modePaiement,
+      paiementEffectue: paiementEffectue ?? this.paiementEffectue,
+      statut: statut ?? this.statut,
+      description: description ?? this.description,
+      photos: photos ?? this.photos,
+      dateCreation: dateCreation ?? this.dateCreation,
+      dateDebut: dateDebut ?? this.dateDebut,
+      dateFin: dateFin ?? this.dateFin,
+      fragile: fragile ?? this.fragile,
+      aideChargement: aideChargement ?? this.aideChargement,
+      aideDechargement: aideDechargement ?? this.aideDechargement,
+      codeSuivi: codeSuivi ?? this.codeSuivi,
+      noteClient: noteClient ?? this.noteClient,
+      noteTransporteur: noteTransporteur ?? this.noteTransporteur,
+      commentaireClient: commentaireClient ?? this.commentaireClient,
+      commentaireTransporteur: commentaireTransporteur ?? this.commentaireTransporteur,
+      scoreIA: scoreIA ?? this.scoreIA,
+      vehiculeRecommandeIA: vehiculeRecommandeIA ?? this.vehiculeRecommandeIA,
+      volumeEstimeIA: volumeEstimeIA ?? this.volumeEstimeIA,
+      conseilIA: conseilIA ?? this.conseilIA,
+      categorieService: categorieService ?? this.categorieService,
+      optionGamme: optionGamme ?? this.optionGamme,
+      detailsSpecifiques: detailsSpecifiques ?? this.detailsSpecifiques,
+      distanceApprocheKm: distanceApprocheKm ?? this.distanceApprocheKm,
+      tempsApprocheMin: tempsApprocheMin ?? this.tempsApprocheMin,
+      candidats: candidats ?? this.candidats,
+      indexCandidatActuel: indexCandidatActuel ?? this.indexCandidatActuel,
+      expirationProposition: expirationProposition ?? this.expirationProposition,
+      codePinLivraison: codePinLivraison ?? this.codePinLivraison,
+      fondsDebloques: fondsDebloques ?? this.fondsDebloques,
+    );
+  }
 
   Map<String, dynamic> toMap() {
     return {
@@ -147,6 +267,11 @@ class Course {
       "detailsSpecifiques": detailsSpecifiques,
       "distanceApprocheKm": distanceApprocheKm,
       "tempsApprocheMin": tempsApprocheMin,
+      "candidats": candidats,
+      "indexCandidatActuel": indexCandidatActuel,
+      "expirationProposition": expirationProposition?.toIso8601String(),
+      "codePinLivraison": codePinLivraison,
+      "fondsDebloques": fondsDebloques,
     };
   }
 
@@ -197,6 +322,11 @@ class Course {
       detailsSpecifiques: map["detailsSpecifiques"] ?? "",
       distanceApprocheKm: Parseur.toDouble(map["distanceApprocheKm"]),
       tempsApprocheMin: map["tempsApprocheMin"] ?? 0,
+      candidats: map['candidats'] != null ? List<String>.from(map['candidats']) : const [],
+      indexCandidatActuel: map['indexCandidatActuel'] ?? 0,
+      expirationProposition: map['expirationProposition'] != null ? Parseur.toDateTime(map['expirationProposition']) : null,
+      codePinLivraison: map['codePinLivraison'] ?? "",
+      fondsDebloques: map['fondsDebloques'] ?? false,
     );
   }
 

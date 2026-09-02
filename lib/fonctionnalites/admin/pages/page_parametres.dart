@@ -5,6 +5,7 @@ import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:update_camtrans/coeur/constantes/couleurs.dart';
 import 'package:update_camtrans/coeur/etat/admin_provider.dart';
 import 'package:update_camtrans/modeles/parametres_app.dart';
+import 'package:update_camtrans/coeur/widgets/loader_premium.dart';
 
 class PageParametres extends ConsumerStatefulWidget {
   const PageParametres({super.key});
@@ -111,7 +112,7 @@ class _PageParametresState extends ConsumerState<PageParametres> {
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: parametresAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator(color: CouleursApp.primaire)),
+        loading: () => Center(child: LoaderPremium()),
         error: (err, stack) => Center(child: Text("Impossible de charger les paramètres : $err 🔧", style: const TextStyle(color: Colors.redAccent))),
         data: (parametres) {
           // On initialise une seule fois (pour ne pas écraser la saisie en cours de route si un update arrive)
@@ -248,7 +249,7 @@ class _PageParametresState extends ConsumerState<PageParametres> {
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                       ),
                       child: _isSaving
-                          ? const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                          ? const SizedBox(width: 24, height: 24, child: LoaderPremium(size: 24))
                           : Text("Enregistrer les modifications", style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
                     ),
                   ),

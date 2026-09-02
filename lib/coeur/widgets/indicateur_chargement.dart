@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-
+import 'dart:ui';
 import 'package:update_camtrans/coeur/constantes/couleurs.dart';
-import 'package:update_camtrans/coeur/constantes/tailles.dart';
+import 'package:update_camtrans/coeur/widgets/loader_premium.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class IndicateurChargement extends StatelessWidget {
   final String? message;
@@ -22,28 +23,16 @@ class IndicateurChargement extends StatelessWidget {
     final Widget contenu = Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        SizedBox(
-          width: taille,
-          height: taille,
-          child: CircularProgressIndicator(
-            strokeWidth: 4,
-            valueColor: AlwaysStoppedAnimation<Color>(
-              couleur ?? CouleursApp.primaire,
-            ),
-          ),
-        ),
-
+        LoaderPremium(size: taille, color: couleur),
         if (message != null) ...[
-          SizedBox(
-            height: TaillesApp.espaceGrand,
-          ),
+          const SizedBox(height: 24),
           Text(
             message!,
             textAlign: TextAlign.center,
-            style: const TextStyle(
-              fontSize: 16,
-              color: CouleursApp.texteSecondaire,
-              fontWeight: FontWeight.w500,
+            style: GoogleFonts.poppins(
+              fontSize: 14,
+              color: Colors.white70,
+              fontWeight: FontWeight.w600,
             ),
           ),
         ],
@@ -51,30 +40,31 @@ class IndicateurChargement extends StatelessWidget {
     );
 
     if (!afficherCarte) {
-      return Center(
-        child: contenu,
-      );
+      return Center(child: contenu);
     }
 
     return Center(
-      child: Container(
-        padding: EdgeInsets.all(
-          TaillesApp.espaceGrand,
-        ),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(
-            TaillesApp.rayonCarte,
-          ),
-          boxShadow: [
-            BoxShadow(
-              color: CouleursApp.ombre,
-              blurRadius: 15,
-              offset: const Offset(0, 6),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(24),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 32),
+            decoration: BoxDecoration(
+              color: const Color(0xFF10192A).withValues(alpha: 0.6),
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.3),
+                  blurRadius: 24,
+                  offset: const Offset(0, 8),
+                ),
+              ],
             ),
-          ],
+            child: contenu,
+          ),
         ),
-        child: contenu,
       ),
     );
   }

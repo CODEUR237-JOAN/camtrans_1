@@ -80,7 +80,7 @@ class ChoixProfil extends StatelessWidget {
                         ),
                         const SizedBox(height: 18),
                         const Text(
-                          'Comment souhaitez-vous utiliser Camtrans ?',
+                          'Comment souhaitez-vous utiliser CamTrans ?',
                           style: TextStyle(
                             fontSize: 31,
                             fontWeight: FontWeight.w900,

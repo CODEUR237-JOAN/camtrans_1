@@ -9,6 +9,7 @@ import 'package:update_camtrans/coeur/etat/admin_provider.dart';
 import 'package:update_camtrans/modeles/course.dart';
 import 'package:update_camtrans/modeles/paiement.dart';
 import 'package:update_camtrans/services/service_firestore.dart';
+import 'package:update_camtrans/coeur/widgets/loader_premium.dart';
 
 class PageLitiges extends ConsumerStatefulWidget {
   const PageLitiges({super.key});
@@ -142,7 +143,7 @@ class _OngletCourses extends ConsumerWidget {
     final coursesAsync = ref.watch(adminCoursesProvider);
 
     return coursesAsync.when(
-      loading: () => const Center(child: CircularProgressIndicator(color: CouleursApp.primaire)),
+      loading: () => Center(child: LoaderPremium()),
       error: (e, _) => Center(child: Text('Erreur: $e', style: const TextStyle(color: Colors.red))),
       data: (courses) {
         final filtered = searchQuery.isEmpty
@@ -356,7 +357,7 @@ class _OngletPaiements extends ConsumerWidget {
     final paiementsAsync = ref.watch(adminPaiementsProvider);
 
     return paiementsAsync.when(
-      loading: () => const Center(child: CircularProgressIndicator(color: CouleursApp.primaire)),
+      loading: () => Center(child: LoaderPremium()),
       error: (e, _) => Center(child: Text('Erreur: $e', style: const TextStyle(color: Colors.red))),
       data: (paiements) {
         final filtered = searchQuery.isEmpty
@@ -490,7 +491,7 @@ class _OngletConversations extends ConsumerWidget {
     final conversationsAsync = ref.watch(adminToutesConversationsProvider);
 
     return conversationsAsync.when(
-      loading: () => const Center(child: CircularProgressIndicator(color: CouleursApp.primaire)),
+      loading: () => Center(child: LoaderPremium()),
       error: (e, _) => Center(child: Text('Erreur: $e', style: const TextStyle(color: Colors.red))),
       data: (conversations) {
         final filtered = searchQuery.isEmpty
@@ -582,7 +583,7 @@ class _CarteConversationState extends ConsumerState<_CarteConversation> {
     return messagesAsync.when(
       loading: () => const Padding(
         padding: EdgeInsets.all(16),
-        child: Center(child: CircularProgressIndicator(color: CouleursApp.primaire)),
+        child: Center(child: LoaderPremium(size: 24)),
       ),
       error: (e, _) => Padding(
         padding: const EdgeInsets.all(16),

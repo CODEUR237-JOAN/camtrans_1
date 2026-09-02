@@ -39,30 +39,25 @@ db.collection('notifications_push')
         await db.collection('notifications_push').doc(notifId).update({ status: 'processing' });
 
         // 1. Récupérer les utilisateurs selon la cible
-        let usersQuery = db.collection('utilisateurs');
-        
-        if (cible === 'clients') {
-          // On filtre sur les clients. NB: Dans cette architecture, les clients sont dans 'clients' ou 'utilisateurs' avec un role
-          // Si les données sont séparées, on cherche dans la collection spécifique, sinon on filtre par role.
-          // En supposant que le role est stocké dans l'utilisateur, ou bien on interroge directement la sous-collection.
-          // Pour la démo, on cherche tous les tokens qui ont une propriété fcmToken
+        let tokens = [];
+
+        if (notifData.cibleId) {
+            // Envoi à un utilisateur spécifique
+            const collectionName = cible === 'client' ? 'clients' : 'transporteurs';
+            const userDoc = await db.collection(collectionName).doc(notifData.cibleId).get();
+            if (userDoc.exists && userDoc.data().fcmToken) {
+                tokens.push(userDoc.data().fcmToken);
+            }
+        } else {
+            // Envoi groupé (ancien comportement)
+            const collectionName = cible === 'clients' ? 'clients' : (cible === 'transporteurs' ? 'transporteurs' : 'utilisateurs');
+            const usersSnap = await db.collection(collectionName).where('fcmToken', '!=', null).get();
+            usersSnap.forEach(userDoc => {
+                if (userDoc.data().fcmToken) {
+                    tokens.push(userDoc.data().fcmToken);
+                }
+            });
         }
-        
-        // Afin de s'assurer d'avoir les tokens, on prend simplement tous les documents de 'utilisateurs' qui ont 'fcmToken'
-        const usersSnap = await usersQuery.where('fcmToken', '!=', null).get();
-        
-        const tokens = [];
-        usersSnap.forEach(userDoc => {
-          const userData = userDoc.data();
-          
-          // Filtrage local selon la cible si le champ 'role' existe
-          if (cible === 'clients' && userData.role !== 'client') return;
-          if (cible === 'transporteurs' && userData.role !== 'transporteur') return;
-          
-          if (userData.fcmToken) {
-            tokens.push(userData.fcmToken);
-          }
-        });
 
         if (tokens.length === 0) {
           console.log(`⚠️ Aucun token trouvé pour la cible '${cible}'.`);

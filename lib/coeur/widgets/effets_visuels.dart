@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 
 import 'package:update_camtrans/coeur/constantes/couleurs.dart';
+import 'package:update_camtrans/coeur/widgets/loader_premium.dart';
 
 
 /// =======================================================
@@ -198,10 +199,7 @@ class _GradientButtonState extends State<GradientButton>
                   ? const SizedBox(
                       width: 24,
                       height: 24,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2.5,
-                        color: Colors.white,
-                      ),
+                      child: LoaderPremium(size: 20),
                     )
                   : Row(
                       mainAxisAlignment: MainAxisAlignment.center,

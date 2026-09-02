@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:update_camtrans/coeur/constantes/couleurs.dart';
+import 'package:update_camtrans/coeur/widgets/marqueur_premium.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
 
@@ -99,13 +100,13 @@ class _CarteSuiviAbstraiteState extends State<CarteSuiviAbstraite> with SingleTi
               point: widget.depart,
               width: 40,
               height: 40,
-              child: const Icon(Icons.location_on, color: Colors.green, size: 40),
+              child: const MarqueurPremium(type: TypeMarqueur.depart),
             ),
             Marker(
               point: widget.arrivee,
               width: 40,
               height: 40,
-              child: const Icon(Icons.location_on, color: Colors.red, size: 40),
+              child: const MarqueurPremium(type: TypeMarqueur.arrivee),
             ),
             if (widget.transporteur != null)
               Marker(

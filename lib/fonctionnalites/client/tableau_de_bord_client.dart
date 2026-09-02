@@ -23,9 +23,12 @@ import 'package:update_camtrans/coeur/etat/notification_provider.dart';
 import 'package:flutter/services.dart';
 import 'package:update_camtrans/coeur/etat/demande_expedition_provider.dart';
 import 'package:update_camtrans/coeur/constantes/couleurs.dart';
+import 'package:update_camtrans/coeur/widgets/assistant_vocal_widget.dart';
+import 'package:update_camtrans/coeur/widgets/marqueur_premium.dart';
 import 'package:update_camtrans/coeur/constantes/statuts.dart';
 import 'package:update_camtrans/coeur/widgets/page_responsive.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:update_camtrans/coeur/widgets/loader_premium.dart';
 
 
 class TableauDeBordClient extends ConsumerStatefulWidget {
@@ -52,9 +55,43 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
   Widget build(BuildContext context) {
     final coursesAsync = ref.watch(coursesClientProvider);
 
+    // ✅ Redirection automatique : dès que le transporteur accepte, le client est envoyé vers sa page de suivi
+    ref.listen<Course?>(activeCourseClientProvider, (previous, current) {
+      if (current == null) return;
+      final oldStatut = previous?.statut;
+      final newStatut = current.statut;
+
+      // Rediriger si la course vient d'être acceptée (propose → attribue) ou si elle est active
+      final devraitRediriger = (oldStatut == StatutCourse.propose || oldStatut == StatutCourse.recherche)
+          && newStatut == StatutCourse.attribue;
+
+      if (devraitRediriger) {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: const Row(
+                  children: [
+                    Icon(Icons.check_circle, color: Colors.white),
+                    SizedBox(width: 10),
+                    Expanded(child: Text("Un transporteur a accepté votre course ! 🎉")),
+                  ],
+                ),
+                backgroundColor: CouleursApp.succes,
+                behavior: SnackBarBehavior.floating,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                duration: const Duration(seconds: 3),
+              ),
+            );
+            context.push('/suivi/${current.id}');
+          }
+        });
+      }
+    });
+
     return Scaffold(
       backgroundColor: const Color(0xFF08111F),
-      floatingActionButton: _bottomNavIndex == 0 ? _buildIAAssistantFAB() : null,
+      floatingActionButton: const BoutonAssistantVocal(),
       body: Stack(
         children: [
           // Blob lumineux haut-gauche (comme admin)
@@ -127,7 +164,7 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
                         }
                         return SuiviTransport(courseId: enCours.first.id, isFullScreen: false);
                       },
-                      loading: () => const Scaffold(body: Center(child: CircularProgressIndicator(color: CouleursApp.primaire))),
+                      loading: () => const Scaffold(body: Center(child: LoaderPremium(size: 24))),
                       error: (err, stack) => Scaffold(body: Center(child: Text("Erreur: $err"))),
                     ),
                     
@@ -569,19 +606,25 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
           children: [
             FlutterMap(
               mapController: _mapController,
-              options: const MapOptions(
-                initialCenter: LatLng(4.0511, 9.7679), // Douala center mock
-                initialZoom: 6,
+              options: MapOptions(
+                initialCenter: LatLng(course.latitudeDepart, course.longitudeDepart),
+                initialZoom: 12, // Zoom plus proche pour la ville
               ),
               children: [
                 TileLayer(
             urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
             userAgentPackageName: 'com.joan.update_camtrans',
           ),
-                const MarkerLayer(
+                MarkerLayer(
                   markers: [
-                    Marker(point: LatLng(4.0511, 9.7679), child: Icon(Icons.local_shipping, color: CouleursApp.primaire, size: 30)),
-                    Marker(point: LatLng(3.8480, 11.5021), child: Icon(Icons.location_on, color: CouleursApp.erreur, size: 30)),
+                    Marker(
+                      point: LatLng(course.latitudeDepart, course.longitudeDepart), 
+                      child: const MarqueurPremium(type: TypeMarqueur.depart)
+                    ),
+                    Marker(
+                      point: LatLng(course.latitudeArrivee, course.longitudeArrivee), 
+                      child: const MarqueurPremium(type: TypeMarqueur.arrivee)
+                    ),
                   ],
                 )
               ],
@@ -640,7 +683,7 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
                 children: [
                   Container(
                     padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(15)),
+                    decoration: BoxDecoration(color: const Color(0xFF1E293B), borderRadius: BorderRadius.circular(15)),
                     child: const Icon(Iconsax.box_copy, color: Colors.white70),
                   ),
                   const SizedBox(width: 15),
@@ -729,7 +772,7 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
         children: [
           Container(
             padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+            decoration: const BoxDecoration(color: Color(0xFF10192A), shape: BoxShape.circle),
             child: const Icon(Iconsax.box_add_copy, size: 50, color: Colors.white70),
           ),
           const SizedBox(height: 20),
@@ -896,7 +939,7 @@ class _BoutonServiceRapideState extends State<_BoutonServiceRapide> {
                 duration: const Duration(milliseconds: 200),
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: _isHovered ? widget.color : CouleursApp.surface,
+                  color: _isHovered ? widget.color : const Color(0xFF10192A),
                   borderRadius: BorderRadius.circular(20),
                   boxShadow: [
                     if (_isHovered)
@@ -977,7 +1020,7 @@ class _ServiceCategoryCardState extends State<_ServiceCategoryCard> {
             duration: const Duration(milliseconds: 200),
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: _isHovered ? CouleursApp.primaire.withValues(alpha: 0.1) : CouleursApp.surface,
+              color: _isHovered ? CouleursApp.primaire.withValues(alpha: 0.1) : const Color(0xFF10192A),
               borderRadius: BorderRadius.circular(24),
               border: Border.all(
                 color: _isHovered ? CouleursApp.primaire.withValues(alpha: 0.3) : Colors.transparent,

@@ -31,18 +31,18 @@ final userRoleProvider = FutureProvider.autoDispose<String?>((ref) async {
     return 'admin';
   }
 
-  // 2. Check Client
-  final clientDoc = await firestore.lireDocument(collection: 'clients', id: userId);
-  if (clientDoc.exists) {
-    ServicePresence().demarrer(role: 'client');
-    return 'client';
-  }
-
-  // 3. Check Transporteur
+  // 2. Check Transporteur (Priorité au transporteur comme dans connexion.dart)
   final transpDoc = await firestore.lireDocument(collection: 'transporteurs', id: userId);
   if (transpDoc.exists) {
     ServicePresence().demarrer(role: 'transporteur');
     return 'transporteur';
+  }
+
+  // 3. Check Client
+  final clientDoc = await firestore.lireDocument(collection: 'clients', id: userId);
+  if (clientDoc.exists) {
+    ServicePresence().demarrer(role: 'client');
+    return 'client';
   }
 
   return null;

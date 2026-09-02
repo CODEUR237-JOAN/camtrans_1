@@ -9,6 +9,7 @@ import 'package:update_camtrans/coeur/etat/admin_provider.dart';
 import 'package:update_camtrans/coeur/constantes/couleurs.dart';
 import 'package:update_camtrans/modeles/transporteur.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:update_camtrans/coeur/widgets/loader_premium.dart';
 
 
 class PageCarteFlotte extends ConsumerStatefulWidget {
@@ -33,7 +34,7 @@ class _PageCarteFlotteState extends ConsumerState<PageCarteFlotte> {
         children: [
           // Carte
           transporteursAsync.when(
-            loading: () => const Center(child: CircularProgressIndicator(color: CouleursApp.primaire)),
+            loading: () => Center(child: LoaderPremium()),
             error: (err, _) => Center(child: Text("Erreur : $err", style: const TextStyle(color: Colors.white))),
             data: (transporteurs) {
               final transporteursEnLigne = transporteurs.where((t) => t.disponible && t.latitude != 0 && t.longitude != 0).toList();

@@ -35,6 +35,7 @@ import 'package:update_camtrans/fonctionnalites/transporteur/documents.dart';
 import 'package:update_camtrans/modeles/transporteur.dart';
 import 'package:update_camtrans/modeles/course.dart';
 import 'package:update_camtrans/fonctionnalites/transporteur/page_abonnement.dart';
+import 'package:update_camtrans/fonctionnalites/transporteur/suivi_transporteur.dart';
 
 class RoutesApplication {
   RoutesApplication._();
@@ -73,6 +74,7 @@ class RoutesApplication {
   static const String documents = "/documents";
   static const String facture = "/facture";
   static const String abonnement = "/abonnement";
+  static const String suiviTransporteur = "/suivi-transporteur/:courseId";
 
   // ===========================
   // Routeur GoRouter
@@ -249,7 +251,15 @@ class RoutesApplication {
       GoRoute(
         path: facture,
         pageBuilder: (context, state) {
-          final course = state.extra as Course?;
+          final extra = state.extra;
+          Course? course;
+          if (extra is Course) {
+            course = extra;
+          } else if (extra is Map<String, dynamic>) {
+            try {
+              course = Course.fromMap(extra);
+            } catch (_) {}
+          }
           return _page(
             Facture(course: course),
             state.pageKey,
@@ -259,6 +269,13 @@ class RoutesApplication {
       GoRoute(
         path: abonnement,
         pageBuilder: (context, state) => _page(const PageAbonnement(), state.pageKey),
+      ),
+      GoRoute(
+        path: suiviTransporteur,
+        pageBuilder: (context, state) => _page(
+          SuiviTransporteur(courseId: state.pathParameters['courseId'] ?? ""),
+          state.pageKey,
+        ),
       ),
     ],
     errorBuilder: (context, state) => Scaffold(

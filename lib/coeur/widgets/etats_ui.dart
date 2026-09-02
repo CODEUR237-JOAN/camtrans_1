@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:update_camtrans/coeur/constantes/couleurs.dart';
 import 'effets_visuels.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:update_camtrans/coeur/widgets/loader_premium.dart';
 
 
 /// =======================================================
@@ -38,10 +39,7 @@ class EtatChargement extends StatelessWidget {
               child: const SizedBox(
                 width: 32,
                 height: 32,
-                child: CircularProgressIndicator(
-                  color: CouleursApp.primaire,
-                  strokeWidth: 3,
-                ),
+                child: LoaderPremium(size: 24),
               ),
             )
                 .animate(onPlay: (c) => c.repeat())

@@ -14,7 +14,7 @@ class TextesApp {
   // Application
   // ==========================
 
-  static const String nomApplication = "Camtrans";
+  static const String nomApplication = "CamTrans";
 
   static const String slogan =
       "Votre remorquage d'urgence au Cameroun, 24h/24";

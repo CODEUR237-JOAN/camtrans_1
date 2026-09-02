@@ -6,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 
 import 'package:update_camtrans/coeur/constantes/couleurs.dart';
+import 'package:update_camtrans/coeur/widgets/progression_paiement.dart';
 import 'package:update_camtrans/services/service_paiement.dart';
 import 'package:update_camtrans/services/service_notification.dart';
 import 'package:update_camtrans/services/service_authentification.dart';
@@ -47,7 +48,9 @@ class _BottomSheetPaiementState extends ConsumerState<BottomSheetPaiement> {
 
   Future<void> _payer() async {
     if (_modeSelectionne == null) return;
-    if (_modeSelectionne != 'especes' && _phoneCtrl.text.isEmpty && _nomCtrl.text.isEmpty) {
+    if (_modeSelectionne != 'especes' &&
+        _phoneCtrl.text.isEmpty &&
+        _nomCtrl.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Veuillez remplir les informations requises.')),
       );
@@ -102,7 +105,7 @@ class _BottomSheetPaiementState extends ConsumerState<BottomSheetPaiement> {
 
       // Notification au transporteur
       await ServiceNotification.afficherNotification(
-        titre: ' Paiement reçu !',
+        titre: '💰 Paiement reçu !',
         message: '${widget.montant.toStringAsFixed(0)} FCFA ont été réglés.',
         type: 'paiement',
       );
@@ -113,8 +116,8 @@ class _BottomSheetPaiementState extends ConsumerState<BottomSheetPaiement> {
       });
       HapticFeedback.heavyImpact();
 
-      // Attendre 2s puis appeler le callback
-      await Future.delayed(const Duration(seconds: 2));
+      // Attendre 3s pour profiter de l'animation de célébration
+      await Future.delayed(const Duration(seconds: 3));
       if (mounted) widget.onPaiementReussi();
     } catch (e) {
       setState(() => _enChargement = false);
@@ -123,6 +126,8 @@ class _BottomSheetPaiementState extends ConsumerState<BottomSheetPaiement> {
           SnackBar(
             content: Text('Paiement échoué : ${e.toString()}'),
             backgroundColor: CouleursApp.erreur,
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           ),
         );
       }
@@ -141,51 +146,113 @@ class _BottomSheetPaiementState extends ConsumerState<BottomSheetPaiement> {
         padding: EdgeInsets.fromLTRB(
             24, 16, 24, MediaQuery.of(context).viewInsets.bottom + 24),
         child: SingleChildScrollView(
-          child: _paiementReussi ? _buildSucces() : _buildFormulaire(),
+          // ✅ HUMANISATION 3.2: Affiche la progression animée pendant le chargement
+          child: _paiementReussi
+              ? _buildSucces()
+              : _enChargement
+                  ? _buildChargementAvecProgression()
+                  : _buildFormulaire(),
         ),
       ),
     );
   }
 
+  /// ✅ HUMANISATION 3.2: Écran de succès animé avec célébration
   Widget _buildSucces() {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        const SizedBox(height: 24),
-        Container(
-          width: 80,
-          height: 80,
-          decoration: BoxDecoration(
-            color: CouleursApp.succes.withValues(alpha: 0.15),
-            shape: BoxShape.circle,
-          ),
-          child: const Icon(Icons.check_circle_outline,
-              color: CouleursApp.succes, size: 48),
-        )
-            ,
-        const SizedBox(height: 20),
-        Text(
-          'Paiement confirmé !',
-          style: GoogleFonts.poppins(
-              color: Colors.white,
-              fontWeight: FontWeight.bold,
-              fontSize: 22),
+        const SizedBox(height: 32),
+        // Animation de célébration en couches
+        Stack(
+          alignment: Alignment.center,
+          children: [
+            // Cercle extérieur pulsant
+            Container(
+              width: 120,
+              height: 120,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: CouleursApp.succes.withValues(alpha: 0.08),
+              ),
+            ).animate(onPlay: (c) => c.repeat(reverse: true))
+              .scale(begin: const Offset(0.9, 0.9), end: const Offset(1.1, 1.1), duration: 1.seconds),
+            // Cercle intermédiaire
+            Container(
+              width: 90,
+              height: 90,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: CouleursApp.succes.withValues(alpha: 0.15),
+              ),
+            ).animate().scale(duration: 500.ms, curve: Curves.elasticOut),
+            // Icône centrale
+            Container(
+              width: 70,
+              height: 70,
+              decoration: const BoxDecoration(
+                shape: BoxShape.circle,
+                color: CouleursApp.succes,
+              ),
+              child: const Icon(Icons.check_rounded, color: Colors.white, size: 40),
+            ).animate()
+              .scale(begin: const Offset(0, 0), end: const Offset(1, 1), duration: 600.ms, curve: Curves.elasticOut)
+              .fadeIn(duration: 300.ms),
+          ],
         ),
+        const SizedBox(height: 28),
+        Text(
+          'Paiement confirmé ! 🎉',
+          style: GoogleFonts.poppins(
+            color: Colors.white,
+            fontWeight: FontWeight.bold,
+            fontSize: 22,
+          ),
+        ).animate().fadeIn(delay: 400.ms).slideY(begin: 0.2, end: 0),
         const SizedBox(height: 8),
         Text(
           '${widget.montant.toStringAsFixed(0)} FCFA',
           style: GoogleFonts.poppins(
-              color: CouleursApp.succes,
-              fontWeight: FontWeight.w800,
-              fontSize: 32),
-        ),
+            color: CouleursApp.succes,
+            fontWeight: FontWeight.w800,
+            fontSize: 36,
+          ),
+        ).animate().fadeIn(delay: 500.ms).scale(begin: const Offset(0.8, 0.8), end: const Offset(1, 1)),
         const SizedBox(height: 8),
         Text(
-          'Merci pour votre confiance.',
+          'Merci pour votre confiance ✨',
           style: GoogleFonts.inter(color: Colors.white54, fontSize: 14),
-        ),
-        const SizedBox(height: 32),
+        ).animate().fadeIn(delay: 600.ms),
+        const SizedBox(height: 20),
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+          decoration: BoxDecoration(
+            color: CouleursApp.succes.withValues(alpha: 0.08),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: CouleursApp.succes.withValues(alpha: 0.2)),
+          ),
+          child: Text(
+            'Votre chauffeur a été notifié',
+            style: GoogleFonts.inter(color: CouleursApp.succes, fontSize: 13),
+          ),
+        ).animate().fadeIn(delay: 700.ms),
+        const SizedBox(height: 36),
       ],
+    );
+  }
+
+  /// ✅ HUMANISATION 3.1: Écran de chargement avec étapes progressives
+  Widget _buildChargementAvecProgression() {
+    final operateur = _modeSelectionne == 'orange' ? 'Orange Money' : 'MTN Mobile Money';
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 32),
+      child: ProgressionPaiement(
+        etapes: ProgressionPaiement.etapesMobileMoney(
+          montant: widget.montant.toStringAsFixed(0),
+          operateur: operateur,
+        ),
+        dureeEntreEtapesMs: 4000,
+      ),
     );
   }
 
@@ -306,22 +373,16 @@ class _BottomSheetPaiementState extends ConsumerState<BottomSheetPaiement> {
                   borderRadius: BorderRadius.circular(16)),
               elevation: 0,
             ),
-            child: _enChargement
-                ? const SizedBox(
-                    width: 24,
-                    height: 24,
-                    child: CircularProgressIndicator(
-                        color: Colors.white, strokeWidth: 2),
-                  )
-                : Text(
-                    _modeSelectionne == null
-                        ? 'Choisir un mode de paiement'
-                        : 'Payer ${widget.montant.toStringAsFixed(0)} FCFA',
-                    style: GoogleFonts.poppins(
-                        color: Colors.white,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16),
-                  ),
+            // ✅ Plus de spinner générique — la progression est dans _buildChargementAvecProgression()
+            child: Text(
+              _modeSelectionne == null
+                  ? 'Choisir un mode de paiement'
+                  : 'Payer ${widget.montant.toStringAsFixed(0)} FCFA →',
+              style: GoogleFonts.poppins(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16),
+            ),
           ),
         ),
       ],
@@ -365,7 +426,6 @@ class _BottomSheetPaiementState extends ConsumerState<BottomSheetPaiement> {
         mainAxisSpacing: 12,
         childAspectRatio: 2.2,
         children: modes.asMap().entries.map((entry) {
-          
           final mode = entry.value;
           final id = mode['id'] as String;
           final selected = _modeSelectionne == id;

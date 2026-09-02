@@ -5,6 +5,7 @@ import 'package:update_camtrans/coeur/constantes/couleurs.dart';
 import 'package:update_camtrans/coeur/constantes/tailles.dart';
 import 'package:update_camtrans/coeur/widgets/bouton_principal.dart';
 import 'package:update_camtrans/coeur/etat/transporteur_provider.dart';
+import 'package:update_camtrans/coeur/widgets/loader_premium.dart';
 
 class Portefeuille extends ConsumerWidget {
   const Portefeuille({super.key});
@@ -120,7 +121,7 @@ class Portefeuille extends ConsumerWidget {
             const SizedBox(height: 15),
 
             fluxRevenus.when(
-              loading: () => const Center(child: CircularProgressIndicator()),
+              loading: () => Center(child: LoaderPremium()),
               error: (err, _) => Text("Erreur: $err"),
               data: (paiements) {
                 if (paiements.isEmpty) {

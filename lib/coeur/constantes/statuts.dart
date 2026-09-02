@@ -18,6 +18,10 @@ class StatutCourse {
   /// Commande créée, recherche en cours
   static const String recherche = 'recherche';
 
+  /// ✅ NOUVEAU (Phase 4.4) : La course est proposée en exclusivité à un chauffeur spécifique
+  static const String propose = 'propose';
+
+
   /// Un transporteur a été attribué
   static const String attribue = 'attribue';
 
@@ -64,7 +68,8 @@ class StatutCourse {
   /// Retourne true si le transporteur peut modifier le statut
   static bool peutTransitionnerVers(String actuel, String suivant) {
     const transitions = {
-      recherche: [attribue, annulee],
+      recherche: [propose, attribue, annulee],
+      propose: [attribue, recherche, annulee],
       attribue: [enRouteDepart, annulee],
       enRouteDepart: [arriveDepart, annulee],
       arriveDepart: [charge],
@@ -80,6 +85,9 @@ class StatutCourse {
     switch (statut) {
       case recherche:
         return 'Recherche...';
+      case propose:
+        return 'En proposition';
+
       case attribue:
         return 'Attribué';
       case enRouteDepart:

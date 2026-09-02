@@ -23,10 +23,13 @@ import 'package:update_camtrans/modeles/course.dart';
 import 'package:update_camtrans/fonctionnalites/transporteur/marche_demandes.dart';
 import 'package:update_camtrans/fonctionnalites/transporteur/navigation.dart';
 import 'package:update_camtrans/fonctionnalites/notifications/notifications.dart';
+import 'package:update_camtrans/coeur/widgets/assistant_vocal_widget.dart';
 import 'package:update_camtrans/services/service_notification.dart';
 import 'profil.dart';
 import 'package:update_camtrans/coeur/widgets/page_responsive.dart';
+import 'package:update_camtrans/fonctionnalites/transporteur/widgets/popup_proposition_course.dart';
 import 'page_abonnement.dart';
+import 'package:update_camtrans/coeur/widgets/loader_premium.dart';
 
 class TableauDeBordTransporteur extends ConsumerStatefulWidget {
   const TableauDeBordTransporteur({super.key});
@@ -88,6 +91,28 @@ class _TableauDeBordTransporteurState extends ConsumerState<TableauDeBordTranspo
     final transporteur = transporteurAsync.valueOrNull;
     final documentsValides = transporteur?.documentsValides ?? false;
 
+    // ✅ PHASE 4: DISPATCH AUTOMATIQUE - Écoute des propositions de courses
+    ref.listen<AsyncValue<Course?>>(fluxCourseProposeeProvider, (previous, next) {
+      if (next.hasValue && next.value != null) {
+        final courseProposee = next.value!;
+        // Éviter d'afficher plusieurs fois la même proposition
+        if (previous?.value?.id != courseProposee.id) {
+          // Déclencher une alerte sonore/système
+          ServiceNotification.afficherNotification(
+            titre: '🚨 NOUVELLE COURSE !',
+            message: 'Une nouvelle demande vous a été affectée. Acceptez vite !',
+            type: 'succes',
+          );
+
+          showDialog(
+            context: context,
+            barrierDismissible: false,
+            builder: (ctx) => PopupPropositionCourse(course: courseProposee),
+          );
+        }
+      }
+    });
+
     // Redirection si l'abonnement est expiré
     if (transporteur != null && !transporteur.abonnementValide) {
       return const PageAbonnement();
@@ -95,6 +120,7 @@ class _TableauDeBordTransporteurState extends ConsumerState<TableauDeBordTranspo
 
     return Scaffold(
       backgroundColor: const Color(0xFF08111F),
+      floatingActionButton: const BoutonAssistantVocal(),
       bottomNavigationBar: _buildBottomNav(),
       body: FondPremiumAnime(
         safeArea: true,
@@ -131,7 +157,7 @@ class _TableauDeBordTransporteurState extends ConsumerState<TableauDeBordTranspo
     final textes = ref.watch(textesAppProvider);
 
     return transporteurAsync.when(
-      loading: () => const Center(child: CircularProgressIndicator(color: CouleursApp.primaire)),
+      loading: () => Center(child: LoaderPremium()),
       error: (err, _) => Center(child: Text("Oups ! Chargement impossible : $err", style: const TextStyle(color: Colors.white70))),
       data: (transporteur) {
         final nomAffichage = transporteur != null ? transporteur.prenom : (utilisateur?.displayName ?? "Transporteur");
@@ -354,6 +380,11 @@ class _TableauDeBordTransporteurState extends ConsumerState<TableauDeBordTranspo
                 }
               ),
 
+              const SizedBox(height: 24),
+
+              // ✅ INNOVATION 4.3: CARTE "CONSEIL DU JOUR" - Astuces prédictives
+              _buildConseilDuJour(statsRevenus),
+
               const SizedBox(height: 35),
 
               // ACTIONS RAPIDES
@@ -494,6 +525,112 @@ class _TableauDeBordTransporteurState extends ConsumerState<TableauDeBordTranspo
     );
   }
 
+
+  // ==========================================
+  // ✅ INNOVATION 4.3: CONSEIL DU JOUR
+  // Carte de conseil prédictif basée sur les stats du transporteur.
+  // Adapte le message selon l'heure et les revenus de la journée.
+  // ==========================================
+  Widget _buildConseilDuJour(Map<String, double> statsRevenus) {
+    final heure = DateTime.now().hour;
+    final revenus = statsRevenus['ceJour'] ?? 0;
+    final conseil = _determinerConseil(heure, revenus);
+
+    return Container(
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            conseil.couleur.withValues(alpha: 0.12),
+            conseil.couleur.withValues(alpha: 0.05),
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(color: conseil.couleur.withValues(alpha: 0.25)),
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: conseil.couleur.withValues(alpha: 0.15),
+              shape: BoxShape.circle,
+            ),
+            child: Text(conseil.emoji, style: const TextStyle(fontSize: 22)),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Text(
+                      "Conseil du jour",
+                      style: GoogleFonts.inter(
+                        color: conseil.couleur,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w700,
+                        letterSpacing: 0.5,
+                      ),
+                    ),
+                    const SizedBox(width: 6),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: conseil.couleur.withValues(alpha: 0.15),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text("IA", style: GoogleFonts.inter(color: conseil.couleur, fontSize: 9, fontWeight: FontWeight.bold)),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  conseil.titre,
+                  style: GoogleFonts.inter(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  conseil.description,
+                  style: GoogleFonts.inter(color: Colors.white60, fontSize: 12, height: 1.4),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    ).animate().fadeIn(delay: 400.ms, duration: 300.ms).slideY(begin: 0.1, end: 0);
+  }
+
+  _ConseilJour _determinerConseil(int heure, double revenus) {
+    if (heure >= 6 && heure < 9) {
+      return _ConseilJour(emoji: "🌅", titre: "C'est l'heure de pointe matinale !", description: "Les courses vers les bureaux et marchés sont très demandées entre 7h et 9h. Restez disponible !", couleur: Colors.orange);
+    } else if (heure >= 9 && heure < 12) {
+      return _ConseilJour(emoji: "📦", titre: "Créneau commercial optimal", description: "Les livraisons B2B sont fréquentes le matin. Concentrez-vous sur les zones industrielles.", couleur: CouleursApp.primaire);
+    } else if (heure >= 12 && heure < 14) {
+      return _ConseilJour(emoji: "☕", titre: "Pause méritée !", description: "Moins de demandes sur le créneau déjeuner. Profitez-en pour vous reposer ou refaire le plein.", couleur: CouleursApp.accent);
+    } else if (heure >= 14 && heure < 18) {
+      return _ConseilJour(emoji: "🚛", titre: "L'après-midi est propice aux longues courses", description: "Les trajets interurbains et livraisons commerciales sont fréquents entre 14h-18h.", couleur: CouleursApp.primaireNeon);
+    } else if (heure >= 18 && heure < 22) {
+      return _ConseilJour(
+        emoji: "🌆",
+        titre: revenus > 10000 ? "Excellente journée ! 🔥" : "Pointe du soir — forte demande",
+        description: revenus > 10000 ? "Vous avez gagné ${revenus.toInt()} FCFA aujourd'hui ! Continuez sur cette lancée." : "Les demandes augmentent après 18h. C'est le moment d'augmenter vos revenus.",
+        couleur: revenus > 10000 ? CouleursApp.succes : Colors.deepOrange,
+      );
+    } else {
+      return _ConseilJour(
+        emoji: revenus > 5000 ? "🌟" : "💤",
+        titre: revenus > 5000 ? "Belle journée : ${(revenus / 1000).toStringAsFixed(0)}k FCFA !" : "Temps calme",
+        description: revenus > 5000 ? "Superbe performance ! Reposez-vous bien pour être au top demain." : "Peu de demandes la nuit. Rechargez votre énergie pour une journée chargée.",
+        couleur: revenus > 5000 ? Colors.amber : Colors.blueGrey,
+      );
+    }
+  }
+
   // ==========================================
   // BOTTOM NAVIGATION
   // ==========================================
@@ -531,3 +668,17 @@ class _TableauDeBordTransporteurState extends ConsumerState<TableauDeBordTranspo
   }
 }
 
+/// Modèle de données pour la carte "Conseil du jour"
+class _ConseilJour {
+  final String emoji;
+  final String titre;
+  final String description;
+  final Color couleur;
+
+  const _ConseilJour({
+    required this.emoji,
+    required this.titre,
+    required this.description,
+    required this.couleur,
+  });
+}

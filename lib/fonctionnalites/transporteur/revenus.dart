@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:update_camtrans/coeur/constantes/couleurs.dart';
 import 'package:update_camtrans/coeur/etat/transporteur_provider.dart';
+import 'package:update_camtrans/coeur/widgets/loader_premium.dart';
 
 class Revenus extends ConsumerWidget {
   const Revenus({super.key});
@@ -94,7 +95,7 @@ class Revenus extends ConsumerWidget {
             const SizedBox(height: 15),
 
             fluxRevenus.when(
-              loading: () => const Center(child: CircularProgressIndicator()),
+              loading: () => Center(child: LoaderPremium()),
               error: (err, _) => Text("Erreur: $err"),
               data: (paiements) {
                 if (paiements.isEmpty) {

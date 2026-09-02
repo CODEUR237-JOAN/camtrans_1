@@ -149,6 +149,9 @@ class EtatDemandeExpedition {
       volumeEstime: volumeEstime ?? this.volumeEstime,
       prixEstime: prixEstime ?? this.prixEstime,
       conseilIA: conseilIA ?? this.conseilIA,
+      chauffeurPropose: chauffeurPropose ?? this.chauffeurPropose,
+      distanceApprocheKm: distanceApprocheKm ?? this.distanceApprocheKm,
+      tempsApprocheMin: tempsApprocheMin ?? this.tempsApprocheMin,
     );
   }
 }
@@ -231,8 +234,12 @@ class DemandeExpeditionNotifier extends StateNotifier<EtatDemandeExpedition> {
       );
     } catch (e) {
       debugPrint("️ IA Indisponible (Quota/Erreur), utilisation du fallback : $e");
+      final vehiculeParDefaut = state.categorieService == 'Remorque' 
+          ? "Dépanneuse" 
+          : (state.categorieVehicule.isNotEmpty ? state.categorieVehicule : "Camionnette");
+          
       estimation = {
-        "vehicule": state.categorieVehicule.isNotEmpty ? state.categorieVehicule : "Camionnette",
+        "vehicule": vehiculeParDefaut,
         "volume": "Selon chargement",
         "prix": "Sur devis",
         "conseil": "Le système d'analyse est temporairement saturé. Un conseiller vérifiera vos détails.",
@@ -256,23 +263,45 @@ class DemandeExpeditionNotifier extends StateNotifier<EtatDemandeExpedition> {
 
       // Utilisation de lngClient pour éviter le warning
       state = state.copierAvec(latitudeDepart: latClient, longitudeDepart: lngClient);
-      // ALGORITHME DE MATCHING (version corrigée)
-      // Conditions OBLIGATOIRES pour qu'un transporteur soit éligible :
       Transporteur? chauffeur;
       try {
+        final vehiculeRequis = estimation["vehicule"] ?? state.categorieVehicule;
+        
+        // On récupère TOUS les transporteurs en ligne pour debugger
         final query = await serviceFirestore.transporteurs
-            .where('disponible', isEqualTo: true)
-            .where('documentsValides', isEqualTo: true)
             .where('estEnLigne', isEqualTo: true)
             .get();
         
+        List<Transporteur> candidats = [];
+        debugPrint("🔍 RECHERCHE DE CHAUFFEUR : ${query.docs.length} transporteur(s) en ligne trouvé(s). Véhicule requis = '$vehiculeRequis'");
+        
         for (var doc in query.docs) {
-          final t = Transporteur.fromMap(doc.data() as Map<String, dynamic>);
-          // Vérifier si le transporteur est réellement en ligne (timeout < 1 minute)
-          if (t.estEnLigne) {
-            chauffeur = t;
-            break;
+          final data = doc.data() as Map<String, dynamic>;
+          data['id'] = doc.id;
+          final t = Transporteur.fromMap(data);
+          
+          debugPrint("   👉 Analyse de ${t.prenom} ${t.nom} (ID: ${t.id}) :");
+          debugPrint("      - estEnLigne: ${t.estEnLigne}");
+          debugPrint("      - disponible: ${t.disponible}");
+          debugPrint("      - documentsValides: ${t.documentsValides}");
+          debugPrint("      - typeVehicule: '${t.typeVehicule}' (Requis: '$vehiculeRequis')");
+          
+          // Filtrage rigoureux en mémoire
+          if (t.estEnLigne && t.disponible && t.documentsValides && t.typeVehicule == vehiculeRequis) {
+            candidats.add(t);
+            debugPrint("      ✅ ACCEPTE comme candidat !");
+          } else {
+            debugPrint("      ❌ REJETE.");
           }
+        }
+        
+        // Règle d'équité CamTrans : Priorité au transporteur ayant le moins de courses
+        if (candidats.isNotEmpty) {
+           candidats.sort((a, b) => a.nombreCourses.compareTo(b.nombreCourses));
+           chauffeur = candidats.first;
+           debugPrint("🏆 Chauffeur sélectionné : ${chauffeur.prenom} ${chauffeur.nom}");
+        } else {
+           debugPrint("⚠️ Aucun candidat n'a passé tous les filtres.");
         }
       } catch (e) {
         debugPrint("Erreur lors de la recherche du chauffeur: $e");

@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../coeur/constantes/couleurs.dart';
 import '../../../coeur/etat/textes_app_provider.dart';
 import '../../../modeles/textes_app.dart';
+import 'package:update_camtrans/coeur/widgets/loader_premium.dart';
 
 class PageGestionTextes extends ConsumerStatefulWidget {
   const PageGestionTextes({super.key});
@@ -49,7 +50,7 @@ class _PageGestionTextesState extends ConsumerState<PageGestionTextes> {
   // Valeurs par défaut pour chaque clé — visibles et modifiables directement par l'Admin
   static const Map<String, String> _defaults = {
     'conditions_transporteur':
-        "Bienvenue sur Camtrans !\n\n"
+        "Bienvenue sur CamTrans !\n\n"
         "1. Engagements du Transporteur\n"
         "Vous vous engagez à maintenir votre véhicule en bon état et à respecter les délais de livraison.\n\n"
         "2. Gammes et Tarification\n"
@@ -175,7 +176,7 @@ class _PageGestionTextesState extends ConsumerState<PageGestionTextes> {
         iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: textesAsync.when(
-        loading: () => const Center(child: CircularProgressIndicator(color: CouleursApp.primaire)),
+        loading: () => Center(child: LoaderPremium()),
         error: (err, _) => Center(
           child: Text("Erreur de chargement : $err", style: const TextStyle(color: Colors.red)),
         ),
@@ -308,7 +309,7 @@ class _PageGestionTextesState extends ConsumerState<PageGestionTextes> {
                         ? const SizedBox(
                             width: 18,
                             height: 18,
-                            child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                            child: LoaderPremium(size: 24),
                           )
                         : const Icon(Icons.save_rounded, color: Colors.white),
                     label: Text(

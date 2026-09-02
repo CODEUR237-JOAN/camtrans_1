@@ -233,4 +233,61 @@ Ne rajoute aucun autre texte, juste l'objet JSON.
       return 1500.0; // Poids moyen par défaut
     }
   }
+
+  /// Analyse le texte vocal pour extraire une commande
+  Future<Map<String, dynamic>> analyserIntentionVocale(String texte) async {
+    final apiKey = dotenv.env['GROQ_API_KEY'] ?? '';
+    if (apiKey.isEmpty) throw Exception("Clé API manquante");
+
+    final prompt = """
+Tu es CamTrans Voice, un assistant intelligent pour commander des transports et déménagements.
+L'utilisateur a dit : "$texte"
+
+Analyse cette phrase pour extraire une intention de commande.
+Tu dois renvoyer UNIQUEMENT un JSON structuré comme ceci :
+{
+  "intention": "CREER_COURSE" ou "INCONNU",
+  "depart": "Lieu de départ (ou vide si non spécifié)",
+  "arrivee": "Lieu d'arrivée (ou vide si non spécifié)",
+  "marchandise": "Catégorie déduite (Déménagement, Marchandise standard, Remorque, etc.) ou vide",
+  "complet": true ou false (true seulement si on a au moins un départ, une arrivée et une catégorie),
+  "reponse_vocale": "La phrase que tu diras à l'utilisateur. Si complet=true, dis que tu crées la commande. Si complet=false, demande poliment ce qu'il manque de manière concise."
+}
+
+Ne renvoie que le JSON valide, sans rien d'autre.
+""";
+
+    try {
+      final response = await _dio.post(
+        _baseUrl,
+        data: {
+          "model": "llama3-70b-8192",
+          "messages": [
+            {"role": "system", "content": "Tu es un extracteur JSON. Réponds uniquement en JSON."},
+            {"role": "user", "content": prompt}
+          ],
+          "response_format": {"type": "json_object"}
+        },
+        options: Options(
+          headers: {
+            "Authorization": "Bearer $apiKey",
+            "Content-Type": "application/json",
+          },
+        ),
+      );
+
+      final Map<String, dynamic> data = response.data['choices'][0]['message']['content'] is String 
+          ? jsonDecode(response.data['choices'][0]['message']['content'])
+          : response.data['choices'][0]['message']['content'];
+
+      return data;
+    } catch (e) {
+      debugPrint("Erreur IA Vocale : $e");
+      return {
+        "intention": "ERREUR",
+        "complet": false,
+        "reponse_vocale": "Désolé, je n'ai pas pu analyser votre demande."
+      };
+    }
+  }
 }

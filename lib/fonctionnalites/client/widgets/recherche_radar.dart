@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:update_camtrans/coeur/constantes/couleurs.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-
+import 'dart:math' as math;
 
 class RechercheRadar extends StatelessWidget {
   const RechercheRadar({super.key});
@@ -33,6 +33,29 @@ class RechercheRadar extends StatelessWidget {
                       .scale(duration: const Duration(seconds: 2), begin: const Offset(0.5, 0.5), end: const Offset(1.5, 1.5))
                       .fade(duration: const Duration(seconds: 2), begin: 0.8, end: 0.0);
                 }),
+
+                // Balayage Radar (Sweep)
+                Container(
+                  width: 260,
+                  height: 260,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    gradient: SweepGradient(
+                      center: Alignment.center,
+                      startAngle: 0.0,
+                      endAngle: math.pi * 2,
+                      colors: [
+                        Colors.transparent,
+                        CouleursApp.primaire.withValues(alpha: 0.2),
+                        CouleursApp.primaire.withValues(alpha: 0.6),
+                        Colors.transparent,
+                      ],
+                      stops: const [0.0, 0.7, 0.75, 0.75],
+                    ),
+                  ),
+                )
+                    .animate(onPlay: (controller) => controller.repeat())
+                    .rotate(duration: const Duration(milliseconds: 1500)),
                 
                 // Point central
                 Container(
