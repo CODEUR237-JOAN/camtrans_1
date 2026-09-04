@@ -9,7 +9,8 @@ import 'package:update_camtrans/services/service_authentification.dart';
 import 'package:update_camtrans/coeur/routes/routes.dart';
 import 'package:intl/intl.dart';
 import 'package:update_camtrans/coeur/widgets/loader_premium.dart';
-
+import 'package:update_camtrans/coeur/widgets/carte_information.dart';
+import 'package:update_camtrans/coeur/constantes/statuts.dart';
 class ProfilTransporteur extends ConsumerWidget {
   const ProfilTransporteur({super.key});
 
@@ -143,24 +144,52 @@ class ProfilTransporteur extends ConsumerWidget {
 
                 const SizedBox(height: 25),
 
-                Row(
-                  children: [
-                    Expanded(
-                      child: _statistique(
-                        "Courses",
-                        "${transporteur.nombreCourses}",
-                        Icons.local_shipping,
-                      ),
-                    ),
-                    const SizedBox(width: 15),
-                    Expanded(
-                      child: _statistique(
-                        "Note",
-                        "${transporteur.noteMoyenne} ",
-                        Icons.star,
-                      ),
-                    ),
-                  ],
+                // === SECTION STATISTIQUES (Déplacée depuis le tableau de bord) ===
+                ref.watch(fluxMesCoursesProvider).when(
+                  loading: () => const SizedBox(height: 100, child: Center(child: CircularProgressIndicator())),
+                  error: (err, _) => const SizedBox.shrink(),
+                  data: (toutesLesCourses) {
+                    final courses = toutesLesCourses.where((c) => c.archivePourTransporteur != true).toList();
+                    int livrees = courses.where((c) => c.statut == StatutCourse.arriveDestination || c.statut == StatutCourse.terminee).length;
+                    int enAttente = courses.where((c) => StatutCourse.estActive(c.statut)).length;
+                    
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            "Mes Statistiques",
+                            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                          ),
+                        ),
+                        const SizedBox(height: 15),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: CarteInformation(titre: "Courses", valeur: "${courses.length}", icone: Icons.local_shipping),
+                            ),
+                            const SizedBox(width: 15),
+                            Expanded(
+                              child: CarteInformation(titre: "Livrées", valeur: "$livrees", icone: Icons.check_circle, couleurIcone: Colors.green, couleurValeur: Colors.green),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 15),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: CarteInformation(titre: "En cours", valeur: "$enAttente", icone: Icons.schedule, couleurIcone: Colors.orange, couleurValeur: Colors.orange),
+                            ),
+                            const SizedBox(width: 15),
+                            Expanded(
+                              child: CarteInformation(titre: "Note", valeur: "${transporteur.noteMoyenne} ", icone: Icons.star, couleurIcone: Colors.amber, couleurValeur: Colors.amber),
+                            ),
+                          ],
+                        ),
+                      ],
+                    );
+                  }
                 ),
 
                 const SizedBox(height: 30),

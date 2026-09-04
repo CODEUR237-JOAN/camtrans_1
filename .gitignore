@@ -65,3 +65,9 @@ package-lock.json
 /android/app/profile
 /android/app/release
 android/app/build/
+
+# Fichiers sensibles / scripts de diagnostic
+diag_gemini.ps1
+test_gemini.ps1
+test_ia.dart
+couleurs_usages.txt

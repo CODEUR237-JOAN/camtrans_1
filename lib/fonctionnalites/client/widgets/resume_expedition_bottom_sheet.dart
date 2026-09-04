@@ -74,12 +74,10 @@ class _ResumeExpeditionBottomSheetState extends ConsumerState<ResumeExpeditionBo
       padding: const EdgeInsets.fromLTRB(24, 12, 24, 24),
       margin: etat.categorieService == "Remorque" ? const EdgeInsets.all(16) : EdgeInsets.zero,
       decoration: BoxDecoration(
-        color: etat.categorieService == "Remorque" ? const Color(0xFF0F172A).withValues(alpha: 0.85) : Colors.white,
+        color: const Color(0xFF08111F).withValues(alpha: 0.95),
         borderRadius: etat.categorieService == "Remorque" ? BorderRadius.circular(24.0) : const BorderRadius.vertical(top: Radius.circular(24.0)),
-        border: etat.categorieService == "Remorque" ? Border.all(color: Colors.white.withValues(alpha: 0.1)) : null,
-        boxShadow: etat.categorieService == "Remorque"
-            ? [BoxShadow(color: Colors.black.withValues(alpha: 0.3), blurRadius: 20, spreadRadius: -5)]
-            : null,
+        border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.3), blurRadius: 20, spreadRadius: -5)],
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -91,7 +89,7 @@ class _ResumeExpeditionBottomSheetState extends ConsumerState<ResumeExpeditionBo
               height: 4,
               margin: const EdgeInsets.only(bottom: 12),
               decoration: BoxDecoration(
-                color: Colors.grey.shade300,
+                color: Colors.white24,
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -110,13 +108,13 @@ class _ResumeExpeditionBottomSheetState extends ConsumerState<ResumeExpeditionBo
                           "Résumé de l'expédition",
                           style: Theme.of(context).textTheme.titleLarge?.copyWith(
                             fontWeight: FontWeight.bold,
-                            color: etat.categorieService == "Remorque" ? Colors.white : Colors.black,
+                            color: Colors.white,
                           ),
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
                       IconButton(
-                        icon: Icon(Icons.close, color: etat.categorieService == "Remorque" ? Colors.white : Colors.black),
+                        icon: const Icon(Icons.close, color: Colors.white),
                         onPressed: () => Navigator.pop(context),
                       ),
                     ],
@@ -246,7 +244,7 @@ class _ResumeExpeditionBottomSheetState extends ConsumerState<ResumeExpeditionBo
                                     const SizedBox(height: 2),
                                     Text(
                                       "Calculé équitablement selon la distance et le volume. Sans négociation.",
-                                      style: TextStyle(color: Colors.grey.shade700, fontSize: 11),
+                                      style: TextStyle(color: Colors.white70, fontSize: 11),
                                     ),
                                   ],
                                 ),
@@ -306,16 +304,6 @@ class _ResumeExpeditionBottomSheetState extends ConsumerState<ResumeExpeditionBo
                     return;
                   }
 
-                  if (etat.chauffeurPropose == null) {
-                    final vehiculeRequis = etatEstimation.resultat?.vehiculeRecommande ?? etat.categorieVehicule;
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text("Aucun transporteur disponible ($vehiculeRequis) dans votre zone."),
-                        backgroundColor: CouleursApp.erreur,
-                      ),
-                    );
-                    return;
-                  }
 
                   // Afficher le Radar pendant l'affectation
                   showGeneralDialog(
@@ -579,14 +567,12 @@ class _ResumeExpeditionBottomSheetState extends ConsumerState<ResumeExpeditionBo
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(label, style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.grey)),
+              Text(label, style: const TextStyle(color: Colors.white54, fontSize: 12)),
               const SizedBox(height: 2),
-              Text(value, style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                fontWeight: FontWeight.w600,
-                color: label == "Détails" || label == "Service" || label == "Trajet" || label == "Véhicule" || label == "Chauffeur" || label == "Date de la demande" 
-                    ? (ref.read(demandeExpeditionProvider).categorieService == "Remorque" ? Colors.white : Colors.black)
-                    : null,
-              )),
+              Text(
+                value,
+                style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14, color: Colors.white),
+              ),
             ],
           ),
         ),

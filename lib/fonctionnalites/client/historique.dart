@@ -42,11 +42,14 @@ class _HistoriqueState extends ConsumerState<Historique> {
     );
     if (confirm != true || !mounted) return;
     final firestore = ref.read(serviceFirestoreProvider);
-    await firestore.supprimerDocument(collection: 'courses', id: course.id);
+    await firestore.modifierDocument(
+        collection: 'courses',
+        id: course.id,
+        donnees: {'archivePourClient': true});
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text("Course supprimée avec succès"),
+          content: Text("Course archivée avec succès"),
           backgroundColor: Colors.green,
         ),
       );

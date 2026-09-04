@@ -330,60 +330,7 @@ class _TableauDeBordTransporteurState extends ConsumerState<TableauDeBordTranspo
                 ),
               ),
 
-              const SizedBox(height: 35),
 
-              // STATISTIQUES
-              Text(
-                "Statistiques",
-                style: GoogleFonts.inter(fontSize: 20, fontWeight: FontWeight.w700, letterSpacing: -0.5, color: Theme.of(context).brightness == Brightness.dark ? Colors.white : CouleursApp.textePrincipal),
-              ),
-              const SizedBox(height: 15),
-
-              mesCoursesAsync.when(
-                loading: () => Column(
-                  children: <Widget>[
-                    ...List.generate(2, (index) => Container(
-                      height: 100, margin: const EdgeInsets.only(bottom: 10),
-                      decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(20)),
-                    ).animate(onPlay: (controller) => controller.repeat()).shimmer(color: Colors.white.withValues(alpha: 0.08), duration: 1.5.seconds)),
-                  ],
-                ),
-                error: (err, _) => const SizedBox.shrink(),
-                data: (courses) {
-                  int livrees = courses.where((c) => c.statut == StatutCourse.arriveDestination || c.statut == StatutCourse.terminee).length;
-                  int enAttente = courses.where((c) => StatutCourse.estActive(c.statut)).length;
-                  
-                  return Column(
-                    children: [
-                      Row(
-                        children: [
-                          Expanded(
-                            child: CarteInformation(titre: "Courses", valeur: "${courses.length}", icone: Icons.local_shipping),
-                          ),
-                          const SizedBox(width: 15),
-                          Expanded(
-                            child: CarteInformation(titre: "Livrées", valeur: "$livrees", icone: Icons.check_circle, couleurIcone: Colors.green, couleurValeur: Colors.green),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: 15),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: CarteInformation(titre: "En cours", valeur: "$enAttente", icone: Icons.schedule, couleurIcone: Colors.orange, couleurValeur: Colors.orange),
-                          ),
-                          const SizedBox(width: 15),
-                          Expanded(
-                            child: CarteInformation(titre: "Note", valeur: "4.9 ", icone: Icons.star, couleurIcone: Colors.amber, couleurValeur: Colors.amber),
-                          ),
-                        ],
-                      ),
-                    ],
-                  );
-                }
-              ),
-
-              const SizedBox(height: 24),
 
               // ✅ INNOVATION 4.3: CARTE "CONSEIL DU JOUR" - Astuces prédictives
               _buildConseilDuJour(statsRevenus),

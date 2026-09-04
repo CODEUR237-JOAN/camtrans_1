@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
 
@@ -96,7 +97,7 @@ class GpsTracker {
             "latitude": position.latitude,
             "longitude": position.longitude,
           },
-        );
+        ).catchError((_) {});
         
         // Optionnel : Mise à jour côté client si besoin de tracker les clients
         firestore.modifierDocument(
@@ -106,9 +107,9 @@ class GpsTracker {
             "latitude": position.latitude,
             "longitude": position.longitude,
           },
-        );
+        ).catchError((_) {});
       } catch (e) {
-        // Ignorer silencieusement si le document n'existe pas dans l'une des collections
+        debugPrint("Erreur locale maj GPS: $e");
       }
     });
   }

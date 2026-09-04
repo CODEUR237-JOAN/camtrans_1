@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:update_camtrans/coeur/widgets/assistant_vocal_widget.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:go_router/go_router.dart';
@@ -90,6 +91,7 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
 
     return Scaffold(
       backgroundColor: const Color(0xFF08111F),
+      floatingActionButton: const BoutonAssistantVocal(),
       body: Stack(
         children: [
           // Blob lumineux haut-gauche (comme admin)
@@ -201,12 +203,12 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
         slivers: [
           SliverToBoxAdapter(child: _buildHeader()),
           SliverToBoxAdapter(child: _buildServiceCategories(context)),
-          SliverToBoxAdapter(child: _buildQuickServices()),
           
           coursesAsync.when(
             loading: () => SliverToBoxAdapter(child: _buildLoadingState()),
             error: (err, stack) => SliverToBoxAdapter(child: _buildErrorState(err.toString())),
-            data: (courses) {
+            data: (toutesLesCourses) {
+              final courses = toutesLesCourses.where((c) => c.archivePourClient != true).toList();
               final enCours = courses.where((c) => !StatutCourse.estTerminee(c.statut)).toList();
               final livrees = courses.where((c) => c.statut == StatutCourse.arriveDestination || c.statut == StatutCourse.terminee).toList();
               
@@ -217,11 +219,11 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
 
               return SliverList(
                 delegate: SliverChildListDelegate(<Widget>[
-                  _buildStats(livraisons: livrees.length, depenses: depenses, enCours: enCours.length),
                   if (courses.isEmpty) _buildEmptyState(),
                   if (enCours.isNotEmpty) _buildActiveShipment(enCours.first),
                   if (enCours.isNotEmpty) _buildMiniMap(enCours.first),
-                  if (courses.isNotEmpty) _buildHistoryList(courses.where((c) => StatutCourse.estTerminee(c.statut)).toList()),
+                  if (courses.where((c) => StatutCourse.estTerminee(c.statut)).isNotEmpty)
+                    _buildHistoryList(courses.where((c) => StatutCourse.estTerminee(c.statut)).toList()),
                   const SizedBox(height: 100),
                 ]),
               );
@@ -375,82 +377,7 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
   }
 
 
-  // ==========================================
-  // SERVICES RAPIDES
-  // ==========================================
-  Widget _buildQuickServices() {
-    final services = [
-      {"icon": Iconsax.box_copy, "title": "Mes Colis", "color": CouleursApp.avertissement, "action": () => setState(() => _bottomNavIndex = 1)},
-      {"icon": Iconsax.document_copy, "title": "Factures", "color": CouleursApp.primaire, "action": () => context.push(RoutesApplication.factures)},
-      {"icon": Iconsax.messages_2_copy, "title": "Support", "color": CouleursApp.erreur, "action": () => context.push(RoutesApplication.assistantIA)},
-    ];
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 20),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: services.map((s) {
-          return _BoutonServiceRapide(
-            icon: s['icon'] as IconData,
-            title: s['title'] as String,
-            color: s['color'] as Color,
-            onTap: s['action'] as VoidCallback,
-          );
-        }).toList(),
-      ),
-    );
-  }
-
-  // ==========================================
-  // STATISTIQUES ANIMÉES
-  // ==========================================
-  Widget _buildStats({required int livraisons, required double depenses, required int enCours}) {
-    // Format des dépenses (k si > 1000)
-    String depensesText = depenses >= 1000 ? "${(depenses / 1000).toStringAsFixed(1)}k" : depenses.toStringAsFixed(0);
-
-    return SizedBox(
-      height: 100,
-      child: ListView(
-        scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 20),
-        children: [
-          _buildStatCard("Livraisons", livraisons.toString(), Iconsax.box_tick_copy, CouleursApp.succes),
-          const SizedBox(width: 15),
-          _buildStatCard("Dépenses", depensesText, Iconsax.coin_copy, CouleursApp.avertissement),
-          const SizedBox(width: 15),
-          _buildStatCard("En cours", enCours.toString(), Iconsax.truck_copy, CouleursApp.primaire),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildStatCard(String title, String value, IconData icon, Color color) {
-    return Container(
-      width: 155,
-      padding: const EdgeInsets.all(15),
-      decoration: BoxDecoration(
-        color: const Color(0xFF10192A),
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [BoxShadow(color: color.withValues(alpha: 0.1), blurRadius: 15, offset: const Offset(0, 5))],
-        border: Border.all(color: color.withValues(alpha: 0.1)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Icon(icon, color: color, size: 24),
-              Text(value, style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: color)),
-            ],
-          ),
-          const Spacer(),
-          Text(title, style: const TextStyle(fontSize: 14, color: Colors.white70, fontWeight: FontWeight.w600)),
-        ],
-      ),
-    );
-  }
 
   // ==========================================
   // LIVRAISON EN COURS (TIMELINE)
