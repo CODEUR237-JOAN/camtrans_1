@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- XMI 1.2 / UML 1.4 compatible Sybase PowerAMC 15 -->
+<!-- Import: Fichier > Import > XMI dans PowerAMC -->
+<XMI xmi.version="1.2" xmlns:UML="org.omg.xmi.namespace.UML">
+  <XMI.header>
+    <XMI.documentation>
+      <XMI.owner>CamTrans</XMI.owner>
+      <XMI.contact>Diagramme de Communication - Consulter Demande</XMI.contact>
+    </XMI.documentation>
+    <XMI.metamodel xmi.name="UML" xmi.version="1.4"/>
+  </XMI.header>
+
+  <XMI.content>
+    <UML:Model xmi.id="model_comm" name="Communication - Consulter Demande">
+      <!-- Classes / Acteurs de base -->
+      <UML:Actor xmi.id="act_transporteur" name="Transporteur" isAbstract="false"/>
+      <UML:Class xmi.id="cls_systeme" name="Système" isAbstract="false"/>
+      <UML:Class xmi.id="cls_sgbd" name="SGBD" isAbstract="false"/>
+
+      <!-- Collaboration (Le diagramme en lui-même) -->
+      <UML:Collaboration xmi.id="collab_1" name="Cas d'utilisation : Consulter Demande">
+        
+        <!-- Les rôles (Lifelines) -->
+        <UML:Collaboration.ownedElement>
+          <UML:ClassifierRole xmi.id="cr_transporteur" name="Transporteur" base="act_transporteur"/>
+          <UML:ClassifierRole xmi.id="cr_systeme" name="Système" base="cls_systeme"/>
+          <UML:ClassifierRole xmi.id="cr_sgbd" name="SGBD" base="cls_sgbd"/>
+          
+          <!-- Les liens de communication (Associations) -->
+          <UML:AssociationRole xmi.id="link_transp_syst" name="Lien_Transp_Syst">
+            <UML:AssociationRole.connection>
+              <UML:AssociationEndRole xmi.id="aer_1" type="cr_transporteur"/>
+              <UML:AssociationEndRole xmi.id="aer_2" type="cr_systeme"/>
+            </UML:AssociationRole.connection>
+          </UML:AssociationRole>
+
+          <UML:AssociationRole xmi.id="link_syst_sgbd" name="Lien_Syst_SGBD">
+            <UML:AssociationRole.connection>
+              <UML:AssociationEndRole xmi.id="aer_3" type="cr_systeme"/>
+              <UML:AssociationEndRole xmi.id="aer_4" type="cr_sgbd"/>
+            </UML:AssociationRole.connection>
+          </UML:AssociationRole>
+        </UML:Collaboration.ownedElement>
+
+        <!-- Les messages échangés -->
+        <UML:Collaboration.interaction>
+          <UML:Interaction xmi.id="int_1" name="Scénario Acceptation">
+            <UML:Interaction.message>
+              <UML:Message xmi.id="msg_1" name="1: afficherPopupProposition()" sender="cr_systeme" receiver="cr_transporteur" communicationConnection="link_transp_syst"/>
+              <UML:Message xmi.id="msg_2" name="2: cliquerAccepter()" sender="cr_transporteur" receiver="cr_systeme" communicationConnection="link_transp_syst"/>
+              <UML:Message xmi.id="msg_3" name="3: verifierDisponibilite()" sender="cr_systeme" receiver="cr_sgbd" communicationConnection="link_syst_sgbd"/>
+              <UML:Message xmi.id="msg_4" name="4: retournerConfirmation()" sender="cr_sgbd" receiver="cr_systeme" communicationConnection="link_syst_sgbd"/>
+              <UML:Message xmi.id="msg_5" name="5: majStatut(Acceptée)" sender="cr_systeme" receiver="cr_sgbd" communicationConnection="link_syst_sgbd"/>
+              <UML:Message xmi.id="msg_6" name="6: afficherSuiviGPS()" sender="cr_systeme" receiver="cr_transporteur" communicationConnection="link_transp_syst"/>
+            </UML:Interaction.message>
+          </UML:Interaction>
+        </UML:Collaboration.interaction>
+        
+      </UML:Collaboration>
+    </UML:Model>
+  </XMI.content>
+</XMI>

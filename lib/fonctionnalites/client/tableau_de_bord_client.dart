@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -91,7 +90,6 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
 
     return Scaffold(
       backgroundColor: const Color(0xFF08111F),
-      floatingActionButton: const BoutonAssistantVocal(),
       body: Stack(
         children: [
           // Blob lumineux haut-gauche (comme admin)
@@ -830,7 +828,11 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
               children: [
                 _buildNavItem(0, Iconsax.home_2_copy, Iconsax.home_2, "Accueil"),
                 _buildNavItem(1, Iconsax.truck_copy, Iconsax.truck, "Demandes"),
-                _buildNavItem(2, Iconsax.location_copy, Iconsax.location, "Suivi"),
+                // Bouton IA central — mode compact, intégré dans la navbar
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 4),
+                  child: BoutonAssistantVocal(compact: true),
+                ),
                 _buildNavItem(3, Iconsax.notification_copy, Iconsax.notification, "Alerte"),
                 _buildNavItem(4, Iconsax.user_copy, Iconsax.user, "Profil"),
               ],

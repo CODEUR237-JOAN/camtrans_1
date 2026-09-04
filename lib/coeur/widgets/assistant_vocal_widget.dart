@@ -7,7 +7,10 @@ import 'package:update_camtrans/coeur/constantes/couleurs.dart';
 import 'package:update_camtrans/services/service_assistant_vocal.dart';
 
 class BoutonAssistantVocal extends ConsumerWidget {
-  const BoutonAssistantVocal({super.key});
+  /// Si [compact] est true, le bouton s'affiche en mode mini (40px)
+  /// pour s'intégrer dans la barre de navigation sans cacher les autres onglets.
+  final bool compact;
+  const BoutonAssistantVocal({super.key, this.compact = false});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -19,17 +22,32 @@ class BoutonAssistantVocal extends ConsumerWidget {
       return const SizedBox.shrink();
     }
 
-    return FloatingActionButton(
-      heroTag: 'voiceAssistant',
-      onPressed: () {
+    final double size = compact ? 44 : 56;
+    final double iconSize = compact ? 20 : 28;
+
+    return GestureDetector(
+      onTap: () {
         _afficherBottomSheet(context, ref, service);
         if (etatAssistant == EtatAssistant.repos || etatAssistant == EtatAssistant.erreur) {
            service.demarrerEcoute(isWakeWord: true);
         }
       },
-      backgroundColor: CouleursApp.primaire,
-      elevation: 8,
-      child: const Icon(Iconsax.microphone_2_copy, color: Colors.white, size: 28),
+      child: Container(
+        width: size,
+        height: size,
+        decoration: BoxDecoration(
+          color: CouleursApp.primaire,
+          shape: BoxShape.circle,
+          boxShadow: [
+            BoxShadow(
+              color: CouleursApp.primaire.withValues(alpha: 0.45),
+              blurRadius: compact ? 12 : 18,
+              spreadRadius: compact ? 1 : 3,
+            ),
+          ],
+        ),
+        child: Icon(Iconsax.microphone_2_copy, color: Colors.white, size: iconSize),
+      ),
     )
     .animate(onPlay: (controller) => controller.repeat(reverse: true))
     .scale(begin: const Offset(1, 1), end: const Offset(1.05, 1.05), duration: 1500.ms)
@@ -99,78 +117,82 @@ class _AssistantBottomSheetState extends ConsumerState<AssistantBottomSheet> {
           BoxShadow(color: Colors.black.withValues(alpha: 0.5), blurRadius: 30, offset: const Offset(0, -10))
         ],
       ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          // Bouton fermer
-          Align(
-            alignment: Alignment.topRight,
-            child: IconButton(
-              icon: const Icon(Icons.close, color: Colors.white54),
-              onPressed: () {
-                Navigator.pop(context);
-              },
-            ),
-          ),
-          
-          const SizedBox(height: 10),
-
-          // Animation Centrale
-          _buildAnimation(etatAssistant),
-
-          const SizedBox(height: 30),
-
-          // Texte
-          AnimatedSwitcher(
-            duration: const Duration(milliseconds: 300),
-            child: Text(
-              _texteAffiche,
-              key: ValueKey<String>(_texteAffiche),
-              textAlign: TextAlign.center,
-              style: TextStyle(
-                color: etatAssistant == EtatAssistant.erreur ? Colors.redAccent : Colors.white,
-                fontSize: 18,
-                fontWeight: etatAssistant == EtatAssistant.parle ? FontWeight.normal : FontWeight.w600,
+      // Le SingleChildScrollView permet au contenu de défiler si l'écran est trop petit,
+      // évitant le débordement (overflow) de 14 pixels observé sur petits écrans.
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Bouton fermer
+            Align(
+              alignment: Alignment.topRight,
+              child: IconButton(
+                icon: const Icon(Icons.close, color: Colors.white54),
+                onPressed: () {
+                  Navigator.pop(context);
+                },
               ),
-            ),
-          ),
-
-          const SizedBox(height: 40),
-
-          // Bouton d'action manuel
-          if (etatAssistant == EtatAssistant.ecoute || etatAssistant == EtatAssistant.veille)
-            ElevatedButton(
-              onPressed: () => service.arreterEcoute(), // Arrête l'écoute et lance le traitement ou retourne au repos
-              style: ElevatedButton.styleFrom(
-                backgroundColor: CouleursApp.primaire,
-                shape: const CircleBorder(),
-                padding: const EdgeInsets.all(16),
-              ),
-              child: const Icon(Icons.stop, color: Colors.white, size: 28),
-            )
-          else if (etatAssistant == EtatAssistant.repos || etatAssistant == EtatAssistant.erreur)
-            ElevatedButton(
-              onPressed: () => service.demarrerEcoute(isWakeWord: false),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: CouleursApp.primaire,
-                shape: const CircleBorder(),
-                padding: const EdgeInsets.all(16),
-              ),
-              child: const Icon(Icons.mic, color: Colors.white, size: 28),
-            )
-          else if (etatAssistant == EtatAssistant.parle)
-             ElevatedButton(
-              onPressed: () => service.arreterEcoute(),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.white24,
-                shape: const CircleBorder(),
-                padding: const EdgeInsets.all(16),
-              ),
-              child: const Icon(Icons.close, color: Colors.white, size: 28),
             ),
             
-          const SizedBox(height: 20),
-        ],
+            const SizedBox(height: 10),
+
+            // Animation centrale qui change selon l'état de l'assistant
+            _buildAnimation(etatAssistant),
+
+            const SizedBox(height: 30),
+
+            // Texte de statut mis à jour en temps réel
+            AnimatedSwitcher(
+              duration: const Duration(milliseconds: 300),
+              child: Text(
+                _texteAffiche,
+                key: ValueKey<String>(_texteAffiche),
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: etatAssistant == EtatAssistant.erreur ? Colors.redAccent : Colors.white,
+                  fontSize: 18,
+                  fontWeight: etatAssistant == EtatAssistant.parle ? FontWeight.normal : FontWeight.w600,
+                ),
+              ),
+            ),
+
+            const SizedBox(height: 40),
+
+            // Bouton d'action dont l'icône change selon l'état de l'assistant
+            if (etatAssistant == EtatAssistant.ecoute || etatAssistant == EtatAssistant.veille)
+              ElevatedButton(
+                onPressed: () => service.arreterEcoute(),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: CouleursApp.primaire,
+                  shape: const CircleBorder(),
+                  padding: const EdgeInsets.all(16),
+                ),
+                child: const Icon(Icons.stop, color: Colors.white, size: 28),
+              )
+            else if (etatAssistant == EtatAssistant.repos || etatAssistant == EtatAssistant.erreur)
+              ElevatedButton(
+                onPressed: () => service.demarrerEcoute(isWakeWord: false),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: CouleursApp.primaire,
+                  shape: const CircleBorder(),
+                  padding: const EdgeInsets.all(16),
+                ),
+                child: const Icon(Icons.mic, color: Colors.white, size: 28),
+              )
+            else if (etatAssistant == EtatAssistant.parle)
+              ElevatedButton(
+                onPressed: () => service.arreterEcoute(),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.white24,
+                  shape: const CircleBorder(),
+                  padding: const EdgeInsets.all(16),
+                ),
+                child: const Icon(Icons.close, color: Colors.white, size: 28),
+              ),
+              
+            const SizedBox(height: 20),
+          ],
+        ),
       ),
     );
   }

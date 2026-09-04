@@ -10,7 +10,8 @@ class ServiceFirestore {
       FirebaseFirestore.instance;
 
   // ===========================
-  // Collections
+  // Accès aux Collections Principales
+  // Ces getters fournissent un accès direct aux tables de la base de données Firestore.
   // ===========================
 
   CollectionReference<Map<String, dynamic>>
@@ -38,8 +39,11 @@ class ServiceFirestore {
       _db.collection("notifications");
 
   // ===========================
-  // Ajouter un document
+  // Opérations d'Écriture : Ajout
   // ===========================
+
+  /// Crée un nouveau document dans la collection spécifiée.
+  /// Écrase les données si le document existe déjà avec le même identifiant.
 
   Future<void> ajouterDocument({
     required String collection,
@@ -53,16 +57,17 @@ class ServiceFirestore {
   }
 
   // ===========================
-  // Modifier un document
+  // Opérations d'Écriture : Modification
   // ===========================
 
+  /// Met à jour les champs spécifiques d'un document existant.
+  /// Utilise `SetOptions(merge: true)` pour garantir que si le document 
+  /// n'existe pas encore, il sera créé sans provoquer d'erreur technique.
   Future<void> modifierDocument({
     required String collection,
     required String id,
     required Map<String, dynamic> donnees,
   }) async {
-    // Utilisation de set avec merge: true au lieu de update
-    // Cela évite l'erreur "No document to update" si le document n'existe pas encore
     await _db
         .collection(collection)
         .doc(id)
@@ -70,8 +75,10 @@ class ServiceFirestore {
   }
 
   // ===========================
-  // Supprimer un document
+  // Opérations d'Écriture : Suppression
   // ===========================
+
+  /// Supprime définitivement un document de la base de données.
 
   Future<void> supprimerDocument({
     required String collection,
@@ -83,23 +90,48 @@ class ServiceFirestore {
         .delete();
   }
 
-  /// Supprime les courses terminées ou annulées d'un utilisateur (client ou transporteur)
+  /// Masque les courses terminées du CLIENT dans son historique.
+  /// Chaque rôle a son propre flag d'archivage — l'admin voit toujours tout.
   Future<int> supprimerCoursesTerminees(String userId, {bool estClient = true}) async {
-    final champ = estClient ? 'clientId' : 'transporteurId';
+    if (!estClient) {
+      return archiverCoursesTerminees(userId);
+    }
     final snapshot = await _db
         .collection('courses')
-        .where(champ, isEqualTo: userId)
+        .where('clientId', isEqualTo: userId)
         .where('statut', whereIn: ['terminee', 'annulee'])
         .get();
     final batch = _db.batch();
     for (final doc in snapshot.docs) {
-      batch.delete(doc.reference);
+      // Archivage logique : le client masque sa vue, l'admin et le transporteur
+      // conservent accès à la même course via leurs propres flags.
+      if (doc.data()['archivePourClient'] != true) {
+        batch.update(doc.reference, {'archivePourClient': true});
+      }
     }
     await batch.commit();
     return snapshot.docs.length;
   }
 
-  /// [ADMIN] Supprime TOUTES les courses terminées/annulées de la base (purge globale)
+  /// Archive logiquement les courses du transporteur (flag Firestore).
+  /// Le transporteur ne peut pas supprimer les courses, mais peut les masquer.
+  Future<int> archiverCoursesTerminees(String userId) async {
+    final snapshot = await _db
+        .collection('courses')
+        .where('transporteurId', isEqualTo: userId)
+        .where('statut', whereIn: ['terminee', 'annulee'])
+        .get();
+    final batch = _db.batch();
+    for (final doc in snapshot.docs) {
+      batch.update(doc.reference, {'archivePourTransporteur': true});
+    }
+    await batch.commit();
+    return snapshot.docs.length;
+  }
+
+  /// [ADMINISTRATION] Purge globale de la base de données.
+  /// Supprime toutes les courses inactives (terminées ou annulées) de tous les utilisateurs
+  /// pour libérer de l'espace de stockage. Action irréversible.
   Future<int> purgerHistoriqueGlobal() async {
     final snapshot = await _db
         .collection('courses')
@@ -113,7 +145,8 @@ class ServiceFirestore {
     return snapshot.docs.length;
   }
 
-  /// [ADMIN] Supprime un compte utilisateur (son profil + toutes ses courses)
+  /// [ADMINISTRATION] Suppression d'un compte utilisateur.
+  /// Efface le profil de l'utilisateur ainsi que tout son historique de courses associé.
   Future<void> supprimerCompteUtilisateur(String userId, String role) async {
     final batch = _db.batch();
     // Supprimer le profil
@@ -133,8 +166,10 @@ class ServiceFirestore {
   }
 
   // ===========================
-  // Lire un document
+  // Opérations de Lecture Simple
   // ===========================
+
+  /// Récupère les informations d'un document spécifique de manière asynchrone (une seule fois).
 
   Future<DocumentSnapshot<Map<String, dynamic>>>
   lireDocument({
@@ -148,8 +183,11 @@ class ServiceFirestore {
   }
 
   // ===========================
-  // Flux d'un document
+  // Écoute en Temps Réel (Streaming) : Document unique
   // ===========================
+
+  /// Permet d'écouter les modifications d'un document en temps réel.
+  /// L'interface utilisateur se mettra à jour automatiquement dès que les données changent dans Firestore.
 
   Stream<DocumentSnapshot<Map<String, dynamic>>>
   fluxDocument({
@@ -163,8 +201,10 @@ class ServiceFirestore {
   }
 
   // ===========================
-  // Flux d'une collection
+  // Écoute en Temps Réel (Streaming) : Collection entière
   // ===========================
+
+  /// Permet d'écouter les modifications sur l'ensemble d'une collection.
 
   Stream<QuerySnapshot<Map<String, dynamic>>>
   fluxCollection({

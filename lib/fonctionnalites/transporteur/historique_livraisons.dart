@@ -124,16 +124,20 @@ class _HistoriquelivraisonsState
                 error: (error, _) =>
                     Center(child: Text("Impossible de charger l'historique : $error 🔧")),
                 data: (courses) {
-                  if (courses.isEmpty) {
+                  // Exclure les courses archivées côté transporteur (swipe suppression logique)
+                  final coursesVisibles = courses
+                      .where((c) => c.archivePourTransporteur != true)
+                      .toList();
+                  if (coursesVisibles.isEmpty) {
                     return const Center(
                         child:
                             Text("Aucune livraison complétée. C'est le moment de prendre la route ! 🚚"));
                   }
 
                   return ListView.builder(
-                    itemCount: courses.length,
+                    itemCount: coursesVisibles.length,
                     itemBuilder: (context, index) {
-                      final course = courses[index];
+                      final course = coursesVisibles[index];
                       final peutSuppr = _peutSupprimer(course);
                       final card = Card(
                         elevation: 3,
@@ -229,14 +233,18 @@ class _HistoriquelivraisonsState
                             );
                           },
                           onDismissed: (_) async {
+                            // On n'efface pas la course (données métier protégées).
+                            // On la masque côté transporteur avec un flag d'archivage.
                             await ref
                                 .read(serviceFirestoreProvider)
-                                .supprimerDocument(
-                                    collection: 'courses', id: course.id);
+                                .modifierDocument(
+                                    collection: 'courses',
+                                    id: course.id,
+                                    donnees: {'archivePourTransporteur': true});
                             if (context.mounted) {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
-                                  content: Text("Livraison supprimée"),
+                                  content: Text("Livraison archivée"),
                                   backgroundColor: Colors.green,
                                 ),
                               );

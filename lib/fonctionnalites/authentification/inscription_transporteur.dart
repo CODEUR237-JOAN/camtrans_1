@@ -76,8 +76,9 @@ class _InscriptionTransporteurState extends ConsumerState<InscriptionTransporteu
     final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
     if (image != null) {
       setState(() {
-        if (docType == 'permis') _photoPermis = image;
-        else if (docType == 'carte_grise') _photoCarteGrise = image;
+        if (docType == 'permis') {
+          _photoPermis = image;
+        } else if (docType == 'carte_grise') _photoCarteGrise = image;
         else if (docType == 'assurance') _photoAssurance = image;
         else if (docType == 'vehicule_avant') _photoVehiculeAvant = image;
         else if (docType == 'vehicule_arriere') _photoVehiculeArriere = image;
@@ -434,7 +435,7 @@ class _InscriptionTransporteurState extends ConsumerState<InscriptionTransporteu
                           ),
                         ),
                         child: DropdownButtonFormField<String>(
-                          value: _vehicule,
+                          initialValue: _vehicule,
                           style: const TextStyle(
                             color: Color(0xFF1E293B),
                             fontSize: 15,
@@ -497,7 +498,7 @@ class _InscriptionTransporteurState extends ConsumerState<InscriptionTransporteu
                           ),
                         ),
                         child: DropdownButtonFormField<String>(
-                          value: _gammeChoisie,
+                          initialValue: _gammeChoisie,
                           style: const TextStyle(
                             color: Color(0xFF1E293B),
                             fontSize: 15,

@@ -167,7 +167,7 @@ class _AdressesFavoritesPageState extends ConsumerState<AdressesFavoritesPage> {
           top: 32, left: 24, right: 24,
         ),
         decoration: const BoxDecoration(
-          color: const Color(0xFF10192A),
+          color: Color(0xFF10192A),
           borderRadius: BorderRadius.only(topLeft: Radius.circular(32), topRight: Radius.circular(32)),
         ),
         child: Column(

@@ -265,7 +265,10 @@ class DemandeExpeditionNotifier extends StateNotifier<EtatDemandeExpedition> {
       state = state.copierAvec(latitudeDepart: latClient, longitudeDepart: lngClient);
       Transporteur? chauffeur;
       try {
-        final vehiculeRequis = estimation["vehicule"] ?? state.categorieVehicule;
+        // Règle métier absolue : si c'est une remorque, c'est TOUJOURS une Dépanneuse, peu importe ce que dit l'IA.
+        final vehiculeRequis = state.categorieService == 'Remorque' 
+            ? "Dépanneuse" 
+            : (estimation["vehicule"] ?? state.categorieVehicule);
         
         // On récupère TOUS les transporteurs en ligne pour debugger
         final query = await serviceFirestore.transporteurs
@@ -276,7 +279,7 @@ class DemandeExpeditionNotifier extends StateNotifier<EtatDemandeExpedition> {
         debugPrint("🔍 RECHERCHE DE CHAUFFEUR : ${query.docs.length} transporteur(s) en ligne trouvé(s). Véhicule requis = '$vehiculeRequis'");
         
         for (var doc in query.docs) {
-          final data = doc.data() as Map<String, dynamic>;
+          final data = doc.data();
           data['id'] = doc.id;
           final t = Transporteur.fromMap(data);
           

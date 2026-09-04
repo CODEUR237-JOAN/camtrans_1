@@ -280,8 +280,9 @@ final adminCourseDistributionProvider = Provider.autoDispose<AsyncValue<Map<Stri
       String statutClean;
       
       // Normalisation des anciens statuts ou variations
-      if (raw.contains('livr') || raw.contains('termin')) statutClean = StatutCourse.terminee;
-      else if (raw.contains('accept') || raw.contains('attribu')) statutClean = StatutCourse.attribue;
+      if (raw.contains('livr') || raw.contains('termin')) {
+        statutClean = StatutCourse.terminee;
+      } else if (raw.contains('accept') || raw.contains('attribu')) statutClean = StatutCourse.attribue;
       else if (raw.contains('cour') || raw.contains('transit') || raw.contains('rout')) statutClean = StatutCourse.enTransit;
       else if (raw.contains('attent') || raw.contains('recherch')) statutClean = StatutCourse.recherche;
       else if (raw.contains('annul')) statutClean = StatutCourse.annulee;

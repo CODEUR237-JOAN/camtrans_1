@@ -98,7 +98,7 @@ class PageAbonnementsAdmin extends ConsumerWidget {
                     ),
                   )
                 else
-                  ...abonnements.map((a) => _carteAbonnement(a)).toList(),
+                  ...abonnements.map((a) => _carteAbonnement(a)),
               ],
             ),
           );

@@ -29,7 +29,7 @@ class MonApplication extends ConsumerWidget {
 
           theme: ThemeApplication.themeClair,
           darkTheme: ThemeApplication.themeSombre,
-          themeMode: ThemeMode.system,
+          themeMode: ThemeMode.dark,
 
           localizationsDelegates: const [
             GlobalMaterialLocalizations.delegate,

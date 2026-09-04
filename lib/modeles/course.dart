@@ -61,6 +61,12 @@ class Course {
   final String codePinLivraison;
   final bool fondsDebloques;
 
+  //---------------- Archivage logique -------//
+  /// Si true, la course est masquée dans l'historique du transporteur
+  final bool archivePourTransporteur;
+  /// Si true, la course est masquée dans l'historique du client
+  final bool archivePourClient;
+
   const Course({
     required this.id,
     required this.clientId,
@@ -112,6 +118,8 @@ class Course {
     this.expirationProposition,
     this.codePinLivraison = "",
     this.fondsDebloques = false,
+    this.archivePourTransporteur = false,
+    this.archivePourClient = false,
   });
 
   Course copyWith({
@@ -165,6 +173,8 @@ class Course {
     DateTime? expirationProposition,
     String? codePinLivraison,
     bool? fondsDebloques,
+    bool? archivePourTransporteur,
+    bool? archivePourClient,
   }) {
     return Course(
       id: id ?? this.id,
@@ -217,6 +227,8 @@ class Course {
       expirationProposition: expirationProposition ?? this.expirationProposition,
       codePinLivraison: codePinLivraison ?? this.codePinLivraison,
       fondsDebloques: fondsDebloques ?? this.fondsDebloques,
+      archivePourTransporteur: archivePourTransporteur ?? this.archivePourTransporteur,
+      archivePourClient: archivePourClient ?? this.archivePourClient,
     );
   }
 
@@ -327,6 +339,8 @@ class Course {
       expirationProposition: map['expirationProposition'] != null ? Parseur.toDateTime(map['expirationProposition']) : null,
       codePinLivraison: map['codePinLivraison'] ?? "",
       fondsDebloques: map['fondsDebloques'] ?? false,
+      archivePourTransporteur: map['archivePourTransporteur'] ?? false,
+      archivePourClient: map['archivePourClient'] ?? false,
     );
   }
 

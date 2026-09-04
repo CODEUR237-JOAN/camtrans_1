@@ -181,11 +181,14 @@ class CarteEstimationRemorque extends StatelessWidget {
                     children: [
                       const Icon(Icons.schedule_rounded, size: 16, color: Color(0xFFF5A623)),
                       const SizedBox(width: 8),
-                      Text(
-                        'Dépanneuse en route dans ~${resultat.dureeMinutes.toInt()} min',
-                        style: GoogleFonts.inter(
-                          color: Colors.white70,
-                          fontSize: 13,
+                      Flexible(
+                        child: Text(
+                          'Dépanneuse en route dans ~${resultat.dureeMinutes.toInt()} min',
+                          style: GoogleFonts.inter(
+                            color: Colors.white70,
+                            fontSize: 13,
+                          ),
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
                     ],

@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 700" width="1100" height="700">
+    <defs>
+        <style>
+            .line { stroke: #0077FF; stroke-width: 1.5; fill: none; }
+            .box { fill: #AAEEFF; stroke: #0055AA; stroke-width: 1.5; }
+            .text { font-family: Arial, sans-serif; font-size: 13px; fill: black; }
+            .arrow { fill: #0077FF; stroke: none; }
+        </style>
+    </defs>
+    
+    <!-- Title -->
+    <rect x="850" y="20" width="220" height="40" fill="white" stroke="#0077FF" stroke-width="1"/>
+    <text x="960" y="38" class="text" text-anchor="middle" font-size="11" font-style="italic">DIAGRAMME DE</text>
+    <text x="960" y="52" class="text" text-anchor="middle" font-size="11" font-style="italic">COMMUNICATION TRAITER COURSE</text>
+    
+    <circle cx="150" cy="130" r="10" class="line" fill="white"/>
+    <line x1="150" y1="140" x2="150" y2="170" class="line"/>
+    <line x1="135" y1="150" x2="165" y2="150" class="line"/>
+    <line x1="150" y1="170" x2="140" y2="190" class="line"/>
+    <line x1="150" y1="170" x2="160" y2="190" class="line"/>
+    <text x="150" y="210" class="text" text-anchor="middle">Transporteur</text>
+    
+    <rect x="510.0" y="480.0" width="80" height="40" class="box"/>
+    <text x="550" y="505" class="text" text-anchor="middle">Système</text>
+    
+    <rect x="910.0" y="230.0" width="80" height="40" class="box"/>
+    <text x="950" y="255" class="text" text-anchor="middle">SGBD</text>
+    <polyline points="150,215 150,500 510.0,500" class="line"/><polyline points="590.0,500 950,500 950,270.0" class="line"/><polyline points="550,480.0 550,450.0 610.0,450.0 610.0,490.0 590.0,490.0" class="line"/><text x="70" y="280" class="text" text-anchor="middle">1: affiche notification</text>
+<polygon points="68,295 72,295 70,285" class="arrow"/><line x1="70" y1="285" x2="70" y2="295" class="line" stroke-width="1"/><text x="240" y="320" class="text" text-anchor="middle">2: consulte détails course</text>
+<polygon points="238,325 242,325 240,335" class="arrow"/><line x1="240" y1="325" x2="240" y2="335" class="line" stroke-width="1"/><text x="80" y="360" class="text" text-anchor="middle">8: redirige vers GPS</text>
+<polygon points="78,375 82,375 80,365" class="arrow"/><line x1="80" y1="365" x2="80" y2="375" class="line" stroke-width="1"/><text x="240" y="420" class="text" text-anchor="middle">4: clique « Accepter »</text>
+<polygon points="238,425 242,425 240,435" class="arrow"/><line x1="240" y1="425" x2="240" y2="435" class="line" stroke-width="1"/><text x="300" y="480" class="text" text-anchor="middle">4.a: [Refus] clique « Refuser »</text>
+<polygon points="310,489 310,493 320,491" class="arrow"/><line x1="290" y1="491" x2="320" y2="491" class="line" stroke-width="1"/><text x="380" y="530" class="text" text-anchor="middle">5.a: [Annulée] affiche erreur</text>
+<polygon points="370,539 370,543 360,541" class="arrow"/><line x1="360" y1="541" x2="390" y2="541" class="line" stroke-width="1"/><text x="700" y="480" class="text" text-anchor="middle">5: vérifie disponibilité course</text>
+<polygon points="710,489 710,493 720,491" class="arrow"/><line x1="690" y1="491" x2="720" y2="491" class="line" stroke-width="1"/><text x="750" y="530" class="text" text-anchor="middle">5.1: [Disponible] retourne statut</text>
+<polygon points="740,539 740,543 730,541" class="arrow"/><line x1="730" y1="541" x2="760" y2="541" class="line" stroke-width="1"/><text x="1030" y="320" class="text" text-anchor="middle">6: lie transporteur &amp; MAJ</text>
+<polygon points="1028,335 1032,335 1030,325" class="arrow"/><line x1="1030" y1="325" x2="1030" y2="335" class="line" stroke-width="1"/><text x="860" y="380" class="text" text-anchor="middle">5.b: [Annulée] retourne erreur</text>
+<polygon points="858,385 862,385 860,395" class="arrow"/><line x1="860" y1="385" x2="860" y2="395" class="line" stroke-width="1"/><text x="1030" y="420" class="text" text-anchor="middle">7: MAJ statut Indisponible</text>
+<polygon points="1028,435 1032,435 1030,425" class="arrow"/><line x1="1030" y1="425" x2="1030" y2="435" class="line" stroke-width="1"/><text x="610" y="430" class="text" text-anchor="middle">4.b: [Timeout 30s] relance algo</text>
+<polygon points="600,439 600,443 590,441" class="arrow"/><line x1="590" y1="441" x2="620" y2="441" class="line" stroke-width="1"/></svg>

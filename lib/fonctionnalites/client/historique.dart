@@ -162,7 +162,10 @@ class _HistoriqueState extends ConsumerState<Historique> {
           Expanded(
             child: coursesAsync.when(
               data: (courses) {
-                List<Course> coursesFiltrees = courses;
+                // Exclure les courses archivées par le client (masquage logique)
+                List<Course> coursesFiltrees = courses
+                    .where((c) => c.archivePourClient != true)
+                    .toList();
 
                 if (_recherche.text.isNotEmpty) {
                   final q = _recherche.text.toLowerCase();
@@ -225,13 +228,16 @@ class _HistoriqueState extends ConsumerState<Historique> {
                           );
                         },
                         onDismissed: (_) async {
+                          // Archivage logique — seul le client masque sa vue
                           final firestore = ref.read(serviceFirestoreProvider);
-                          await firestore.supprimerDocument(
-                              collection: 'courses', id: course.id);
+                          await firestore.modifierDocument(
+                              collection: 'courses',
+                              id: course.id,
+                              donnees: {'archivePourClient': true});
                           if (context.mounted) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
-                                content: Text("Course supprimée"),
+                                content: Text("Course archivée"),
                                 backgroundColor: Colors.green,
                               ),
                             );

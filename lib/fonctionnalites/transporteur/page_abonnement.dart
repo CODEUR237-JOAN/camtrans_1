@@ -510,7 +510,7 @@ class _DialogPaiementAbonnementState extends State<_DialogPaiementAbonnement> {
           ),
           const SizedBox(height: 6),
           DropdownButtonFormField<String>(
-            value: _operateur,
+            initialValue: _operateur,
             dropdownColor: const Color(0xFF10192A),
             style: GoogleFonts.inter(color: Colors.white),
             decoration: InputDecoration(

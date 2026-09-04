@@ -21,8 +21,8 @@ import 'widgets/timeline_statut.dart';
 import 'widgets/carte_suivi_abstraite.dart';
 import 'widgets/bottom_sheet_paiement.dart';
 import 'package:flutter_animate/flutter_animate.dart';
-
-
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'widgets/recherche_radar.dart';
 class SuiviTransport extends ConsumerStatefulWidget {
   final String courseId;
   final bool isFullScreen;
@@ -100,7 +100,7 @@ class _SuiviTransportState extends ConsumerState<SuiviTransport> {
 
     if (etatSuivi.chargement) {
       return const Scaffold(
-        backgroundColor: const Color(0xFF08111F),
+        backgroundColor: Color(0xFF08111F),
         body: Center(child: CircularProgressIndicator(color: CouleursApp.primaire)),
       );
     }
@@ -111,13 +111,66 @@ class _SuiviTransportState extends ConsumerState<SuiviTransport> {
         appBar: AppBar(
           backgroundColor: const Color(0xFF08111F),
           elevation: 0,
-          iconTheme: const IconThemeData(color: const Color(0xFF08111F)),
+          iconTheme: const IconThemeData(color: Color(0xFF08111F)),
         ),
         body: const Center(child: Text('Course introuvable ou inaccessible.')),
       );
     }
 
     final course = etatSuivi.course!;
+
+    // ✅ PHASE 4: DISPATCH - Logique de Timeout côté Client (Zéro Coût Cloud Functions)
+    if (estClient && course.statut == StatutCourse.propose && course.expirationProposition != null) {
+      if (DateTime.now().isAfter(course.expirationProposition!)) {
+        // Le délai est dépassé, on passe au transporteur suivant
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          _passerAuTransporteurSuivant(course);
+        });
+      }
+    }
+
+    // Affichage du Radar continu tant qu'aucun transporteur n'a accepté
+    if (course.statut == StatutCourse.recherche || course.statut == StatutCourse.propose) {
+      return Scaffold(
+        backgroundColor: const Color(0xFF08111F),
+        body: Stack(
+          children: [
+            const RechercheRadar(), // Votre widget de Radar existant
+            Positioned(
+              top: MediaQuery.of(context).padding.top + 10,
+              left: 20,
+              child: _buildBackButton(context),
+            ),
+            Positioned(
+              bottom: 40,
+              left: 0,
+              right: 0,
+              child: Column(
+                children: [
+                  const Text(
+                    "Recherche du meilleur transporteur...",
+                    style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    course.statut == StatutCourse.propose 
+                      ? "En attente de la réponse du candidat idéal..."
+                      : "Analyse des transporteurs disponibles...",
+                    style: const TextStyle(color: Colors.white70, fontSize: 14),
+                  ),
+                  const SizedBox(height: 20),
+                  TextButton(
+                    onPressed: () => _confirmerAnnulation(context),
+                    style: TextButton.styleFrom(foregroundColor: CouleursApp.erreur),
+                    child: const Text("Annuler l'expédition"),
+                  )
+                ],
+              ),
+            )
+          ],
+        ),
+      );
+    }
 
     final transporteur = etatSuivi.transporteur;
 
@@ -488,5 +541,58 @@ class _SuiviTransportState extends ConsumerState<SuiviTransport> {
         },
       ),
     );
+  }
+
+  bool _enCoursDeRedirection = false;
+  Future<void> _passerAuTransporteurSuivant(Course course) async {
+    if (_enCoursDeRedirection) return;
+    _enCoursDeRedirection = true;
+    try {
+      final List<dynamic> candidats = course.candidats;
+      final int index = course.indexCandidatActuel;
+      final int nextIndex = index + 1;
+
+      final serviceFs = ref.read(serviceFirestoreProvider);
+
+      if (nextIndex < candidats.length) {
+        final prochainId = candidats[nextIndex] as String;
+        await serviceFs.modifierDocument(
+          collection: 'courses', 
+          id: course.id,
+          donnees: {
+            'indexCandidatActuel': nextIndex,
+            'transporteurId': prochainId,
+            'expirationProposition': DateTime.now().add(const Duration(seconds: 30)).toIso8601String(),
+          }
+        );
+        
+        // Push notification for the next candidate
+        await FirebaseFirestore.instance.collection('notifications_push').add({
+           'titre': '🚨 NOUVELLE COURSE !',
+           'message': 'Une course à proximité vous est proposée. Acceptez vite !',
+           'cible': 'transporteur',
+           'cibleId': prochainId,
+           'status': 'pending',
+           'createdAt': FieldValue.serverTimestamp(),
+        });
+      } else {
+        // Plus aucun candidat : on passe au marché public
+        await serviceFs.modifierDocument(
+          collection: 'courses', 
+          id: course.id,
+          donnees: {
+            'statut': StatutCourse.recherche,
+            'transporteurId': '',
+            'indexCandidatActuel': nextIndex,
+          }
+        );
+      }
+    } catch (e) {
+      debugPrint("Erreur lors du passage au transporteur suivant: $e");
+    } finally {
+      // Petite pause avant de permettre un autre appel (debouncing)
+      await Future.delayed(const Duration(seconds: 2));
+      _enCoursDeRedirection = false;
+    }
   }
 }

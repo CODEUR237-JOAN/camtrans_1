@@ -23,8 +23,9 @@ final userRoleProvider = FutureProvider.autoDispose<String?>((ref) async {
   if (adminDoc.exists) {
     // Si l\'admin est aussi transporteur ou client, on lance sa presence
     final testTransp = await firestore.lireDocument(collection: 'transporteurs', id: userId);
-    if (testTransp.exists) ServicePresence().demarrer(role: 'transporteur');
-    else {
+    if (testTransp.exists) {
+      ServicePresence().demarrer(role: 'transporteur');
+    } else {
       final testClient = await firestore.lireDocument(collection: 'clients', id: userId);
       if (testClient.exists) ServicePresence().demarrer(role: 'client');
     }

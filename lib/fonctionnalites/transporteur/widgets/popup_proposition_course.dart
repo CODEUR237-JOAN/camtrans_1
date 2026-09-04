@@ -123,6 +123,21 @@ class _PopupPropositionCourseState extends ConsumerState<PopupPropositionCourse>
 
   @override
   Widget build(BuildContext context) {
+    // Écouter le flux de la proposition. Si elle disparaît (annulée, expirée ou transférée), on ferme le popup.
+    ref.listen<AsyncValue<Course?>>(fluxCourseProposeeProvider, (previous, next) {
+      if (next.hasValue && next.value == null) {
+        if (mounted && !_enCoursTraitement) {
+          Navigator.of(context).pop();
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text("Temps écoulé ou course non disponible."),
+              backgroundColor: Colors.grey,
+            ),
+          );
+        }
+      }
+    });
+
     // Calcul de la progression du cercle
     final double progression = _secondesRestantes / 30.0;
 

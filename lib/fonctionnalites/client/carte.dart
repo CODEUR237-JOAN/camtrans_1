@@ -8,7 +8,6 @@ import 'package:update_camtrans/coeur/constantes/couleurs.dart';
 import 'package:update_camtrans/coeur/etat/carte_provider.dart';
 import 'package:update_camtrans/services/service_gps.dart';
 import 'widgets/couche_transporteurs.dart';
-import 'package:flutter_animate/flutter_animate.dart';
 import 'package:update_camtrans/coeur/widgets/loader_premium.dart';
 import 'package:update_camtrans/coeur/widgets/marqueur_premium.dart';
 

@@ -1140,8 +1140,10 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
 
 class _GlassCard extends StatelessWidget {
   final Widget child;
+  // Le padding contrôle l'espacement interne de la carte.
+  // Une valeur par défaut est fournie pour éviter d'avoir à la spécifier à chaque usage.
   final EdgeInsets padding;
-  const _GlassCard({required this.child, this.padding = const EdgeInsets.all(24)});
+  const _GlassCard({required this.child, this.padding = const EdgeInsets.all(20)});
 
   @override
   Widget build(BuildContext context) {

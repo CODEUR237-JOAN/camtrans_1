@@ -359,7 +359,7 @@ class _PageParametresState extends ConsumerState<PageParametres> {
         Switch(
           value: valeur,
           onChanged: onChanged,
-          activeColor: CouleursApp.primaire,
+          activeThumbColor: CouleursApp.primaire,
         ),
       ],
     );

@@ -12,43 +12,49 @@ import 'package:update_camtrans/principal.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:update_camtrans/coeur/constantes/couleurs.dart';
 
-// Gestionnaire de messages en arrière-plan
+// Gestionnaire des notifications Push reçues en arrière-plan.
+// Cette fonction s'exécute même lorsque l'application est fermée.
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
-  // Initialise Firebase si nécessaire pour le processus d'arrière-plan
+  // Initialise l'instance Firebase requise pour traiter le message en tâche de fond.
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  debugPrint("📨 Message reçu en arrière-plan : ${message.notification?.title}");
+  debugPrint("[INFO] Message push reçu en arrière-plan : ${message.notification?.title}");
 }
 
 Future<void> main() async {
   try {
+    // S'assure que les liaisons Flutter sont prêtes avant toute initialisation asynchrone.
     WidgetsFlutterBinding.ensureInitialized();
-    debugPrint("🚀 Initialisation de l'application...");
+    debugPrint("[INFO] Démarrage de l'application CamTrans en cours...");
 
+    // Initialisation du backend Firebase (authentification, base de données, etc.).
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
-    debugPrint("✅ Firebase initialisé");
+    debugPrint("[SUCCÈS] Service Firebase initialisé.");
 
-    // ✅ AMÉLIORATION 2.2: Activer le cache offline Firestore
-    // Permet à l'app de fonctionner (en lecture) sans connexion internet
+    // Configuration de Firestore pour permettre un fonctionnement sans connexion internet.
+    // Cela garantit que les utilisateurs peuvent consulter leurs données même hors ligne.
     FirebaseFirestore.instance.settings = const Settings(
       persistenceEnabled: true,
       cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED,
     );
-    debugPrint("✅ Cache offline Firestore activé");
+    debugPrint("[SUCCÈS] Mode hors-ligne de la base de données activé.");
 
-    // Enregistrer le gestionnaire d'arrière-plan
+    // Enregistrement du service de notifications pour fonctionner en arrière-plan.
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
+    // Initialisation et configuration des notifications locales.
     await ServiceNotification.initialiser();
-    debugPrint("✅ Notifications initialisées");
+    debugPrint("[SUCCÈS] Service de notifications configuré.");
 
+    // Démarrage de l'écoute des nouveaux messages et des actions liées aux notifications.
     ServiceNotification.ecouterMessages();
     ServiceNotification.ecouterOuverture();
 
+    // Chargement des variables d'environnement (ex: clés d'API).
     await dotenv.load(fileName: ".env");
-    debugPrint("✅ Configuration .env chargée");
+    debugPrint("[SUCCÈS] Variables de configuration (.env) chargées avec succès.");
 
     runApp(
       const ProviderScope(
@@ -56,17 +62,17 @@ Future<void> main() async {
       ),
     );
   } catch (e, stack) {
-    debugPrint("💥 ERREUR FATALE LORS DU DÉMARRAGE:");
+    debugPrint("[ERREUR FATALE] Le démarrage a échoué :");
     debugPrint(e.toString());
     debugPrint(stack.toString());
 
-    // ✅ HUMANISATION 3.6 + INNOVATION 4.4: Écran d'erreur premium au lieu d'un simple Text
+    // Affichage d'un écran d'erreur convivial pour l'utilisateur en cas de panne au démarrage.
     runApp(EcranErreurDemarrage(erreur: e.toString()));
   }
 }
 
-/// ✅ INNOVATION 4.4: Écran d'erreur de démarrage stylisé avec bouton "Réessayer"
-/// Remplace l'ancien Text() brut par une interface premium et rassurante.
+/// Écran affiché si l'application ne parvient pas à s'initialiser correctement.
+/// Présente un message d'erreur clair et offre la possibilité de réessayer le démarrage.
 class EcranErreurDemarrage extends StatelessWidget {
   final String erreur;
   const EcranErreurDemarrage({super.key, required this.erreur});
@@ -117,7 +123,7 @@ class EcranErreurDemarrage extends StatelessWidget {
                 const SizedBox(height: 8),
 
                 Text(
-                  "Oups, un petit souci au démarrage 🔧",
+                  "Un problème technique est survenu au démarrage.",
                   style: GoogleFonts.inter(
                     color: Colors.white70,
                     fontSize: 16,

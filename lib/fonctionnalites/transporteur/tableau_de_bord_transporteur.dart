@@ -10,11 +10,11 @@ import 'package:update_camtrans/coeur/constantes/couleurs.dart';
 import 'package:update_camtrans/coeur/constantes/tailles.dart';
 import 'package:update_camtrans/coeur/widgets/carte_information.dart';
 import 'package:update_camtrans/coeur/widgets/effets_visuels.dart';
+import 'package:update_camtrans/coeur/widgets/glass_container.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:update_camtrans/coeur/constantes/statuts.dart';
 import '../../coeur/etat/transporteur_provider.dart';
 import '../../coeur/etat/textes_app_provider.dart';
-import '../../modeles/textes_app.dart';
 import 'package:update_camtrans/coeur/routes/routes.dart';
 import 'package:update_camtrans/coeur/etat/gps_provider.dart';
 import 'package:update_camtrans/services/service_authentification.dart';
@@ -272,20 +272,11 @@ class _TableauDeBordTransporteurState extends ConsumerState<TableauDeBordTranspo
               const SizedBox(height: 30),
 
               // BANNER REVENUS
-              Container(
+              GlassContainer(
                 width: double.infinity,
                 padding: const EdgeInsets.all(25),
-                decoration: BoxDecoration(
-                  gradient: CouleursApp.degradePrincipal,
-                  borderRadius: BorderRadius.circular(25),
-                  boxShadow: [
-                    BoxShadow(
-                      color: CouleursApp.primaire.withValues(alpha: 0.3),
-                      blurRadius: 20,
-                      offset: const Offset(0, 10),
-                    )
-                  ]
-                ),
+                opaciteFond: 0.15,
+                customBorder: Border.all(color: CouleursApp.primaire.withValues(alpha: 0.3)),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -298,21 +289,33 @@ class _TableauDeBordTransporteurState extends ConsumerState<TableauDeBordTranspo
                       "${(statsRevenus['ceJour'] ?? 0).toStringAsFixed(0)} FCFA",
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: GoogleFonts.inter(color: Colors.white, fontSize: 34, fontWeight: FontWeight.w800, letterSpacing: -1.0),
+                      style: GoogleFonts.inter(
+                        color: Colors.white, 
+                        fontSize: 34, 
+                        fontWeight: FontWeight.w800, 
+                        letterSpacing: -1.0,
+                        shadows: [
+                          Shadow(
+                            color: CouleursApp.primaire.withValues(alpha: 0.5),
+                            blurRadius: 20,
+                          ),
+                        ],
+                      ),
                     ),
                     const SizedBox(height: 15),
                     Container(
                       padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                       decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.2),
+                        color: Colors.white.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(20),
+                        border: Border.all(color: Colors.white.withValues(alpha: 0.2)),
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Icon(
                             Icons.circle,
-                            color: estDisponible ? Colors.greenAccent : Colors.redAccent,
+                            color: estDisponible ? CouleursApp.succes : CouleursApp.erreur,
                             size: 12,
                           ),
                           const SizedBox(width: 8),
@@ -444,9 +447,10 @@ class _TableauDeBordTransporteurState extends ConsumerState<TableauDeBordTranspo
               mesCoursesAsync.when(
                 loading: () => Column(
                   children: <Widget>[
-                    ...List.generate(3, (index) => Container(
+                    ...List.generate(3, (index) => GlassContainer(
                       height: 80, margin: const EdgeInsets.only(bottom: 10),
-                      decoration: BoxDecoration(color: const Color(0xFF08111F), borderRadius: BorderRadius.circular(20)),
+                      opaciteFond: 0.05,
+                      child: const SizedBox.shrink(),
                     ).animate(onPlay: (controller) => controller.repeat()).shimmer(color: Colors.white.withValues(alpha: 0.08), duration: 1.5.seconds)),
                   ],
                 ),
@@ -484,22 +488,13 @@ class _TableauDeBordTransporteurState extends ConsumerState<TableauDeBordTranspo
   }
 
   Widget _creationCarteTrajet(String titre, String sousTitre, String prix, IconData icone, Color couleurIcone) {
-    return Container(
-      padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.07)),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.white.withValues(alpha: 0.07),
-            blurRadius: 10,
-            offset: const Offset(0, 5),
-          )
-        ]
-      ),
-      child: Row(
-        children: [
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12.0),
+      child: GlassContainer(
+        padding: const EdgeInsets.all(18),
+        opaciteFond: 0.08,
+        child: Row(
+          children: [
           Container(
             padding: const EdgeInsets.all(12),
             decoration: BoxDecoration(
@@ -522,7 +517,7 @@ class _TableauDeBordTransporteurState extends ConsumerState<TableauDeBordTranspo
           Text(prix, style: const TextStyle(fontWeight: FontWeight.w900, color: CouleursApp.primaire, fontSize: 15)),
         ],
       ),
-    );
+    ));
   }
 
 
@@ -536,20 +531,10 @@ class _TableauDeBordTransporteurState extends ConsumerState<TableauDeBordTranspo
     final revenus = statsRevenus['ceJour'] ?? 0;
     final conseil = _determinerConseil(heure, revenus);
 
-    return Container(
+    return GlassContainer(
       padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(
-        gradient: LinearGradient(
-          colors: [
-            conseil.couleur.withValues(alpha: 0.12),
-            conseil.couleur.withValues(alpha: 0.05),
-          ],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: conseil.couleur.withValues(alpha: 0.25)),
-      ),
+      opaciteFond: 0.06,
+      customBorder: Border.all(color: conseil.couleur.withValues(alpha: 0.25), width: 1.5),
       child: Row(
         children: [
           Container(

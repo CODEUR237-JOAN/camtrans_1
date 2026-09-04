@@ -1,0 +1,28 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 750" width="1100" height="750">
+    <defs>
+        <style>
+            .line { stroke: #0077FF; stroke-width: 1.5; fill: none; }
+            .box { fill: #AAEEFF; stroke: #0055AA; stroke-width: 1.5; }
+            .text { font-family: Arial, sans-serif; font-size: 13px; fill: black; }
+            .arrow { fill: #0077FF; stroke: none; }
+        </style>
+    </defs>
+    
+    <!-- Title -->
+    <rect x="850" y="20" width="220" height="40" fill="white" stroke="#0077FF" stroke-width="1"/>
+    <text x="960" y="38" class="text" text-anchor="middle" font-size="11" font-style="italic">DIAGRAMME DE</text>
+    <text x="960" y="52" class="text" text-anchor="middle" font-size="11" font-style="italic">COMMUNICATION CREER COMMANDE</text>
+    
+    <circle cx="150" cy="130" r="10" class="line" fill="white"/>
+    <line x1="150" y1="140" x2="150" y2="170" class="line"/>
+    <line x1="135" y1="150" x2="165" y2="150" class="line"/>
+    <line x1="150" y1="170" x2="140" y2="190" class="line"/>
+    <line x1="150" y1="170" x2="160" y2="190" class="line"/>
+    <text x="150" y="210" class="text" text-anchor="middle">Client</text>
+    
+    <rect x="510.0" y="480.0" width="80" height="40" class="box"/>
+    <text x="550" y="505" class="text" text-anchor="middle">Système</text>
+    
+    <rect x="910.0" y="230.0" width="80" height="40" class="box"/>
+    <text x="950" y="255" class="text" text-anchor="middle">SGBD</text>
+    <polyline points="150,215 150,500 510.0,500" class="line"/><polyline points="590.0,500 950,500 950,270.0" class="line"/><polyline points="550,480.0 550,440.0 490.0,440.0 490.0,490.0 510.0,490.0" class="line"/><polyline points="570,480.0 570,420.0 630.0,420.0 630.0,500.0 590.0,500.0" class="line"/><text x="250" y="260" class="text" text-anchor="middle">1: saisirDemande(Trajet, Marchandise)</text>\n<polygon points="248,265 252,265 250,275" class="arrow"/><line x1="250" y1="265" x2="250" y2="275" class="line" stroke-width="1"/><text x="60" y="300" class="text" text-anchor="middle">3: afficherEstimation(Prix, Vehicule)</text>\n<polygon points="58,315 62,315 60,305" class="arrow"/><line x1="60" y1="305" x2="60" y2="315" class="line" stroke-width="1"/><text x="240" y="340" class="text" text-anchor="middle">4: [Si Accord] cliquerConfirmer()</text>\n<polygon points="238,345 242,345 240,355" class="arrow"/><line x1="240" y1="345" x2="240" y2="355" class="line" stroke-width="1"/><text x="80" y="380" class="text" text-anchor="middle">8: afficherSuiviRadar()</text>\n<polygon points="78,395 82,395 80,385" class="arrow"/><line x1="80" y1="385" x2="80" y2="395" class="line" stroke-width="1"/><text x="280" y="480" class="text" text-anchor="middle">4.a: [Si Refus] cliquerAnnuler()</text>\n<polygon points="290,489 290,493 300,491" class="arrow"/><line x1="270" y1="491" x2="300" y2="491" class="line" stroke-width="1"/><text x="360" y="530" class="text" text-anchor="middle">4.b: [Refus] retourneAccueil()</text>\n<polygon points="350,539 350,543 340,541" class="arrow"/><line x1="340" y1="541" x2="370" y2="541" class="line" stroke-width="1"/><text x="700" y="480" class="text" text-anchor="middle">5: enregistrerCourse(Client, Vehicule)</text>\n<polygon points="710,489 710,493 720,491" class="arrow"/><line x1="690" y1="491" x2="720" y2="491" class="line" stroke-width="1"/><text x="1020" y="320" class="text" text-anchor="middle">6: statutSuccès()</text>\n<polygon points="1018,325 1022,325 1020,335" class="arrow"/><line x1="1020" y1="325" x2="1020" y2="335" class="line" stroke-width="1"/><text x="850" y="360" class="text" text-anchor="middle">5.a: [Erreur réseau] retourneErreur()</text>\n<polygon points="848,365 852,365 850,375" class="arrow"/><line x1="850" y1="365" x2="850" y2="375" class="line" stroke-width="1"/><text x="420" y="420" class="text" text-anchor="middle">2: interrogerIA(Description)</text>\n<polygon points="430,429 430,433 440,431" class="arrow"/><line x1="410" y1="431" x2="440" y2="431" class="line" stroke-width="1"/><text x="700" y="390" class="text" text-anchor="middle">7: lancerRechercheTransporteurs()</text>\n<polygon points="710,399 710,403 720,401" class="arrow"/><line x1="690" y1="401" x2="720" y2="401" class="line" stroke-width="1"/></svg>

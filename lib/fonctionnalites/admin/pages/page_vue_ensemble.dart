@@ -376,8 +376,9 @@ class PageVueEnsemble extends ConsumerWidget {
           data.forEach((key, value) {
             String l = key.toLowerCase();
             String label;
-            if (l.contains('termin') || l.contains('livr')) label = 'Terminée';
-            else if (l.contains('annul')) label = 'Annulée';
+            if (l.contains('termin') || l.contains('livr')) {
+              label = 'Terminée';
+            } else if (l.contains('annul')) label = 'Annulée';
             else if (l.contains('cours') || l.contains('transit') || l.contains('rout')) label = 'En cours';
             else if (l.contains('attent') || l.contains('recherch')) label = 'En attente';
             else if (l.contains('accept') || l.contains('attribu')) label = 'Attribué';
@@ -651,8 +652,9 @@ class PageVueEnsemble extends ConsumerWidget {
                   .map<Marker>((t) {
                       IconData iconData = Icons.directions_car;
                       final type = t.typeVehicule.toLowerCase();
-                      if (type.contains('moto')) iconData = Icons.two_wheeler;
-                      else if (type.contains('camion')) iconData = Icons.local_shipping;
+                      if (type.contains('moto')) {
+                        iconData = Icons.two_wheeler;
+                      } else if (type.contains('camion')) iconData = Icons.local_shipping;
                       else if (type.contains('fourgon') || type.contains('van')) iconData = Icons.airport_shuttle;
 
                       return Marker(

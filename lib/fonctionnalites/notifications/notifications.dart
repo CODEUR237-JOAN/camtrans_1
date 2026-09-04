@@ -28,7 +28,7 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
         title: const Text("Notifications", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
         backgroundColor: const Color(0xFF08111F),
         elevation: 0,
-        iconTheme: const IconThemeData(color: const Color(0xFF08111F)),
+        iconTheme: const IconThemeData(color: Color(0xFF08111F)),
         automaticallyImplyLeading: false,
         actions: [
           notificationsAsync.maybeWhen(
