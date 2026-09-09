@@ -8,6 +8,10 @@ GoogleService-Info.plist
 *.env
 *.env.local
 *.env.production
+
+# Clés et secrets
+lib/coeur/constantes/api_keys.dart
+
 # ============================================================
 
 # Miscellaneous
@@ -39,6 +43,7 @@ migrate_working_dir/
 **/doc/api/
 **/ios/Flutter/.last_build_id
 .dart_tool/
+.flutter-plugins
 .flutter-plugins-dependencies
 .pub-cache/
 .pub/
@@ -51,11 +56,7 @@ app.*.symbols
 # Obfuscation related
 app.*.map.json
 
-# Secrets & API Keys
-.env
-lib/coeur/constantes/api_keys.dart
-serviceAccountKey.json
-setup_admin.js
+# Node
 node_modules/
 package.json
 package-lock.json
@@ -66,8 +67,35 @@ package-lock.json
 /android/app/release
 android/app/build/
 
-# Fichiers sensibles / scripts de diagnostic
+# ============================================================
+# 🛠️ Scripts de développement/migration — Ne pas versionner
+# (Ces fichiers contiennent des informations sur la structure interne)
+# ============================================================
 diag_gemini.ps1
 test_gemini.ps1
 test_ia.dart
+test2.dart
+test_state.dart
 couleurs_usages.txt
+diff.txt
+diff_tdb.txt
+apply_changes.py
+apply_pure_white_theme.py
+clean_creer_demande.py
+convert_light_to_dark.py
+convert_light_to_dark_2.py
+fix_colors.py
+fix_dark_to_light.py
+restore_light.py
+reverse_creer_demande.py
+unify_colors.py
+update_model.py
+patch_utilisateurs.py
+add_imports.js
+remove_animations.js
+remove_imports.js
+strip_emojis.js
+worker_dispatch.js
+worker_notifications.js
+setup_admin.js
+find_emojis.dart

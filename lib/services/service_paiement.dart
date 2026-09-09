@@ -278,6 +278,13 @@ class ServicePaiement {
   }
 
   /// Traitement d'un paiement par Carte Bancaire
+  ///
+  /// ⚠️  FIX SÉCURITÉ : Cette méthode était une simulation qui marquait toujours
+  /// le paiement comme réussi sans aucune vraie transaction.
+  /// Elle lève maintenant une exception claire pour éviter toute fausse validation.
+  ///
+  /// TODO : Intégrer une vraie passerelle (Notchpay, Flutterwave, Stripe)
+  /// pour les paiements par carte au Cameroun.
   Future<Paiement> initierPaiementCarte({
     required String courseId,
     required String clientId,
@@ -285,17 +292,9 @@ class ServicePaiement {
     required double montant,
     required String nomTitulaire,
   }) async {
-    // Non implémenté par Campay directement pour les cartes au Cameroun.
-    // Simulation pour Stripe/Carte.
-    await Future.delayed(const Duration(seconds: 4)); 
-    return _creerPaiementReussi(
-      courseId: courseId,
-      clientId: clientId,
-      transporteurId: transporteurId,
-      montant: montant,
-      methode: "Carte Bancaire",
-      operateur: "Stripe/Visa",
-      telephone: nomTitulaire,
+    throw UnimplementedError(
+      "Le paiement par carte bancaire n'est pas encore disponible. "
+      "Veuillez utiliser MTN Mobile Money ou Orange Money.",
     );
   }
 

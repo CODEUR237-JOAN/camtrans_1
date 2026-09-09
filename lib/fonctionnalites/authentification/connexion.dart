@@ -48,17 +48,15 @@ class _ConnexionState extends ConsumerState<Connexion> {
 
       if (userCred.user != null) {
         final uid = userCred.user!.uid;
-        final email = userCred.user!.email;
 
           String? role;
-          if (email == 'admintrans@gmail.com') {
-            role = 'admin';
-          } else {
-            // Vérification admin
-            try {
-              final adminDoc = await serviceDb.lireDocument(collection: 'admin', id: uid);
-              if (adminDoc.exists) role = 'admin';
-            } catch (_) {}
+          // ✅ FIX : Vérification admin uniquement via Firestore (plus d'email codé en dur)
+          try {
+            final adminDoc = await serviceDb.lireDocument(collection: 'admin', id: uid);
+            if (adminDoc.exists) role = 'admin';
+          } catch (e) {
+            debugPrint('[Auth] Erreur vérification admin: $e');
+          }
 
             // Vérification transporteur EN PREMIER (priorité sur client)
             if (role == null) {
@@ -66,10 +64,10 @@ class _ConnexionState extends ConsumerState<Connexion> {
                 final transpDoc = await serviceDb.lireDocument(collection: 'transporteurs', id: uid);
                 if (transpDoc.exists) {
                   role = 'transporteur';
-                  debugPrint(' Rôle détecté: transporteur (uid=$uid)');
+                  debugPrint('[Auth] Rôle détecté: transporteur (uid=$uid)');
                 }
               } catch (e) {
-                debugPrint('️ Erreur lecture transporteurs: $e');
+                debugPrint('[Auth] Erreur lecture transporteurs: $e');
               }
             }
 

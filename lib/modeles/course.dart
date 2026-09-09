@@ -284,6 +284,9 @@ class Course {
       "expirationProposition": expirationProposition?.toIso8601String(),
       "codePinLivraison": codePinLivraison,
       "fondsDebloques": fondsDebloques,
+      // ✅ FIX : Champs d'archivage logique — étaient absents, causant une perte de données
+      "archivePourTransporteur": archivePourTransporteur,
+      "archivePourClient": archivePourClient,
     };
   }
 

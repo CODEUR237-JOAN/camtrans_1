@@ -17,8 +17,7 @@ final userRoleProvider = FutureProvider.autoDispose<String?>((ref) async {
 
   final firestore = ref.read(serviceFirestoreProvider);
   
-  // 1. Check Admin
-  if (authState.value?.email == 'admintrans@gmail.com') return 'admin';
+  // 1. Check Admin — uniquement via la collection Firestore (pas d'email codé en dur)
   final adminDoc = await firestore.lireDocument(collection: 'admin', id: userId);
   if (adminDoc.exists) {
     // Si l\'admin est aussi transporteur ou client, on lance sa presence

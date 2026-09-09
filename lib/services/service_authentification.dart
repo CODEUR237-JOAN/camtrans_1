@@ -47,7 +47,10 @@ class ServiceAuthentification {
     // 1. Arreter la presence avant de se deconnecter car on a besoin de currentUser
     try {
       await ServicePresence().arreter();
-    } catch(e) {}
+    } catch (e) {
+      // ✅ FIX : Erreur loggée — ne doit pas bloquer la déconnexion
+      debugPrint('[Auth] Avertissement lors de l\'arrêt de présence : $e');
+    }
     // 2. Se deconnecter
     await _auth.signOut();
   }

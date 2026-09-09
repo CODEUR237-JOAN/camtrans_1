@@ -223,8 +223,35 @@ class RoutesApplication {
       GoRoute(
         path: chat,
         pageBuilder: (context, state) {
-          final args = state.extra as Map<String, dynamic>? ?? {};
-          final transporteur = args['transporteur'] as Transporteur;
+          final args = state.extra as Map<String, dynamic>?;
+          // ✅ FIX : Cast sécurisé — évite un crash TypeError si les args sont absents
+          final transporteur = args?['transporteur'] as Transporteur?;
+          if (transporteur == null) {
+            // Redirection vers le tableau de bord si les arguments sont invalides
+            return _page(
+              const Scaffold(
+                body: Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.chat_bubble_outline, size: 60, color: Colors.grey),
+                      SizedBox(height: 16),
+                      Text(
+                        "Impossible d'ouvrir le chat",
+                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                      ),
+                      SizedBox(height: 8),
+                      Text(
+                        "Veuillez relancer depuis votre course.",
+                        textAlign: TextAlign.center,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              state.pageKey,
+            );
+          }
           return _page(EcranChat(transporteur: transporteur), state.pageKey);
         },
       ),

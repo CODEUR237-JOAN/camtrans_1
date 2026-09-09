@@ -14,10 +14,12 @@ service cloud.firestore {
       return request.auth.uid == userId;
     }
 
+    // ✅ FIX : Détection admin uniquement via la collection Firestore.
+    // L'email n'est plus codé en dur — tout changement d'admin ne nécessite
+    // plus un redéploiement des règles. Ajouter l'UID de l'admin dans /admin/{uid}.
     function estAdmin() {
       return request.auth != null &&
-        (request.auth.token.email == 'admintrans@gmail.com' ||
-         exists(/databases/$(database)/documents/admin/$(request.auth.uid)));
+        exists(/databases/$(database)/documents/admin/$(request.auth.uid));
     }
 
     function estClient() {
@@ -151,9 +153,15 @@ service cloud.firestore {
 
     // ============================================================
     // COLLECTION : messages (messagerie client <-> transporteur)
+    // ✅ FIX : La lecture était ouverte à tous les connectés.
+    // Maintenant seuls l'expéditeur, le destinataire et l'admin peuvent lire.
     // ============================================================
     match /messages/{messageId} {
-      allow read: if estConnecte();
+      allow read: if estConnecte() && (
+        estAdmin() ||
+        resource.data.expediteurId == request.auth.uid ||
+        resource.data.destinataireId == request.auth.uid
+      );
       allow create: if estConnecte() && request.resource.data.expediteurId == request.auth.uid;
       allow update, delete: if estAdmin();
     }
