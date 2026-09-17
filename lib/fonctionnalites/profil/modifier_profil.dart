@@ -21,7 +21,7 @@ class ModifierProfil extends ConsumerStatefulWidget {
 
 class _ModifierProfilState extends ConsumerState<ModifierProfil> {
   final _formKey = GlobalKey<FormState>();
-  
+
   late TextEditingController prenomController;
   late TextEditingController nomController;
   late TextEditingController telephoneController;
@@ -59,14 +59,15 @@ class _ModifierProfilState extends ConsumerState<ModifierProfil> {
 
     try {
       final firestore = ref.read(serviceFirestoreProvider);
-      
+
       // Essayer de charger comme client
       var doc = await firestore.lireDocument(collection: 'clients', id: userId);
       bool estClient = doc.exists;
-      
+
       if (!estClient) {
         // Essayer comme transporteur
-        doc = await firestore.lireDocument(collection: 'transporteurs', id: userId);
+        doc = await firestore.lireDocument(
+            collection: 'transporteurs', id: userId);
       }
 
       if (doc.exists && doc.data() != null) {
@@ -107,7 +108,7 @@ class _ModifierProfilState extends ConsumerState<ModifierProfil> {
     try {
       final firestore = ref.read(serviceFirestoreProvider);
       final stockage = ref.read(serviceStockageProvider);
-      
+
       // 1. Upload photo si nouvelle
       String photoFinale = _photoUrl;
       if (_nouvellePhoto != null) {
@@ -120,7 +121,8 @@ class _ModifierProfilState extends ConsumerState<ModifierProfil> {
       }
 
       // 2. Déterminer la collection
-      final clientDoc = await firestore.lireDocument(collection: 'clients', id: userId);
+      final clientDoc =
+          await firestore.lireDocument(collection: 'clients', id: userId);
       final collection = clientDoc.exists ? 'clients' : 'transporteurs';
 
       // 3. Mettre à jour Firestore
@@ -140,23 +142,32 @@ class _ModifierProfilState extends ConsumerState<ModifierProfil> {
       );
 
       // Mettre à jour le profil Firebase Auth aussi (nom d'affichage)
-      await ref.read(serviceAuthentificationProvider).utilisateur?.updateDisplayName(
-        "${prenomController.text.trim()} ${nomController.text.trim()}"
-      );
+      await ref
+          .read(serviceAuthentificationProvider)
+          .utilisateur
+          ?.updateDisplayName(
+              "${prenomController.text.trim()} ${nomController.text.trim()}");
       if (photoFinale.isNotEmpty) {
-        await ref.read(serviceAuthentificationProvider).utilisateur?.updatePhotoURL(photoFinale);
+        await ref
+            .read(serviceAuthentificationProvider)
+            .utilisateur
+            ?.updatePhotoURL(photoFinale);
       }
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Profil mis à jour avec succès !"), backgroundColor: Colors.green),
+          const SnackBar(
+              content: Text("Profil mis à jour avec succès !"),
+              backgroundColor: Colors.green),
         );
         context.pop();
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Oups ! Échec de la mise à jour : $e 🔧"), backgroundColor: Colors.red),
+          SnackBar(
+              content: Text("Oups ! Échec de la mise à jour : $e 🔧"),
+              backgroundColor: Colors.red),
         );
       }
     } finally {
@@ -197,22 +208,27 @@ class _ModifierProfilState extends ConsumerState<ModifierProfil> {
               child: Column(
                 children: [
                   const SizedBox(height: 10),
-                  
+
                   // Photo de profil
                   Center(
                     child: Stack(
                       children: [
                         CircleAvatar(
                           radius: 65,
-                          backgroundColor: CouleursApp.primaire.withValues(alpha: 0.1),
-                          backgroundImage: _nouvellePhoto != null 
-                            ? (kIsWeb 
-                                ? NetworkImage(_nouvellePhoto!.path) 
-                                : FileImage(io.File(_nouvellePhoto!.path)) as ImageProvider)
-                            : (_photoUrl.isNotEmpty ? NetworkImage(_photoUrl) : null),
+                          backgroundColor:
+                              CouleursApp.primaire.withValues(alpha: 0.1),
+                          backgroundImage: _nouvellePhoto != null
+                              ? (kIsWeb
+                                  ? NetworkImage(_nouvellePhoto!.path)
+                                  : FileImage(io.File(_nouvellePhoto!.path))
+                                      as ImageProvider)
+                              : (_photoUrl.isNotEmpty
+                                  ? NetworkImage(_photoUrl)
+                                  : null),
                           child: (_nouvellePhoto == null && _photoUrl.isEmpty)
-                            ? const Icon(Icons.person, size: 65, color: CouleursApp.primaire)
-                            : null,
+                              ? const Icon(Icons.person,
+                                  size: 65, color: CouleursApp.primaire)
+                              : null,
                         ),
                         Positioned(
                           bottom: 0,
@@ -224,9 +240,11 @@ class _ModifierProfilState extends ConsumerState<ModifierProfil> {
                               decoration: BoxDecoration(
                                 color: CouleursApp.primaire,
                                 shape: BoxShape.circle,
-                                border: Border.all(color: const Color(0xFF08111F), width: 3),
+                                border: Border.all(
+                                    color: const Color(0xFF08111F), width: 3),
                               ),
-                              child: const Icon(Icons.camera_alt, color: Colors.white, size: 20),
+                              child: const Icon(Icons.camera_alt,
+                                  color: Colors.white, size: 20),
                             ),
                           ),
                         ),
@@ -240,11 +258,15 @@ class _ModifierProfilState extends ConsumerState<ModifierProfil> {
                   const SizedBox(height: 16),
                   _buildField("Nom", nomController, Icons.person_outline),
                   const SizedBox(height: 16),
-                  _buildField("Téléphone", telephoneController, Icons.phone_outlined, keyboardType: TextInputType.phone),
+                  _buildField(
+                      "Téléphone", telephoneController, Icons.phone_outlined,
+                      keyboardType: TextInputType.phone),
                   const SizedBox(height: 16),
-                  _buildField("Ville", villeController, Icons.location_city_outlined),
+                  _buildField(
+                      "Ville", villeController, Icons.location_city_outlined),
                   const SizedBox(height: 16),
-                  _buildField("Adresse", adresseController, Icons.home_outlined, maxLines: 2),
+                  _buildField("Adresse", adresseController, Icons.home_outlined,
+                      maxLines: 2),
 
                   const SizedBox(height: 40),
 
@@ -253,7 +275,7 @@ class _ModifierProfilState extends ConsumerState<ModifierProfil> {
                     chargement: _chargement,
                     auClic: _enregistrer,
                   ),
-                  
+
                   const SizedBox(height: 40),
                 ],
               ),
@@ -269,7 +291,9 @@ class _ModifierProfilState extends ConsumerState<ModifierProfil> {
     );
   }
 
-  Widget _buildField(String label, TextEditingController controller, IconData icon, {TextInputType? keyboardType, int maxLines = 1}) {
+  Widget _buildField(
+      String label, TextEditingController controller, IconData icon,
+      {TextInputType? keyboardType, int maxLines = 1}) {
     return TextFormField(
       controller: controller,
       keyboardType: keyboardType,
@@ -298,7 +322,11 @@ class BoutonPrincipal extends StatelessWidget {
   final bool chargement;
   final VoidCallback auClic;
 
-  const BoutonPrincipal({super.key, required this.texte, this.chargement = false, required this.auClic});
+  const BoutonPrincipal(
+      {super.key,
+      required this.texte,
+      this.chargement = false,
+      required this.auClic});
 
   @override
   Widget build(BuildContext context) {
@@ -310,11 +338,14 @@ class BoutonPrincipal extends StatelessWidget {
         style: ElevatedButton.styleFrom(
           backgroundColor: CouleursApp.primaire,
           foregroundColor: Colors.white,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
         ),
-        child: chargement 
-          ? const LoaderPremium(size: 24)
-          : Text(texte, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+        child: chargement
+            ? const LoaderPremium(size: 24)
+            : Text(texte,
+                style:
+                    const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
       ),
     );
   }

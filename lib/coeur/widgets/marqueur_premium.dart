@@ -54,9 +54,13 @@ class MarqueurPremium extends StatelessWidget {
               shape: BoxShape.circle,
               color: couleurBase.withValues(alpha: 0.2),
             ),
-          ).animate(onPlay: (c) => c.repeat(reverse: true))
-           .scale(begin: const Offset(0.8, 0.8), end: const Offset(1.2, 1.2), duration: 1.5.seconds)
-           .fade(begin: 0.5, end: 1.0, duration: 1.5.seconds),
+          )
+              .animate(onPlay: (c) => c.repeat(reverse: true))
+              .scale(
+                  begin: const Offset(0.8, 0.8),
+                  end: const Offset(1.2, 1.2),
+                  duration: 1.5.seconds)
+              .fade(begin: 0.5, end: 1.0, duration: 1.5.seconds),
         Container(
           width: size,
           height: size,

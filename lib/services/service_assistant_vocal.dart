@@ -11,24 +11,26 @@ import 'package:update_camtrans/coeur/constantes/statuts.dart';
 
 enum EtatAssistant { repos, veille, ecoute, traitement, parle, erreur }
 
-final serviceAssistantVocalProvider = StateNotifierProvider<ServiceAssistantVocal, EtatAssistant>((ref) {
+final serviceAssistantVocalProvider =
+    StateNotifierProvider<ServiceAssistantVocal, EtatAssistant>((ref) {
   return ServiceAssistantVocal(ref, ref.read(serviceIAProvider));
 });
 
 class ServiceAssistantVocal extends StateNotifier<EtatAssistant> {
   final Ref _ref;
   final ServiceIA _serviceIA;
-  
+
   final stt.SpeechToText _speech = stt.SpeechToText();
   final FlutterTts _flutterTts = FlutterTts();
 
   bool _isInitialized = false;
-  
+
   String texteCourant = "";
   void Function(String)? onTextChanged;
   void Function(String)? onNavigate;
 
-  ServiceAssistantVocal(this._ref, this._serviceIA) : super(EtatAssistant.repos) {
+  ServiceAssistantVocal(this._ref, this._serviceIA)
+      : super(EtatAssistant.repos) {
     _initTTS();
   }
 
@@ -37,7 +39,7 @@ class ServiceAssistantVocal extends StateNotifier<EtatAssistant> {
     await _flutterTts.setSpeechRate(0.5);
     await _flutterTts.setVolume(1.0);
     await _flutterTts.setPitch(1.0);
-    
+
     _flutterTts.setCompletionHandler(() {
       if (state == EtatAssistant.parle) {
         if (_doitRelancerVeille) {
@@ -60,20 +62,23 @@ class ServiceAssistantVocal extends StateNotifier<EtatAssistant> {
   /// Active la veille (écoute continue pour détecter "CamTrans")
   Future<void> _demarrerVeille() async {
     if (!_isInitialized) {
-      _isInitialized = await _speech.initialize(
-        onStatus: (status) {
-          if (status == 'done' && state == EtatAssistant.veille) {
-            // Relancer la veille en boucle tant qu'on est en état veille
-            _speech.listen(onResult: _onResultVeille, localeId: 'fr_FR', cancelOnError: true, listenMode: stt.ListenMode.dictation);
-          }
-        },
-        onError: (error) {
-          // Ignorer les timeouts en veille et relancer
-          if (state == EtatAssistant.veille) {
-             _speech.listen(onResult: _onResultVeille, localeId: 'fr_FR', cancelOnError: true, listenMode: stt.ListenMode.dictation);
-          }
+      _isInitialized = await _speech.initialize(onStatus: (status) {
+        if (status == 'done' && state == EtatAssistant.veille) {
+          // Relancer la veille en boucle tant qu'on est en état veille
+          _speech.listen(
+              onResult: _onResultVeille,
+              listenOptions: stt.SpeechListenOptions(
+                  cancelOnError: true, listenMode: stt.ListenMode.dictation));
         }
-      );
+      }, onError: (error) {
+        // Ignorer les timeouts en veille et relancer
+        if (state == EtatAssistant.veille) {
+          _speech.listen(
+              onResult: _onResultVeille,
+              listenOptions: stt.SpeechListenOptions(
+                  cancelOnError: true, listenMode: stt.ListenMode.dictation));
+        }
+      });
     }
 
     if (_isInitialized) {
@@ -81,11 +86,14 @@ class ServiceAssistantVocal extends StateNotifier<EtatAssistant> {
       texteCourant = "En veille (Dites 'CamTrans')";
       onTextChanged?.call(texteCourant);
       await _flutterTts.stop();
-      _speech.listen(onResult: _onResultVeille, localeId: 'fr_FR', cancelOnError: true, listenMode: stt.ListenMode.dictation);
+      _speech.listen(
+          onResult: _onResultVeille,
+          listenOptions: stt.SpeechListenOptions(
+              cancelOnError: true, listenMode: stt.ListenMode.dictation));
     }
   }
 
-  void _onResultVeille(val) {
+  void _onResultVeille(dynamic val) {
     final text = val.recognizedWords.toLowerCase();
     if (text.contains("camtrans") || text.contains("cam trans")) {
       _speech.stop();
@@ -97,14 +105,19 @@ class ServiceAssistantVocal extends StateNotifier<EtatAssistant> {
     state = EtatAssistant.traitement;
     final user = _ref.read(serviceAuthentificationProvider).utilisateur;
     String nom = user?.displayName ?? "Monsieur/Madame";
-    String salutation = "Bonjour $nom, que voulez-vous ?";
-    
+    String salutation = _getSalutation(nom);
+
     texteCourant = salutation;
     onTextChanged?.call(texteCourant);
-    
+
     state = EtatAssistant.parle;
     _doitRelancerEcouteActive = true;
     await _flutterTts.speak(salutation);
+  }
+
+  String _getSalutation(String nom) {
+    return "Bonjour $nom ! Je suis l'assistant CamTrans. "
+        "Je peux créer une course, consulter vos courses ou répondre à vos questions. Que puis-je faire ?";
   }
 
   /// Démarre l'écoute active d'une requête utilisateur
@@ -138,7 +151,7 @@ class ServiceAssistantVocal extends StateNotifier<EtatAssistant> {
       texteCourant = "J'écoute...";
       onTextChanged?.call(texteCourant);
       state = EtatAssistant.ecoute;
-      
+
       await _flutterTts.stop();
 
       _speech.listen(
@@ -146,9 +159,11 @@ class ServiceAssistantVocal extends StateNotifier<EtatAssistant> {
           texteCourant = val.recognizedWords;
           onTextChanged?.call(texteCourant);
         },
-        localeId: 'fr_FR',
-        cancelOnError: true,
-        listenMode: stt.ListenMode.dictation,
+        listenOptions: stt.SpeechListenOptions(
+          localeId: 'fr_FR',
+          cancelOnError: true,
+          listenMode: stt.ListenMode.dictation,
+        ),
       );
     }
   }
@@ -167,7 +182,9 @@ class ServiceAssistantVocal extends StateNotifier<EtatAssistant> {
   }
 
   Future<void> _traiterTexteCommande() async {
-    if (texteCourant.isEmpty || texteCourant == "J'écoute..." || texteCourant == "En veille (Dites 'CamTrans')") {
+    if (texteCourant.isEmpty ||
+        texteCourant == "J'écoute..." ||
+        texteCourant == "En veille (Dites 'CamTrans')") {
       state = EtatAssistant.repos;
       texteCourant = "";
       onTextChanged?.call(texteCourant);
@@ -181,8 +198,9 @@ class ServiceAssistantVocal extends StateNotifier<EtatAssistant> {
 
     try {
       final jsonResponse = await _serviceIA.analyserIntentionVocale(phrase);
-      
-      String reponseVocale = jsonResponse["reponse_vocale"] ?? "Je n'ai pas compris.";
+
+      String reponseVocale =
+          jsonResponse["reponse_vocale"] ?? "Je n'ai pas compris.";
       bool complet = jsonResponse["complet"] ?? false;
       String intention = jsonResponse["intention"] ?? "INCONNU";
 
@@ -192,8 +210,16 @@ class ServiceAssistantVocal extends StateNotifier<EtatAssistant> {
           await _creerCourseAutonome(jsonResponse);
         } else {
           // Rebond pour demander les infos manquantes
-          _doitRelancerEcouteActive = true; 
+          _doitRelancerEcouteActive = true;
         }
+      } else if (intention == "CONSULTER_COURSES") {
+        // Naviguer vers l'historique des courses
+        onNavigate?.call('/historique');
+      } else if (intention == "CONSULTER_REVENUS") {
+        // Naviguer vers la page des revenus (transporteur)
+        onNavigate?.call('/revenus');
+      } else if (intention == "INFO_SERVICE") {
+        // Juste répondre vocalement, pas de navigation
       } else {
         // Intention inconnue, on répond juste
       }
@@ -202,7 +228,6 @@ class ServiceAssistantVocal extends StateNotifier<EtatAssistant> {
       texteCourant = reponseVocale;
       onTextChanged?.call(texteCourant);
       await _flutterTts.speak(reponseVocale);
-
     } catch (e) {
       state = EtatAssistant.erreur;
       texteCourant = "Erreur de compréhension.";
@@ -223,14 +248,16 @@ class ServiceAssistantVocal extends StateNotifier<EtatAssistant> {
 
     // --- GPS et Geocoding ---
     final serviceGps = _ref.read(serviceGpsProvider);
-    
+
     // 1. Position actuelle (Départ)
     final positionDepart = await serviceGps.obtenirPositionActuelle();
-    double latDepart = positionDepart?.latitude ?? 3.8480; // Yaoundé par défaut si refusé
+    double latDepart =
+        positionDepart?.latitude ?? 3.8480; // Yaoundé par défaut si refusé
     double lngDepart = positionDepart?.longitude ?? 11.5021;
     String adresseDepartReelle = depart;
     if (depart.isEmpty || depart.toLowerCase() == "ici") {
-      adresseDepartReelle = await serviceGps.obtenirAdresse(latitude: latDepart, longitude: lngDepart);
+      adresseDepartReelle = await serviceGps.obtenirAdresse(
+          latitude: latDepart, longitude: lngDepart);
     }
 
     // 2. Géocodage de l'arrivée
@@ -244,11 +271,10 @@ class ServiceAssistantVocal extends StateNotifier<EtatAssistant> {
 
     // 3. Calcul de la distance
     double distanceCourse = serviceGps.calculerDistance(
-      latitudeDepart: latDepart, 
-      longitudeDepart: lngDepart, 
-      latitudeArrivee: latArrivee, 
-      longitudeArrivee: lngArrivee
-    );
+        latitudeDepart: latDepart,
+        longitudeDepart: lngDepart,
+        latitudeArrivee: latArrivee,
+        longitudeArrivee: lngArrivee);
     if (distanceCourse < 1.0) distanceCourse = 5.0; // Distance minimum
 
     // Injection dans le provider de demande
@@ -260,10 +286,11 @@ class ServiceAssistantVocal extends StateNotifier<EtatAssistant> {
     notifier.setLongitudeDepart(lngDepart);
     notifier.setLatitudeArrivee(latArrivee);
     notifier.setLongitudeArrivee(lngArrivee);
-    
+
     // Création Firestore de la course
     final serviceFirestore = _ref.read(serviceFirestoreProvider);
-    final String docId = "C-${DateTime.now().millisecondsSinceEpoch.toString().substring(5)}";
+    final String docId =
+        "C-${DateTime.now().millisecondsSinceEpoch.toString().substring(5)}";
     final String codeSuivi = docId;
 
     final Course nouvelleCourse = Course(

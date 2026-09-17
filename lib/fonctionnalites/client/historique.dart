@@ -27,8 +27,7 @@ class _HistoriqueState extends ConsumerState<Historique> {
   bool _suppressionEnCours = false;
   final List<String> _filtres = ["Toutes", "En cours", "Livrées", "Annulées"];
 
-  bool _peutSupprimer(Course course) =>
-      StatutCourse.estTerminee(course.statut);
+  bool _peutSupprimer(Course course) => StatutCourse.estTerminee(course.statut);
 
   Future<void> _supprimerCourse(Course course) async {
     final confirm = await showDialog<bool>(
@@ -60,7 +59,8 @@ class _HistoriqueState extends ConsumerState<Historique> {
     final terminees = courses.where(_peutSupprimer).toList();
     if (terminees.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Aucune course terminée/annulée à supprimer.")),
+        const SnackBar(
+            content: Text("Aucune course terminée/annulée à supprimer.")),
       );
       return;
     }
@@ -68,7 +68,8 @@ class _HistoriqueState extends ConsumerState<Historique> {
       context: context,
       builder: (_) => _DialogConfirmation(
         titre: "Vider l'historique ?",
-        message: "${terminees.length} course(s) terminée(s)/annulée(s) seront supprimées définitivement.",
+        message:
+            "${terminees.length} course(s) terminée(s)/annulée(s) seront supprimées définitivement.",
         bouton: "Tout supprimer",
         couleur: CouleursApp.erreur,
       ),
@@ -100,28 +101,33 @@ class _HistoriqueState extends ConsumerState<Historique> {
     return Scaffold(
       backgroundColor: const Color(0xFF08111F),
       appBar: AppBar(
-        title: const Text("Historique des demandes", style: TextStyle(fontWeight: FontWeight.bold)),
+        title: const Text("Historique des commandes",
+            style: TextStyle(fontWeight: FontWeight.bold)),
         backgroundColor: const Color(0xFF08111F),
         elevation: 0,
         automaticallyImplyLeading: false,
         actions: [
           coursesAsync.whenOrNull(
-            data: (courses) => courses.isNotEmpty
-                ? Tooltip(
-                    message: "Supprimer les courses terminées/annulées",
-                    child: IconButton(
-                      icon: _suppressionEnCours
-                          ? const SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: LoaderPremium(size: 20),
-                            )
-                          : const Icon(Icons.delete_sweep_rounded, color: CouleursApp.erreur),
-                      onPressed: _suppressionEnCours ? null : () => _supprimerTout(courses),
-                    ),
-                  )
-                : const SizedBox.shrink(),
-          ) ?? const SizedBox.shrink(),
+                data: (courses) => courses.isNotEmpty
+                    ? Tooltip(
+                        message: "Supprimer les courses terminées/annulées",
+                        child: IconButton(
+                          icon: _suppressionEnCours
+                              ? const SizedBox(
+                                  width: 20,
+                                  height: 20,
+                                  child: LoaderPremium(size: 20),
+                                )
+                              : const Icon(Icons.delete_sweep_rounded,
+                                  color: CouleursApp.erreur),
+                          onPressed: _suppressionEnCours
+                              ? null
+                              : () => _supprimerTout(courses),
+                        ),
+                      )
+                    : const SizedBox.shrink(),
+              ) ??
+              const SizedBox.shrink(),
         ],
       ),
       body: Column(
@@ -166,9 +172,8 @@ class _HistoriqueState extends ConsumerState<Historique> {
             child: coursesAsync.when(
               data: (courses) {
                 // Exclure les courses archivées par le client (masquage logique)
-                List<Course> coursesFiltrees = courses
-                    .where((c) => c.archivePourClient != true)
-                    .toList();
+                List<Course> coursesFiltrees =
+                    courses.where((c) => c.archivePourClient != true).toList();
 
                 if (_recherche.text.isNotEmpty) {
                   final q = _recherche.text.toLowerCase();
@@ -198,7 +203,8 @@ class _HistoriqueState extends ConsumerState<Historique> {
                 }
 
                 return ListView.builder(
-                  padding: EdgeInsets.fromLTRB(TaillesApp.margePage, TaillesApp.margePage, TaillesApp.margePage, 120),
+                  padding: EdgeInsets.fromLTRB(TaillesApp.margePage,
+                      TaillesApp.margePage, TaillesApp.margePage, 120),
                   itemCount: coursesFiltrees.length,
                   itemBuilder: (context, index) {
                     final course = coursesFiltrees[index];
@@ -217,7 +223,8 @@ class _HistoriqueState extends ConsumerState<Historique> {
                             color: CouleursApp.erreur,
                             borderRadius: BorderRadius.circular(20),
                           ),
-                          child: const Icon(Icons.delete_rounded, color: Colors.white, size: 30),
+                          child: const Icon(Icons.delete_rounded,
+                              color: Colors.white, size: 30),
                         ),
                         confirmDismiss: (_) async {
                           return await showDialog<bool>(
@@ -253,8 +260,11 @@ class _HistoriqueState extends ConsumerState<Historique> {
                   },
                 );
               },
-              loading: () => const Center(child: IndicateurChargement(taille: 30)),
-              error: (err, stack) => Center(child: Text("Oups ! Impossible de charger l'historique : $err 🔧")),
+              loading: () =>
+                  const Center(child: IndicateurChargement(taille: 30)),
+              error: (err, stack) => Center(
+                  child: Text(
+                      "Oups ! Impossible de charger l'historique : $err 🔧")),
             ),
           ),
         ],
@@ -288,8 +298,7 @@ class _HistoriqueState extends ConsumerState<Historique> {
           texte,
           style: TextStyle(
             color: estSelectionne ? Colors.white : CouleursApp.texteSecondaire,
-            fontWeight:
-                estSelectionne ? FontWeight.bold : FontWeight.normal,
+            fontWeight: estSelectionne ? FontWeight.bold : FontWeight.normal,
           ),
         ),
       ),
@@ -355,8 +364,7 @@ class _HistoriqueState extends ConsumerState<Historique> {
                       const SizedBox(height: 5),
                       Text(dateStr,
                           style: const TextStyle(
-                              color: Colors.white70,
-                              fontSize: 13)),
+                              color: Colors.white70, fontSize: 13)),
                     ],
                   ),
                 ),
@@ -448,7 +456,9 @@ class _DialogConfirmation extends StatelessWidget {
         children: [
           Icon(Icons.warning_amber_rounded, color: couleur),
           const SizedBox(width: 10),
-          Text(titre, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+          Text(titre,
+              style:
+                  const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
         ],
       ),
       content: Text(message),
@@ -461,7 +471,8 @@ class _DialogConfirmation extends StatelessWidget {
           style: ElevatedButton.styleFrom(
             backgroundColor: couleur,
             foregroundColor: Colors.white,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           ),
           onPressed: () => Navigator.pop(context, true),
           child: Text(bouton),

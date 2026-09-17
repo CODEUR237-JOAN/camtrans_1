@@ -1,0 +1,310 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="1050" viewBox="0 0 1200 1050">
+
+  <!-- ===== MARQUEURS DE FLÈCHES ===== -->
+  <defs>
+    <marker id="arw" viewBox="0 0 10 7" markerWidth="7" markerHeight="5"
+            refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0,10 3.5,0 7" fill="#2C3E50"/>
+    </marker>
+    <marker id="arwr" viewBox="0 0 10 7" markerWidth="7" markerHeight="5"
+            refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0,10 3.5,0 7" fill="#C53030"/>
+    </marker>
+  </defs>
+
+  <!-- ===== FOND GÉNÉRAL ===== -->
+  <rect width="1200" height="1050" fill="white"/>
+  <rect x="1" y="1" width="1198" height="1048" fill="none" stroke="#3B97D3" stroke-width="1.5"/>
+
+  <!-- ===== TITRE ===== -->
+  <text x="600" y="19" text-anchor="middle"
+        font-family="Arial,sans-serif" font-size="13" font-weight="bold" fill="#1A3A5C">
+    Diagramme d'Activité — Créer une Demande de Course · CamTrans
+  </text>
+
+  <!-- ===== EN-TÊTES DES PARTITIONS ===== -->
+  <rect x="1"   y="23" width="399" height="40" fill="#C8E6F7" stroke="#3B97D3" stroke-width="1.5"/>
+  <rect x="400" y="23" width="410" height="40" fill="#C8E6F7" stroke="#3B97D3" stroke-width="1.5"/>
+  <rect x="810" y="23" width="390" height="40" fill="#C8E6F7" stroke="#3B97D3" stroke-width="1.5"/>
+
+  <text x="200"  y="48" text-anchor="middle" font-family="Arial,sans-serif"
+        font-size="13" font-weight="bold" fill="#1A3A5C">Client</text>
+  <text x="605"  y="48" text-anchor="middle" font-family="Arial,sans-serif"
+        font-size="13" font-weight="bold" fill="#1A3A5C">Système</text>
+  <text x="1005" y="48" text-anchor="middle" font-family="Arial,sans-serif"
+        font-size="13" font-weight="bold" fill="#1A3A5C">Firebase (SGBD)</text>
+
+  <!-- ===== FONDS DES PARTITIONS ===== -->
+  <rect x="1"   y="63" width="399" height="986" fill="#EFF8FF"/>
+  <rect x="400" y="63" width="410" height="986" fill="#FAFEFF"/>
+  <rect x="810" y="63" width="390" height="986" fill="#EFF8FF"/>
+
+  <!-- ===== SÉPARATEURS VERTICAUX ===== -->
+  <line x1="400" y1="23" x2="400" y2="1049" stroke="#3B97D3" stroke-width="1.5"/>
+  <line x1="810" y1="23" x2="810" y2="1049" stroke="#3B97D3" stroke-width="1.5"/>
+
+
+  <!-- ============================================================ -->
+  <!--                     NŒUDS UML                                -->
+  <!-- ============================================================ -->
+
+  <!-- NŒUD INITIAL ● (Client, cy=100) -->
+  <circle cx="200" cy="100" r="12" fill="#CC0000"/>
+
+  <!-- B1 : Appuyer "Nouvelle Course" — Client (y=126–164) -->
+  <rect x="90" y="126" width="220" height="38" rx="10" ry="10"
+        fill="#D4E9F7" stroke="#3B97D3" stroke-width="1.5"/>
+  <text x="200" y="149" text-anchor="middle" font-family="Arial,sans-serif"
+        font-size="11" fill="#1A3A5C">Appuyer "Nouvelle Course"</text>
+
+  <!-- B2 : Afficher formulaire de création — Système (y=126–164) -->
+  <rect x="495" y="126" width="220" height="38" rx="10" ry="10"
+        fill="#D4E9F7" stroke="#3B97D3" stroke-width="1.5"/>
+  <text x="605" y="149" text-anchor="middle" font-family="Arial,sans-serif"
+        font-size="11" fill="#1A3A5C">Afficher formulaire de création</text>
+
+  <!-- B3 : Saisir informations — Client (y=208–258, 2 lignes) -->
+  <rect x="90" y="208" width="220" height="50" rx="10" ry="10"
+        fill="#D4E9F7" stroke="#3B97D3" stroke-width="1.5"/>
+  <text x="200" y="228" text-anchor="middle" font-family="Arial,sans-serif"
+        font-size="11" fill="#1A3A5C">Saisir informations de course</text>
+  <text x="200" y="246" text-anchor="middle" font-family="Arial,sans-serif"
+        font-size="10" fill="#3E7AB5">(départ, arrivée, marchandise)</text>
+
+  <!-- B4 : Joindre photos — Client (y=288–326, pointillé = optionnel) -->
+  <rect x="90" y="288" width="220" height="38" rx="10" ry="10"
+        fill="#EAF4FB" stroke="#3B97D3" stroke-width="1.5" stroke-dasharray="6,3"/>
+  <text x="200" y="311" text-anchor="middle" font-family="Arial,sans-serif"
+        font-size="11" fill="#1A3A5C">Joindre photos (optionnel)</text>
+
+  <!-- B5 : Valider le formulaire — Client (y=358–396) -->
+  <rect x="90" y="358" width="220" height="38" rx="10" ry="10"
+        fill="#D4E9F7" stroke="#3B97D3" stroke-width="1.5"/>
+  <text x="200" y="381" text-anchor="middle" font-family="Arial,sans-serif"
+        font-size="11" fill="#1A3A5C">Valider le formulaire</text>
+
+  <!-- BE : Afficher message d'erreur — Client (y=447–485, rouge) -->
+  <rect x="90" y="447" width="220" height="38" rx="10" ry="10"
+        fill="#FDE8E8" stroke="#E53E3E" stroke-width="1.5"/>
+  <text x="200" y="470" text-anchor="middle" font-family="Arial,sans-serif"
+        font-size="11" fill="#C53030">Afficher message d'erreur</text>
+
+  <!-- D1 : DÉCISION "Vérifier format" — Système (losange, cy=470) -->
+  <!--  sommets : haut(605,444) droite(661,470) bas(605,496) gauche(549,470) -->
+  <polygon points="605,444 661,470 605,496 549,470"
+           fill="#D4E9F7" stroke="#3B97D3" stroke-width="1.5"/>
+  <text x="605" y="465" text-anchor="middle" font-family="Arial,sans-serif"
+        font-size="10" fill="#1A3A5C">Vérifier</text>
+  <text x="605" y="478" text-anchor="middle" font-family="Arial,sans-serif"
+        font-size="10" fill="#1A3A5C">format</text>
+
+  <!-- B6 : Appeler API Gemini IA — Système (y=524–562) -->
+  <rect x="495" y="524" width="220" height="38" rx="10" ry="10"
+        fill="#D4E9F7" stroke="#3B97D3" stroke-width="1.5"/>
+  <text x="605" y="547" text-anchor="middle" font-family="Arial,sans-serif"
+        font-size="11" fill="#1A3A5C">Appeler API Gemini IA</text>
+
+  <!-- B7 : Afficher estimation — Système (y=594–644, 2 lignes) -->
+  <rect x="495" y="594" width="220" height="50" rx="10" ry="10"
+        fill="#D4E9F7" stroke="#3B97D3" stroke-width="1.5"/>
+  <text x="605" y="614" text-anchor="middle" font-family="Arial,sans-serif"
+        font-size="11" fill="#1A3A5C">Afficher estimation</text>
+  <text x="605" y="631" text-anchor="middle" font-family="Arial,sans-serif"
+        font-size="10" fill="#3E7AB5">(véhicule, prix estimé, volume)</text>
+
+  <!-- B8 : Confirmer la demande — Client (y=674–712) -->
+  <rect x="90" y="674" width="220" height="38" rx="10" ry="10"
+        fill="#D4E9F7" stroke="#3B97D3" stroke-width="1.5"/>
+  <text x="200" y="697" text-anchor="middle" font-family="Arial,sans-serif"
+        font-size="11" fill="#1A3A5C">Confirmer la demande</text>
+
+  <!-- D2 : DÉCISION "Connexion disponible ?" — Système (losange, cy=760) -->
+  <!--  sommets : haut(605,734) droite(661,760) bas(605,786) gauche(549,760) -->
+  <polygon points="605,734 661,760 605,786 549,760"
+           fill="#D4E9F7" stroke="#3B97D3" stroke-width="1.5"/>
+  <text x="605" y="755" text-anchor="middle" font-family="Arial,sans-serif"
+        font-size="10" fill="#1A3A5C">Connexion</text>
+  <text x="605" y="768" text-anchor="middle" font-family="Arial,sans-serif"
+        font-size="10" fill="#1A3A5C">disponible ?</text>
+
+  <!-- B9 : Enregistrer la course — Firebase (y=810–860, 2 lignes) -->
+  <rect x="895" y="810" width="220" height="50" rx="10" ry="10"
+        fill="#D4E9F7" stroke="#3B97D3" stroke-width="1.5"/>
+  <text x="1005" y="830" text-anchor="middle" font-family="Arial,sans-serif"
+        font-size="11" fill="#1A3A5C">Enregistrer la course</text>
+  <text x="1005" y="848" text-anchor="middle" font-family="Arial,sans-serif"
+        font-size="10" fill="#3E7AB5">(statut : recherche)</text>
+
+  <!-- BN : Sauvegarder brouillon — Client (y=810–860, jaune) -->
+  <rect x="90" y="810" width="220" height="50" rx="10" ry="10"
+        fill="#FEF3C7" stroke="#D69E2E" stroke-width="1.5"/>
+  <text x="200" y="830" text-anchor="middle" font-family="Arial,sans-serif"
+        font-size="11" fill="#744210">Sauvegarder en brouillon</text>
+  <text x="200" y="848" text-anchor="middle" font-family="Arial,sans-serif"
+        font-size="10" fill="#744210">(mode hors-ligne)</text>
+
+  <!-- B10 : Notifier transporteurs — Firebase (y=886–936, 2 lignes) -->
+  <rect x="895" y="886" width="220" height="50" rx="10" ry="10"
+        fill="#D4E9F7" stroke="#3B97D3" stroke-width="1.5"/>
+  <text x="1005" y="906" text-anchor="middle" font-family="Arial,sans-serif"
+        font-size="11" fill="#1A3A5C">Notifier les transporteurs</text>
+  <text x="1005" y="923" text-anchor="middle" font-family="Arial,sans-serif"
+        font-size="10" fill="#3E7AB5">disponibles (Push FCM)</text>
+
+  <!-- B11 : Afficher confirmation — Système (y=886–936, vert) -->
+  <rect x="495" y="886" width="220" height="50" rx="10" ry="10"
+        fill="#D1F2EB" stroke="#27AE60" stroke-width="1.5"/>
+  <text x="605" y="906" text-anchor="middle" font-family="Arial,sans-serif"
+        font-size="11" fill="#1A5C2A">Afficher confirmation</text>
+  <text x="605" y="923" text-anchor="middle" font-family="Arial,sans-serif"
+        font-size="10" fill="#27AE60">de création de course ✓</text>
+
+  <!-- E2 : FIN DE FLUX ⊗  (Client, cx=155, cy=912) -->
+  <circle cx="155" cy="912" r="12" fill="white" stroke="#CC0000" stroke-width="2"/>
+  <line x1="147" y1="904" x2="163" y2="920" stroke="#CC0000" stroke-width="2"/>
+  <line x1="163" y1="904" x2="147" y2="920" stroke="#CC0000" stroke-width="2"/>
+
+  <!-- NŒUD FINAL ●○  (Client, cx=200, cy=1010) -->
+  <circle cx="200" cy="1010" r="14" fill="white" stroke="#CC0000" stroke-width="2"/>
+  <circle cx="200" cy="1010" r="8"  fill="#CC0000"/>
+
+  <!-- Étiquette nœud final -->
+  <text x="220" y="1014" font-family="Arial,sans-serif" font-size="9" fill="#666">Fin</text>
+  <!-- Étiquette nœud flux-final -->
+  <text x="172" y="916"  font-family="Arial,sans-serif" font-size="9" fill="#C53030">Fin flux</text>
+
+
+  <!-- ============================================================ -->
+  <!--                        FLÈCHES                               -->
+  <!-- ============================================================ -->
+
+  <!-- A1 : Nœud initial → B1 -->
+  <line x1="200" y1="112" x2="200" y2="126"
+        stroke="#2C3E50" stroke-width="1.5" marker-end="url(#arw)"/>
+
+  <!-- A2 : B1 → B2 (horizontal droite) -->
+  <line x1="310" y1="145" x2="495" y2="145"
+        stroke="#2C3E50" stroke-width="1.5" marker-end="url(#arw)"/>
+
+  <!-- A3 : B2 → B3  (bas ➞ gauche ➞ bas) -->
+  <polyline points="605,164 605,188 200,188 200,208"
+            fill="none" stroke="#2C3E50" stroke-width="1.5" marker-end="url(#arw)"/>
+
+  <!-- A4 : B3 → B4 -->
+  <line x1="200" y1="258" x2="200" y2="288"
+        stroke="#2C3E50" stroke-width="1.5" marker-end="url(#arw)"/>
+
+  <!-- A5 : B4 → B5 -->
+  <line x1="200" y1="326" x2="200" y2="358"
+        stroke="#2C3E50" stroke-width="1.5" marker-end="url(#arw)"/>
+
+  <!-- A6 : B5 → D1  (bas ➞ droite ➞ bas vers sommet du losange) -->
+  <polyline points="200,396 200,434 605,434 605,444"
+            fill="none" stroke="#2C3E50" stroke-width="1.5" marker-end="url(#arw)"/>
+
+  <!-- A7 : D1 gauche → BE  [format incorrect] -->
+  <line x1="549" y1="470" x2="310" y2="470"
+        stroke="#E53E3E" stroke-width="1.5" marker-end="url(#arwr)"/>
+  <text x="430" y="462" text-anchor="middle"
+        font-family="Arial,sans-serif" font-size="10" fill="#C53030">[format incorrect]</text>
+
+  <!-- A8 : BE → B3  (boucle retour extérieure, pointillé rouge) -->
+  <polyline points="90,466 52,466 52,233 90,233"
+            fill="none" stroke="#E53E3E" stroke-width="1.5" stroke-dasharray="5,3"
+            marker-end="url(#arwr)"/>
+  <!-- Libellé vertical "Correction" -->
+  <text font-family="Arial,sans-serif" font-size="9" fill="#C53030"
+        transform="translate(46,370) rotate(-90)">Correction</text>
+
+  <!-- A9 : D1 bas → B6  [format OK] -->
+  <line x1="605" y1="496" x2="605" y2="524"
+        stroke="#2C3E50" stroke-width="1.5" marker-end="url(#arw)"/>
+  <text x="628" y="513" font-family="Arial,sans-serif" font-size="10" fill="#27AE60">[format OK]</text>
+
+  <!-- A10 : B6 → B7 -->
+  <line x1="605" y1="562" x2="605" y2="594"
+        stroke="#2C3E50" stroke-width="1.5" marker-end="url(#arw)"/>
+
+  <!-- A11 : B7 → B8  (gauche ➞ bas) -->
+  <polyline points="495,619 200,619 200,674"
+            fill="none" stroke="#2C3E50" stroke-width="1.5" marker-end="url(#arw)"/>
+
+  <!-- A12 : B8 → D2  (droite ➞ bas vers sommet du losange) -->
+  <polyline points="310,693 605,693 605,734"
+            fill="none" stroke="#2C3E50" stroke-width="1.5" marker-end="url(#arw)"/>
+
+  <!-- A13 : D2 droite → B9  [OUI] (droite ➞ bas) -->
+  <polyline points="661,760 895,760 895,810"
+            fill="none" stroke="#2C3E50" stroke-width="1.5" marker-end="url(#arw)"/>
+  <text x="775" y="752" text-anchor="middle"
+        font-family="Arial,sans-serif" font-size="10" fill="#27AE60">[OUI]</text>
+
+  <!-- A14 : B9 → B10 (bas) -->
+  <line x1="1005" y1="860" x2="1005" y2="886"
+        stroke="#2C3E50" stroke-width="1.5" marker-end="url(#arw)"/>
+
+  <!-- A15 : B10 → B11  (gauche : Firebase ➞ Système) -->
+  <polyline points="895,911 715,911"
+            fill="none" stroke="#2C3E50" stroke-width="1.5" marker-end="url(#arw)"/>
+
+  <!-- A16 : B11 → Nœud final  (gauche ➞ bas) -->
+  <polyline points="495,911 200,911 200,996"
+            fill="none" stroke="#2C3E50" stroke-width="1.5" marker-end="url(#arw)"/>
+
+  <!-- A17 : D2 gauche → BN  [NON] (gauche ➞ bas) -->
+  <polyline points="549,760 200,760 200,810"
+            fill="none" stroke="#2C3E50" stroke-width="1.5" marker-end="url(#arw)"/>
+  <text x="370" y="752" text-anchor="middle"
+        font-family="Arial,sans-serif" font-size="10" fill="#C53030">[NON]</text>
+
+  <!-- A18 : BN → Fin de flux ⊗  (bas ➞ gauche ➞ bas) -->
+  <polyline points="200,860 155,860 155,900"
+            fill="none" stroke="#2C3E50" stroke-width="1.5" marker-end="url(#arw)"/>
+
+
+  <!-- ============================================================ -->
+  <!--                    LÉGENDE EN BAS                            -->
+  <!-- ============================================================ -->
+  <rect x="5" y="1018" width="890" height="28" rx="5"
+        fill="#F8FCFF" stroke="#3B97D3" stroke-width="1" opacity="0.85"/>
+
+  <!-- Symbole : nœud initial -->
+  <circle cx="22" cy="1032" r="7" fill="#CC0000"/>
+  <text x="33" y="1036" font-family="Arial,sans-serif" font-size="9" fill="#333">Nœud initial</text>
+
+  <!-- Symbole : nœud final -->
+  <circle cx="110" cy="1032" r="8" fill="white" stroke="#CC0000" stroke-width="1.5"/>
+  <circle cx="110" cy="1032" r="5" fill="#CC0000"/>
+  <text x="122" y="1036" font-family="Arial,sans-serif" font-size="9" fill="#333">Nœud final</text>
+
+  <!-- Symbole : fin de flux -->
+  <circle cx="198" cy="1032" r="7" fill="white" stroke="#CC0000" stroke-width="1.5"/>
+  <line x1="193" y1="1027" x2="203" y2="1037" stroke="#CC0000" stroke-width="1.5"/>
+  <line x1="203" y1="1027" x2="193" y2="1037" stroke="#CC0000" stroke-width="1.5"/>
+  <text x="209" y="1036" font-family="Arial,sans-serif" font-size="9" fill="#333">Fin de flux</text>
+
+  <!-- Symbole : action -->
+  <rect x="278" y="1024" width="50" height="16" rx="4" fill="#D4E9F7" stroke="#3B97D3" stroke-width="1"/>
+  <text x="303" y="1036" text-anchor="middle" font-family="Arial,sans-serif" font-size="9" fill="#333">Action</text>
+  <text x="334" y="1036" font-family="Arial,sans-serif" font-size="9" fill="#333">Action / Activité</text>
+
+  <!-- Symbole : optionnel -->
+  <rect x="426" y="1024" width="50" height="16" rx="4" fill="#EAF4FB" stroke="#3B97D3" stroke-width="1" stroke-dasharray="4,2"/>
+  <text x="451" y="1036" text-anchor="middle" font-family="Arial,sans-serif" font-size="9" fill="#333">opt.</text>
+  <text x="482" y="1036" font-family="Arial,sans-serif" font-size="9" fill="#333">Activité optionnelle</text>
+
+  <!-- Symbole : décision -->
+  <polygon points="578,1032 593,1024 608,1032 593,1040" fill="#D4E9F7" stroke="#3B97D3" stroke-width="1"/>
+  <text x="614" y="1036" font-family="Arial,sans-serif" font-size="9" fill="#333">Décision / Condition</text>
+
+  <!-- Symbole : succès -->
+  <rect x="718" y="1024" width="50" height="16" rx="4" fill="#D1F2EB" stroke="#27AE60" stroke-width="1"/>
+  <text x="743" y="1036" text-anchor="middle" font-family="Arial,sans-serif" font-size="9" fill="#1A5C2A">✓ OK</text>
+  <text x="774" y="1036" font-family="Arial,sans-serif" font-size="9" fill="#333">Succès</text>
+
+  <!-- Symbole : erreur -->
+  <rect x="822" y="1024" width="50" height="16" rx="4" fill="#FDE8E8" stroke="#E53E3E" stroke-width="1"/>
+  <text x="847" y="1036" text-anchor="middle" font-family="Arial,sans-serif" font-size="9" fill="#C53030">Erreur</text>
+
+</svg>

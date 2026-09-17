@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
-
 /// =======================================================
 /// ANIMATIONS AVANCÉES
 /// Staggered list, pulse, scale bounce, parallax
@@ -248,8 +247,8 @@ class _AnimationScaleBounceState extends State<AnimationScaleBounce>
     return AnimatedBuilder(
       animation: _animation,
       builder: (context, child) {
-        final scale = widget.beginScale +
-            (1.0 - widget.beginScale) * _animation.value;
+        final scale =
+            widget.beginScale + (1.0 - widget.beginScale) * _animation.value;
         return Transform.scale(
           scale: scale,
           child: Opacity(

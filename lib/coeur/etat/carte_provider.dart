@@ -48,13 +48,15 @@ class CarteNotifier extends StateNotifier<EtatCarte> {
     final connectivityResult = await (Connectivity().checkConnectivity());
     _verifierConnectivite(connectivityResult);
 
-    _subscriptionReseau = Connectivity().onConnectivityChanged.listen(_verifierConnectivite);
+    _subscriptionReseau =
+        Connectivity().onConnectivityChanged.listen(_verifierConnectivite);
 
     await actualiserPosition();
   }
 
   void _verifierConnectivite(List<ConnectivityResult> resultats) {
-    bool horsLigne = resultats.isEmpty || resultats.contains(ConnectivityResult.none);
+    bool horsLigne =
+        resultats.isEmpty || resultats.contains(ConnectivityResult.none);
     state = state.copierAvec(horsLigne: horsLigne);
   }
 

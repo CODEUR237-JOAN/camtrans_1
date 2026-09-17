@@ -13,7 +13,6 @@ class ThemeApplication {
       brightness: Brightness.light,
       primaryColor: CouleursApp.primaire,
       scaffoldBackgroundColor: CouleursApp.fond,
-      
       colorScheme: ColorScheme.fromSeed(
         seedColor: CouleursApp.primaire,
         primary: CouleursApp.primaire,
@@ -22,7 +21,8 @@ class ThemeApplication {
         error: CouleursApp.erreur,
         brightness: Brightness.light,
       ),
-      textTheme: _getTextTheme(CouleursApp.textePrincipal, CouleursApp.texteSecondaire),
+      textTheme: _getTextTheme(
+          CouleursApp.textePrincipal, CouleursApp.texteSecondaire),
     );
   }
 
@@ -33,7 +33,7 @@ class ThemeApplication {
       brightness: Brightness.dark,
       primaryColor: CouleursApp.primaire,
       scaffoldBackgroundColor: CouleursApp.fondSombre,
-      
+
       colorScheme: ColorScheme.fromSeed(
         seedColor: CouleursApp.primaire,
         primary: CouleursApp.primaire,
@@ -68,7 +68,7 @@ class ThemeApplication {
           backgroundColor: CouleursApp.primaire,
           foregroundColor: Colors.white,
           minimumSize: const Size(double.infinity, 56),
-          elevation: 0, 
+          elevation: 0,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
@@ -83,7 +83,8 @@ class ThemeApplication {
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: Colors.white.withValues(alpha: 0.05),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
+        contentPadding:
+            const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
           borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.1)),
@@ -137,17 +138,48 @@ class ThemeApplication {
   static TextTheme _getTextTheme(Color primaryColor, Color secondaryColor) {
     return GoogleFonts.interTextTheme(
       TextTheme(
-        headlineLarge: TextStyle(fontSize: 34, fontWeight: FontWeight.w900, color: primaryColor, letterSpacing: -1.0),
-        headlineMedium: TextStyle(fontSize: 28, fontWeight: FontWeight.w800, color: primaryColor, letterSpacing: -0.8),
-        headlineSmall: TextStyle(fontSize: 22, fontWeight: FontWeight.w700, color: primaryColor, letterSpacing: -0.5),
-        titleLarge: TextStyle(fontSize: 20, fontWeight: FontWeight.w700, color: primaryColor, letterSpacing: -0.5),
-        titleMedium: TextStyle(fontSize: 17, fontWeight: FontWeight.w600, color: primaryColor, letterSpacing: -0.3),
-        titleSmall: TextStyle(fontSize: 15, fontWeight: FontWeight.w600, color: secondaryColor, letterSpacing: -0.2),
-        bodyLarge: TextStyle(fontSize: 17, color: primaryColor, letterSpacing: -0.2),
-        bodyMedium: TextStyle(fontSize: 15, color: secondaryColor, letterSpacing: -0.1),
+        headlineLarge: TextStyle(
+            fontSize: 34,
+            fontWeight: FontWeight.w900,
+            color: primaryColor,
+            letterSpacing: -1.0),
+        headlineMedium: TextStyle(
+            fontSize: 28,
+            fontWeight: FontWeight.w800,
+            color: primaryColor,
+            letterSpacing: -0.8),
+        headlineSmall: TextStyle(
+            fontSize: 22,
+            fontWeight: FontWeight.w700,
+            color: primaryColor,
+            letterSpacing: -0.5),
+        titleLarge: TextStyle(
+            fontSize: 20,
+            fontWeight: FontWeight.w700,
+            color: primaryColor,
+            letterSpacing: -0.5),
+        titleMedium: TextStyle(
+            fontSize: 17,
+            fontWeight: FontWeight.w600,
+            color: primaryColor,
+            letterSpacing: -0.3),
+        titleSmall: TextStyle(
+            fontSize: 15,
+            fontWeight: FontWeight.w600,
+            color: secondaryColor,
+            letterSpacing: -0.2),
+        bodyLarge:
+            TextStyle(fontSize: 17, color: primaryColor, letterSpacing: -0.2),
+        bodyMedium:
+            TextStyle(fontSize: 15, color: secondaryColor, letterSpacing: -0.1),
         bodySmall: TextStyle(fontSize: 13, color: secondaryColor),
-        labelLarge: TextStyle(fontSize: 15, fontWeight: FontWeight.w700, color: Colors.white, letterSpacing: -0.1),
-        labelMedium: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: secondaryColor),
+        labelLarge: TextStyle(
+            fontSize: 15,
+            fontWeight: FontWeight.w700,
+            color: Colors.white,
+            letterSpacing: -0.1),
+        labelMedium: TextStyle(
+            fontSize: 13, fontWeight: FontWeight.w600, color: secondaryColor),
       ),
     );
   }

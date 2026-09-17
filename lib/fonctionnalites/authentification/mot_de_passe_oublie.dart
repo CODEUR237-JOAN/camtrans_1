@@ -12,16 +12,13 @@ class MotDePasseOublie extends StatefulWidget {
   const MotDePasseOublie({super.key});
 
   @override
-  State<MotDePasseOublie> createState() =>
-      _MotDePasseOublieState();
+  State<MotDePasseOublie> createState() => _MotDePasseOublieState();
 }
 
-class _MotDePasseOublieState
-    extends State<MotDePasseOublie> {
+class _MotDePasseOublieState extends State<MotDePasseOublie> {
   final _formKey = GlobalKey<FormState>();
 
-  final TextEditingController _email =
-  TextEditingController();
+  final TextEditingController _email = TextEditingController();
 
   bool _chargement = false;
 
@@ -74,87 +71,73 @@ class _MotDePasseOublieState
       body: SafeArea(
         child: PageResponsive(
           child: SingleChildScrollView(
-          padding: EdgeInsets.all(
-            TaillesApp.margePage,
-          ),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              children: [
-                const SizedBox(height: 20),
-
-                const Icon(
-                  Icons.local_shipping,
-                  size: 120,
-                  color: CouleursApp.primaire,
-                ),
-
-                const SizedBox(height: 30),
-
-                const Icon(
-                  Icons.lock_reset,
-                  size: 90,
-                  color: CouleursApp.primaire,
-                ),
-
-                const SizedBox(height: 25),
-
-                const Text(
-                  "Réinitialisation du mot de passe",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 26,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-
-                const SizedBox(height: 15),
-
-                const Text(
-                  "Saisissez votre adresse e-mail. Nous vous enverrons un lien permettant de créer un nouveau mot de passe.",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: CouleursApp.texteSecondaire,
-                    height: 1.5,
-                  ),
-                ),
-
-                const SizedBox(height: 35),
-
-                ChampTexte(
-                  controleur: _email,
-                  libelle: "Adresse e-mail",
-                  icone: Icons.email_outlined,
-                  typeClavier:
-                  TextInputType.emailAddress,
-                  validateur: Validateurs.email,
-                ),
-
-                const SizedBox(height: 35),
-
-                BoutonPrincipal(
-                  texte: "Envoyer le lien",
-                  icone: Icons.send,
-                  chargement: _chargement,
-                  auClic: _envoyerLien,
-                ),
-
-                const SizedBox(height: 20),
-
-                TextButton.icon(
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                  icon: const Icon(
-                    Icons.arrow_back,
-                  ),
-                  label: const Text(
-                    "Retour à la connexion",
-                  ),
-                ),
-              ],
+            padding: EdgeInsets.all(
+              TaillesApp.margePage,
             ),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                children: [
+                  const SizedBox(height: 20),
+                  const Icon(
+                    Icons.local_shipping,
+                    size: 120,
+                    color: CouleursApp.primaire,
+                  ),
+                  const SizedBox(height: 30),
+                  const Icon(
+                    Icons.lock_reset,
+                    size: 90,
+                    color: CouleursApp.primaire,
+                  ),
+                  const SizedBox(height: 25),
+                  const Text(
+                    "Réinitialisation du mot de passe",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 26,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: 15),
+                  const Text(
+                    "Saisissez votre adresse e-mail. Nous vous enverrons un lien permettant de créer un nouveau mot de passe.",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 16,
+                      color: CouleursApp.texteSecondaire,
+                      height: 1.5,
+                    ),
+                  ),
+                  const SizedBox(height: 35),
+                  ChampTexte(
+                    controleur: _email,
+                    libelle: "Adresse e-mail",
+                    icone: Icons.email_outlined,
+                    typeClavier: TextInputType.emailAddress,
+                    validateur: Validateurs.email,
+                  ),
+                  const SizedBox(height: 35),
+                  BoutonPrincipal(
+                    texte: "Envoyer le lien",
+                    icone: Icons.send,
+                    chargement: _chargement,
+                    auClic: _envoyerLien,
+                  ),
+                  const SizedBox(height: 20),
+                  TextButton.icon(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    icon: const Icon(
+                      Icons.arrow_back,
+                    ),
+                    label: const Text(
+                      "Retour à la connexion",
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),

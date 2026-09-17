@@ -5,7 +5,6 @@ import 'effets_visuels.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:update_camtrans/coeur/widgets/loader_premium.dart';
 
-
 /// =======================================================
 /// ÉTATS UI MODERNISÉS
 /// Loading shimmer, Empty avec animation, Error avec bounce
@@ -33,7 +32,8 @@ class EtatChargement extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: CouleursApp.primaire.withValues(alpha: isDark ? 0.15 : 0.08),
+                color: CouleursApp.primaire
+                    .withValues(alpha: isDark ? 0.15 : 0.08),
                 shape: BoxShape.circle,
               ),
               child: const SizedBox(
@@ -62,8 +62,7 @@ class EtatChargement extends StatelessWidget {
                 fontSize: 15,
                 fontWeight: FontWeight.w500,
               ),
-            )
-                ,
+            ),
           ],
         ),
       ),
@@ -115,8 +114,7 @@ class EtatVide extends StatelessWidget {
             size: 48,
             color: CouleursApp.primaire.withValues(alpha: isDark ? 0.8 : 0.6),
           ),
-        )
-            ,
+        ),
         const SizedBox(height: 24),
         Text(
           titre,
@@ -126,8 +124,7 @@ class EtatVide extends StatelessWidget {
             fontWeight: FontWeight.bold,
             color: isDark ? Colors.white : CouleursApp.textePrincipal,
           ),
-        )
-            ,
+        ),
         const SizedBox(height: 8),
         Text(
           message,
@@ -137,8 +134,7 @@ class EtatVide extends StatelessWidget {
             fontSize: 14,
             height: 1.5,
           ),
-        )
-            ,
+        ),
         if (onAction != null && actionLabel != null) ...[
           const SizedBox(height: 28),
           GradientButton(
@@ -146,8 +142,7 @@ class EtatVide extends StatelessWidget {
             onPressed: onAction,
             height: 48,
             width: 200,
-          )
-              ,
+          ),
         ],
       ],
     );
@@ -210,8 +205,7 @@ class EtatErreur extends StatelessWidget {
                   color: Colors.white,
                   size: 40,
                 ),
-              )
-                  ,
+              ),
               const SizedBox(height: 24),
               Text(
                 "Oups ! Quelque chose s'est mal passé.",
@@ -221,8 +215,7 @@ class EtatErreur extends StatelessWidget {
                   fontWeight: FontWeight.bold,
                   color: isDark ? Colors.white : CouleursApp.textePrincipal,
                 ),
-              )
-                  ,
+              ),
               const SizedBox(height: 8),
               Text(
                 erreur,
@@ -232,8 +225,7 @@ class EtatErreur extends StatelessWidget {
                   fontSize: 14,
                   height: 1.5,
                 ),
-              )
-                  ,
+              ),
               const SizedBox(height: 28),
               GradientButton(
                 text: "Réessayer",
@@ -242,8 +234,7 @@ class EtatErreur extends StatelessWidget {
                 height: 48,
                 width: 200,
                 gradient: CouleursApp.degradeErreur,
-              )
-                  ,
+              ),
             ],
           ),
         ),

@@ -56,7 +56,6 @@ class Transporteur extends Utilisateur {
     required super.actif,
     required super.emailVerifie,
     required super.dateCreation,
-
     this.typeVehicule = "",
     this.marqueVehicule = "",
     this.modeleVehicule = "",
@@ -68,28 +67,21 @@ class Transporteur extends Utilisateur {
     this.photosInspectionVehicule = const [],
     this.dateDerniereInspection,
     this.signalementsEtatVehicule = 0,
-
     this.capaciteM3 = 0,
     this.chargeMaxKg = 0,
-
     this.disponible = true,
     this.documentsValides = false,
-
     this.noteMoyenne = 0,
     this.nombreCourses = 0,
-
     this.revenusTotaux = 0,
     this.soldePortefeuille = 0,
-
     this.numeroPermis = "",
     this.numeroCarteGrise = "",
     this.numeroAssurance = "",
-
     this.photoPermis = "",
     this.photoCarteGrise = "",
     this.photoAssurance = "",
     this.photoVehicule = "",
-
     this.latitude = 0,
     this.longitude = 0,
     this.dateFinAbonnement,
@@ -113,7 +105,6 @@ class Transporteur extends Utilisateur {
     DateTime? dateCreation,
     bool? estEnLigne,
     DateTime? derniereConnexion,
-
     String? typeVehicule,
     String? marqueVehicule,
     String? modeleVehicule,
@@ -125,28 +116,21 @@ class Transporteur extends Utilisateur {
     List<String>? photosInspectionVehicule,
     DateTime? dateDerniereInspection,
     int? signalementsEtatVehicule,
-
     double? capaciteM3,
     double? chargeMaxKg,
-
     bool? disponible,
     bool? documentsValides,
-
     double? noteMoyenne,
     int? nombreCourses,
-
     double? revenusTotaux,
     double? soldePortefeuille,
-
     String? numeroPermis,
     String? numeroCarteGrise,
     String? numeroAssurance,
-
     String? photoPermis,
     String? photoCarteGrise,
     String? photoAssurance,
     String? photoVehicule,
-
     double? latitude,
     double? longitude,
     DateTime? dateFinAbonnement,
@@ -166,7 +150,6 @@ class Transporteur extends Utilisateur {
       dateCreation: dateCreation ?? this.dateCreation,
       estEnLigne: estEnLigne ?? this.estEnLigne,
       derniereConnexion: derniereConnexion ?? this.derniereConnexion,
-
       typeVehicule: typeVehicule ?? this.typeVehicule,
       marqueVehicule: marqueVehicule ?? this.marqueVehicule,
       modeleVehicule: modeleVehicule ?? this.modeleVehicule,
@@ -175,31 +158,27 @@ class Transporteur extends Utilisateur {
       gammeValidee: gammeValidee ?? this.gammeValidee,
       etatVehicule: etatVehicule ?? this.etatVehicule,
       anneeVehicule: anneeVehicule ?? this.anneeVehicule,
-      photosInspectionVehicule: photosInspectionVehicule ?? this.photosInspectionVehicule,
-      dateDerniereInspection: dateDerniereInspection ?? this.dateDerniereInspection,
-      signalementsEtatVehicule: signalementsEtatVehicule ?? this.signalementsEtatVehicule,
-
+      photosInspectionVehicule:
+          photosInspectionVehicule ?? this.photosInspectionVehicule,
+      dateDerniereInspection:
+          dateDerniereInspection ?? this.dateDerniereInspection,
+      signalementsEtatVehicule:
+          signalementsEtatVehicule ?? this.signalementsEtatVehicule,
       capaciteM3: capaciteM3 ?? this.capaciteM3,
       chargeMaxKg: chargeMaxKg ?? this.chargeMaxKg,
-
       disponible: disponible ?? this.disponible,
       documentsValides: documentsValides ?? this.documentsValides,
-
       noteMoyenne: noteMoyenne ?? this.noteMoyenne,
       nombreCourses: nombreCourses ?? this.nombreCourses,
-
       revenusTotaux: revenusTotaux ?? this.revenusTotaux,
       soldePortefeuille: soldePortefeuille ?? this.soldePortefeuille,
-
       numeroPermis: numeroPermis ?? this.numeroPermis,
       numeroCarteGrise: numeroCarteGrise ?? this.numeroCarteGrise,
       numeroAssurance: numeroAssurance ?? this.numeroAssurance,
-
       photoPermis: photoPermis ?? this.photoPermis,
       photoCarteGrise: photoCarteGrise ?? this.photoCarteGrise,
       photoAssurance: photoAssurance ?? this.photoAssurance,
       photoVehicule: photoVehicule ?? this.photoVehicule,
-
       latitude: latitude ?? this.latitude,
       longitude: longitude ?? this.longitude,
       dateFinAbonnement: dateFinAbonnement ?? this.dateFinAbonnement,
@@ -245,6 +224,20 @@ class Transporteur extends Utilisateur {
     return map;
   }
 
+  /// Parse robuste pour dateFinAbonnement : accepte int (ms) ou String (ISO)
+  static DateTime? _parseDate(dynamic value) {
+    if (value == null) return null;
+    if (value is int) return DateTime.fromMillisecondsSinceEpoch(value);
+    if (value is String) {
+      try {
+        return DateTime.parse(value);
+      } catch (_) {
+        return null;
+      }
+    }
+    return null;
+  }
+
   factory Transporteur.fromMap(Map<String, dynamic> map) {
     return Transporteur(
       id: map["id"] ?? "",
@@ -268,9 +261,10 @@ class Transporteur extends Utilisateur {
       gammeValidee: map["gammeValidee"] ?? true,
       etatVehicule: map["etatVehicule"] ?? "Standard",
       anneeVehicule: map["anneeVehicule"] ?? 0,
-      photosInspectionVehicule: List<String>.from(map["photosInspectionVehicule"] ?? []),
-      dateDerniereInspection: map["dateDerniereInspection"] != null 
-          ? DateTime.fromMillisecondsSinceEpoch(map["dateDerniereInspection"]) 
+      photosInspectionVehicule:
+          List<String>.from(map["photosInspectionVehicule"] ?? []),
+      dateDerniereInspection: map["dateDerniereInspection"] != null
+          ? DateTime.fromMillisecondsSinceEpoch(map["dateDerniereInspection"])
           : null,
       signalementsEtatVehicule: map["signalementsEtatVehicule"] ?? 0,
 
@@ -297,16 +291,19 @@ class Transporteur extends Utilisateur {
 
       latitude: Parseur.toDouble(map["latitude"]),
       longitude: Parseur.toDouble(map["longitude"]),
-      dateFinAbonnement: map["dateFinAbonnement"] != null 
-          ? DateTime.fromMillisecondsSinceEpoch(map["dateFinAbonnement"]) 
-          : null,
-      
-      // LOGIQUE DE PRESENCE : Tolérance de 90 secondes pour équilibrer déconnexion rapide et décalage d'horloge
-      estEnLigne: (map["estEnLigne"] ?? false) && 
-                  (map["derniereConnexion"] != null && 
-                   DateTime.now().difference(Parseur.toDateTime(map["derniereConnexion"])).inSeconds <= 90),
+      dateFinAbonnement: _parseDate(map["dateFinAbonnement"]),
 
-      derniereConnexion: map["derniereConnexion"] != null ? Parseur.toDateTime(map["derniereConnexion"]) : null,
+      // LOGIQUE DE PRESENCE : Tolérance de 90 secondes pour équilibrer déconnexion rapide et décalage d'horloge
+      estEnLigne: (map["estEnLigne"] ?? false) &&
+          (map["derniereConnexion"] != null &&
+              DateTime.now()
+                      .difference(Parseur.toDateTime(map["derniereConnexion"]))
+                      .inSeconds <=
+                  90),
+
+      derniereConnexion: map["derniereConnexion"] != null
+          ? Parseur.toDateTime(map["derniereConnexion"])
+          : null,
     );
   }
 

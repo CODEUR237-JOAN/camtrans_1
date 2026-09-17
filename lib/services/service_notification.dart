@@ -18,7 +18,8 @@ class NotificationInApp {
   final String titre;
   final String message;
   final String type; // 'info' | 'succes' | 'alerte' | 'paiement'
-  NotificationInApp({required this.titre, required this.message, this.type = 'info'});
+  NotificationInApp(
+      {required this.titre, required this.message, this.type = 'info'});
 }
 
 class ServiceNotification {
@@ -125,7 +126,6 @@ class ServiceNotification {
       afficherNotification(titre: titre, message: corps);
     });
   }
-
 
   // ===========================
   // Écoute ouverture notification

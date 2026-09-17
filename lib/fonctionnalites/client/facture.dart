@@ -15,7 +15,8 @@ import 'package:update_camtrans/fonctionnalites/paiement/widgets/ticket_recu.dar
 import 'package:update_camtrans/coeur/widgets/loader_premium.dart';
 
 // Provider filtré par l'UID de l'utilisateur connecté
-final listePaiementsProvider = StreamProvider.autoDispose<List<Paiement>>((ref) {
+final listePaiementsProvider =
+    StreamProvider.autoDispose<List<Paiement>>((ref) {
   final firestore = ref.watch(serviceFirestoreProvider);
   final auth = ref.watch(serviceAuthentificationProvider);
   final uid = auth.utilisateur?.uid ?? '';
@@ -23,11 +24,13 @@ final listePaiementsProvider = StreamProvider.autoDispose<List<Paiement>>((ref) 
   if (uid.isEmpty) return Stream.value([]);
 
   // Filtrage Firestore par clientId pour ne voir que ses propres paiements
-  return firestore.fluxCollectionCondition(
+  return firestore
+      .fluxCollectionCondition(
     collection: 'paiements',
     champ: 'clientId',
     valeur: uid,
-  ).map((snapshot) {
+  )
+      .map((snapshot) {
     return snapshot.docs.map((doc) {
       final data = doc.data();
       data['id'] = doc.id;
@@ -55,7 +58,8 @@ class Facture extends ConsumerWidget {
         // ✅ CORRECTION 1.3: foregroundColor blanc (était Colors.black87 invisible sur fond sombre)
         title: Text(
           "Mes Transactions",
-          style: GoogleFonts.inter(fontWeight: FontWeight.bold, color: Colors.white),
+          style: GoogleFonts.inter(
+              fontWeight: FontWeight.bold, color: Colors.white),
         ),
         backgroundColor: const Color(0xFF08111F),
         elevation: 0,
@@ -71,13 +75,18 @@ class Facture extends ConsumerWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.wifi_off_rounded, size: 60, color: Colors.white38),
+              const Icon(Icons.wifi_off_rounded,
+                  size: 60, color: Colors.white38),
               const SizedBox(height: 16),
               Text("Problème de connexion 📡",
-                  style: GoogleFonts.inter(color: Colors.white70, fontSize: 16, fontWeight: FontWeight.bold)),
+                  style: GoogleFonts.inter(
+                      color: Colors.white70,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold)),
               const SizedBox(height: 8),
               Text("Réessayez dans quelques instants",
-                  style: GoogleFonts.inter(color: Colors.white38, fontSize: 13)),
+                  style:
+                      GoogleFonts.inter(color: Colors.white38, fontSize: 13)),
             ],
           ),
         ),
@@ -96,11 +105,16 @@ class Facture extends ConsumerWidget {
                       decoration: BoxDecoration(
                         color: CouleursApp.primaire.withValues(alpha: 0.08),
                         shape: BoxShape.circle,
-                        border: Border.all(color: CouleursApp.primaire.withValues(alpha: 0.15), width: 2),
+                        border: Border.all(
+                            color: CouleursApp.primaire.withValues(alpha: 0.15),
+                            width: 2),
                       ),
-                      child: const Icon(Iconsax.receipt_copy, size: 48, color: CouleursApp.primaire),
-                    ).animate(onPlay: (c) => c.repeat(reverse: true))
-                      .scale(begin: const Offset(1, 1), end: const Offset(1.05, 1.05), duration: 2.seconds),
+                      child: const Icon(Iconsax.receipt_copy,
+                          size: 48, color: CouleursApp.primaire),
+                    ).animate(onPlay: (c) => c.repeat(reverse: true)).scale(
+                        begin: const Offset(1, 1),
+                        end: const Offset(1.05, 1.05),
+                        duration: 2.seconds),
                     const SizedBox(height: 24),
                     Text(
                       "Votre historique est vierge ✨",
@@ -114,7 +128,8 @@ class Facture extends ConsumerWidget {
                     const SizedBox(height: 12),
                     Text(
                       "Vos transactions apparaîtront ici après votre première course. Lancez-vous ! 🚀",
-                      style: GoogleFonts.inter(color: Colors.white54, fontSize: 14, height: 1.5),
+                      style: GoogleFonts.inter(
+                          color: Colors.white54, fontSize: 14, height: 1.5),
                       textAlign: TextAlign.center,
                     ),
                   ],
@@ -143,7 +158,8 @@ class Facture extends ConsumerWidget {
       appBar: AppBar(
         // ✅ CORRECTION 1.3: foregroundColor blanc
         title: Text("Détail de la course",
-            style: GoogleFonts.inter(fontWeight: FontWeight.bold, color: Colors.white)),
+            style: GoogleFonts.inter(
+                fontWeight: FontWeight.bold, color: Colors.white)),
         backgroundColor: const Color(0xFF08111F),
         elevation: 0,
         foregroundColor: Colors.white,
@@ -163,17 +179,27 @@ class Facture extends ConsumerWidget {
               decoration: BoxDecoration(
                 gradient: CouleursApp.degradePrincipal,
                 borderRadius: BorderRadius.circular(20),
-                boxShadow: [BoxShadow(color: CouleursApp.primaire.withValues(alpha: 0.25), blurRadius: 20)],
+                boxShadow: [
+                  BoxShadow(
+                      color: CouleursApp.primaire.withValues(alpha: 0.25),
+                      blurRadius: 20)
+                ],
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text("Montant de la course", style: TextStyle(color: Colors.white70, fontSize: 14)),
+                  const Text("Montant de la course",
+                      style: TextStyle(color: Colors.white70, fontSize: 14)),
                   const SizedBox(height: 6),
                   Text("${c.prixEstime.toInt()} FCFA",
-                      style: const TextStyle(color: Colors.white, fontSize: 32, fontWeight: FontWeight.w900)),
+                      style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 32,
+                          fontWeight: FontWeight.w900)),
                   const SizedBox(height: 20),
-                  Text("Statut : ${c.statut}", style: const TextStyle(color: Colors.white70, fontSize: 13)),
+                  Text("Statut : ${c.statut}",
+                      style:
+                          const TextStyle(color: Colors.white70, fontSize: 13)),
                 ],
               ),
             ),
@@ -197,22 +223,30 @@ class Facture extends ConsumerWidget {
       decoration: BoxDecoration(
         color: const Color(0xFF10192A),
         borderRadius: BorderRadius.circular(14),
-        boxShadow: [BoxShadow(color: Colors.white.withValues(alpha: 0.07), blurRadius: 8)],
+        boxShadow: [
+          BoxShadow(color: Colors.white.withValues(alpha: 0.07), blurRadius: 8)
+        ],
       ),
       child: Row(
         children: [
           Container(
             padding: const EdgeInsets.all(10),
-            decoration: BoxDecoration(color: CouleursApp.primaire.withValues(alpha: 0.1), shape: BoxShape.circle),
+            decoration: BoxDecoration(
+                color: CouleursApp.primaire.withValues(alpha: 0.1),
+                shape: BoxShape.circle),
             child: Icon(icon, color: CouleursApp.primaire, size: 20),
           ),
           const SizedBox(width: 14),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(label, style: const TextStyle(color: Colors.white54, fontSize: 12)),
+              Text(label,
+                  style: const TextStyle(color: Colors.white54, fontSize: 12)),
               Text(value.isNotEmpty ? value : "-",
-                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Colors.white)),
+                  style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                      color: Colors.white)),
             ],
           ),
         ],
@@ -220,20 +254,25 @@ class Facture extends ConsumerWidget {
     );
   }
 
-  Widget _buildTransactionCard(BuildContext context, Paiement paiement, int index) {
+  Widget _buildTransactionCard(
+      BuildContext context, Paiement paiement, int index) {
     // ✅ CORRECTION 1.2: Utilise StatutPaiement.succes au lieu de chaînes littérales
     // (le statut réel en DB est "succes", pas "Succès" ou "Confirmé")
     final bool isSucces = paiement.statut == StatutPaiement.succes;
-    
+
     IconData getIcon() {
-      if (paiement.methodePaiement.toLowerCase().contains("orange")) return Icons.account_balance_wallet;
-      if (paiement.methodePaiement.toLowerCase().contains("mtn")) return Icons.phone_android;
+      if (paiement.methodePaiement.toLowerCase().contains("orange"))
+        return Icons.account_balance_wallet;
+      if (paiement.methodePaiement.toLowerCase().contains("mtn"))
+        return Icons.phone_android;
       return Icons.credit_card;
     }
 
     Color getColor() {
-      if (paiement.methodePaiement.toLowerCase().contains("orange")) return Colors.orange;
-      if (paiement.methodePaiement.toLowerCase().contains("mtn")) return Colors.amber;
+      if (paiement.methodePaiement.toLowerCase().contains("orange"))
+        return Colors.orange;
+      if (paiement.methodePaiement.toLowerCase().contains("mtn"))
+        return Colors.amber;
       return Colors.blue;
     }
 
@@ -254,12 +293,14 @@ class Facture extends ConsumerWidget {
         margin: const EdgeInsets.only(bottom: 16),
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: const Color(0xFF10192A),
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(color: Colors.white.withValues(alpha: 0.07), blurRadius: 10, offset: const Offset(0, 5))
-          ]
-        ),
+            color: const Color(0xFF10192A),
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                  color: Colors.white.withValues(alpha: 0.07),
+                  blurRadius: 10,
+                  offset: const Offset(0, 5))
+            ]),
         child: Row(
           children: [
             Container(
@@ -275,9 +316,16 @@ class Facture extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(paiement.methodePaiement, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.white)),
+                  Text(paiement.methodePaiement,
+                      style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                          color: Colors.white)),
                   const SizedBox(height: 4),
-                  Text("${paiement.datePaiement.day}/${paiement.datePaiement.month}/${paiement.datePaiement.year}", style: const TextStyle(color: Colors.white70, fontSize: 13)),
+                  Text(
+                      "${paiement.datePaiement.day}/${paiement.datePaiement.month}/${paiement.datePaiement.year}",
+                      style:
+                          const TextStyle(color: Colors.white70, fontSize: 13)),
                 ],
               ),
             ),
@@ -290,14 +338,18 @@ class Facture extends ConsumerWidget {
                     fontWeight: FontWeight.w900,
                     fontSize: 16,
                     // ✅ Couleur correcte : vert si succes, orange sinon (plus de Colors.black87 invisible)
-                    color: isSucces ? CouleursApp.succes : CouleursApp.avertissement,
+                    color: isSucces
+                        ? CouleursApp.succes
+                        : CouleursApp.avertissement,
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   StatutPaiement.libelle(paiement.statut),
                   style: GoogleFonts.inter(
-                    color: isSucces ? CouleursApp.succes : CouleursApp.avertissement,
+                    color: isSucces
+                        ? CouleursApp.succes
+                        : CouleursApp.avertissement,
                     fontSize: 12,
                     fontWeight: FontWeight.bold,
                   ),

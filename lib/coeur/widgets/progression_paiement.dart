@@ -32,7 +32,8 @@ class ProgressionPaiement extends StatefulWidget {
   });
 
   /// Étapes prédéfinies pour un paiement Mobile Money (MTN/Orange)
-  static List<EtapePaiement> etapesMobileMoney({required String montant, required String operateur}) {
+  static List<EtapePaiement> etapesMobileMoney(
+      {required String montant, required String operateur}) {
     return [
       EtapePaiement(
         icone: Icons.send_rounded,
@@ -43,7 +44,8 @@ class ProgressionPaiement extends StatefulWidget {
       EtapePaiement(
         icone: Icons.phone_android_rounded,
         titre: "Confirmez sur votre téléphone",
-        description: "Un message USSD va s'afficher. Acceptez le paiement de $montant FCFA.",
+        description:
+            "Un message USSD va s'afficher. Acceptez le paiement de $montant FCFA.",
         couleur: const Color(0xFFFF8C00),
       ),
       EtapePaiement(
@@ -62,7 +64,8 @@ class ProgressionPaiement extends StatefulWidget {
   }
 
   /// Étapes prédéfinies pour un abonnement
-  static List<EtapePaiement> etapesAbonnement({required String montant, required String operateur}) {
+  static List<EtapePaiement> etapesAbonnement(
+      {required String montant, required String operateur}) {
     return [
       EtapePaiement(
         icone: Icons.send_rounded,
@@ -73,13 +76,15 @@ class ProgressionPaiement extends StatefulWidget {
       EtapePaiement(
         icone: Icons.phone_android_rounded,
         titre: "Confirmez sur votre téléphone",
-        description: "Acceptez le paiement de $montant FCFA pour votre abonnement",
+        description:
+            "Acceptez le paiement de $montant FCFA pour votre abonnement",
         couleur: const Color(0xFFFF8C00),
       ),
       EtapePaiement(
         icone: Icons.sync_rounded,
         titre: "Vérification du paiement...",
-        description: "Validation auprès de $operateur — cela peut prendre jusqu'à 2 minutes",
+        description:
+            "Validation auprès de $operateur — cela peut prendre jusqu'à 2 minutes",
         couleur: CouleursApp.primaireNeon,
       ),
       EtapePaiement(
@@ -154,9 +159,11 @@ class _ProgressionPaiementState extends State<ProgressionPaiement>
               height: 80 + (_pulseController.value * 10),
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: etapeActuelle.couleur.withValues(alpha: 0.1 + (_pulseController.value * 0.05)),
+                color: etapeActuelle.couleur
+                    .withValues(alpha: 0.1 + (_pulseController.value * 0.05)),
                 border: Border.all(
-                  color: etapeActuelle.couleur.withValues(alpha: 0.4 + (_pulseController.value * 0.3)),
+                  color: etapeActuelle.couleur
+                      .withValues(alpha: 0.4 + (_pulseController.value * 0.3)),
                   width: 2,
                 ),
               ),

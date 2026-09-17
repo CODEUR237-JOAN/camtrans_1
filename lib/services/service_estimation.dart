@@ -57,7 +57,6 @@ class ResultatEstimation {
   });
 }
 
-
 final serviceEstimationProvider = Provider<ServiceEstimation>((ref) {
   final ia = ref.watch(serviceIAProvider);
   final gps = ref.watch(serviceGpsProvider);
@@ -112,7 +111,8 @@ class ServiceEstimation {
     double volume = 1.0;
     double poids = 50.0;
 
-    if (typeMarchandise.toLowerCase().contains("lourd") || typeMarchandise.toLowerCase().contains("matériaux")) {
+    if (typeMarchandise.toLowerCase().contains("lourd") ||
+        typeMarchandise.toLowerCase().contains("matériaux")) {
       volume = 15.0;
       poids = 800.0;
     } else if (typeMarchandise.toLowerCase().contains("déménagement")) {
@@ -207,7 +207,8 @@ class ServiceEstimation {
       }
 
       // Calcul avec la vraie distance
-      final coutTotal = prixBase > 5000 ? prixBase : prixBase + (distanceKm * 500);
+      final coutTotal =
+          prixBase > 5000 ? prixBase : prixBase + (distanceKm * 500);
 
       return ResultatEstimation(
         distanceKm: distanceKm,
@@ -252,14 +253,17 @@ class ServiceEstimation {
     final double fraisBase = ConfigTarificationRemorque.fraisBase;
     final double tarifKmBase = ConfigTarificationRemorque.tarifKmBase;
     final double coeffMasse = ConfigTarificationRemorque.coeffMasseCarburant;
-    final double indexation = ConfigTarificationRemorque.coeffIndexationCarburant;
+    final double indexation =
+        ConfigTarificationRemorque.coeffIndexationCarburant;
 
     // Composantes du coût — INTERNES uniquement
     final double coutDistance = distanceKm * tarifKmBase;
-    final double surchargeMasseCarburant = distanceKm * (masseKg / 1000) * coeffMasse;
+    final double surchargeMasseCarburant =
+        distanceKm * (masseKg / 1000) * coeffMasse;
 
     // Prix total visible client (arrondi à 50 FCFA le plus proche)
-    final double coutBrut = (fraisBase + coutDistance + surchargeMasseCarburant) * indexation;
+    final double coutBrut =
+        (fraisBase + coutDistance + surchargeMasseCarburant) * indexation;
     final double coutTotal = (coutBrut / 50).round() * 50.0;
 
     // Log interne debug — jamais affiché dans l'UI

@@ -68,7 +68,8 @@ class RoutesApplication {
   static const String admin = "/admin";
   static const String adressesFavorites = "/adresses-favorites";
   static const String chat = "/chat";
-  static const String historiqueLivraisonsTransporteur = "/historique-livraisons-transporteur";
+  static const String historiqueLivraisonsTransporteur =
+      "/historique-livraisons-transporteur";
   static const String revenus = "/revenus";
   static const String portefeuille = "/portefeuille";
   static const String documents = "/documents";
@@ -93,55 +94,68 @@ class RoutesApplication {
     routes: [
       GoRoute(
         path: splash,
-        pageBuilder: (context, state) => _page(const EcranSplash(), state.pageKey),
+        pageBuilder: (context, state) =>
+            _page(const EcranSplash(), state.pageKey),
       ),
       GoRoute(
         path: onboarding,
-        pageBuilder: (context, state) => _page(const Onboarding(), state.pageKey),
+        pageBuilder: (context, state) =>
+            _page(const Onboarding(), state.pageKey),
       ),
       GoRoute(
         path: connexion,
-        pageBuilder: (context, state) => _page(const Connexion(), state.pageKey),
+        pageBuilder: (context, state) =>
+            _page(const Connexion(), state.pageKey),
       ),
       GoRoute(
         path: choixProfil,
-        pageBuilder: (context, state) => _page(const ChoixProfil(), state.pageKey),
+        pageBuilder: (context, state) =>
+            _page(const ChoixProfil(), state.pageKey),
       ),
       GoRoute(
         path: inscriptionClient,
-        pageBuilder: (context, state) => _page(const InscriptionClient(), state.pageKey),
+        pageBuilder: (context, state) =>
+            _page(const InscriptionClient(), state.pageKey),
       ),
       GoRoute(
         path: inscriptionTransporteur,
-        pageBuilder: (context, state) => _page(const InscriptionTransporteur(), state.pageKey),
+        pageBuilder: (context, state) =>
+            _page(const InscriptionTransporteur(), state.pageKey),
       ),
       GoRoute(
         path: motDePasseOublie,
-        pageBuilder: (context, state) => _page(const MotDePasseOublie(), state.pageKey),
+        pageBuilder: (context, state) =>
+            _page(const MotDePasseOublie(), state.pageKey),
       ),
       GoRoute(
         path: verificationEmail,
-        pageBuilder: (context, state) => _page(const VerificationEmail(), state.pageKey),
+        pageBuilder: (context, state) =>
+            _page(const VerificationEmail(), state.pageKey),
       ),
       GoRoute(
         path: modifierProfil,
-        pageBuilder: (context, state) => _page(const ModifierProfil(), state.pageKey),
+        pageBuilder: (context, state) =>
+            _page(const ModifierProfil(), state.pageKey),
       ),
       GoRoute(
         path: changerMotDePasse,
-        pageBuilder: (context, state) => _page(const ChangerMotDePasse(), state.pageKey),
+        pageBuilder: (context, state) =>
+            _page(const ChangerMotDePasse(), state.pageKey),
       ),
       GoRoute(
         path: tableauBordClient,
-        pageBuilder: (context, state) => _page(const TableauDeBordClient(), state.pageKey),
+        pageBuilder: (context, state) =>
+            _page(const TableauDeBordClient(), state.pageKey),
       ),
       GoRoute(
         path: tableauBordTransporteur,
-        pageBuilder: (context, state) => _page(const TableauDeBordTransporteur(), state.pageKey),
+        pageBuilder: (context, state) =>
+            _page(const TableauDeBordTransporteur(), state.pageKey),
       ),
       GoRoute(
         path: creerDemande,
-        pageBuilder: (context, state) => _page(const CreerDemande(), state.pageKey),
+        pageBuilder: (context, state) =>
+            _page(const CreerDemande(), state.pageKey),
       ),
       GoRoute(
         path: carte,
@@ -155,7 +169,7 @@ class RoutesApplication {
           state.pageKey,
         ),
       ),
-      // Route de suivi avec l'ID réel de la course 
+      // Route de suivi avec l'ID réel de la course
       GoRoute(
         path: suiviAvecId,
         pageBuilder: (context, state) => _page(
@@ -165,7 +179,8 @@ class RoutesApplication {
       ),
       GoRoute(
         path: historique,
-        pageBuilder: (context, state) => _page(const Historique(), state.pageKey),
+        pageBuilder: (context, state) =>
+            _page(const Historique(), state.pageKey),
       ),
       GoRoute(
         path: factures,
@@ -173,7 +188,8 @@ class RoutesApplication {
       ),
       GoRoute(
         path: assistantIA,
-        pageBuilder: (context, state) => _page(const EcranAssistantIA(), state.pageKey),
+        pageBuilder: (context, state) =>
+            _page(const EcranAssistantIA(), state.pageKey),
       ),
       GoRoute(
         path: "/evaluation/:courseId",
@@ -194,11 +210,15 @@ class RoutesApplication {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Icon(Icons.error_outline, size: 60, color: Colors.red),
+                      const Icon(Icons.error_outline,
+                          size: 60, color: Colors.red),
                       const SizedBox(height: 16),
-                      const Text("Impossible d'accéder au paiement", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                      const Text("Impossible d'accéder au paiement",
+                          style: TextStyle(
+                              fontSize: 18, fontWeight: FontWeight.bold)),
                       const SizedBox(height: 8),
-                      const Text("Veuillez relancer depuis votre course.", textAlign: TextAlign.center),
+                      const Text("Veuillez relancer depuis votre course.",
+                          textAlign: TextAlign.center),
                     ],
                   ),
                 ),
@@ -218,7 +238,8 @@ class RoutesApplication {
       ),
       GoRoute(
         path: adressesFavorites,
-        pageBuilder: (context, state) => _page(const AdressesFavoritesPage(), state.pageKey),
+        pageBuilder: (context, state) =>
+            _page(const AdressesFavoritesPage(), state.pageKey),
       ),
       GoRoute(
         path: chat,
@@ -234,11 +255,13 @@ class RoutesApplication {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.chat_bubble_outline, size: 60, color: Colors.grey),
+                      Icon(Icons.chat_bubble_outline,
+                          size: 60, color: Colors.grey),
                       SizedBox(height: 16),
                       Text(
                         "Impossible d'ouvrir le chat",
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold),
                       ),
                       SizedBox(height: 8),
                       Text(
@@ -257,11 +280,13 @@ class RoutesApplication {
       ),
       GoRoute(
         path: historiqueLivraisonsTransporteur,
-        pageBuilder: (context, state) => _page(const HistoriqueLivraisons(), state.pageKey),
+        pageBuilder: (context, state) =>
+            _page(const HistoriqueLivraisons(), state.pageKey),
       ),
       GoRoute(
         path: admin,
-        pageBuilder: (context, state) => _page(const TableauDeBordAdmin(), state.pageKey),
+        pageBuilder: (context, state) =>
+            _page(const TableauDeBordAdmin(), state.pageKey),
       ),
       GoRoute(
         path: revenus,
@@ -269,11 +294,13 @@ class RoutesApplication {
       ),
       GoRoute(
         path: portefeuille,
-        pageBuilder: (context, state) => _page(const Portefeuille(), state.pageKey),
+        pageBuilder: (context, state) =>
+            _page(const Portefeuille(), state.pageKey),
       ),
       GoRoute(
         path: documents,
-        pageBuilder: (context, state) => _page(const Documents(), state.pageKey),
+        pageBuilder: (context, state) =>
+            _page(const Documents(), state.pageKey),
       ),
       GoRoute(
         path: facture,
@@ -295,7 +322,8 @@ class RoutesApplication {
       ),
       GoRoute(
         path: abonnement,
-        pageBuilder: (context, state) => _page(const PageAbonnement(), state.pageKey),
+        pageBuilder: (context, state) =>
+            _page(const PageAbonnement(), state.pageKey),
       ),
       GoRoute(
         path: suiviTransporteur,
@@ -327,7 +355,8 @@ class RoutesApplication {
                       ),
                     ],
                   ),
-                  child: const Icon(Icons.route_outlined, color: Colors.white, size: 42),
+                  child: const Icon(Icons.route_outlined,
+                      color: Colors.white, size: 42),
                 ),
                 const SizedBox(height: 24),
                 const Text(

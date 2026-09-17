@@ -49,8 +49,7 @@ class _PageGestionTextesState extends ConsumerState<PageGestionTextes> {
 
   // Valeurs par défaut pour chaque clé — visibles et modifiables directement par l'Admin
   static const Map<String, String> _defaults = {
-    'conditions_transporteur':
-        "Bienvenue sur CamTrans !\n\n"
+    'conditions_transporteur': "Bienvenue sur CamTrans !\n\n"
         "1. Engagements du Transporteur\n"
         "Vous vous engagez à maintenir votre véhicule en bon état et à respecter les délais de livraison.\n\n"
         "2. Gammes et Tarification\n"
@@ -59,9 +58,7 @@ class _PageGestionTextesState extends ConsumerState<PageGestionTextes> {
         "3. Confidentialité\n"
         "Vos documents et données personnelles sont stockés de manière sécurisée "
         "et ne seront partagés qu'avec l'administration pour validation.",
-
-    'conditions_client':
-        "Bienvenue sur la plateforme CamTrans.\n\n"
+    'conditions_client': "Bienvenue sur la plateforme CamTrans.\n\n"
         "1. Utilisation du service\n"
         "En utilisant notre plateforme, vous vous engagez à respecter les lois en vigueur "
         "et à ne pas utiliser nos services à des fins illégales.\n\n"
@@ -75,20 +72,20 @@ class _PageGestionTextesState extends ConsumerState<PageGestionTextes> {
         "4. Responsabilité\n"
         "CamTrans agit en tant qu'intermédiaire entre le client et le transporteur. "
         "Nous ne saurions être tenus responsables des retards ou des dommages causés pendant le transport.",
-
     'succes_parametres': "Paramètres mis à jour avec succès.",
     'succes_purge_historique': "Historique nettoyé avec succès.",
     'succes_annulation_course': "Course annulée avec succès.",
-
-    'err_demarrage': "Une erreur est survenue au démarrage. Veuillez relancer l'application.",
-    'err_chargement_historique': "Impossible de charger l'historique. Vérifiez votre connexion.",
+    'err_demarrage':
+        "Une erreur est survenue au démarrage. Veuillez relancer l'application.",
+    'err_chargement_historique':
+        "Impossible de charger l'historique. Vérifiez votre connexion.",
     'err_chargement_stats': "Impossible de charger les statistiques.",
     'err_reseau': "Problème de connexion réseau. Veuillez réessayer.",
     'err_inscription': "L'inscription a échoué. Veuillez réessayer.",
     'err_profil': "La mise à jour du profil a échoué.",
     'err_sauvegarde_parametres': "Erreur lors de la sauvegarde des paramètres.",
-
-    'vide_course_client': "Aucune course en cours. Créez une nouvelle demande !",
+    'vide_course_client':
+        "Aucune course en cours. Créez une nouvelle demande !",
     'vide_historique_client': "Votre historique de courses est vide.",
     'vide_historique_transp': "Vous n'avez pas encore effectué de course.",
     'vide_demandes_transp': "Aucune demande disponible pour le moment.",
@@ -170,7 +167,8 @@ class _PageGestionTextesState extends ConsumerState<PageGestionTextes> {
       appBar: AppBar(
         title: Text(
           "Gestion des Textes",
-          style: GoogleFonts.outfit(color: Colors.white, fontWeight: FontWeight.bold),
+          style: GoogleFonts.outfit(
+              color: Colors.white, fontWeight: FontWeight.bold),
         ),
         backgroundColor: CouleursApp.secondaire,
         iconTheme: const IconThemeData(color: Colors.white),
@@ -178,7 +176,8 @@ class _PageGestionTextesState extends ConsumerState<PageGestionTextes> {
       body: textesAsync.when(
         loading: () => Center(child: LoaderPremium()),
         error: (err, _) => Center(
-          child: Text("Erreur de chargement : $err", style: const TextStyle(color: Colors.red)),
+          child: Text("Erreur de chargement : $err",
+              style: const TextStyle(color: Colors.red)),
         ),
         data: (textes) {
           _initialiserControleurs(textes);
@@ -194,20 +193,24 @@ class _PageGestionTextesState extends ConsumerState<PageGestionTextes> {
                 ),
                 const SizedBox(height: 8),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                   decoration: BoxDecoration(
                     color: CouleursApp.primaire.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: CouleursApp.primaire.withValues(alpha: 0.3)),
+                    border: Border.all(
+                        color: CouleursApp.primaire.withValues(alpha: 0.3)),
                   ),
                   child: Row(
                     children: [
-                      const Icon(Icons.info_outline, color: CouleursApp.primaire, size: 16),
+                      const Icon(Icons.info_outline,
+                          color: CouleursApp.primaire, size: 16),
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
                           "💡 Videz un champ et sauvegardez pour revenir à la valeur par défaut codée en dur.",
-                          style: GoogleFonts.inter(color: CouleursApp.primaire, fontSize: 12),
+                          style: GoogleFonts.inter(
+                              color: CouleursApp.primaire, fontSize: 12),
                         ),
                       ),
                     ],
@@ -217,7 +220,8 @@ class _PageGestionTextesState extends ConsumerState<PageGestionTextes> {
                 Expanded(
                   child: ListView.separated(
                     itemCount: _descriptions.length,
-                    separatorBuilder: (context, index) => const Divider(color: Colors.white12),
+                    separatorBuilder: (context, index) =>
+                        const Divider(color: Colors.white12),
                     itemBuilder: (context, index) {
                       final cle = _descriptions.keys.elementAt(index);
                       final description = _descriptions[cle]!;
@@ -253,44 +257,58 @@ class _PageGestionTextesState extends ConsumerState<PageGestionTextes> {
                                         controller.text = _defaults[cle]!;
                                       });
                                     },
-                                    icon: const Icon(Icons.refresh, size: 14, color: Colors.white38),
+                                    icon: const Icon(Icons.refresh,
+                                        size: 14, color: Colors.white38),
                                     label: Text(
                                       "Réinitialiser",
-                                      style: GoogleFonts.inter(color: Colors.white38, fontSize: 11),
+                                      style: GoogleFonts.inter(
+                                          color: Colors.white38, fontSize: 11),
                                     ),
-                                    style: TextButton.styleFrom(padding: EdgeInsets.zero),
+                                    style: TextButton.styleFrom(
+                                        padding: EdgeInsets.zero),
                                   ),
                               ],
                             ),
                             const SizedBox(height: 4),
                             Text(
                               "Clé : $cle",
-                              style: GoogleFonts.inter(color: Colors.white38, fontSize: 11),
+                              style: GoogleFonts.inter(
+                                  color: Colors.white38, fontSize: 11),
                             ),
                             const SizedBox(height: 8),
                             TextField(
                               controller: controller,
-                              style: const TextStyle(color: Colors.white, fontSize: 13, height: 1.5),
+                              style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 13,
+                                  height: 1.5),
                               maxLines: estConditions ? 10 : 3,
                               minLines: estConditions ? 6 : 1,
                               decoration: InputDecoration(
                                 hintText: "Entrez le texte ici...",
-                                hintStyle: const TextStyle(color: Colors.white24),
+                                hintStyle:
+                                    const TextStyle(color: Colors.white24),
                                 filled: true,
                                 fillColor: Colors.white.withValues(alpha: 0.05),
                                 border: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(10),
-                                  borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.1)),
+                                  borderSide: BorderSide(
+                                      color:
+                                          Colors.white.withValues(alpha: 0.1)),
                                 ),
                                 enabledBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(10),
-                                  borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.1)),
+                                  borderSide: BorderSide(
+                                      color:
+                                          Colors.white.withValues(alpha: 0.1)),
                                 ),
                                 focusedBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(10),
-                                  borderSide: const BorderSide(color: CouleursApp.primaire, width: 1.5),
+                                  borderSide: const BorderSide(
+                                      color: CouleursApp.primaire, width: 1.5),
                                 ),
-                                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                                contentPadding: const EdgeInsets.symmetric(
+                                    horizontal: 16, vertical: 12),
                               ),
                             ),
                           ],
@@ -313,13 +331,17 @@ class _PageGestionTextesState extends ConsumerState<PageGestionTextes> {
                           )
                         : const Icon(Icons.save_rounded, color: Colors.white),
                     label: Text(
-                      _enCours ? "Sauvegarde en cours..." : "Sauvegarder les modifications",
-                      style: GoogleFonts.inter(fontWeight: FontWeight.bold, fontSize: 15),
+                      _enCours
+                          ? "Sauvegarde en cours..."
+                          : "Sauvegarder les modifications",
+                      style: GoogleFonts.inter(
+                          fontWeight: FontWeight.bold, fontSize: 15),
                     ),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: CouleursApp.primaire,
                       foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12)),
                     ),
                   ),
                 ),

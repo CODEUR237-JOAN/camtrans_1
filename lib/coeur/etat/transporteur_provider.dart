@@ -14,7 +14,8 @@ final currentTransporteurIdProvider = Provider<String>((ref) {
 });
 
 // Transporteur connecté (objet complet)
-final currentTransporteurProvider = StreamProvider.autoDispose<Transporteur?>((ref) {
+final currentTransporteurProvider =
+    StreamProvider.autoDispose<Transporteur?>((ref) {
   final firestore = ref.watch(serviceFirestoreProvider);
   final transporteurId = ref.watch(currentTransporteurIdProvider);
 
@@ -32,72 +33,67 @@ final currentTransporteurProvider = StreamProvider.autoDispose<Transporteur?>((r
 // 1. GESTION DES COURSES
 // ==========================================
 
-
-
 // Flux des courses assignées à ce transporteur
-final fluxMesCoursesProvider =
-    StreamProvider.autoDispose<List<Course>>((ref) {
+final fluxMesCoursesProvider = StreamProvider.autoDispose<List<Course>>((ref) {
   final firestore = ref.watch(serviceFirestoreProvider);
   final transporteurId = ref.watch(currentTransporteurIdProvider);
 
   return firestore
       .fluxCollectionCondition(
-        collection: 'courses',
-        champ: 'transporteurId',
-        valeur: transporteurId,
-      )
+    collection: 'courses',
+    champ: 'transporteurId',
+    valeur: transporteurId,
+  )
       .map((snapshot) {
-    var courses = snapshot.docs
-        .map((doc) {
-          final data = doc.data();
-          data['id'] = doc.id;
-          return Course.fromMap(data);
-        })
-        .toList();
+    var courses = snapshot.docs.map((doc) {
+      final data = doc.data();
+      data['id'] = doc.id;
+      return Course.fromMap(data);
+    }).toList();
     // Tri par date de création décroissante
     courses.sort((a, b) => b.dateCreation.compareTo(a.dateCreation));
     return courses;
   });
 });
 
-
 // Flux des courses en attente de transporteur (compatibles)
-final fluxCoursesDisponiblesProvider = StreamProvider.autoDispose<List<Course>>((ref) {
+final fluxCoursesDisponiblesProvider =
+    StreamProvider.autoDispose<List<Course>>((ref) {
   final firestore = ref.watch(serviceFirestoreProvider);
   final transporteurAsync = ref.watch(currentTransporteurProvider);
-  
+
   return transporteurAsync.when(
     data: (transporteur) {
-      if (transporteur == null || !transporteur.disponible || !transporteur.documentsValides) {
+      if (transporteur == null ||
+          !transporteur.disponible ||
+          !transporteur.documentsValides) {
         return Stream.value(<Course>[]);
       }
-      
+
       return firestore
           .fluxCollectionCondition(
-            collection: 'courses',
-            champ: 'statut',
-            valeur: StatutCourse.recherche,
-          )
+        collection: 'courses',
+        champ: 'statut',
+        valeur: StatutCourse.recherche,
+      )
           .map((snapshot) {
-        final courses = snapshot.docs
-            .map((doc) {
-              final data = doc.data();
-              data['id'] = doc.id;
-              return Course.fromMap(data);
-            })
-            .where((c) {
-               // Ignore si transporteurId est déjà défini (sécurité)
-               if (c.transporteurId.isNotEmpty) return false;
-               
-               // Vérifier la compatibilité du véhicule
-               if (c.typeVehicule.isNotEmpty && transporteur.typeVehicule.isNotEmpty) {
-                 if (c.typeVehicule != transporteur.typeVehicule) return false;
-               }
-               
-               return true;
-            })
-            .toList();
-            
+        final courses = snapshot.docs.map((doc) {
+          final data = doc.data();
+          data['id'] = doc.id;
+          return Course.fromMap(data);
+        }).where((c) {
+          // Ignore si transporteurId est déjà défini (sécurité)
+          if (c.transporteurId.isNotEmpty) return false;
+
+          // Vérifier la compatibilité du véhicule
+          if (c.typeVehicule.isNotEmpty &&
+              transporteur.typeVehicule.isNotEmpty) {
+            if (c.typeVehicule != transporteur.typeVehicule) return false;
+          }
+
+          return true;
+        }).toList();
+
         courses.sort((a, b) => b.dateCreation.compareTo(a.dateCreation));
         return courses;
       });
@@ -111,22 +107,25 @@ final fluxCoursesDisponiblesProvider = StreamProvider.autoDispose<List<Course>>(
 final fluxCourseProposeeProvider = StreamProvider.autoDispose<Course?>((ref) {
   final firestore = ref.watch(serviceFirestoreProvider);
   final transporteurId = ref.watch(currentTransporteurIdProvider);
-  
+
   if (transporteurId.isEmpty) return Stream.value(null);
 
   // On écoute les courses "propose" où transporteurId == moi
   // Et dont la date d'expiration n'est pas dépassée (le filtrage exact du temps se fera côté client/app)
-  return firestore.fluxCoursesProposeesTransporteur(transporteurId).map((snapshot) {
+  return firestore
+      .fluxCoursesProposeesTransporteur(transporteurId)
+      .map((snapshot) {
     try {
       final docs = snapshot.docs;
       if (docs.isEmpty) return null;
-      
+
       final data = docs.first.data();
       data['id'] = docs.first.id;
       final course = Course.fromMap(data);
-      
+
       // Vérifier l'expiration
-      if (course.expirationProposition != null && DateTime.now().isAfter(course.expirationProposition!)) {
+      if (course.expirationProposition != null &&
+          DateTime.now().isAfter(course.expirationProposition!)) {
         return null;
       }
       return course;
@@ -157,7 +156,6 @@ final transporteurActionsProvider = Provider<TransporteurActions>((ref) {
   return TransporteurActions(
     ref.read(serviceFirestoreProvider),
     ref.read(currentTransporteurIdProvider),
-    
   );
 });
 
@@ -166,25 +164,29 @@ class TransporteurActions {
   final String _transporteurId;
   // final Ref _ref;
 
-  TransporteurActions(this._firestore, this._transporteurId, );
-
+  TransporteurActions(
+    this._firestore,
+    this._transporteurId,
+  );
 
   /// Accepter une course (Transaction sécurisée)
   Future<void> accepterCourse(String courseId) async {
-    final docRef = FirebaseFirestore.instance.collection('courses').doc(courseId);
-    
+    final docRef =
+        FirebaseFirestore.instance.collection('courses').doc(courseId);
+
     await FirebaseFirestore.instance.runTransaction((transaction) async {
       final courseSnapshot = await transaction.get(docRef);
       if (!courseSnapshot.exists || courseSnapshot.data() == null) {
         throw Exception("Course introuvable.");
       }
-      
+
       final data = courseSnapshot.data()!;
       // Vérifier que la course est toujours attribuée à CE transporteur
-      if (data['statut'] != StatutCourse.attribue || data['transporteurId'] != _transporteurId) {
+      if (data['statut'] != StatutCourse.attribue ||
+          data['transporteurId'] != _transporteurId) {
         throw Exception("Cette course n'est plus disponible ou a été annulée.");
       }
-      
+
       transaction.update(docRef, {
         'statut': StatutCourse.enRouteDepart,
         'dateDebut': DateTime.now().toIso8601String(),
@@ -194,19 +196,21 @@ class TransporteurActions {
 
   /// Refuser une course attribuée automatiquement (Transaction sécurisée)
   Future<void> refuserCourse(String courseId) async {
-    final docRef = FirebaseFirestore.instance.collection('courses').doc(courseId);
-    
+    final docRef =
+        FirebaseFirestore.instance.collection('courses').doc(courseId);
+
     await FirebaseFirestore.instance.runTransaction((transaction) async {
       final courseSnapshot = await transaction.get(docRef);
       if (!courseSnapshot.exists || courseSnapshot.data() == null) {
         throw Exception("Course introuvable.");
       }
-      
+
       final data = courseSnapshot.data()!;
-      if (data['statut'] != StatutCourse.attribue || data['transporteurId'] != _transporteurId) {
+      if (data['statut'] != StatutCourse.attribue ||
+          data['transporteurId'] != _transporteurId) {
         throw Exception("Cette course n'est plus disponible.");
       }
-      
+
       transaction.update(docRef, {
         'transporteurId': '',
         'nomTransporteur': '',
@@ -219,21 +223,28 @@ class TransporteurActions {
 
   // ✅ PHASE 4: DISPATCH AUTOMATIQUE - Accepter une proposition
   Future<void> accepterPropositionCourse(String courseId) async {
-    final docRef = FirebaseFirestore.instance.collection('courses').doc(courseId);
-    final tDoc = await _firestore.lireDocument(collection: 'transporteurs', id: _transporteurId);
-    final nomComplet = tDoc.exists && tDoc.data() != null ? "${tDoc.data()!['prenom']} ${tDoc.data()!['nom']}" : "";
-    final telephone = tDoc.exists && tDoc.data() != null ? tDoc.data()!['telephone'] : "";
-    
+    final docRef =
+        FirebaseFirestore.instance.collection('courses').doc(courseId);
+    final tDoc = await _firestore.lireDocument(
+        collection: 'transporteurs', id: _transporteurId);
+    final nomComplet = tDoc.exists && tDoc.data() != null
+        ? "${tDoc.data()!['prenom']} ${tDoc.data()!['nom']}"
+        : "";
+    final telephone =
+        tDoc.exists && tDoc.data() != null ? tDoc.data()!['telephone'] : "";
+
     await FirebaseFirestore.instance.runTransaction((transaction) async {
       final courseSnapshot = await transaction.get(docRef);
-      if (!courseSnapshot.exists || courseSnapshot.data() == null) throw Exception("Course introuvable.");
-      
+      if (!courseSnapshot.exists || courseSnapshot.data() == null)
+        throw Exception("Course introuvable.");
+
       final data = courseSnapshot.data()!;
       // Vérifications de base
-      if (data['statut'] != StatutCourse.propose || data['transporteurId'] != _transporteurId) {
+      if (data['statut'] != StatutCourse.propose ||
+          data['transporteurId'] != _transporteurId) {
         throw Exception("Proposition expirée ou course déjà assignée.");
       }
-      
+
       // Attribution
       transaction.update(docRef, {
         'statut': StatutCourse.attribue,
@@ -245,37 +256,42 @@ class TransporteurActions {
 
   // ✅ PHASE 4: DISPATCH AUTOMATIQUE - Refuser une proposition (Fallback au suivant ou marché)
   Future<void> refuserPropositionCourse(String courseId) async {
-    final docRef = FirebaseFirestore.instance.collection('courses').doc(courseId);
-    
+    final docRef =
+        FirebaseFirestore.instance.collection('courses').doc(courseId);
+
     await FirebaseFirestore.instance.runTransaction((transaction) async {
       final courseSnapshot = await transaction.get(docRef);
       if (!courseSnapshot.exists || courseSnapshot.data() == null) return;
-      
+
       final data = courseSnapshot.data()!;
-      if (data['statut'] != StatutCourse.propose || data['transporteurId'] != _transporteurId) return;
-      
+      if (data['statut'] != StatutCourse.propose ||
+          data['transporteurId'] != _transporteurId) return;
+
       final List<dynamic> candidats = data['candidats'] ?? [];
       final int index = data['indexCandidatActuel'] ?? 0;
       final int nextIndex = index + 1;
-      
+
       if (nextIndex < candidats.length) {
         // Passer au candidat suivant
         final prochainId = candidats[nextIndex] as String;
         transaction.update(docRef, {
           'indexCandidatActuel': nextIndex,
           'transporteurId': prochainId,
-          'expirationProposition': DateTime.now().add(const Duration(seconds: 30)).toIso8601String(),
+          'expirationProposition':
+              DateTime.now().add(const Duration(seconds: 30)).toIso8601String(),
         });
-        
+
         // Déclencher une notification Push pour le prochain
-        final notifRef = FirebaseFirestore.instance.collection('notifications_push').doc();
+        final notifRef =
+            FirebaseFirestore.instance.collection('notifications_push').doc();
         transaction.set(notifRef, {
-           'titre': '🚨 NOUVELLE COURSE !',
-           'message': 'Une course à proximité vous est proposée. Acceptez vite !',
-           'cible': 'transporteur',
-           'cibleId': prochainId,
-           'status': 'pending',
-           'createdAt': FieldValue.serverTimestamp(),
+          'titre': '🚨 NOUVELLE COURSE !',
+          'message':
+              'Une course à proximité vous est proposée. Acceptez vite !',
+          'cible': 'transporteur',
+          'cibleId': prochainId,
+          'status': 'pending',
+          'createdAt': FieldValue.serverTimestamp(),
         });
       } else {
         // Fallback: Retour au marché public
@@ -289,18 +305,18 @@ class TransporteurActions {
   }
 
   /// Change le statut d'une course en validant la transition
-  Future<void> changerStatutCourse(String courseId, String nouveauStatut) async {
+  Future<void> changerStatutCourse(
+      String courseId, String nouveauStatut) async {
     // Lire le statut actuel pour valider la transition
-    final courseDoc = await _firestore.lireDocument(
-        collection: 'courses', id: courseId);
+    final courseDoc =
+        await _firestore.lireDocument(collection: 'courses', id: courseId);
     if (!courseDoc.exists || courseDoc.data() == null) {
       throw Exception("Course introuvable.");
     }
     final statutActuel = courseDoc.data()!['statut'] as String? ?? '';
 
     if (!StatutCourse.peutTransitionnerVers(statutActuel, nouveauStatut)) {
-      throw Exception(
-          "Transition invalide : $statutActuel → $nouveauStatut");
+      throw Exception("Transition invalide : $statutActuel → $nouveauStatut");
     }
 
     final Map<String, dynamic> miseAJour = {'statut': nouveauStatut};
@@ -355,22 +371,20 @@ final fluxMesRevenusProvider =
 
   return firestore
       .fluxCollectionCondition(
-        collection: 'paiements',
-        champ: 'transporteurId',
-        valeur: transporteurId,
-      )
+    collection: 'paiements',
+    champ: 'transporteurId',
+    valeur: transporteurId,
+  )
       .map((snapshot) {
-    var paiements = snapshot.docs
-        .map((doc) => Paiement.fromMap(doc.data()))
-        .toList();
+    var paiements =
+        snapshot.docs.map((doc) => Paiement.fromMap(doc.data())).toList();
     paiements.sort((a, b) => b.datePaiement.compareTo(a.datePaiement));
     return paiements;
   });
 });
 
 // Calculs statistiques basés sur le flux — valeurs corrigées
-final statsRevenusProvider =
-    Provider.autoDispose<Map<String, double>>((ref) {
+final statsRevenusProvider = Provider.autoDispose<Map<String, double>>((ref) {
   final paiementsAsync = ref.watch(fluxMesRevenusProvider);
 
   return paiementsAsync.maybeWhen(
@@ -409,7 +423,6 @@ final statsRevenusProvider =
         'ceJour': ceJour, //  valeur correcte pour le dashboard
       };
     },
-    orElse: () =>
-        {'total': 0, 'ceMois': 0, 'cetteSemaine': 0, 'ceJour': 0},
+    orElse: () => {'total': 0, 'ceMois': 0, 'cetteSemaine': 0, 'ceJour': 0},
   );
 });

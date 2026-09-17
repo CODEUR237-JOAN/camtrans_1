@@ -21,7 +21,8 @@ final adminClientsProvider = StreamProvider.autoDispose<List<Client>>((ref) {
   });
 });
 
-final adminTransporteursProvider = StreamProvider.autoDispose<List<Transporteur>>((ref) {
+final adminTransporteursProvider =
+    StreamProvider.autoDispose<List<Transporteur>>((ref) {
   final firestore = ref.watch(serviceFirestoreProvider);
   // ✅ AMÉLIORATION 2.1: Limité à 200 entrées
   return firestore.fluxCollection(collection: 'transporteurs').map((snapshot) {
@@ -52,7 +53,8 @@ final adminCoursesProvider = StreamProvider.autoDispose<List<Course>>((ref) {
 // Abonnements des transporteurs
 // ===========================
 
-final adminAbonnementsProvider = StreamProvider.autoDispose<List<Map<String, dynamic>>>((ref) {
+final adminAbonnementsProvider =
+    StreamProvider.autoDispose<List<Map<String, dynamic>>>((ref) {
   final firestore = ref.watch(serviceFirestoreProvider);
   return firestore.fluxCollection(collection: 'abonnements').map((snapshot) {
     final list = snapshot.docs.map((doc) {
@@ -74,7 +76,8 @@ final adminAbonnementsProvider = StreamProvider.autoDispose<List<Map<String, dyn
 // Paiements (tous)
 // ===========================
 
-final adminPaiementsProvider = StreamProvider.autoDispose<List<Paiement>>((ref) {
+final adminPaiementsProvider =
+    StreamProvider.autoDispose<List<Paiement>>((ref) {
   final firestore = ref.watch(serviceFirestoreProvider);
   return firestore.fluxCollection(collection: 'paiements').map((snapshot) {
     final list = snapshot.docs.map((doc) {
@@ -91,7 +94,8 @@ final adminPaiementsProvider = StreamProvider.autoDispose<List<Paiement>>((ref) 
 // Messages (toutes conversations)
 // ===========================
 
-final adminToutesConversationsProvider = StreamProvider.autoDispose<List<Map<String, dynamic>>>((ref) {
+final adminToutesConversationsProvider =
+    StreamProvider.autoDispose<List<Map<String, dynamic>>>((ref) {
   final firestore = ref.watch(serviceFirestoreProvider);
   return firestore.fluxCollection(collection: 'messages').map((snapshot) {
     // Grouper par conversationId
@@ -121,7 +125,8 @@ final adminToutesConversationsProvider = StreamProvider.autoDispose<List<Map<Str
 });
 
 // Provider paramétré : messages d'une conversation spécifique
-final adminMessagesConversationProvider = StreamProvider.autoDispose.family<List<Map<String, dynamic>>, String>((ref, conversationId) {
+final adminMessagesConversationProvider = StreamProvider.autoDispose
+    .family<List<Map<String, dynamic>>, String>((ref, conversationId) {
   final firestore = ref.watch(serviceFirestoreProvider);
   return firestore.fluxMessages(conversationId).map((snapshot) {
     return snapshot.docs.map((doc) {
@@ -136,9 +141,12 @@ final adminMessagesConversationProvider = StreamProvider.autoDispose.family<List
 // Paramètres de l'application
 // ===========================
 
-final adminParametresProvider = StreamProvider.autoDispose<ParametresApp>((ref) {
+final adminParametresProvider =
+    StreamProvider.autoDispose<ParametresApp>((ref) {
   final firestore = ref.watch(serviceFirestoreProvider);
-  return firestore.fluxDocument(collection: 'parametres', id: 'globaux').map((doc) {
+  return firestore
+      .fluxDocument(collection: 'parametres', id: 'globaux')
+      .map((doc) {
     if (doc.exists && doc.data() != null) {
       return ParametresApp.fromMap(doc.data()!);
     }
@@ -195,13 +203,19 @@ final adminStatsProvider = Provider.autoDispose<AsyncValue<AdminStats>>((ref) {
   final transporteursAsync = ref.watch(adminTransporteursProvider);
   final coursesAsync = ref.watch(adminCoursesProvider);
 
-  if (clientsAsync is AsyncLoading || transporteursAsync is AsyncLoading || coursesAsync is AsyncLoading) {
+  if (clientsAsync is AsyncLoading ||
+      transporteursAsync is AsyncLoading ||
+      coursesAsync is AsyncLoading) {
     return const AsyncValue.loading();
   }
 
-  if (clientsAsync is AsyncError) return AsyncValue.error(clientsAsync.error!, clientsAsync.stackTrace!);
-  if (transporteursAsync is AsyncError) return AsyncValue.error(transporteursAsync.error!, transporteursAsync.stackTrace!);
-  if (coursesAsync is AsyncError) return AsyncValue.error(coursesAsync.error!, coursesAsync.stackTrace!);
+  if (clientsAsync is AsyncError)
+    return AsyncValue.error(clientsAsync.error!, clientsAsync.stackTrace!);
+  if (transporteursAsync is AsyncError)
+    return AsyncValue.error(
+        transporteursAsync.error!, transporteursAsync.stackTrace!);
+  if (coursesAsync is AsyncError)
+    return AsyncValue.error(coursesAsync.error!, coursesAsync.stackTrace!);
 
   final clients = clientsAsync.value ?? [];
   final transporteurs = transporteursAsync.value ?? [];
@@ -209,7 +223,7 @@ final adminStatsProvider = Provider.autoDispose<AsyncValue<AdminStats>>((ref) {
 
   final now = DateTime.now().toLocal();
   final debutAujourdhuiLocal = DateTime(now.year, now.month, now.day);
-  
+
   // Historiques sur 7 jours
   List<double> revHist = List.filled(7, 0.0);
   List<double> cliHist = List.filled(7, 0.0);
@@ -218,22 +232,26 @@ final adminStatsProvider = Provider.autoDispose<AsyncValue<AdminStats>>((ref) {
 
   // Clients
   for (var c in clients) {
-    final diff = debutAujourdhuiLocal.difference(c.dateCreation.toLocal()).inDays;
+    final diff =
+        debutAujourdhuiLocal.difference(c.dateCreation.toLocal()).inDays;
     if (diff >= 0 && diff < 7) cliHist[6 - diff] += 1;
   }
   // Transporteurs
   for (var t in transporteurs) {
-    final diff = debutAujourdhuiLocal.difference(t.dateCreation.toLocal()).inDays;
+    final diff =
+        debutAujourdhuiLocal.difference(t.dateCreation.toLocal()).inDays;
     if (diff >= 0 && diff < 7) transHist[6 - diff] += 1;
   }
   // Courses et Revenus
   double revenus = 0;
   for (var course in courses) {
-    final diff = debutAujourdhuiLocal.difference(course.dateCreation.toLocal()).inDays;
-    
+    final diff =
+        debutAujourdhuiLocal.difference(course.dateCreation.toLocal()).inDays;
+
     if (diff >= 0 && diff < 7) coursHist[6 - diff] += 1;
 
-    if (StatutCourse.estTerminee(course.statut) && course.statut != StatutCourse.annulee) {
+    if (StatutCourse.estTerminee(course.statut) &&
+        course.statut != StatutCourse.annulee) {
       double p = course.prixFinal > 0 ? course.prixFinal : course.prixEstime;
       revenus += p;
       if (diff >= 0 && diff < 7) revHist[6 - diff] += p;
@@ -248,7 +266,7 @@ final adminStatsProvider = Provider.autoDispose<AsyncValue<AdminStats>>((ref) {
 
   // Si on veut des courbes "cumulatives" plutôt que par jour, on peut faire :
   // Mais par jour c'est mieux pour des sparklines !
-  
+
   // ✅ CORRECTION 1.5: Suppression des données fictives injectées quand tout = 0
   // Ces données étaient trompeuses pour l'admin (il voyait de faux graphiques).
   // Désormais, si aucune donnée réelle, les historiques restent à 0 (honnête).
@@ -271,28 +289,38 @@ final adminStatsProvider = Provider.autoDispose<AsyncValue<AdminStats>>((ref) {
 });
 
 // Répartition des courses par statut
-final adminCourseDistributionProvider = Provider.autoDispose<AsyncValue<Map<String, int>>>((ref) {
+final adminCourseDistributionProvider =
+    Provider.autoDispose<AsyncValue<Map<String, int>>>((ref) {
   final coursesAsync = ref.watch(adminCoursesProvider);
   return coursesAsync.whenData((courses) {
     final Map<String, int> distribution = {};
     for (var c in courses) {
       String raw = c.statut.toLowerCase();
       String statutClean;
-      
+
       // Normalisation des anciens statuts ou variations
       if (raw.contains('livr') || raw.contains('termin')) {
         statutClean = StatutCourse.terminee;
-      } else if (raw.contains('accept') || raw.contains('attribu')) statutClean = StatutCourse.attribue;
-      else if (raw.contains('cour') || raw.contains('transit') || raw.contains('rout')) statutClean = StatutCourse.enTransit;
-      else if (raw.contains('attent') || raw.contains('recherch')) statutClean = StatutCourse.recherche;
-      else if (raw.contains('annul')) statutClean = StatutCourse.annulee;
-      else statutClean = c.statut;
+      } else if (raw.contains('accept') || raw.contains('attribu'))
+        statutClean = StatutCourse.attribue;
+      else if (raw.contains('cour') ||
+          raw.contains('transit') ||
+          raw.contains('rout'))
+        statutClean = StatutCourse.enTransit;
+      else if (raw.contains('attent') || raw.contains('recherch'))
+        statutClean = StatutCourse.recherche;
+      else if (raw.contains('annul'))
+        statutClean = StatutCourse.annulee;
+      else
+        statutClean = c.statut;
 
       String label = StatutCourse.libelle(statutClean);
       if (label == statutClean) {
-        label = label.isNotEmpty ? label[0].toUpperCase() + label.substring(1) : label;
+        label = label.isNotEmpty
+            ? label[0].toUpperCase() + label.substring(1)
+            : label;
       }
-      
+
       distribution[label] = (distribution[label] ?? 0) + 1;
     }
     return distribution;
@@ -300,7 +328,8 @@ final adminCourseDistributionProvider = Provider.autoDispose<AsyncValue<Map<Stri
 });
 
 // Activités très récentes (5 dernières)
-final adminRecentActivitiesProvider = Provider.autoDispose<AsyncValue<List<Course>>>((ref) {
+final adminRecentActivitiesProvider =
+    Provider.autoDispose<AsyncValue<List<Course>>>((ref) {
   final coursesAsync = ref.watch(adminCoursesProvider);
   return coursesAsync.whenData((courses) {
     final sorted = List<Course>.from(courses);
@@ -310,21 +339,26 @@ final adminRecentActivitiesProvider = Provider.autoDispose<AsyncValue<List<Cours
 });
 
 // Compteur de modération en attente
-final adminPendingApprovalsCountProvider = Provider.autoDispose<AsyncValue<int>>((ref) {
+final adminPendingApprovalsCountProvider =
+    Provider.autoDispose<AsyncValue<int>>((ref) {
   final transporteursAsync = ref.watch(adminTransporteursProvider);
-  return transporteursAsync.whenData((list) => list.where((t) => !t.documentsValides).length);
+  return transporteursAsync
+      .whenData((list) => list.where((t) => !t.documentsValides).length);
 });
 
 // Provider pour la vue de la carte (Standard ou Satellite)
 final isSatelliteViewProvider = StateProvider<bool>((ref) => false);
-const String urlCarteStandard = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
-const String urlCarteSatellite = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}';
+const String urlCarteStandard =
+    'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
+const String urlCarteSatellite =
+    'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}';
 
 // Index du menu sélectionné dans la sidebar
 final adminMenuIndexProvider = StateProvider<int>((ref) => 0);
 
 // Revenus hebdomadaires (pour le graphique)
-final adminWeeklyRevenuesProvider = Provider.autoDispose<AsyncValue<List<double>>>((ref) {
+final adminWeeklyRevenuesProvider =
+    Provider.autoDispose<AsyncValue<List<double>>>((ref) {
   final coursesAsync = ref.watch(adminCoursesProvider);
 
   return coursesAsync.maybeWhen(
@@ -335,15 +369,18 @@ final adminWeeklyRevenuesProvider = Provider.autoDispose<AsyncValue<List<double>
       final debutAujourdhuiLocal = DateTime(now.year, now.month, now.day);
 
       for (var course in courses) {
-        if (StatutCourse.estTerminee(course.statut) && course.statut != StatutCourse.annulee) {
+        if (StatutCourse.estTerminee(course.statut) &&
+            course.statut != StatutCourse.annulee) {
           // Convertir la date de la course en heure locale
           final dateLocale = course.dateCreation.toLocal();
-          final debutJourCourse = DateTime(dateLocale.year, dateLocale.month, dateLocale.day);
+          final debutJourCourse =
+              DateTime(dateLocale.year, dateLocale.month, dateLocale.day);
           final diff = debutAujourdhuiLocal.difference(debutJourCourse).inDays;
           if (diff >= 0 && diff < 7) {
             // Index 6 = aujourd'hui, 0 = il y a 6 jours
             final index = 6 - diff;
-            weeklyData[index] += course.prixFinal > 0 ? course.prixFinal : course.prixEstime;
+            weeklyData[index] +=
+                course.prixFinal > 0 ? course.prixFinal : course.prixEstime;
           }
         }
       }

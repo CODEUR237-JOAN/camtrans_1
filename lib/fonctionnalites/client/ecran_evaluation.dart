@@ -7,7 +7,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:update_camtrans/coeur/widgets/loader_premium.dart';
 
-
 class EcranEvaluation extends ConsumerStatefulWidget {
   final String courseId;
   const EcranEvaluation({super.key, required this.courseId});
@@ -46,24 +45,28 @@ class _EcranEvaluationState extends ConsumerState<EcranEvaluation> {
                   color: CouleursApp.succes.withValues(alpha: 0.1),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(Icons.check_circle_outline, color: CouleursApp.succes, size: 80),
+                child: const Icon(Icons.check_circle_outline,
+                    color: CouleursApp.succes, size: 80),
               ),
-              
+
               const SizedBox(height: 24),
               Text(
                 "Course terminée !",
-                style: GoogleFonts.poppins(color: Colors.white, fontSize: 28, fontWeight: FontWeight.bold),
+                style: GoogleFonts.poppins(
+                    color: Colors.white,
+                    fontSize: 28,
+                    fontWeight: FontWeight.bold),
               ),
-              
+
               const SizedBox(height: 8),
               Text(
                 "Comment s'est passée votre livraison ?",
                 textAlign: TextAlign.center,
                 style: GoogleFonts.poppins(color: Colors.white54, fontSize: 16),
               ),
-              
+
               const SizedBox(height: 40),
-              
+
               // Étoiles
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -78,16 +81,21 @@ class _EcranEvaluationState extends ConsumerState<EcranEvaluation> {
                       padding: const EdgeInsets.symmetric(horizontal: 8.0),
                       child: Icon(
                         index < _note ? Icons.star : Icons.star_border,
-                        color: index < _note ? CouleursApp.avertissement : Colors.white24,
+                        color: index < _note
+                            ? CouleursApp.avertissement
+                            : Colors.white24,
                         size: 40,
-                      ).animate(target: index < _note ? 1 : 0).scale(end: const Offset(1.2, 1.2)).tint(color: CouleursApp.avertissement),
+                      )
+                          .animate(target: index < _note ? 1 : 0)
+                          .scale(end: const Offset(1.2, 1.2))
+                          .tint(color: CouleursApp.avertissement),
                     ),
                   );
                 }),
               ),
-              
+
               const SizedBox(height: 40),
-              
+
               // Champ Commentaire
               if (_note > 0)
                 TextField(
@@ -105,49 +113,60 @@ class _EcranEvaluationState extends ConsumerState<EcranEvaluation> {
                     ),
                   ),
                 ),
-              
+
               const Spacer(),
-              
+
               SizedBox(
                 width: double.infinity,
                 height: 56,
                 child: ElevatedButton(
-                  onPressed: (_note > 0 && !_chargement) ? () async {
-                    setState(() => _chargement = true);
-                    try {
-                      final firestore = ref.read(serviceFirestoreProvider);
-                      await firestore.modifierDocument(
-                        collection: 'courses',
-                        id: widget.courseId,
-                        donnees: {
-                          'noteClient': _note.toDouble(),
-                          'commentaireClient': _commentaireController.text.trim(),
-                        },
-                      );
-                      
-                      if (!context.mounted) return;
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text("Merci pour votre retour !"), backgroundColor: CouleursApp.succes),
-                      );
-                      context.go('/');
-                    } catch (e) {
-                      if (context.mounted) {
-                        setState(() => _chargement = false);
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text("Erreur : $e"), backgroundColor: CouleursApp.erreur),
-                        );
-                      }
-                    }
-                  } : null,
+                  onPressed: (_note > 0 && !_chargement)
+                      ? () async {
+                          setState(() => _chargement = true);
+                          try {
+                            final firestore =
+                                ref.read(serviceFirestoreProvider);
+                            await firestore.modifierDocument(
+                              collection: 'courses',
+                              id: widget.courseId,
+                              donnees: {
+                                'noteClient': _note.toDouble(),
+                                'commentaireClient':
+                                    _commentaireController.text.trim(),
+                              },
+                            );
+
+                            if (!context.mounted) return;
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                  content: Text("Merci pour votre retour !"),
+                                  backgroundColor: CouleursApp.succes),
+                            );
+                            context.go('/');
+                          } catch (e) {
+                            if (context.mounted) {
+                              setState(() => _chargement = false);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                    content: Text("Erreur : $e"),
+                                    backgroundColor: CouleursApp.erreur),
+                              );
+                            }
+                          }
+                        }
+                      : null,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: CouleursApp.primaire,
                     foregroundColor: Colors.white,
                     disabledBackgroundColor: Colors.white12,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16)),
                   ),
-                  child: _chargement 
-                    ? const LoaderPremium(size: 24)
-                    : Text("Envoyer mon avis", style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.bold)),
+                  child: _chargement
+                      ? const LoaderPremium(size: 24)
+                      : Text("Envoyer mon avis",
+                          style: GoogleFonts.poppins(
+                              fontSize: 16, fontWeight: FontWeight.bold)),
                 ),
               ),
             ],

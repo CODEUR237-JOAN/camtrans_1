@@ -13,7 +13,6 @@ import 'package:update_camtrans/coeur/etat/utilisateur_provider.dart';
 import 'package:update_camtrans/services/service_authentification.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
-
 class EcranSplash extends ConsumerStatefulWidget {
   const EcranSplash({super.key});
 
@@ -39,11 +38,11 @@ class _EcranSplashState extends ConsumerState<EcranSplash>
   Future<void> _demarrerRedirection() async {
     // On attend au moins 3 secondes pour l'effet visuel
     await Future.delayed(const Duration(seconds: 3));
-    
+
     if (!mounted) return;
 
     final user = ref.read(serviceAuthentificationProvider).utilisateur;
-    
+
     if (user == null) {
       if (!mounted) return;
       // Non connecté -> Onboarding
@@ -99,93 +98,35 @@ class _EcranSplashState extends ConsumerState<EcranSplash>
                 children: [
                   const Spacer(),
 
-                  // Logo avec glow néon
-                  Container(
-                    width: 170,
-                    height: 170,
-                    padding: const EdgeInsets.all(28),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(40),
-                      boxShadow: [
-                        BoxShadow(
-                          color: CouleursApp.primaireNeon.withValues(alpha: 0.4),
-                          blurRadius: 40,
-                          spreadRadius: 8,
+                  // Logo
+                  Expanded(
+                    child: Center(
+                      child: Container(
+                        width: 320,
+                        height: 320,
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(30),
+                          boxShadow: [
+                            BoxShadow(
+                              color:
+                                  CouleursApp.primaireNeon.withValues(alpha: 0.4),
+                              blurRadius: 50,
+                              spreadRadius: 10,
+                            ),
+                            BoxShadow(
+                              color: Colors.black.withValues(alpha: 0.3),
+                              blurRadius: 30,
+                              offset: const Offset(0, 10),
+                            ),
+                          ],
+                          image: const DecorationImage(
+                            image: AssetImage('assets/images/logo_splash.jpg'),
+                            fit: BoxFit.contain,
+                          ),
                         ),
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.15),
-                          blurRadius: 30,
-                          offset: const Offset(0, 10),
-                        ),
-                      ],
-                    ),
-                    child: const Icon(
-                      Icons.local_shipping,
-                      size: 140,
-                      color: CouleursApp.primaire,
-                    ),
-                  )
-                      ,
-
-                  const SizedBox(height: 40),
-
-                  // Nom de l'app avec dégradé de texte
-                  ShaderMask(
-                    shaderCallback: (bounds) {
-                      return const LinearGradient(
-                        colors: [Colors.white, Color(0xFFC7D2FE)],
-                        begin: Alignment.topCenter,
-                        end: Alignment.bottomCenter,
-                      ).createShader(bounds);
-                    },
-                    child: Text(
-                      TextesApp.nomApplication,
-                      textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        fontSize: 36,
-                        fontWeight: FontWeight.w900,
-                        color: Colors.white,
-                        letterSpacing: 1.5,
-                        height: 1.1,
-                      ),
-                    ),
-                  )
-                      ,
-
-                  const SizedBox(height: 14),
-
-                  // Slogan
-                  Text(
-                    TextesApp.slogan,
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      color: Colors.white70,
-                      height: 1.5,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-
-                  const SizedBox(height: 30),
-
-                  // Badge premium
-                  GlassCard(
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                    borderRadius: 30,
-                    blur: 15,
-                    child: const Text(
-                      "L'Excellence Logistique",
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 14,
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: 1.5,
                       ),
                     ),
                   ),
-
-                  const Spacer(),
 
                   // Indicateur de progression stylisé
                   SizedBox(
@@ -199,7 +140,8 @@ class _EcranSplashState extends ConsumerState<EcranSplash>
                         builder: (context, value, child) {
                           return LinearProgressIndicator(
                             value: value,
-                            backgroundColor: Colors.white.withValues(alpha: 0.15),
+                            backgroundColor:
+                                Colors.white.withValues(alpha: 0.15),
                             valueColor: const AlwaysStoppedAnimation<Color>(
                               Colors.white,
                             ),

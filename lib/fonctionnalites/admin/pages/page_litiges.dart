@@ -56,7 +56,8 @@ class _PageLitigesState extends ConsumerState<PageLitiges>
                         color: Colors.red.withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      child: const Icon(Icons.gavel, color: Colors.redAccent, size: 28),
+                      child: const Icon(Icons.gavel,
+                          color: Colors.redAccent, size: 28),
                     ),
                     const SizedBox(width: 16),
                     Column(
@@ -68,7 +69,8 @@ class _PageLitigesState extends ConsumerState<PageLitiges>
                                 fontSize: 24,
                                 fontWeight: FontWeight.bold)),
                         Text('Accès complet — Courses, Paiements, Messages',
-                            style: TextStyle(color: Colors.white54, fontSize: 13)),
+                            style:
+                                TextStyle(color: Colors.white54, fontSize: 13)),
                       ],
                     ),
                   ],
@@ -77,7 +79,8 @@ class _PageLitigesState extends ConsumerState<PageLitiges>
 
                 // ===== BARRE DE RECHERCHE =====
                 TextField(
-                  onChanged: (v) => setState(() => _searchQuery = v.toLowerCase()),
+                  onChanged: (v) =>
+                      setState(() => _searchQuery = v.toLowerCase()),
                   style: const TextStyle(color: Colors.white),
                   decoration: InputDecoration(
                     hintText: 'Rechercher par ID, nom, téléphone...',
@@ -87,11 +90,13 @@ class _PageLitigesState extends ConsumerState<PageLitiges>
                     fillColor: Colors.white.withValues(alpha: 0.06),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.1)),
+                      borderSide: BorderSide(
+                          color: Colors.white.withValues(alpha: 0.1)),
                     ),
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(12),
-                      borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.1)),
+                      borderSide: BorderSide(
+                          color: Colors.white.withValues(alpha: 0.1)),
                     ),
                   ),
                 ),
@@ -144,20 +149,25 @@ class _OngletCourses extends ConsumerWidget {
 
     return coursesAsync.when(
       loading: () => Center(child: LoaderPremium()),
-      error: (e, _) => Center(child: Text('Erreur: $e', style: const TextStyle(color: Colors.red))),
+      error: (e, _) => Center(
+          child: Text('Erreur: $e', style: const TextStyle(color: Colors.red))),
       data: (courses) {
         final filtered = searchQuery.isEmpty
             ? courses
-            : courses.where((c) =>
-                c.id.toLowerCase().contains(searchQuery) ||
-                c.nomClient.toLowerCase().contains(searchQuery) ||
-                c.nomTransporteur.toLowerCase().contains(searchQuery) ||
-                c.adresseDepart.toLowerCase().contains(searchQuery) ||
-                c.adresseArrivee.toLowerCase().contains(searchQuery)).toList();
+            : courses
+                .where((c) =>
+                    c.id.toLowerCase().contains(searchQuery) ||
+                    c.nomClient.toLowerCase().contains(searchQuery) ||
+                    c.nomTransporteur.toLowerCase().contains(searchQuery) ||
+                    c.adresseDepart.toLowerCase().contains(searchQuery) ||
+                    c.adresseArrivee.toLowerCase().contains(searchQuery))
+                .toList();
 
         if (filtered.isEmpty) {
           return const Center(
-              child: Text('Aucune course correspondante, c\'est très calme par ici ! 🌴', style: TextStyle(color: Colors.white38)));
+              child: Text(
+                  'Aucune course correspondante, c\'est très calme par ici ! 🌴',
+                  style: TextStyle(color: Colors.white38)));
         }
 
         return ListView.builder(
@@ -209,7 +219,8 @@ class _CarteCourse extends ConsumerWidget {
             const SizedBox(width: 10),
             Expanded(
               child: Text('Course #${course.id.substring(0, 8).toUpperCase()}',
-                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                  style: const TextStyle(
+                      color: Colors.white, fontWeight: FontWeight.bold)),
             ),
           ],
         ),
@@ -227,8 +238,12 @@ class _CarteCourse extends ConsumerWidget {
                 _infoRow(Icons.location_on, 'Départ', course.adresseDepart),
                 _infoRow(Icons.flag, 'Arrivée', course.adresseArrivee),
                 _infoRow(Icons.phone, 'Tél Client', course.telephoneClient),
-                _infoRow(Icons.phone_android, 'Tél Transporteur',
-                    course.telephoneTransporteur.isEmpty ? 'N/A' : course.telephoneTransporteur),
+                _infoRow(
+                    Icons.phone_android,
+                    'Tél Transporteur',
+                    course.telephoneTransporteur.isEmpty
+                        ? 'N/A'
+                        : course.telephoneTransporteur),
                 _infoRow(Icons.monetization_on, 'Prix',
                     '${course.prixEstime.toInt()} FCFA estimé / ${course.prixFinal.toInt()} FCFA final'),
                 _infoRow(Icons.calendar_today, 'Créée le',
@@ -249,8 +264,10 @@ class _CarteCourse extends ConsumerWidget {
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.red.shade700,
                           foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 10),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8)),
                         ),
                       ),
                   ],
@@ -271,7 +288,8 @@ class _CarteCourse extends ConsumerWidget {
         children: [
           Icon(icon, color: Colors.white38, size: 16),
           const SizedBox(width: 8),
-          Text('$label : ', style: const TextStyle(color: Colors.white38, fontSize: 13)),
+          Text('$label : ',
+              style: const TextStyle(color: Colors.white38, fontSize: 13)),
           Expanded(
               child: Text(value,
                   style: const TextStyle(color: Colors.white70, fontSize: 13))),
@@ -280,18 +298,23 @@ class _CarteCourse extends ConsumerWidget {
     );
   }
 
-  Future<void> _annulerCourse(BuildContext ctx, WidgetRef ref, Course course) async {
+  Future<void> _annulerCourse(
+      BuildContext ctx, WidgetRef ref, Course course) async {
     final confirm = await showDialog<bool>(
       context: ctx,
       builder: (_) => AlertDialog(
         title: const Text('Annuler la course'),
-        content: Text('Êtes-vous sûr de vouloir annuler la course #${course.id.substring(0, 8).toUpperCase()} ? Cette action est irréversible.'),
+        content: Text(
+            'Êtes-vous sûr de vouloir annuler la course #${course.id.substring(0, 8).toUpperCase()} ? Cette action est irréversible.'),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(ctx, false), child: const Text('Non')),
+          TextButton(
+              onPressed: () => Navigator.pop(ctx, false),
+              child: const Text('Non')),
           ElevatedButton(
             onPressed: () => Navigator.pop(ctx, true),
             style: ElevatedButton.styleFrom(backgroundColor: Colors.red),
-            child: const Text('Oui, annuler', style: TextStyle(color: Colors.white)),
+            child: const Text('Oui, annuler',
+                style: TextStyle(color: Colors.white)),
           ),
         ],
       ),
@@ -310,14 +333,18 @@ class _CarteCourse extends ConsumerWidget {
     // Notification aux deux parties
     final now = DateTime.now().toIso8601String();
     final db = ref.read(serviceFirestoreProvider);
-    for (final uid in [course.clientId, if (course.transporteurId.isNotEmpty) course.transporteurId]) {
+    for (final uid in [
+      course.clientId,
+      if (course.transporteurId.isNotEmpty) course.transporteurId
+    ]) {
       await db.ajouterDocument(
         collection: 'notifications',
         id: 'NOTIF-LITIGE-${uid.substring(0, 5)}-${DateTime.now().millisecondsSinceEpoch}',
         donnees: {
           'utilisateurId': uid,
           'titre': '⚠️ Course annulée par l\'admin',
-          'message': 'La course #${course.id.substring(0, 8).toUpperCase()} a été annulée suite à un litige.',
+          'message':
+              'La course #${course.id.substring(0, 8).toUpperCase()} a été annulée suite à un litige.',
           'type': 'alerte',
           'categorie': 'litige',
           'lue': false,
@@ -339,7 +366,10 @@ class _CarteCourse extends ConsumerWidget {
 
     if (ctx.mounted) {
       ScaffoldMessenger.of(ctx).showSnackBar(
-        const SnackBar(content: Text('Course annulée. Les deux parties ont été notifiées.'), backgroundColor: Colors.green),
+        const SnackBar(
+            content:
+                Text('Course annulée. Les deux parties ont été notifiées.'),
+            backgroundColor: Colors.green),
       );
     }
   }
@@ -358,19 +388,24 @@ class _OngletPaiements extends ConsumerWidget {
 
     return paiementsAsync.when(
       loading: () => Center(child: LoaderPremium()),
-      error: (e, _) => Center(child: Text('Erreur: $e', style: const TextStyle(color: Colors.red))),
+      error: (e, _) => Center(
+          child: Text('Erreur: $e', style: const TextStyle(color: Colors.red))),
       data: (paiements) {
         final filtered = searchQuery.isEmpty
             ? paiements
-            : paiements.where((p) =>
-                p.id.toLowerCase().contains(searchQuery) ||
-                p.courseId.toLowerCase().contains(searchQuery) ||
-                p.telephonePayeur.toLowerCase().contains(searchQuery) ||
-                p.operateur.toLowerCase().contains(searchQuery)).toList();
+            : paiements
+                .where((p) =>
+                    p.id.toLowerCase().contains(searchQuery) ||
+                    p.courseId.toLowerCase().contains(searchQuery) ||
+                    p.telephonePayeur.toLowerCase().contains(searchQuery) ||
+                    p.operateur.toLowerCase().contains(searchQuery))
+                .toList();
 
         if (filtered.isEmpty) {
           return const Center(
-              child: Text('Aucun paiement trouvé, espérons que les affaires reprennent vite ! 💸', style: TextStyle(color: Colors.white38)));
+              child: Text(
+                  'Aucun paiement trouvé, espérons que les affaires reprennent vite ! 💸',
+                  style: TextStyle(color: Colors.white38)));
         }
 
         final totalGeneral = filtered.fold(0.0, (sum, p) => sum + p.montant);
@@ -384,17 +419,24 @@ class _OngletPaiements extends ConsumerWidget {
                 margin: const EdgeInsets.only(bottom: 16),
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  gradient: LinearGradient(colors: [CouleursApp.primaire.withValues(alpha: 0.3), CouleursApp.primaire.withValues(alpha: 0.1)]),
+                  gradient: LinearGradient(colors: [
+                    CouleursApp.primaire.withValues(alpha: 0.3),
+                    CouleursApp.primaire.withValues(alpha: 0.1)
+                  ]),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text('Total (${filtered.length} paiements)',
-                        style: const TextStyle(color: Colors.white70, fontSize: 14)),
-                    Text('${NumberFormat('#,##0', 'fr_FR').format(totalGeneral)} FCFA',
+                        style: const TextStyle(
+                            color: Colors.white70, fontSize: 14)),
+                    Text(
+                        '${NumberFormat('#,##0', 'fr_FR').format(totalGeneral)} FCFA',
                         style: GoogleFonts.inter(
-                            color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold)),
+                            color: Colors.white,
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold)),
                   ],
                 ),
               );
@@ -444,13 +486,22 @@ class _CartePaiement extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  estAbonnement ? 'Abonnement' : 'Course #${paiement.courseId.substring(0, 8).toUpperCase()}',
-                  style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 14),
+                  estAbonnement
+                      ? 'Abonnement'
+                      : 'Course #${paiement.courseId.substring(0, 8).toUpperCase()}',
+                  style: const TextStyle(
+                      color: Colors.white,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14),
                 ),
                 Text('${paiement.operateur} • ${paiement.telephonePayeur}',
-                    style: const TextStyle(color: Colors.white54, fontSize: 12)),
-                Text(DateFormat('dd/MM/yyyy HH:mm').format(paiement.datePaiement),
-                    style: const TextStyle(color: Colors.white38, fontSize: 11)),
+                    style:
+                        const TextStyle(color: Colors.white54, fontSize: 12)),
+                Text(
+                    DateFormat('dd/MM/yyyy HH:mm')
+                        .format(paiement.datePaiement),
+                    style:
+                        const TextStyle(color: Colors.white38, fontSize: 11)),
               ],
             ),
           ),
@@ -469,7 +520,8 @@ class _CartePaiement extends ConsumerWidget {
                   borderRadius: BorderRadius.circular(4),
                 ),
                 child: Text(paiement.statut,
-                    style: const TextStyle(color: Colors.greenAccent, fontSize: 11)),
+                    style: const TextStyle(
+                        color: Colors.greenAccent, fontSize: 11)),
               ),
             ],
           ),
@@ -492,21 +544,27 @@ class _OngletConversations extends ConsumerWidget {
 
     return conversationsAsync.when(
       loading: () => Center(child: LoaderPremium()),
-      error: (e, _) => Center(child: Text('Erreur: $e', style: const TextStyle(color: Colors.red))),
+      error: (e, _) => Center(
+          child: Text('Erreur: $e', style: const TextStyle(color: Colors.red))),
       data: (conversations) {
         final filtered = searchQuery.isEmpty
             ? conversations
-            : conversations.where((c) =>
-                (c['conversationId'] as String).toLowerCase().contains(searchQuery)).toList();
+            : conversations
+                .where((c) => (c['conversationId'] as String)
+                    .toLowerCase()
+                    .contains(searchQuery))
+                .toList();
 
         if (filtered.isEmpty) {
           return Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: const [
-                Icon(Icons.chat_bubble_outline, size: 64, color: Colors.white12),
+                Icon(Icons.chat_bubble_outline,
+                    size: 64, color: Colors.white12),
                 SizedBox(height: 12),
-                Text('Aucune conversation pour le moment. 🕊️', style: TextStyle(color: Colors.white38, fontSize: 16)),
+                Text('Aucune conversation pour le moment. 🕊️',
+                    style: TextStyle(color: Colors.white38, fontSize: 16)),
               ],
             ),
           );
@@ -556,7 +614,9 @@ class _CarteConversationState extends ConsumerState<_CarteConversation> {
             ),
             title: Text(convId,
                 style: const TextStyle(
-                    color: Colors.white, fontWeight: FontWeight.bold, fontSize: 13)),
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 13)),
             subtitle: Text(
               '$nbMessages message(s) • "$contenu"',
               style: const TextStyle(color: Colors.white54, fontSize: 12),
@@ -568,7 +628,8 @@ class _CarteConversationState extends ConsumerState<_CarteConversation> {
               icon: Icon(_expanded ? Icons.expand_less : Icons.expand_more,
                   color: Colors.blueAccent, size: 18),
               label: Text(_expanded ? 'Fermer' : 'Lire',
-                  style: const TextStyle(color: Colors.blueAccent, fontSize: 12)),
+                  style:
+                      const TextStyle(color: Colors.blueAccent, fontSize: 12)),
             ),
           ),
           if (_expanded) _buildMessages(context, convId),
@@ -623,7 +684,8 @@ class _CarteConversationState extends ConsumerState<_CarteConversation> {
                           ),
                           const SizedBox(height: 4),
                           Text(texte,
-                              style: const TextStyle(color: Colors.white70, fontSize: 13)),
+                              style: const TextStyle(
+                                  color: Colors.white70, fontSize: 13)),
                         ],
                       ),
                     );

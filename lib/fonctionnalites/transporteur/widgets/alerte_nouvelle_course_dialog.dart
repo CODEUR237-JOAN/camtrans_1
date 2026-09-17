@@ -14,10 +14,12 @@ class AlerteNouvelleCourseDialog extends ConsumerStatefulWidget {
   const AlerteNouvelleCourseDialog({super.key, required this.course});
 
   @override
-  ConsumerState<AlerteNouvelleCourseDialog> createState() => _AlerteNouvelleCourseDialogState();
+  ConsumerState<AlerteNouvelleCourseDialog> createState() =>
+      _AlerteNouvelleCourseDialogState();
 }
 
-class _AlerteNouvelleCourseDialogState extends ConsumerState<AlerteNouvelleCourseDialog> {
+class _AlerteNouvelleCourseDialogState
+    extends ConsumerState<AlerteNouvelleCourseDialog> {
   @override
   void initState() {
     super.initState();
@@ -39,8 +41,8 @@ class _AlerteNouvelleCourseDialogState extends ConsumerState<AlerteNouvelleCours
       child: Container(
         padding: const EdgeInsets.all(24),
         decoration: BoxDecoration(
-          color: Theme.of(context).brightness == Brightness.dark 
-              ? Colors.grey[900] 
+          color: Theme.of(context).brightness == Brightness.dark
+              ? Colors.grey[900]
               : Colors.white,
           borderRadius: BorderRadius.circular(24),
           boxShadow: [
@@ -67,11 +69,15 @@ class _AlerteNouvelleCourseDialogState extends ConsumerState<AlerteNouvelleCours
                 size: 60,
               ),
             )
-            .animate(onPlay: (controller) => controller.repeat(reverse: true))
-            .scale(begin: const Offset(1, 1), end: const Offset(1.2, 1.2), duration: 500.ms),
-            
+                .animate(
+                    onPlay: (controller) => controller.repeat(reverse: true))
+                .scale(
+                    begin: const Offset(1, 1),
+                    end: const Offset(1.2, 1.2),
+                    duration: 500.ms),
+
             const SizedBox(height: 24),
-            
+
             // Titre
             Text(
               "NOUVELLE COURSE !",
@@ -82,25 +88,26 @@ class _AlerteNouvelleCourseDialogState extends ConsumerState<AlerteNouvelleCours
               ),
               textAlign: TextAlign.center,
             )
-            .animate(onPlay: (controller) => controller.repeat(reverse: true))
-            .fadeIn(duration: 500.ms),
-            
+                .animate(
+                    onPlay: (controller) => controller.repeat(reverse: true))
+                .fadeIn(duration: 500.ms),
+
             const SizedBox(height: 16),
-            
+
             // Description
             Text(
               "Une nouvelle course vous a été attribuée automatiquement. Vous devez vous rendre au point de départ.",
               style: GoogleFonts.inter(
                 fontSize: 14,
-                color: Theme.of(context).brightness == Brightness.dark 
-                    ? Colors.white70 
+                color: Theme.of(context).brightness == Brightness.dark
+                    ? Colors.white70
                     : Colors.black87,
               ),
               textAlign: TextAlign.center,
             ),
-            
+
             const SizedBox(height: 20),
-            
+
             // Details
             Container(
               padding: const EdgeInsets.all(12),
@@ -112,12 +119,14 @@ class _AlerteNouvelleCourseDialogState extends ConsumerState<AlerteNouvelleCours
                 children: [
                   Row(
                     children: [
-                      const Icon(Icons.location_on, color: Colors.green, size: 16),
+                      const Icon(Icons.location_on,
+                          color: Colors.green, size: 16),
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
                           widget.course.adresseDepart,
-                          style: GoogleFonts.inter(fontWeight: FontWeight.w600, fontSize: 13),
+                          style: GoogleFonts.inter(
+                              fontWeight: FontWeight.w600, fontSize: 13),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -132,7 +141,8 @@ class _AlerteNouvelleCourseDialogState extends ConsumerState<AlerteNouvelleCours
                       Expanded(
                         child: Text(
                           widget.course.adresseArrivee,
-                          style: GoogleFonts.inter(fontWeight: FontWeight.w600, fontSize: 13),
+                          style: GoogleFonts.inter(
+                              fontWeight: FontWeight.w600, fontSize: 13),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -142,9 +152,9 @@ class _AlerteNouvelleCourseDialogState extends ConsumerState<AlerteNouvelleCours
                 ],
               ),
             ),
-            
+
             const SizedBox(height: 30),
-            
+
             Row(
               children: [
                 Expanded(
@@ -154,7 +164,9 @@ class _AlerteNouvelleCourseDialogState extends ConsumerState<AlerteNouvelleCours
                       onPressed: () async {
                         FlutterRingtonePlayer().stop();
                         try {
-                          await ref.read(transporteurActionsProvider).refuserCourse(widget.course.id);
+                          await ref
+                              .read(transporteurActionsProvider)
+                              .refuserCourse(widget.course.id);
                         } catch (e) {
                           debugPrint("Erreur refus course: $e");
                         }
@@ -187,7 +199,9 @@ class _AlerteNouvelleCourseDialogState extends ConsumerState<AlerteNouvelleCours
                       onPressed: () async {
                         FlutterRingtonePlayer().stop();
                         try {
-                          await ref.read(transporteurActionsProvider).accepterCourse(widget.course.id);
+                          await ref
+                              .read(transporteurActionsProvider)
+                              .accepterCourse(widget.course.id);
                         } catch (e) {
                           debugPrint("Erreur acceptation course: $e");
                         }

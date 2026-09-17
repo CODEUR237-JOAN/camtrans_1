@@ -6,7 +6,6 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../../coeur/etat/demande_expedition_provider.dart';
 import '../../coeur/etat/textes_app_provider.dart';
 import '../../coeur/etat/utilisateur_provider.dart';
 import '../../modeles/textes_app.dart';
@@ -23,11 +22,13 @@ import 'widgets/bottom_sheet_paiement.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'widgets/recherche_radar.dart';
+
 class SuiviTransport extends ConsumerStatefulWidget {
   final String courseId;
   final bool isFullScreen;
 
-  const SuiviTransport({super.key, required this.courseId, this.isFullScreen = true});
+  const SuiviTransport(
+      {super.key, required this.courseId, this.isFullScreen = true});
 
   @override
   ConsumerState<SuiviTransport> createState() => _SuiviTransportState();
@@ -45,7 +46,8 @@ class _SuiviTransportState extends ConsumerState<SuiviTransport> {
         if (!autorise && mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text("Le GPS est nécessaire pour le suivi en temps réel."),
+              content:
+                  Text("Le GPS est nécessaire pour le suivi en temps réel."),
               backgroundColor: Colors.orange,
             ),
           );
@@ -71,9 +73,14 @@ class _SuiviTransportState extends ConsumerState<SuiviTransport> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.local_shipping_outlined, size: 80, color: Colors.white54),
-             const SizedBox(height: 20),
-            Text(textes.get('vide_course_client', "Aucune course active à suivre. Où allons-nous aujourd'hui ? 🚀"), style: const TextStyle(fontSize: 16, color: Colors.white70), textAlign: TextAlign.center),
+              const Icon(Icons.local_shipping_outlined,
+                  size: 80, color: Colors.white54),
+              const SizedBox(height: 20),
+              Text(
+                  textes.get('vide_course_client',
+                      "Aucune course active à suivre. Où allons-nous aujourd'hui ? 🚀"),
+                  style: const TextStyle(fontSize: 16, color: Colors.white70),
+                  textAlign: TextAlign.center),
             ],
           ),
         ),
@@ -89,7 +96,8 @@ class _SuiviTransportState extends ConsumerState<SuiviTransport> {
       if (!estClient) return;
       final ancienStatut = previous?.course?.statut;
       final nouveauStatut = next.course?.statut;
-      if (ancienStatut != StatutCourse.terminee && nouveauStatut == StatutCourse.terminee) {
+      if (ancienStatut != StatutCourse.terminee &&
+          nouveauStatut == StatutCourse.terminee) {
         if (next.course?.paiementEffectue == false) {
           WidgetsBinding.instance.addPostFrameCallback((_) {
             if (mounted) _confirmerFinCourse(context);
@@ -101,7 +109,8 @@ class _SuiviTransportState extends ConsumerState<SuiviTransport> {
     if (etatSuivi.chargement) {
       return const Scaffold(
         backgroundColor: Color(0xFF08111F),
-        body: Center(child: CircularProgressIndicator(color: CouleursApp.primaire)),
+        body: Center(
+            child: CircularProgressIndicator(color: CouleursApp.primaire)),
       );
     }
 
@@ -120,7 +129,9 @@ class _SuiviTransportState extends ConsumerState<SuiviTransport> {
     final course = etatSuivi.course!;
 
     // ✅ PHASE 4: DISPATCH - Logique de Timeout côté Client (Zéro Coût Cloud Functions)
-    if (estClient && course.statut == StatutCourse.propose && course.expirationProposition != null) {
+    if (estClient &&
+        course.statut == StatutCourse.propose &&
+        course.expirationProposition != null) {
       if (DateTime.now().isAfter(course.expirationProposition!)) {
         // Le délai est dépassé, on passe au transporteur suivant
         WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -130,7 +141,8 @@ class _SuiviTransportState extends ConsumerState<SuiviTransport> {
     }
 
     // Affichage du Radar continu tant qu'aucun transporteur n'a accepté
-    if (course.statut == StatutCourse.recherche || course.statut == StatutCourse.propose) {
+    if (course.statut == StatutCourse.recherche ||
+        course.statut == StatutCourse.propose) {
       return Scaffold(
         backgroundColor: const Color(0xFF08111F),
         body: Stack(
@@ -149,20 +161,24 @@ class _SuiviTransportState extends ConsumerState<SuiviTransport> {
                 children: [
                   const Text(
                     "Recherche du meilleur transporteur...",
-                    style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    course.statut == StatutCourse.propose 
-                      ? "En attente de la réponse du candidat idéal..."
-                      : "Analyse des transporteurs disponibles...",
+                    course.statut == StatutCourse.propose
+                        ? "En attente de la réponse du candidat idéal..."
+                        : "Analyse des transporteurs disponibles...",
                     style: const TextStyle(color: Colors.white70, fontSize: 14),
                   ),
                   const SizedBox(height: 20),
                   TextButton(
                     onPressed: () => _confirmerAnnulation(context),
-                    style: TextButton.styleFrom(foregroundColor: CouleursApp.erreur),
-                    child: const Text("Annuler l'expédition"),
+                    style: TextButton.styleFrom(
+                        foregroundColor: CouleursApp.erreur),
+                    child: const Text("Annuler la course"),
                   )
                 ],
               ),
@@ -175,10 +191,13 @@ class _SuiviTransportState extends ConsumerState<SuiviTransport> {
     final transporteur = etatSuivi.transporteur;
 
     final LatLng depart = LatLng(course.latitudeDepart, course.longitudeDepart);
-    final LatLng arrivee = LatLng(course.latitudeArrivee, course.longitudeArrivee);
-    
+    final LatLng arrivee =
+        LatLng(course.latitudeArrivee, course.longitudeArrivee);
+
     LatLng posTransporteur = depart;
-    if (transporteur != null && transporteur.latitude != 0 && transporteur.longitude != 0) {
+    if (transporteur != null &&
+        transporteur.latitude != 0 &&
+        transporteur.longitude != 0) {
       posTransporteur = LatLng(transporteur.latitude, transporteur.longitude);
     }
 
@@ -216,13 +235,12 @@ class _SuiviTransportState extends ConsumerState<SuiviTransport> {
             right: 0,
             bottom: 0,
             child: _buildBottomSheet(
-              context, 
-              course,
-              transporteur, 
-              etatSuivi.quartierTransporteur,
-              etatSuivi.distanceRestante, 
-              etatSuivi.tempsRestantSeconds
-            ),
+                context,
+                course,
+                transporteur,
+                etatSuivi.quartierTransporteur,
+                etatSuivi.distanceRestante,
+                etatSuivi.tempsRestantSeconds),
           ),
         ],
       ),
@@ -240,7 +258,15 @@ class _SuiviTransportState extends ConsumerState<SuiviTransport> {
       },
       child: Container(
         padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(color: const Color(0xFF08111F), shape: BoxShape.circle, boxShadow: [BoxShadow(color: Colors.white.withValues(alpha: 0.07), blurRadius: 10, offset: const Offset(0, 4))]),
+        decoration: BoxDecoration(
+            color: const Color(0xFF08111F),
+            shape: BoxShape.circle,
+            boxShadow: [
+              BoxShadow(
+                  color: Colors.white.withValues(alpha: 0.07),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4))
+            ]),
         child: const Icon(Icons.arrow_back, color: Colors.white),
       ),
     );
@@ -255,7 +281,15 @@ class _SuiviTransportState extends ConsumerState<SuiviTransport> {
       },
       child: Container(
         padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(color: const Color(0xFF08111F), shape: BoxShape.circle, boxShadow: [BoxShadow(color: Colors.white.withValues(alpha: 0.07), blurRadius: 10, offset: const Offset(0, 4))]),
+        decoration: BoxDecoration(
+            color: const Color(0xFF08111F),
+            shape: BoxShape.circle,
+            boxShadow: [
+              BoxShadow(
+                  color: Colors.white.withValues(alpha: 0.07),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4))
+            ]),
         child: const Icon(Iconsax.location_copy, color: CouleursApp.primaire),
       ),
     );
@@ -264,7 +298,7 @@ class _SuiviTransportState extends ConsumerState<SuiviTransport> {
   Widget _buildInfosTrajet(double distanceMetres, double tempsSecondes) {
     final distKm = (distanceMetres / 1000).toStringAsFixed(1);
     final min = (tempsSecondes / 60).ceil();
-    
+
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
       decoration: BoxDecoration(
@@ -279,15 +313,23 @@ class _SuiviTransportState extends ConsumerState<SuiviTransport> {
             children: [
               const Icon(Icons.route, color: CouleursApp.primaire, size: 20),
               const SizedBox(width: 8),
-              Text("$distKm km", style: const TextStyle(fontWeight: FontWeight.bold, color: CouleursApp.primaire)),
+              Text("$distKm km",
+                  style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: CouleursApp.primaire)),
             ],
           ),
-          Container(width: 1, height: 24, color: CouleursApp.primaire.withValues(alpha: 0.3)),
+          Container(
+              width: 1,
+              height: 24,
+              color: CouleursApp.primaire.withValues(alpha: 0.3)),
           Row(
             children: [
               const Icon(Icons.timer, color: CouleursApp.succes, size: 20),
               const SizedBox(width: 8),
-              Text("$min min", style: const TextStyle(fontWeight: FontWeight.bold, color: CouleursApp.succes)),
+              Text("$min min",
+                  style: const TextStyle(
+                      fontWeight: FontWeight.bold, color: CouleursApp.succes)),
             ],
           ),
         ],
@@ -295,32 +337,62 @@ class _SuiviTransportState extends ConsumerState<SuiviTransport> {
     );
   }
 
-  Widget _buildTransporteurInfo(BuildContext context, Transporteur transporteur, String? quartier) {
+  Widget _buildTransporteurInfo(
+      BuildContext context, Transporteur transporteur, String? quartier) {
     return Container(
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(color: const Color(0xFF08111F), borderRadius: BorderRadius.circular(16), boxShadow: [BoxShadow(color: Colors.white.withValues(alpha: 0.07), blurRadius: 20, offset: const Offset(0, 10))]),
+      decoration: BoxDecoration(
+          color: const Color(0xFF08111F),
+          borderRadius: BorderRadius.circular(16),
+          boxShadow: [
+            BoxShadow(
+                color: Colors.white.withValues(alpha: 0.07),
+                blurRadius: 20,
+                offset: const Offset(0, 10))
+          ]),
       child: Row(
         children: [
           CircleAvatar(
-            radius: 24, 
-            backgroundColor: CouleursApp.primaire.withValues(alpha: 0.1), 
-            backgroundImage: transporteur.photo.isNotEmpty ? NetworkImage(transporteur.photo) : null,
-            child: transporteur.photo.isEmpty ? const Icon(Icons.person, color: CouleursApp.primaire) : null,
+            radius: 24,
+            backgroundColor: CouleursApp.primaire.withValues(alpha: 0.1),
+            backgroundImage: transporteur.photo.isNotEmpty
+                ? NetworkImage(transporteur.photo)
+                : null,
+            child: transporteur.photo.isEmpty
+                ? const Icon(Icons.person, color: CouleursApp.primaire)
+                : null,
           ),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text("${transporteur.prenom} ${transporteur.nom}", style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.white), overflow: TextOverflow.ellipsis),
+                Text("${transporteur.prenom} ${transporteur.nom}",
+                    style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                        color: Colors.white),
+                    overflow: TextOverflow.ellipsis),
                 Row(
                   children: [
-                    const Icon(Iconsax.location_copy, size: 12, color: CouleursApp.primaire),
+                    const Icon(Iconsax.location_copy,
+                        size: 12, color: CouleursApp.primaire),
                     const SizedBox(width: 4),
-                    Expanded(child: Text(quartier ?? "Localisation en cours...", style: const TextStyle(color: CouleursApp.primaire, fontSize: 12, fontWeight: FontWeight.w600), overflow: TextOverflow.ellipsis)),
+                    Expanded(
+                        child: Text(quartier ?? "Localisation en cours...",
+                            style: const TextStyle(
+                                color: CouleursApp.primaire,
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600),
+                            overflow: TextOverflow.ellipsis)),
                   ],
                 ),
-                Text(transporteur.typeVehicule.isEmpty ? "Véhicule utilitaire" : transporteur.typeVehicule, style: const TextStyle(color: Colors.white70, fontSize: 11)),
+                Text(
+                    transporteur.typeVehicule.isEmpty
+                        ? "Véhicule utilitaire"
+                        : transporteur.typeVehicule,
+                    style:
+                        const TextStyle(color: Colors.white70, fontSize: 11)),
               ],
             ),
           ),
@@ -333,21 +405,28 @@ class _SuiviTransportState extends ConsumerState<SuiviTransport> {
                 child: Container(
                   padding: const EdgeInsets.all(10),
                   margin: const EdgeInsets.only(right: 8),
-                  decoration: BoxDecoration(color: CouleursApp.secondaire.withValues(alpha: 0.1), shape: BoxShape.circle),
-                  child: const Icon(Iconsax.message_copy, color: CouleursApp.secondaire, size: 20),
+                  decoration: BoxDecoration(
+                      color: CouleursApp.secondaire.withValues(alpha: 0.1),
+                      shape: BoxShape.circle),
+                  child: const Icon(Iconsax.message_copy,
+                      color: CouleursApp.secondaire, size: 20),
                 ),
               ),
               GestureDetector(
                 onTap: () async {
-                  final Uri telUrl = Uri(scheme: 'tel', path: transporteur.telephone);
+                  final Uri telUrl =
+                      Uri(scheme: 'tel', path: transporteur.telephone);
                   if (await canLaunchUrl(telUrl)) {
                     await launchUrl(telUrl);
                   }
                 },
                 child: Container(
                   padding: const EdgeInsets.all(10),
-                  decoration: BoxDecoration(color: CouleursApp.primaire.withValues(alpha: 0.1), shape: BoxShape.circle),
-                  child: const Icon(Iconsax.call_copy, color: CouleursApp.primaire, size: 20),
+                  decoration: BoxDecoration(
+                      color: CouleursApp.primaire.withValues(alpha: 0.1),
+                      shape: BoxShape.circle),
+                  child: const Icon(Iconsax.call_copy,
+                      color: CouleursApp.primaire, size: 20),
                 ),
               ),
             ],
@@ -357,23 +436,40 @@ class _SuiviTransportState extends ConsumerState<SuiviTransport> {
     );
   }
 
-  Widget _buildBottomSheet(BuildContext context, Course course, Transporteur? transporteur, String? quartier, double distanceMetres, double tempsSecondes) {
+  Widget _buildBottomSheet(
+      BuildContext context,
+      Course course,
+      Transporteur? transporteur,
+      String? quartier,
+      double distanceMetres,
+      double tempsSecondes) {
     return Container(
       height: MediaQuery.of(context).size.height * 0.70,
       padding: const EdgeInsets.fromLTRB(24, 12, 24, 24),
-      decoration: BoxDecoration(color: Colors.white, borderRadius: const BorderRadius.vertical(top: Radius.circular(32)), boxShadow: [BoxShadow(color: Colors.white.withValues(alpha: 0.07), blurRadius: 20, offset: const Offset(0, -5))]),
+      decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
+          boxShadow: [
+            BoxShadow(
+                color: Colors.white.withValues(alpha: 0.07),
+                blurRadius: 20,
+                offset: const Offset(0, -5))
+          ]),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Poignée du bottom sheet
           Center(
             child: Container(
-              width: 40, height: 5,
+              width: 40,
+              height: 5,
               margin: const EdgeInsets.only(bottom: 16),
-              decoration: BoxDecoration(color: Colors.black26, borderRadius: BorderRadius.circular(10)),
+              decoration: BoxDecoration(
+                  color: Colors.black26,
+                  borderRadius: BorderRadius.circular(10)),
             ),
           ),
-          
+
           // Entête Course
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -381,15 +477,30 @@ class _SuiviTransportState extends ConsumerState<SuiviTransport> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text("Course", style: TextStyle(color: Colors.black54, fontSize: 13)),
-                  Text(course.codeSuivi, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.black)),
+                  const Text("Course",
+                      style: TextStyle(color: Colors.black54, fontSize: 13)),
+                  Text(course.codeSuivi,
+                      style: const TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18,
+                          color: Colors.black)),
                 ],
               ),
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                decoration: BoxDecoration(color: CouleursApp.primaire.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(20)),
-                child: const Text("En direct", style: TextStyle(color: CouleursApp.primaire, fontWeight: FontWeight.bold, fontSize: 12)),
-              ).animate(onPlay: (controller) => controller.repeat(reverse: true)).fade(begin: 0.5, end: 1.0, duration: 1.seconds),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                    color: CouleursApp.primaire.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(20)),
+                child: const Text("En direct",
+                    style: TextStyle(
+                        color: CouleursApp.primaire,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 12)),
+              )
+                  .animate(
+                      onPlay: (controller) => controller.repeat(reverse: true))
+                  .fade(begin: 0.5, end: 1.0, duration: 1.seconds),
             ],
           ),
           const SizedBox(height: 12),
@@ -399,7 +510,12 @@ class _SuiviTransportState extends ConsumerState<SuiviTransport> {
             children: [
               const Icon(Icons.location_on, color: Colors.redAccent, size: 20),
               const SizedBox(width: 8),
-              Expanded(child: Text(course.adresseDepart, style: const TextStyle(color: Colors.black87, fontSize: 13, fontWeight: FontWeight.w500))),
+              Expanded(
+                  child: Text(course.adresseDepart,
+                      style: const TextStyle(
+                          color: Colors.black87,
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500))),
             ],
           ),
           Padding(
@@ -410,7 +526,12 @@ class _SuiviTransportState extends ConsumerState<SuiviTransport> {
             children: [
               const Icon(Icons.flag, color: Colors.green, size: 20),
               const SizedBox(width: 8),
-              Expanded(child: Text(course.adresseArrivee, style: const TextStyle(color: Colors.black87, fontSize: 13, fontWeight: FontWeight.w500))),
+              Expanded(
+                  child: Text(course.adresseArrivee,
+                      style: const TextStyle(
+                          color: Colors.black87,
+                          fontSize: 13,
+                          fontWeight: FontWeight.w500))),
             ],
           ),
 
@@ -436,7 +557,9 @@ class _SuiviTransportState extends ConsumerState<SuiviTransport> {
           ),
 
           // Bouton "Terminer la course" ou "Je suis arrivé"
-          if (course.statut == StatutCourse.arriveDestination || (course.statut == StatutCourse.enTransit && distanceMetres < 200)) ...[
+          if (course.statut == StatutCourse.arriveDestination ||
+              (course.statut == StatutCourse.enTransit &&
+                  distanceMetres < 200)) ...[
             const SizedBox(height: 16),
             SizedBox(
               width: double.infinity,
@@ -444,28 +567,37 @@ class _SuiviTransportState extends ConsumerState<SuiviTransport> {
               child: ElevatedButton(
                 onPressed: () => _confirmerFinCourse(context),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: course.statut == StatutCourse.arriveDestination ? CouleursApp.primaire : CouleursApp.succes,
+                  backgroundColor:
+                      course.statut == StatutCourse.arriveDestination
+                          ? CouleursApp.primaire
+                          : CouleursApp.succes,
                   foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16)),
                   elevation: 0,
                 ),
                 child: Text(
-                  course.statut == StatutCourse.arriveDestination ? "Confirmer la livraison" : "Valider l'arrivée", 
-                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)
-                ),
+                    course.statut == StatutCourse.arriveDestination
+                        ? "Confirmer la livraison"
+                        : "Valider l'arrivée",
+                    style: const TextStyle(
+                        fontSize: 16, fontWeight: FontWeight.bold)),
               ),
             ),
           ],
 
           // Bouton d'annulation
-          if (course.statut == StatutCourse.recherche || course.statut == StatutCourse.attribue || course.statut == StatutCourse.enRouteDepart) ...[
+          if (course.statut == StatutCourse.recherche ||
+              course.statut == StatutCourse.attribue ||
+              course.statut == StatutCourse.enRouteDepart) ...[
             const SizedBox(height: 8),
             SizedBox(
               width: double.infinity,
               child: TextButton(
                 onPressed: () => _confirmerAnnulation(context),
-                style: TextButton.styleFrom(foregroundColor: CouleursApp.erreur),
-                child: const Text("Annuler l'expédition"),
+                style:
+                    TextButton.styleFrom(foregroundColor: CouleursApp.erreur),
+                child: const Text("Annuler la course"),
               ),
             ),
           ],
@@ -478,8 +610,9 @@ class _SuiviTransportState extends ConsumerState<SuiviTransport> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text("Annuler l'expédition"),
-        content: const Text("Êtes-vous sûr de vouloir annuler cette expédition ?"),
+        title: const Text("Annuler la course"),
+        content:
+            const Text("Êtes-vous sûr de vouloir annuler cette course ?"),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
@@ -498,7 +631,9 @@ class _SuiviTransportState extends ConsumerState<SuiviTransport> {
                 context.go('/');
               }
             },
-            style: ElevatedButton.styleFrom(backgroundColor: CouleursApp.erreur, foregroundColor: Colors.white),
+            style: ElevatedButton.styleFrom(
+                backgroundColor: CouleursApp.erreur,
+                foregroundColor: Colors.white),
             child: const Text("Oui, annuler"),
           ),
         ],
@@ -507,9 +642,7 @@ class _SuiviTransportState extends ConsumerState<SuiviTransport> {
   }
 
   void _confirmerFinCourse(BuildContext context) {
-    final course = ref
-        .read(suiviProvider(widget.courseId))
-        .course;
+    final course = ref.read(suiviProvider(widget.courseId)).course;
 
     if (course == null) return;
 
@@ -556,36 +689,32 @@ class _SuiviTransportState extends ConsumerState<SuiviTransport> {
 
       if (nextIndex < candidats.length) {
         final prochainId = candidats[nextIndex] as String;
-        await serviceFs.modifierDocument(
-          collection: 'courses', 
-          id: course.id,
-          donnees: {
-            'indexCandidatActuel': nextIndex,
-            'transporteurId': prochainId,
-            'expirationProposition': DateTime.now().add(const Duration(seconds: 30)).toIso8601String(),
-          }
-        );
-        
+        await serviceFs
+            .modifierDocument(collection: 'courses', id: course.id, donnees: {
+          'indexCandidatActuel': nextIndex,
+          'transporteurId': prochainId,
+          'expirationProposition':
+              DateTime.now().add(const Duration(seconds: 30)).toIso8601String(),
+        });
+
         // Push notification for the next candidate
         await FirebaseFirestore.instance.collection('notifications_push').add({
-           'titre': '🚨 NOUVELLE COURSE !',
-           'message': 'Une course à proximité vous est proposée. Acceptez vite !',
-           'cible': 'transporteur',
-           'cibleId': prochainId,
-           'status': 'pending',
-           'createdAt': FieldValue.serverTimestamp(),
+          'titre': '🚨 NOUVELLE COURSE !',
+          'message':
+              'Une course à proximité vous est proposée. Acceptez vite !',
+          'cible': 'transporteur',
+          'cibleId': prochainId,
+          'status': 'pending',
+          'createdAt': FieldValue.serverTimestamp(),
         });
       } else {
         // Plus aucun candidat : on passe au marché public
-        await serviceFs.modifierDocument(
-          collection: 'courses', 
-          id: course.id,
-          donnees: {
-            'statut': StatutCourse.recherche,
-            'transporteurId': '',
-            'indexCandidatActuel': nextIndex,
-          }
-        );
+        await serviceFs
+            .modifierDocument(collection: 'courses', id: course.id, donnees: {
+          'statut': StatutCourse.recherche,
+          'transporteurId': '',
+          'indexCandidatActuel': nextIndex,
+        });
       }
     } catch (e) {
       debugPrint("Erreur lors du passage au transporteur suivant: $e");

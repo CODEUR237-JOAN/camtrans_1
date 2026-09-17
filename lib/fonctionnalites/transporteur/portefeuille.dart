@@ -51,9 +51,7 @@ class Portefeuille extends ConsumerWidget {
                 ],
               ),
             ),
-
             const SizedBox(height: 25),
-
             Row(
               children: [
                 Expanded(
@@ -73,81 +71,75 @@ class Portefeuille extends ConsumerWidget {
                 ),
               ],
             ),
-
             const SizedBox(height: 30),
-
             const Text(
               "Retrait",
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
-
             const SizedBox(height: 15),
-
             BoutonPrincipal(
               texte: "Retirer via Orange Money",
               icone: Icons.account_balance_wallet,
               auClic: () {
-                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Service de retrait non disponible en environnement de test.")));
+                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                    content: Text(
+                        "Service de retrait non disponible en environnement de test.")));
               },
             ),
-
             const SizedBox(height: 15),
-
             BoutonPrincipal(
               texte: "Retirer via MTN Mobile Money",
               icone: Icons.phone_android,
               auClic: () {
-                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Service de retrait non disponible en environnement de test.")));
+                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                    content: Text(
+                        "Service de retrait non disponible en environnement de test.")));
               },
             ),
-
             const SizedBox(height: 15),
-
             BoutonPrincipal(
               texte: "Virement bancaire",
               icone: Icons.account_balance,
               auClic: () {
-                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Service de retrait non disponible en environnement de test.")));
+                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                    content: Text(
+                        "Service de retrait non disponible en environnement de test.")));
               },
             ),
-
             const SizedBox(height: 30),
-
             const Text(
               "Historique des transactions",
               style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
-
             const SizedBox(height: 15),
-
             fluxRevenus.when(
-              loading: () => Center(child: LoaderPremium()),
-              error: (err, _) => Text("Erreur: $err"),
-              data: (paiements) {
-                if (paiements.isEmpty) {
-                  return const Padding(
-                    padding: EdgeInsets.all(20.0),
-                    child: Center(child: Text("Aucune transaction.", style: TextStyle(color: Colors.white54))),
-                  );
-                }
-                return ListView.builder(
-                  shrinkWrap: true,
-                  physics: const NeverScrollableScrollPhysics(),
-                  itemCount: paiements.length,
-                  itemBuilder: (context, index) {
-                    final paiement = paiements[index];
-                    return _transaction(
-                      "Paiement course",
-                      "Via ${paiement.methodePaiement}",
-                      "+${paiement.montantNet.toStringAsFixed(0)} FCFA",
-                      Colors.green,
-                      Icons.arrow_downward,
+                loading: () => Center(child: LoaderPremium()),
+                error: (err, _) => Text("Erreur: $err"),
+                data: (paiements) {
+                  if (paiements.isEmpty) {
+                    return const Padding(
+                      padding: EdgeInsets.all(20.0),
+                      child: Center(
+                          child: Text("Aucune transaction.",
+                              style: TextStyle(color: Colors.white54))),
                     );
-                  },
-                );
-              }
-            ),
-
+                  }
+                  return ListView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: paiements.length,
+                    itemBuilder: (context, index) {
+                      final paiement = paiements[index];
+                      return _transaction(
+                        "Paiement course",
+                        "Via ${paiement.methodePaiement}",
+                        "+${paiement.montantNet.toStringAsFixed(0)} FCFA",
+                        Colors.green,
+                        Icons.arrow_downward,
+                      );
+                    },
+                  );
+                }),
             const SizedBox(height: 25),
           ],
         ),
@@ -164,7 +156,9 @@ class Portefeuille extends ConsumerWidget {
           children: [
             Icon(icone, color: CouleursApp.primaire, size: 35),
             const SizedBox(height: 12),
-            Text(valeur, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
+            Text(valeur,
+                style:
+                    const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
             const SizedBox(height: 6),
             Text(titre, textAlign: TextAlign.center),
           ],
@@ -173,7 +167,8 @@ class Portefeuille extends ConsumerWidget {
     );
   }
 
-  Widget _transaction(String titre, String sousTitre, String montant, Color couleur, IconData icone) {
+  Widget _transaction(String titre, String sousTitre, String montant,
+      Color couleur, IconData icone) {
     return Card(
       color: const Color(0xFF10192A),
       margin: const EdgeInsets.only(bottom: 12),
@@ -186,7 +181,8 @@ class Portefeuille extends ConsumerWidget {
         subtitle: Text(sousTitre),
         trailing: Text(
           montant,
-          style: TextStyle(color: couleur, fontWeight: FontWeight.bold, fontSize: 16),
+          style: TextStyle(
+              color: couleur, fontWeight: FontWeight.bold, fontSize: 16),
         ),
       ),
     );

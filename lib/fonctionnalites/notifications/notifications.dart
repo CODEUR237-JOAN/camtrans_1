@@ -25,7 +25,8 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
     return Scaffold(
       backgroundColor: const Color(0xFF08111F),
       appBar: AppBar(
-        title: const Text("Notifications", style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
+        title: const Text("Notifications",
+            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
         backgroundColor: const Color(0xFF08111F),
         elevation: 0,
         iconTheme: const IconThemeData(color: Color(0xFF08111F)),
@@ -33,7 +34,9 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
         actions: [
           notificationsAsync.maybeWhen(
             data: (list) => IconButton(
-              onPressed: () => ref.read(notificationActionsProvider).toutMarquerCommeLu(list),
+              onPressed: () => ref
+                  .read(notificationActionsProvider)
+                  .toutMarquerCommeLu(list),
               icon: const Icon(Icons.done_all),
               tooltip: "Tout marquer comme lu",
             ),
@@ -76,9 +79,14 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Icon(Icons.notifications_none, size: 80, color: Colors.white.withValues(alpha: 0.1)),
+                          Icon(Icons.notifications_none,
+                              size: 80,
+                              color: Colors.white.withValues(alpha: 0.1)),
                           const SizedBox(height: 16),
-                          const Text("Aucune notification", style: TextStyle(color: Colors.white54, fontWeight: FontWeight.bold)),
+                          const Text("Aucune notification",
+                              style: TextStyle(
+                                  color: Colors.white54,
+                                  fontWeight: FontWeight.bold)),
                         ],
                       ),
                     );
@@ -133,7 +141,10 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(18),
-        side: BorderSide(color: notification.lue ? Colors.white.withValues(alpha: 0.05) : couleur.withValues(alpha: 0.3)),
+        side: BorderSide(
+            color: notification.lue
+                ? Colors.white.withValues(alpha: 0.05)
+                : couleur.withValues(alpha: 0.3)),
       ),
       child: ListTile(
         leading: CircleAvatar(
@@ -151,17 +162,21 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 4),
-            Text(notification.message, style: TextStyle(color: Colors.white38, fontSize: 13)),
+            Text(notification.message,
+                style: TextStyle(color: Colors.white38, fontSize: 13)),
             const SizedBox(height: 8),
             Row(
               children: [
-                Text("$dateStr à $timeStr", style: const TextStyle(fontSize: 11, color: Colors.white54)),
+                Text("$dateStr à $timeStr",
+                    style:
+                        const TextStyle(fontSize: 11, color: Colors.white54)),
                 const Spacer(),
                 if (!notification.lue)
                   Container(
                     width: 8,
                     height: 8,
-                    decoration: BoxDecoration(color: couleur, shape: BoxShape.circle),
+                    decoration:
+                        BoxDecoration(color: couleur, shape: BoxShape.circle),
                   ),
               ],
             ),
@@ -172,12 +187,15 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
             if (value == "Supprimer") {
               ref.read(notificationActionsProvider).supprimer(notification.id);
             } else if (value == "Marquer comme lu") {
-              ref.read(notificationActionsProvider).marquerCommeLue(notification.id);
+              ref
+                  .read(notificationActionsProvider)
+                  .marquerCommeLue(notification.id);
             }
           },
           itemBuilder: (context) => [
             if (!notification.lue)
-              const PopupMenuItem(value: "Marquer comme lu", child: Text("Marquer comme lu")),
+              const PopupMenuItem(
+                  value: "Marquer comme lu", child: Text("Marquer comme lu")),
             const PopupMenuItem(value: "Supprimer", child: Text("Supprimer")),
           ],
         ),
@@ -199,7 +217,8 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
           }
         },
         selectedColor: CouleursApp.primaire,
-        labelStyle: TextStyle(color: filtre == valeur ? Colors.white : Colors.white54),
+        labelStyle:
+            TextStyle(color: filtre == valeur ? Colors.white : Colors.white54),
       ),
     );
   }

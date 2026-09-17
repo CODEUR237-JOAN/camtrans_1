@@ -14,7 +14,6 @@ import 'package:update_camtrans/services/service_firestore.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:update_camtrans/coeur/widgets/loader_premium.dart';
 
-
 class PageActivites extends ConsumerStatefulWidget {
   const PageActivites({super.key});
 
@@ -35,7 +34,8 @@ class _PageActivitesState extends ConsumerState<PageActivites> {
     if (confirm != true || !mounted) return;
     setState(() => _purgerEnCours = true);
     try {
-      final nb = await ref.read(serviceFirestoreProvider).purgerHistoriqueGlobal();
+      final nb =
+          await ref.read(serviceFirestoreProvider).purgerHistoriqueGlobal();
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -48,7 +48,9 @@ class _PageActivitesState extends ConsumerState<PageActivites> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Aïe, impossible de purger l'historique : $e 🧹"), backgroundColor: Colors.red),
+          SnackBar(
+              content: Text("Aïe, impossible de purger l'historique : $e 🧹"),
+              backgroundColor: Colors.red),
         );
       }
     } finally {
@@ -61,7 +63,8 @@ class _PageActivitesState extends ConsumerState<PageActivites> {
     final coursesAsync = ref.watch(adminCoursesProvider);
 
     return Scaffold(
-      backgroundColor: Colors.transparent, // Background handled by parent or stack
+      backgroundColor:
+          Colors.transparent, // Background handled by parent or stack
       body: Stack(
         children: [
           Container(color: const Color(0xFF08111F)),
@@ -75,37 +78,55 @@ class _PageActivitesState extends ConsumerState<PageActivites> {
                 color: CouleursApp.succes.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
-            ).animate(onPlay: (controller) => controller.repeat(reverse: true)).scale(duration: 4.seconds, begin: const Offset(1,1), end: const Offset(1.2,1.2)),
+            )
+                .animate(
+                    onPlay: (controller) => controller.repeat(reverse: true))
+                .scale(
+                    duration: 4.seconds,
+                    begin: const Offset(1, 1),
+                    end: const Offset(1.2, 1.2)),
           ),
-          
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _buildHeader(),
               Expanded(
                 child: coursesAsync.when(
-                  loading: () => const EtatChargement(message: "Chargement de l'historique..."),
-                  error: (err, _) => EtatErreur(erreur: "Impossible de charger les activités : ${err.toString()} 🔧", onRetry: () => ref.refresh(adminCoursesProvider)),
+                  loading: () => const EtatChargement(
+                      message: "Chargement de l'historique..."),
+                  error: (err, _) => EtatErreur(
+                      erreur:
+                          "Impossible de charger les activités : ${err.toString()} 🔧",
+                      onRetry: () => ref.refresh(adminCoursesProvider)),
                   data: (toutesCourses) {
                     final courses = toutesCourses.where((c) {
-                      final texte = "${c.adresseDepart} ${c.adresseArrivee} ${c.statut}".toLowerCase();
+                      final texte =
+                          "${c.adresseDepart} ${c.adresseArrivee} ${c.statut}"
+                              .toLowerCase();
                       return texte.contains(_searchQuery);
                     }).toList();
 
-                    courses.sort((a, b) => b.dateCreation.compareTo(a.dateCreation));
+                    courses.sort(
+                        (a, b) => b.dateCreation.compareTo(a.dateCreation));
 
                     if (courses.isEmpty) {
-                      return Center(child: Text("Aucune activité ne correspond à vos critères.", style: GoogleFonts.inter(color: Colors.white54)));
+                      return Center(
+                          child: Text(
+                              "Aucune activité ne correspond à vos critères.",
+                              style: GoogleFonts.inter(color: Colors.white54)));
                     }
 
                     return ListView.builder(
-                      padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 32, vertical: 16),
                       itemCount: courses.length,
                       itemBuilder: (context, index) {
                         final course = courses[index];
-                        final estTerminee = StatutCourse.estTerminee(course.statut);
+                        final estTerminee =
+                            StatutCourse.estTerminee(course.statut);
                         final card = _CourseCard(course: course)
-                            .animate(delay: (index * 50).ms).slideX();
+                            .animate(delay: (index * 50).ms)
+                            .slideX();
 
                         if (estTerminee) {
                           return Dismissible(
@@ -122,9 +143,12 @@ class _PageActivitesState extends ConsumerState<PageActivites> {
                               child: const Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  Icon(Icons.delete_forever_rounded, color: Colors.white, size: 32),
+                                  Icon(Icons.delete_forever_rounded,
+                                      color: Colors.white, size: 32),
                                   SizedBox(height: 4),
-                                  Text("Supprimer", style: TextStyle(color: Colors.white, fontSize: 12)),
+                                  Text("Supprimer",
+                                      style: TextStyle(
+                                          color: Colors.white, fontSize: 12)),
                                 ],
                               ),
                             ),
@@ -132,14 +156,29 @@ class _PageActivitesState extends ConsumerState<PageActivites> {
                               return await showDialog<bool>(
                                 context: context,
                                 builder: (_) => AlertDialog(
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-                                  title: const Text("Supprimer cette course ?", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                                  content: const Text("Cette action est irréversible."),
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(20)),
+                                  title: const Text("Supprimer cette course ?",
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 16)),
+                                  content: const Text(
+                                      "Cette action est irréversible."),
                                   actions: [
-                                    TextButton(onPressed: () => Navigator.pop(context, false), child: const Text("Annuler")),
+                                    TextButton(
+                                        onPressed: () =>
+                                            Navigator.pop(context, false),
+                                        child: const Text("Annuler")),
                                     ElevatedButton(
-                                      style: ElevatedButton.styleFrom(backgroundColor: Colors.red, foregroundColor: Colors.white, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
-                                      onPressed: () => Navigator.pop(context, true),
+                                      style: ElevatedButton.styleFrom(
+                                          minimumSize: const Size(0, 48),
+                                          backgroundColor: Colors.red,
+                                          foregroundColor: Colors.white,
+                                          shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(12))),
+                                      onPressed: () =>
+                                          Navigator.pop(context, true),
                                       child: const Text("Supprimer"),
                                     ),
                                   ],
@@ -147,11 +186,16 @@ class _PageActivitesState extends ConsumerState<PageActivites> {
                               );
                             },
                             onDismissed: (_) async {
-                              await ref.read(serviceFirestoreProvider)
-                                  .supprimerDocument(collection: 'courses', id: course.id);
+                              await ref
+                                  .read(serviceFirestoreProvider)
+                                  .supprimerDocument(
+                                      collection: 'courses', id: course.id);
                               if (context.mounted) {
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                   SnackBar(content: Text("L'historique a été nettoyé avec succès ! ✨"), backgroundColor: CouleursApp.succes),
+                                  SnackBar(
+                                      content: Text(
+                                          "L'historique a été nettoyé avec succès ! ✨"),
+                                      backgroundColor: CouleursApp.succes),
                                 );
                               }
                             },
@@ -182,7 +226,11 @@ class _PageActivitesState extends ConsumerState<PageActivites> {
               Expanded(
                 child: Text(
                   "Toutes les activités (Temps réel)",
-                  style: GoogleFonts.inter(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.white, letterSpacing: -1),
+                  style: GoogleFonts.inter(
+                      fontSize: 28,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white,
+                      letterSpacing: -1),
                 ),
               ),
               // Bouton Purge Admin
@@ -191,15 +239,20 @@ class _PageActivitesState extends ConsumerState<PageActivites> {
                 child: ElevatedButton.icon(
                   onPressed: _purgerEnCours ? null : _purgerHistorique,
                   style: ElevatedButton.styleFrom(
+                    minimumSize: const Size(0, 48),
                     backgroundColor: Colors.red.shade800,
                     foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12)),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 16, vertical: 12),
                   ),
                   icon: _purgerEnCours
-                      ? const SizedBox(width: 18, height: 18, child: LoaderPremium(size: 20))
+                      ? const SizedBox(
+                          width: 18, height: 18, child: LoaderPremium(size: 20))
                       : const Icon(Icons.cleaning_services_rounded, size: 18),
-                  label: Text(_purgerEnCours ? "Purge..." : "Purger", style: GoogleFonts.inter(fontWeight: FontWeight.bold)),
+                  label: Text(_purgerEnCours ? "Purge..." : "Purger",
+                      style: GoogleFonts.inter(fontWeight: FontWeight.bold)),
                 ),
               ),
             ],
@@ -217,11 +270,14 @@ class _PageActivitesState extends ConsumerState<PageActivites> {
               decoration: InputDecoration(
                 hintText: "Rechercher par adresse ou statut...",
                 hintStyle: GoogleFonts.inter(color: Colors.white54),
-                prefixIcon: const Icon(Iconsax.search_normal_copy, color: Colors.white54, size: 20),
+                prefixIcon: const Icon(Iconsax.search_normal_copy,
+                    color: Colors.white54, size: 20),
                 border: InputBorder.none,
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                contentPadding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
               ),
-              onChanged: (value) => setState(() => _searchQuery = value.toLowerCase()),
+              onChanged: (value) =>
+                  setState(() => _searchQuery = value.toLowerCase()),
             ),
           ),
         ],
@@ -274,7 +330,8 @@ class _DialogPurgeState extends State<_DialogPurge> {
             autofocus: true,
             decoration: InputDecoration(
               hintText: 'CONFIRMER',
-              border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+              border:
+                  OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
             ),
             onChanged: (_) => setState(() {}),
           ),
@@ -289,9 +346,11 @@ class _DialogPurgeState extends State<_DialogPurge> {
           valueListenable: _ctrl,
           builder: (context, value, child) => ElevatedButton(
             style: ElevatedButton.styleFrom(
+              minimumSize: const Size(0, 48),
               backgroundColor: _valid ? Colors.red.shade700 : Colors.grey,
               foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12)),
             ),
             onPressed: _valid ? () => Navigator.pop(context, true) : null,
             child: const Text("Purger"),
@@ -313,7 +372,8 @@ class _CourseCard extends StatelessWidget {
     if (statut == StatutCourse.enRouteDepart) return CouleursApp.primaire;
     if (statut == StatutCourse.enTransit) return Colors.indigo;
     if (statut == StatutCourse.arriveDepart) return Colors.purpleAccent;
-    if (statut == StatutCourse.arriveDestination || statut == StatutCourse.terminee) return CouleursApp.succes;
+    if (statut == StatutCourse.arriveDestination ||
+        statut == StatutCourse.terminee) return CouleursApp.succes;
     if (statut == StatutCourse.annulee) return CouleursApp.erreur;
     return Colors.grey;
   }
@@ -340,14 +400,18 @@ class _CourseCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
                     color: color.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
                     StatutCourse.libelle(course.statut).toUpperCase(),
-                    style: GoogleFonts.inter(color: color, fontWeight: FontWeight.bold, fontSize: 12),
+                    style: GoogleFonts.inter(
+                        color: color,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 12),
                   ),
                 ),
                 Text(
@@ -361,11 +425,18 @@ class _CourseCard extends StatelessWidget {
               children: [
                 Container(
                   padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(color: CouleursApp.primaire.withValues(alpha: 0.15), shape: BoxShape.circle),
-                  child: const Icon(Iconsax.location_copy, color: CouleursApp.primaire, size: 16),
+                  decoration: BoxDecoration(
+                      color: CouleursApp.primaire.withValues(alpha: 0.15),
+                      shape: BoxShape.circle),
+                  child: const Icon(Iconsax.location_copy,
+                      color: CouleursApp.primaire, size: 16),
                 ),
                 const SizedBox(width: 12),
-                Expanded(child: Text(course.adresseDepart, style: GoogleFonts.inter(color: Colors.white), maxLines: 1, overflow: TextOverflow.ellipsis)),
+                Expanded(
+                    child: Text(course.adresseDepart,
+                        style: GoogleFonts.inter(color: Colors.white),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis)),
               ],
             ),
             Container(
@@ -378,11 +449,18 @@ class _CourseCard extends StatelessWidget {
               children: [
                 Container(
                   padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(color: CouleursApp.erreur.withValues(alpha: 0.15), shape: BoxShape.circle),
-                  child: const Icon(Iconsax.routing_2_copy, color: CouleursApp.erreur, size: 16),
+                  decoration: BoxDecoration(
+                      color: CouleursApp.erreur.withValues(alpha: 0.15),
+                      shape: BoxShape.circle),
+                  child: const Icon(Iconsax.routing_2_copy,
+                      color: CouleursApp.erreur, size: 16),
                 ),
                 const SizedBox(width: 12),
-                Expanded(child: Text(course.adresseArrivee, style: GoogleFonts.inter(color: Colors.white), maxLines: 1, overflow: TextOverflow.ellipsis)),
+                Expanded(
+                    child: Text(course.adresseArrivee,
+                        style: GoogleFonts.inter(color: Colors.white),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis)),
               ],
             ),
             const SizedBox(height: 20),
@@ -393,14 +471,21 @@ class _CourseCard extends StatelessWidget {
               children: [
                 Row(
                   children: [
-                    const Icon(Iconsax.user_copy, size: 16, color: Colors.white54),
+                    const Icon(Iconsax.user_copy,
+                        size: 16, color: Colors.white54),
                     const SizedBox(width: 8),
-                    Text("Client: ${course.clientId.length > 8 ? course.clientId.substring(0, 8) : course.clientId}...", style: GoogleFonts.inter(color: Colors.white54, fontSize: 12)),
+                    Text(
+                        "Client: ${course.clientId.length > 8 ? course.clientId.substring(0, 8) : course.clientId}...",
+                        style: GoogleFonts.inter(
+                            color: Colors.white54, fontSize: 12)),
                   ],
                 ),
                 Text(
                   "${NumberFormat.compact().format(prix)} FCFA",
-                  style: GoogleFonts.inter(fontWeight: FontWeight.bold, fontSize: 18, color: CouleursApp.succes),
+                  style: GoogleFonts.inter(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                      color: CouleursApp.succes),
                 ),
               ],
             ),
@@ -416,11 +501,13 @@ class _CourseCard extends StatelessWidget {
                   backgroundColor: CouleursApp.primaire.withValues(alpha: 0.2),
                   foregroundColor: CouleursApp.primaire,
                   elevation: 0,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12)),
                   padding: const EdgeInsets.symmetric(vertical: 12),
                 ),
                 icon: const Icon(Iconsax.radar_2_copy),
-                label: const Text("Suivre en direct", style: TextStyle(fontWeight: FontWeight.bold)),
+                label: const Text("Suivre en direct",
+                    style: TextStyle(fontWeight: FontWeight.bold)),
               ),
             ),
           ],

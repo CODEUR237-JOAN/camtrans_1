@@ -21,13 +21,15 @@ class EtatTransaction {
   }) {
     return EtatTransaction(
       enCours: enCours ?? this.enCours,
-      succes: succes, // On ne garde pas l'ancien succès s'il y a une nouvelle transaction
+      succes:
+          succes, // On ne garde pas l'ancien succès s'il y a une nouvelle transaction
       erreur: erreur, // Idem
     );
   }
 }
 
-final paiementProvider = StateNotifierProvider<PaiementNotifier, EtatTransaction>((ref) {
+final paiementProvider =
+    StateNotifierProvider<PaiementNotifier, EtatTransaction>((ref) {
   return PaiementNotifier(ref.read(servicePaiementProvider));
 });
 
@@ -53,7 +55,9 @@ class PaiementNotifier extends StateNotifier<EtatTransaction> {
         telephonePayeur: telephone,
       );
       state = EtatTransaction(enCours: false, succes: paiement);
-      ServiceNotification.afficherNotification(titre: " Paiement validé", message: "Votre reçu de $montant FCFA a été généré avec succès.");
+      ServiceNotification.afficherNotification(
+          titre: " Paiement validé",
+          message: "Votre reçu de $montant FCFA a été généré avec succès.");
     } catch (e) {
       state = EtatTransaction(enCours: false, erreur: e.toString());
     }
@@ -76,7 +80,9 @@ class PaiementNotifier extends StateNotifier<EtatTransaction> {
         telephonePayeur: telephone,
       );
       state = EtatTransaction(enCours: false, succes: paiement);
-      ServiceNotification.afficherNotification(titre: " Paiement validé", message: "Votre reçu de $montant FCFA a été généré avec succès.");
+      ServiceNotification.afficherNotification(
+          titre: " Paiement validé",
+          message: "Votre reçu de $montant FCFA a été généré avec succès.");
     } catch (e) {
       state = EtatTransaction(enCours: false, erreur: e.toString());
     }
@@ -99,7 +105,9 @@ class PaiementNotifier extends StateNotifier<EtatTransaction> {
         nomTitulaire: nomTitulaire,
       );
       state = EtatTransaction(enCours: false, succes: paiement);
-      ServiceNotification.afficherNotification(titre: " Paiement validé", message: "Votre reçu de $montant FCFA a été généré avec succès.");
+      ServiceNotification.afficherNotification(
+          titre: " Paiement validé",
+          message: "Votre reçu de $montant FCFA a été généré avec succès.");
     } catch (e) {
       state = EtatTransaction(enCours: false, erreur: e.toString());
     }
@@ -120,12 +128,14 @@ class PaiementNotifier extends StateNotifier<EtatTransaction> {
         montant: montant,
       );
       state = EtatTransaction(enCours: false, succes: paiement);
-      ServiceNotification.afficherNotification(titre: " Paiement validé", message: "Votre reçu de $montant FCFA a été généré avec succès.");
+      ServiceNotification.afficherNotification(
+          titre: " Paiement validé",
+          message: "Votre reçu de $montant FCFA a été généré avec succès.");
     } catch (e) {
       state = EtatTransaction(enCours: false, erreur: e.toString());
     }
   }
-  
+
   void reinitialiser() {
     state = EtatTransaction();
   }

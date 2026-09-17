@@ -89,8 +89,7 @@ class NotificationApp {
     };
   }
 
-  factory NotificationApp.fromMap(
-      Map<String, dynamic> map) {
+  factory NotificationApp.fromMap(Map<String, dynamic> map) {
     return NotificationApp(
       id: map["id"] ?? "",
       utilisateurId: map["utilisateurId"] ?? "",
@@ -108,15 +107,11 @@ class NotificationApp {
       lien: map["lien"] ?? "",
       action: map["action"] ?? "",
       expediteurId: map["expediteurId"] ?? "",
-      expediteurNom:
-      map["expediteurNom"] ?? "",
+      expediteurNom: map["expediteurNom"] ?? "",
       priorite: map["priorite"] ?? "Normale",
-      notificationPush:
-      map["notificationPush"] ?? true,
-      notificationEmail:
-      map["notificationEmail"] ?? false,
-      notificationSms:
-      map["notificationSms"] ?? false,
+      notificationPush: map["notificationPush"] ?? true,
+      notificationEmail: map["notificationEmail"] ?? false,
+      notificationSms: map["notificationSms"] ?? false,
       donnees: Map<String, dynamic>.from(
         map["donnees"] ?? {},
       ),
@@ -125,8 +120,7 @@ class NotificationApp {
 
   Map<String, dynamic> toJson() => toMap();
 
-  factory NotificationApp.fromJson(
-      Map<String, dynamic> json) =>
+  factory NotificationApp.fromJson(Map<String, dynamic> json) =>
       NotificationApp.fromMap(json);
 
   NotificationApp copyWith({
@@ -153,35 +147,24 @@ class NotificationApp {
   }) {
     return NotificationApp(
       id: id ?? this.id,
-      utilisateurId:
-      utilisateurId ?? this.utilisateurId,
+      utilisateurId: utilisateurId ?? this.utilisateurId,
       titre: titre ?? this.titre,
       message: message ?? this.message,
       type: type ?? this.type,
       categorie: categorie ?? this.categorie,
       lue: lue ?? this.lue,
       envoyee: envoyee ?? this.envoyee,
-      dateCreation:
-      dateCreation ?? this.dateCreation,
-      dateLecture:
-      dateLecture ?? this.dateLecture,
+      dateCreation: dateCreation ?? this.dateCreation,
+      dateLecture: dateLecture ?? this.dateLecture,
       image: image ?? this.image,
       lien: lien ?? this.lien,
       action: action ?? this.action,
-      expediteurId:
-      expediteurId ?? this.expediteurId,
-      expediteurNom:
-      expediteurNom ?? this.expediteurNom,
+      expediteurId: expediteurId ?? this.expediteurId,
+      expediteurNom: expediteurNom ?? this.expediteurNom,
       priorite: priorite ?? this.priorite,
-      notificationPush:
-      notificationPush ??
-          this.notificationPush,
-      notificationEmail:
-      notificationEmail ??
-          this.notificationEmail,
-      notificationSms:
-      notificationSms ??
-          this.notificationSms,
+      notificationPush: notificationPush ?? this.notificationPush,
+      notificationEmail: notificationEmail ?? this.notificationEmail,
+      notificationSms: notificationSms ?? this.notificationSms,
       donnees: donnees ?? this.donnees,
     );
   }

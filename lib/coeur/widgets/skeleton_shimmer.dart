@@ -22,12 +22,10 @@ class SkeletonShimmer extends StatelessWidget {
         color: const Color(0xFF1E293B), // Fond gris sombre "Neo Dark"
         borderRadius: BorderRadius.circular(borderRadius),
       ),
-    )
-        .animate(onPlay: (controller) => controller.repeat())
-        .shimmer(
+    ).animate(onPlay: (controller) => controller.repeat()).shimmer(
           duration: 1500.ms,
           color: Colors.white.withValues(alpha: 0.1),
-          angle: 1.0, 
+          angle: 1.0,
         );
   }
 }

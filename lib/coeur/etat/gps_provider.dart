@@ -40,7 +40,8 @@ class GpsTracker {
     // Arrêter le tracker existant s'il y en a un
     stopTracking();
 
-    _positionSubscription = serviceGps.fluxPosition().listen((Position position) {
+    _positionSubscription =
+        serviceGps.fluxPosition().listen((Position position) {
       // 1. Mettre à jour l'état local pour l'UI
       _ref.read(positionActuelleProvider.notifier).state = position;
 
@@ -55,10 +56,13 @@ class GpsTracker {
               latitudeArrivee: activeCourse.latitudeDepart,
               longitudeArrivee: activeCourse.longitudeDepart,
             );
-            if (dist < 0.1) { // moins de 100m
-               _ref.read(transporteurActionsProvider).changerStatutCourse(activeCourse.id, StatutCourse.arriveDepart);
+            if (dist < 0.1) {
+              // moins de 100m
+              _ref.read(transporteurActionsProvider).changerStatutCourse(
+                  activeCourse.id, StatutCourse.arriveDepart);
             }
-          } else if (activeCourse.statut == StatutCourse.arriveDepart || activeCourse.statut == StatutCourse.charge) {
+          } else if (activeCourse.statut == StatutCourse.arriveDepart ||
+              activeCourse.statut == StatutCourse.charge) {
             final distToDepart = serviceGps.calculerDistance(
               latitudeDepart: position.latitude,
               longitudeDepart: position.longitude,
@@ -67,7 +71,9 @@ class GpsTracker {
             );
             // S'il s'éloigne de plus de 150m du point de départ, on déduit qu'il est en transit
             if (distToDepart > 0.15) {
-               _ref.read(transporteurActionsProvider).changerStatutCourse(activeCourse.id, StatutCourse.enTransit);
+              _ref
+                  .read(transporteurActionsProvider)
+                  .changerStatutCourse(activeCourse.id, StatutCourse.enTransit);
             }
           } else if (activeCourse.statut == StatutCourse.enTransit) {
             final dist = serviceGps.calculerDistance(
@@ -77,7 +83,8 @@ class GpsTracker {
               longitudeArrivee: activeCourse.longitudeArrivee,
             );
             if (dist < 0.1) {
-               _ref.read(transporteurActionsProvider).changerStatutCourse(activeCourse.id, StatutCourse.arriveDestination);
+              _ref.read(transporteurActionsProvider).changerStatutCourse(
+                  activeCourse.id, StatutCourse.arriveDestination);
             }
           }
         }
@@ -87,7 +94,7 @@ class GpsTracker {
 
       // 2. Envoyer à Firebase (En supposant que le rôle est connu, ici on met à jour 'transporteurs' et 'utilisateurs')
       // Dans une appli réelle, on optimiserait pour ne pas écrire à Firebase chaque seconde, mais par exemple toutes les 10s ou quand la distance change beaucoup.
-      
+
       try {
         // Mise à jour générique dans la table des transporteurs
         firestore.modifierDocument(
@@ -98,7 +105,7 @@ class GpsTracker {
             "longitude": position.longitude,
           },
         ).catchError((_) {});
-        
+
         // Optionnel : Mise à jour côté client si besoin de tracker les clients
         firestore.modifierDocument(
           collection: "clients",

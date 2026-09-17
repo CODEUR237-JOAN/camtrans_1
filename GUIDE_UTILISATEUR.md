@@ -70,4 +70,4 @@ L'espace administrateur est une interface web/desktop réservée aux gestionnair
 - **Profil** : Personnalisez vos informations personnelles, votre photo de profil et vos préférences de sécurité.
 
 > [!TIP]
-> **Raccourcis rapides** : Naviguez fluidement grâce à la barre de navigation optimisée en bas de votre écran. Pour toute difficulté technique, le bouton **"Support"** ou l'**Assistant IA** sont disponibles 24h/24 et 7j/7.
+> **Raccourcis rapides** : Navig

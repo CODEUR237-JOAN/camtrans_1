@@ -18,7 +18,8 @@ import 'package:update_camtrans/coeur/constantes/couleurs.dart';
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   // Initialise l'instance Firebase requise pour traiter le message en tâche de fond.
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  debugPrint("[INFO] Message push reçu en arrière-plan : ${message.notification?.title}");
+  debugPrint(
+      "[INFO] Message push reçu en arrière-plan : ${message.notification?.title}");
 }
 
 Future<void> main() async {
@@ -54,7 +55,8 @@ Future<void> main() async {
 
     // Chargement des variables d'environnement (ex: clés d'API).
     await dotenv.load(fileName: ".env");
-    debugPrint("[SUCCÈS] Variables de configuration (.env) chargées avec succès.");
+    debugPrint(
+        "[SUCCÈS] Variables de configuration (.env) chargées avec succès.");
 
     runApp(
       const ProviderScope(
@@ -160,7 +162,8 @@ class EcranErreurDemarrage extends StatelessWidget {
                       ),
                       padding: const EdgeInsets.symmetric(vertical: 16),
                     ),
-                    icon: const Icon(Icons.refresh_rounded, color: Colors.white),
+                    icon:
+                        const Icon(Icons.refresh_rounded, color: Colors.white),
                     label: Text(
                       "Réessayer",
                       style: GoogleFonts.inter(
@@ -197,7 +200,9 @@ class EcranErreurDemarrage extends StatelessWidget {
                         actions: [
                           TextButton(
                             onPressed: () => Navigator.pop(context),
-                            child: Text("Fermer", style: GoogleFonts.inter(color: CouleursApp.primaire)),
+                            child: Text("Fermer",
+                                style: GoogleFonts.inter(
+                                    color: CouleursApp.primaire)),
                           ),
                         ],
                       ),

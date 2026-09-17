@@ -14,7 +14,7 @@ import 'package:update_camtrans/coeur/widgets/loader_premium.dart';
 
 class EcranChat extends ConsumerStatefulWidget {
   final Transporteur transporteur;
-  
+
   const EcranChat({super.key, required this.transporteur});
 
   @override
@@ -31,7 +31,7 @@ class _EcranChatState extends ConsumerState<EcranChat> {
   Future<void> _envoyerMessage() async {
     final texte = _messageController.text.trim();
     if (texte.isEmpty) return;
-    
+
     _messageController.clear();
 
     final message = Message(
@@ -79,8 +79,13 @@ class _EcranChatState extends ConsumerState<EcranChat> {
             CircleAvatar(
               radius: 18,
               backgroundColor: CouleursApp.primaire.withValues(alpha: 0.1),
-              backgroundImage: widget.transporteur.photo.isNotEmpty ? NetworkImage(widget.transporteur.photo) : null,
-              child: widget.transporteur.photo.isEmpty ? const Icon(Icons.person, color: CouleursApp.primaire, size: 20) : null,
+              backgroundImage: widget.transporteur.photo.isNotEmpty
+                  ? NetworkImage(widget.transporteur.photo)
+                  : null,
+              child: widget.transporteur.photo.isEmpty
+                  ? const Icon(Icons.person,
+                      color: CouleursApp.primaire, size: 20)
+                  : null,
             ),
             const SizedBox(width: 12),
             Expanded(
@@ -89,17 +94,24 @@ class _EcranChatState extends ConsumerState<EcranChat> {
                 children: [
                   Text(
                     "${widget.transporteur.prenom} ${widget.transporteur.nom}",
-                    style: GoogleFonts.inter(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.white),
+                    style: GoogleFonts.inter(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                        color: Colors.white),
                     overflow: TextOverflow.ellipsis,
                   ),
                   Row(
                     children: [
                       Container(
-                        width: 8, height: 8,
-                        decoration: const BoxDecoration(color: Colors.green, shape: BoxShape.circle),
+                        width: 8,
+                        height: 8,
+                        decoration: const BoxDecoration(
+                            color: Colors.green, shape: BoxShape.circle),
                       ),
                       const SizedBox(width: 4),
-                      Text("En ligne", style: GoogleFonts.inter(fontSize: 12, color: Colors.green)),
+                      Text("En ligne",
+                          style: GoogleFonts.inter(
+                              fontSize: 12, color: Colors.green)),
                     ],
                   )
                 ],
@@ -121,12 +133,14 @@ class _EcranChatState extends ConsumerState<EcranChat> {
           children: [
             Expanded(
               child: StreamBuilder(
-                stream: ref.watch(serviceFirestoreProvider).fluxMessages(conversationId),
+                stream: ref
+                    .watch(serviceFirestoreProvider)
+                    .fluxMessages(conversationId),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
                     return Center(child: LoaderPremium());
                   }
-                  
+
                   if (snapshot.hasError) {
                     return Center(child: Text("Erreur : ${snapshot.error}"));
                   }
@@ -136,7 +150,8 @@ class _EcranChatState extends ConsumerState<EcranChat> {
                   final messages = docs
                       .map((doc) => Message.depuisMap(doc.data(), doc.id))
                       .toList()
-                      ..sort((a, b) => b.dateEnvoi.compareTo(a.dateEnvoi)); // desc pour reverse:true
+                    ..sort((a, b) => b.dateEnvoi
+                        .compareTo(a.dateEnvoi)); // desc pour reverse:true
 
                   if (messages.isEmpty) {
                     return Center(
@@ -150,48 +165,71 @@ class _EcranChatState extends ConsumerState<EcranChat> {
                   return ListView.builder(
                     controller: _scrollController,
                     reverse: true, // Affiche les messages du bas vers le haut
-                    padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 20, vertical: 24),
                     itemCount: messages.length,
                     itemBuilder: (context, index) {
                       final msg = messages[index];
                       final isUser = msg.expediteurId == clientId;
-                      
+
                       return Padding(
                         padding: const EdgeInsets.only(bottom: 16),
                         child: Row(
-                          mainAxisAlignment: isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
+                          mainAxisAlignment: isUser
+                              ? MainAxisAlignment.end
+                              : MainAxisAlignment.start,
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
                             if (!isUser) ...[
                               CircleAvatar(
                                 radius: 14,
-                                backgroundImage: widget.transporteur.photo.isNotEmpty ? NetworkImage(widget.transporteur.photo) : null,
-                                child: widget.transporteur.photo.isEmpty ? const Icon(Icons.person, size: 14) : null,
+                                backgroundImage: widget
+                                        .transporteur.photo.isNotEmpty
+                                    ? NetworkImage(widget.transporteur.photo)
+                                    : null,
+                                child: widget.transporteur.photo.isEmpty
+                                    ? const Icon(Icons.person, size: 14)
+                                    : null,
                               ),
                               const SizedBox(width: 8),
                             ],
                             Flexible(
                               child: Container(
-                                padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 18, vertical: 14),
                                 decoration: BoxDecoration(
-                                  color: isUser ? CouleursApp.primaire : Colors.white,
-                                  borderRadius: BorderRadius.only(
-                                    topLeft: const Radius.circular(20),
-                                    topRight: const Radius.circular(20),
-                                    bottomLeft: isUser ? const Radius.circular(20) : const Radius.circular(4),
-                                    bottomRight: isUser ? const Radius.circular(4) : const Radius.circular(20),
-                                  ),
-                                  boxShadow: [
-                                    if (!isUser) BoxShadow(color: Colors.white.withValues(alpha: 0.07), blurRadius: 10, offset: const Offset(0, 4))
-                                  ]
-                                ),
+                                    color: isUser
+                                        ? CouleursApp.primaire
+                                        : Colors.white,
+                                    borderRadius: BorderRadius.only(
+                                      topLeft: const Radius.circular(20),
+                                      topRight: const Radius.circular(20),
+                                      bottomLeft: isUser
+                                          ? const Radius.circular(20)
+                                          : const Radius.circular(4),
+                                      bottomRight: isUser
+                                          ? const Radius.circular(4)
+                                          : const Radius.circular(20),
+                                    ),
+                                    boxShadow: [
+                                      if (!isUser)
+                                        BoxShadow(
+                                            color: Colors.white
+                                                .withValues(alpha: 0.07),
+                                            blurRadius: 10,
+                                            offset: const Offset(0, 4))
+                                    ]),
                                 child: Column(
-                                  crossAxisAlignment: isUser ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+                                  crossAxisAlignment: isUser
+                                      ? CrossAxisAlignment.end
+                                      : CrossAxisAlignment.start,
                                   children: [
                                     Text(
                                       msg.contenu,
                                       style: GoogleFonts.inter(
-                                        color: isUser ? Colors.white : Colors.black87,
+                                        color: isUser
+                                            ? Colors.white
+                                            : Colors.black87,
                                         fontSize: 15,
                                         height: 1.4,
                                       ),
@@ -200,7 +238,10 @@ class _EcranChatState extends ConsumerState<EcranChat> {
                                     Text(
                                       _formatTime(msg.dateEnvoi),
                                       style: GoogleFonts.inter(
-                                        color: isUser ? Colors.white.withValues(alpha: 0.7) : Colors.black45,
+                                        color: isUser
+                                            ? Colors.white
+                                                .withValues(alpha: 0.7)
+                                            : Colors.black45,
                                         fontSize: 11,
                                       ),
                                     ),
@@ -217,14 +258,17 @@ class _EcranChatState extends ConsumerState<EcranChat> {
                 },
               ),
             ),
-            
+
             // Input Area
             Container(
               padding: const EdgeInsets.all(16),
               decoration: BoxDecoration(
                 color: const Color(0xFF10192A),
                 boxShadow: [
-                  BoxShadow(color: Colors.white.withValues(alpha: 0.07), blurRadius: 20, offset: const Offset(0, -5))
+                  BoxShadow(
+                      color: Colors.white.withValues(alpha: 0.07),
+                      blurRadius: 20,
+                      offset: const Offset(0, -5))
                 ],
               ),
               child: Row(
@@ -232,7 +276,9 @@ class _EcranChatState extends ConsumerState<EcranChat> {
                   GestureDetector(
                     onTap: () {
                       // Action pièce jointe
-                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Fonctionnalité d'envoi d'images à venir.")));
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                          content: Text(
+                              "Fonctionnalité d'envoi d'images à venir.")));
                     },
                     child: Container(
                       padding: const EdgeInsets.all(12),
@@ -240,7 +286,8 @@ class _EcranChatState extends ConsumerState<EcranChat> {
                         color: const Color(0xFFEEEEEE),
                         shape: BoxShape.circle,
                       ),
-                      child: const Icon(Iconsax.camera_copy, color: Colors.white54, size: 22),
+                      child: const Icon(Iconsax.camera_copy,
+                          color: Colors.white54, size: 22),
                     ),
                   ),
                   const SizedBox(width: 12),
@@ -257,7 +304,8 @@ class _EcranChatState extends ConsumerState<EcranChat> {
                           hintText: "Écrire un message...",
                           hintStyle: GoogleFonts.inter(color: Colors.white54),
                           border: InputBorder.none,
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                          contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 20, vertical: 14),
                         ),
                         onSubmitted: (_) => _envoyerMessage(),
                       ),
@@ -275,7 +323,8 @@ class _EcranChatState extends ConsumerState<EcranChat> {
                         color: CouleursApp.primaire,
                         shape: BoxShape.circle,
                       ),
-                      child: const Icon(Iconsax.send_2_copy, color: Colors.white, size: 20),
+                      child: const Icon(Iconsax.send_2_copy,
+                          color: Colors.white, size: 20),
                     ),
                   ),
                 ],

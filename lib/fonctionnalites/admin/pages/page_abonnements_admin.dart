@@ -19,7 +19,8 @@ class PageAbonnementsAdmin extends ConsumerWidget {
       appBar: AppBar(
         title: Text(
           'Abonnements Transporteurs',
-          style: GoogleFonts.inter(fontWeight: FontWeight.bold, fontSize: 20, color: Colors.white),
+          style: GoogleFonts.inter(
+              fontWeight: FontWeight.bold, fontSize: 20, color: Colors.white),
         ),
         backgroundColor: CouleursApp.secondaire,
         elevation: 0,
@@ -27,7 +28,9 @@ class PageAbonnementsAdmin extends ConsumerWidget {
       ),
       body: abonnementsAsync.when(
         loading: () => Center(child: LoaderPremium()),
-        error: (err, _) => Center(child: Text("Oups ! Les données sont introuvables : $err 🔧", style: const TextStyle(color: Colors.red))),
+        error: (err, _) => Center(
+            child: Text("Oups ! Les données sont introuvables : $err 🔧",
+                style: const TextStyle(color: Colors.red))),
         data: (abonnements) {
           // ===== CALCUL DES STATISTIQUES =====
           final now = DateTime.now();
@@ -56,7 +59,10 @@ class PageAbonnementsAdmin extends ConsumerWidget {
               children: [
                 // ===== CARTES STATISTIQUES =====
                 Text('Revenus des abonnements',
-                    style: GoogleFonts.inter(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
+                    style: GoogleFonts.inter(
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white)),
                 const SizedBox(height: 16),
                 GridView.count(
                   crossAxisCount: 2,
@@ -66,10 +72,14 @@ class PageAbonnementsAdmin extends ConsumerWidget {
                   physics: const NeverScrollableScrollPhysics(),
                   childAspectRatio: 1.4,
                   children: [
-                    _carteStatistique('Aujourd\'hui', totalJour, Icons.today, const Color(0xFF4CAF50)),
-                    _carteStatistique('Cette semaine', totalSemaine, Icons.date_range, const Color(0xFF2196F3)),
-                    _carteStatistique('Ce mois', totalMois, Icons.calendar_month, const Color(0xFFFF9800)),
-                    _carteStatistique('Cette année', totalAnnee, Icons.bar_chart, CouleursApp.primaire),
+                    _carteStatistique('Aujourd\'hui', totalJour, Icons.today,
+                        const Color(0xFF4CAF50)),
+                    _carteStatistique('Cette semaine', totalSemaine,
+                        Icons.date_range, const Color(0xFF2196F3)),
+                    _carteStatistique('Ce mois', totalMois,
+                        Icons.calendar_month, const Color(0xFFFF9800)),
+                    _carteStatistique('Cette année', totalAnnee,
+                        Icons.bar_chart, CouleursApp.primaire),
                   ],
                 ),
 
@@ -80,7 +90,10 @@ class PageAbonnementsAdmin extends ConsumerWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text('Historique (${abonnements.length})',
-                        style: GoogleFonts.inter(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
+                        style: GoogleFonts.inter(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.white)),
                   ],
                 ),
                 const SizedBox(height: 12),
@@ -90,10 +103,13 @@ class PageAbonnementsAdmin extends ConsumerWidget {
                     child: Column(
                       children: [
                         const SizedBox(height: 40),
-                        Icon(Icons.receipt_long_outlined, size: 70, color: Colors.grey.shade400),
+                        Icon(Icons.receipt_long_outlined,
+                            size: 70, color: Colors.grey.shade400),
                         const SizedBox(height: 12),
-                        Text('Aucun abonnement pour le moment. Laissons le temps aux transporteurs de nous rejoindre ! 🌱',
-                            style: TextStyle(color: Colors.grey.shade500, fontSize: 16)),
+                        Text(
+                            'Aucun abonnement pour le moment. Laissons le temps aux transporteurs de nous rejoindre ! 🌱',
+                            style: TextStyle(
+                                color: Colors.grey.shade500, fontSize: 16)),
                       ],
                     ),
                   )
@@ -107,7 +123,8 @@ class PageAbonnementsAdmin extends ConsumerWidget {
     );
   }
 
-  Widget _carteStatistique(String titre, double montant, IconData icone, Color couleur) {
+  Widget _carteStatistique(
+      String titre, double montant, IconData icone, Color couleur) {
     final formatter = NumberFormat('#,##0', 'fr_FR');
     return Container(
       padding: const EdgeInsets.all(16),
@@ -115,7 +132,10 @@ class PageAbonnementsAdmin extends ConsumerWidget {
         color: CouleursApp.carteSombre,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
-          BoxShadow(color: Colors.black.withValues(alpha: 0.2), blurRadius: 12, offset: const Offset(0, 4)),
+          BoxShadow(
+              color: Colors.black.withValues(alpha: 0.2),
+              blurRadius: 12,
+              offset: const Offset(0, 4)),
         ],
       ),
       child: Column(
@@ -135,9 +155,14 @@ class PageAbonnementsAdmin extends ConsumerWidget {
             children: [
               Text('${formatter.format(montant)} F',
                   style: GoogleFonts.inter(
-                      fontSize: 18, fontWeight: FontWeight.w800, color: couleur)),
+                      fontSize: 18,
+                      fontWeight: FontWeight.w800,
+                      color: couleur)),
               Text(titre,
-                  style: TextStyle(fontSize: 12, color: Colors.grey.shade400, fontWeight: FontWeight.w500)),
+                  style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.grey.shade400,
+                      fontWeight: FontWeight.w500)),
             ],
           )
         ],
@@ -163,7 +188,10 @@ class PageAbonnementsAdmin extends ConsumerWidget {
         color: CouleursApp.carteSombre,
         borderRadius: BorderRadius.circular(14),
         boxShadow: [
-          BoxShadow(color: Colors.black.withValues(alpha: 0.2), blurRadius: 8, offset: const Offset(0, 2)),
+          BoxShadow(
+              color: Colors.black.withValues(alpha: 0.2),
+              blurRadius: 8,
+              offset: const Offset(0, 2)),
         ],
       ),
       child: Row(
@@ -175,7 +203,8 @@ class PageAbonnementsAdmin extends ConsumerWidget {
               color: CouleursApp.primaire.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: const Icon(Icons.workspace_premium, color: CouleursApp.primaire, size: 26),
+            child: const Icon(Icons.workspace_premium,
+                color: CouleursApp.primaire, size: 26),
           ),
           const SizedBox(width: 14),
           Expanded(
@@ -183,10 +212,14 @@ class PageAbonnementsAdmin extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(nom,
-                    style: GoogleFonts.inter(fontWeight: FontWeight.bold, fontSize: 15, color: Colors.white)),
+                    style: GoogleFonts.inter(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 15,
+                        color: Colors.white)),
                 const SizedBox(height: 2),
                 Text('$duree jours • $operateur',
-                    style: TextStyle(color: Colors.grey.shade400, fontSize: 13)),
+                    style:
+                        TextStyle(color: Colors.grey.shade400, fontSize: 13)),
                 if (dateDebut != null)
                   Text(
                     'Du ${DateFormat('dd/MM/yy').format(dateDebut)} au ${dateFin != null ? DateFormat('dd/MM/yy').format(dateFin) : '?'}',
@@ -199,7 +232,10 @@ class PageAbonnementsAdmin extends ConsumerWidget {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Text('${montant.toInt()} F',
-                  style: GoogleFonts.inter(fontWeight: FontWeight.w800, fontSize: 16, color: Colors.green.shade700)),
+                  style: GoogleFonts.inter(
+                      fontWeight: FontWeight.w800,
+                      fontSize: 16,
+                      color: Colors.green.shade700)),
               const SizedBox(height: 4),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
@@ -208,7 +244,10 @@ class PageAbonnementsAdmin extends ConsumerWidget {
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Text(statut,
-                    style: TextStyle(color: couleurStatut, fontSize: 11, fontWeight: FontWeight.bold)),
+                    style: TextStyle(
+                        color: couleurStatut,
+                        fontSize: 11,
+                        fontWeight: FontWeight.bold)),
               ),
             ],
           ),

@@ -41,7 +41,8 @@ class _EcranPaiementState extends ConsumerState<EcranPaiement> {
   }
 
   void _validerPaiement() {
-    if (_methodeSelectionnee != "especes" && _telephoneController.text.isEmpty) {
+    if (_methodeSelectionnee != "especes" &&
+        _telephoneController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text("Veuillez entrer une information valide."),
@@ -51,7 +52,7 @@ class _EcranPaiementState extends ConsumerState<EcranPaiement> {
       );
       return;
     }
-    
+
     // Fermer le clavier
     FocusScope.of(context).unfocus();
 
@@ -114,7 +115,11 @@ class _EcranPaiementState extends ConsumerState<EcranPaiement> {
             },
           ),
         ),
-        title: Text("Paiement Sécurisé", style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18)),
+        title: Text("Paiement Sécurisé",
+            style: GoogleFonts.poppins(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                fontSize: 18)),
         centerTitle: true,
       ),
       body: Stack(
@@ -163,7 +168,9 @@ class _EcranPaiementState extends ConsumerState<EcranPaiement> {
                         Center(
                           child: Column(
                             children: [
-                              Text("Montant de la course", style: GoogleFonts.poppins(color: Colors.white54, fontSize: 14)),
+                              Text("Montant de la course",
+                                  style: GoogleFonts.poppins(
+                                      color: Colors.white54, fontSize: 14)),
                               const SizedBox(height: 8),
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
@@ -171,12 +178,20 @@ class _EcranPaiementState extends ConsumerState<EcranPaiement> {
                                 children: [
                                   Text(
                                     widget.montant.toInt().toString(),
-                                    style: GoogleFonts.poppins(fontSize: 48, fontWeight: FontWeight.w900, color: Colors.white, height: 1),
+                                    style: GoogleFonts.poppins(
+                                        fontSize: 48,
+                                        fontWeight: FontWeight.w900,
+                                        color: Colors.white,
+                                        height: 1),
                                   ),
                                   const SizedBox(width: 8),
                                   Text(
                                     "FCFA",
-                                    style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.bold, color: CouleursApp.primaire, height: 1.5),
+                                    style: GoogleFonts.poppins(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                        color: CouleursApp.primaire,
+                                        height: 1.5),
                                   ),
                                 ],
                               ),
@@ -185,19 +200,47 @@ class _EcranPaiementState extends ConsumerState<EcranPaiement> {
                         ),
                         const SizedBox(height: 40),
 
-                        Text("Méthode de paiement", style: GoogleFonts.poppins(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.white)),
+                        Text("Méthode de paiement",
+                            style: GoogleFonts.poppins(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 18,
+                                color: Colors.white)),
                         const SizedBox(height: 16),
 
                         // Liste des méthodes de paiement
                         Column(
                           children: [
-                            _buildMethodeCard("om", "Orange Money", "Paiement Mobile", "assets/om.png", Iconsax.mobile_copy, const Color(0xFFFF7900)),
+                            _buildMethodeCard(
+                                "om",
+                                "Orange Money",
+                                "Paiement Mobile",
+                                "assets/om.png",
+                                Iconsax.mobile_copy,
+                                const Color(0xFFFF7900)),
                             const SizedBox(height: 12),
-                            _buildMethodeCard("mtn", "MTN Mobile Money", "Paiement Mobile", "assets/mtn.png", Iconsax.mobile_copy, const Color(0xFFFFCC00)),
+                            _buildMethodeCard(
+                                "mtn",
+                                "MTN Mobile Money",
+                                "Paiement Mobile",
+                                "assets/mtn.png",
+                                Iconsax.mobile_copy,
+                                const Color(0xFFFFCC00)),
                             const SizedBox(height: 12),
-                            _buildMethodeCard("carte", "Carte Bancaire", "Visa, Mastercard", "", Iconsax.card_copy, const Color(0xFF3B82F6)),
+                            _buildMethodeCard(
+                                "carte",
+                                "Carte Bancaire",
+                                "Visa, Mastercard",
+                                "",
+                                Iconsax.card_copy,
+                                const Color(0xFF3B82F6)),
                             const SizedBox(height: 12),
-                            _buildMethodeCard("especes", "Espèces", "Paiement direct au chauffeur", "", Iconsax.money_3_copy, CouleursApp.succes),
+                            _buildMethodeCard(
+                                "especes",
+                                "Espèces",
+                                "Paiement direct au chauffeur",
+                                "",
+                                Iconsax.money_3_copy,
+                                CouleursApp.succes),
                           ],
                         ),
 
@@ -209,46 +252,65 @@ class _EcranPaiementState extends ConsumerState<EcranPaiement> {
                           curve: Curves.easeInOut,
                           child: Container(
                             key: ValueKey(_methodeSelectionnee),
-                            child: _methodeSelectionnee == "especes" 
-                            ? Container(
-                                padding: const EdgeInsets.all(16),
-                                decoration: BoxDecoration(
-                                  color: CouleursApp.succes.withValues(alpha: 0.1),
-                                  borderRadius: BorderRadius.circular(16),
-                                  border: Border.all(color: CouleursApp.succes.withValues(alpha: 0.2)),
-                                ),
-                                child: Row(
-                                  children: [
-                                    const Icon(Iconsax.info_circle_copy, color: CouleursApp.succes, size: 24),
-                                    const SizedBox(width: 12),
-                                    Expanded(
-                                      child: Text(
-                                        "Vous réglerez le montant directement au chauffeur lors de la prestation.",
-                                        style: GoogleFonts.poppins(color: CouleursApp.succes, fontSize: 13),
-                                      ),
+                            child: _methodeSelectionnee == "especes"
+                                ? Container(
+                                    padding: const EdgeInsets.all(16),
+                                    decoration: BoxDecoration(
+                                      color: CouleursApp.succes
+                                          .withValues(alpha: 0.1),
+                                      borderRadius: BorderRadius.circular(16),
+                                      border: Border.all(
+                                          color: CouleursApp.succes
+                                              .withValues(alpha: 0.2)),
                                     ),
-                                  ],
-                                ),
-                              )
-                            : Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  _methodeSelectionnee == "carte" ? "Nom sur la carte" : "Numéro de téléphone",
-                                  style: GoogleFonts.poppins(fontWeight: FontWeight.w600, fontSize: 14, color: Colors.white70),
-                                ),
-                                const SizedBox(height: 12),
-                                _buildFloatingTextField(
-                                  controller: _telephoneController,
-                                  focusNode: _focusNode,
-                                  hint: _methodeSelectionnee == "carte" ? "Ex: Jean Dupont" : "Ex: 6XXXXXXXX",
-                                  icon: _methodeSelectionnee == "carte" ? Iconsax.user_copy : Iconsax.call_copy,
-                                  keyboardType: _methodeSelectionnee == "carte" ? TextInputType.name : TextInputType.phone,
-                                ),
-                                const SizedBox(height: 12),
-
-                              ],
-                            ),
+                                    child: Row(
+                                      children: [
+                                        const Icon(Iconsax.info_circle_copy,
+                                            color: CouleursApp.succes,
+                                            size: 24),
+                                        const SizedBox(width: 12),
+                                        Expanded(
+                                          child: Text(
+                                            "Vous réglerez le montant directement au chauffeur lors de la prestation.",
+                                            style: GoogleFonts.poppins(
+                                                color: CouleursApp.succes,
+                                                fontSize: 13),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  )
+                                : Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        _methodeSelectionnee == "carte"
+                                            ? "Nom sur la carte"
+                                            : "Numéro de téléphone",
+                                        style: GoogleFonts.poppins(
+                                            fontWeight: FontWeight.w600,
+                                            fontSize: 14,
+                                            color: Colors.white70),
+                                      ),
+                                      const SizedBox(height: 12),
+                                      _buildFloatingTextField(
+                                        controller: _telephoneController,
+                                        focusNode: _focusNode,
+                                        hint: _methodeSelectionnee == "carte"
+                                            ? "Ex: Jean Dupont"
+                                            : "Ex: 6XXXXXXXX",
+                                        icon: _methodeSelectionnee == "carte"
+                                            ? Iconsax.user_copy
+                                            : Iconsax.call_copy,
+                                        keyboardType:
+                                            _methodeSelectionnee == "carte"
+                                                ? TextInputType.name
+                                                : TextInputType.phone,
+                                      ),
+                                      const SizedBox(height: 12),
+                                    ],
+                                  ),
                           ),
                         ),
 
@@ -282,7 +344,8 @@ class _EcranPaiementState extends ConsumerState<EcranPaiement> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: CouleursApp.succes,
                       foregroundColor: Colors.white,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16)),
                       elevation: 0,
                     ),
                     child: etatPaiement.enCours
@@ -292,7 +355,10 @@ class _EcranPaiementState extends ConsumerState<EcranPaiement> {
                             children: [
                               const Icon(Iconsax.lock_copy, size: 20),
                               const SizedBox(width: 8),
-                              Text("Payer ${widget.montant.toInt()} FCFA", style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.bold)),
+                              Text("Payer ${widget.montant.toInt()} FCFA",
+                                  style: GoogleFonts.poppins(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold)),
                             ],
                           ),
                   ),
@@ -320,12 +386,19 @@ class _EcranPaiementState extends ConsumerState<EcranPaiement> {
                     ),
                     child: Row(
                       children: [
-                        const Icon(Iconsax.warning_2_copy, color: CouleursApp.erreur),
+                        const Icon(Iconsax.warning_2_copy,
+                            color: CouleursApp.erreur),
                         const SizedBox(width: 12),
-                        Expanded(child: Text(etatPaiement.erreur!, style: GoogleFonts.poppins(color: Colors.white))),
+                        Expanded(
+                            child: Text(etatPaiement.erreur!,
+                                style:
+                                    GoogleFonts.poppins(color: Colors.white))),
                         IconButton(
-                          icon: const Icon(Icons.close, color: Colors.white54, size: 18),
-                          onPressed: () => ref.read(paiementProvider.notifier).reinitialiser(), // Permet de fermer l'erreur
+                          icon: const Icon(Icons.close,
+                              color: Colors.white54, size: 18),
+                          onPressed: () => ref
+                              .read(paiementProvider.notifier)
+                              .reinitialiser(), // Permet de fermer l'erreur
                           padding: EdgeInsets.zero,
                           constraints: const BoxConstraints(),
                         )
@@ -349,7 +422,8 @@ class _EcranPaiementState extends ConsumerState<EcranPaiement> {
                         paiement: etatPaiement.succes!,
                         onFermer: () {
                           ref.read(paiementProvider.notifier).reinitialiser();
-                          context.go('/evaluation/${widget.courseId}'); // Redirection vers l'écran d'évaluation avec ID
+                          context.go(
+                              '/evaluation/${widget.courseId}'); // Redirection vers l'écran d'évaluation avec ID
                         },
                       ),
                     ),
@@ -362,7 +436,8 @@ class _EcranPaiementState extends ConsumerState<EcranPaiement> {
     );
   }
 
-  Widget _buildMethodeCard(String cle, String titre, String sousTitre, String logoPath, IconData defaultIcon, Color brandColor) {
+  Widget _buildMethodeCard(String cle, String titre, String sousTitre,
+      String logoPath, IconData defaultIcon, Color brandColor) {
     final estSelectionne = _methodeSelectionnee == cle;
     return GestureDetector(
       onTap: () {
@@ -377,14 +452,23 @@ class _EcranPaiementState extends ConsumerState<EcranPaiement> {
         curve: Curves.easeOutQuart,
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: estSelectionne ? brandColor.withValues(alpha: 0.1) : const Color(0xFF1E293B).withValues(alpha: 0.5),
+          color: estSelectionne
+              ? brandColor.withValues(alpha: 0.1)
+              : const Color(0xFF1E293B).withValues(alpha: 0.5),
           borderRadius: BorderRadius.circular(24),
           border: Border.all(
-            color: estSelectionne ? brandColor : Colors.white.withValues(alpha: 0.05),
+            color: estSelectionne
+                ? brandColor
+                : Colors.white.withValues(alpha: 0.05),
             width: estSelectionne ? 2 : 1,
           ),
           boxShadow: estSelectionne
-              ? [BoxShadow(color: brandColor.withValues(alpha: 0.2), blurRadius: 20, offset: const Offset(0, 8))]
+              ? [
+                  BoxShadow(
+                      color: brandColor.withValues(alpha: 0.2),
+                      blurRadius: 20,
+                      offset: const Offset(0, 8))
+                ]
               : [],
         ),
         child: Row(
@@ -392,25 +476,36 @@ class _EcranPaiementState extends ConsumerState<EcranPaiement> {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: estSelectionne ? brandColor.withValues(alpha: 0.2) : Colors.white.withValues(alpha: 0.05),
+                color: estSelectionne
+                    ? brandColor.withValues(alpha: 0.2)
+                    : Colors.white.withValues(alpha: 0.05),
                 shape: BoxShape.circle,
               ),
-              child: Icon(defaultIcon, color: estSelectionne ? brandColor : Colors.white54, size: 24),
+              child: Icon(defaultIcon,
+                  color: estSelectionne ? brandColor : Colors.white54,
+                  size: 24),
             ),
             const SizedBox(width: 16),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(titre, style: GoogleFonts.poppins(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.white)),
-                  Text(sousTitre, style: GoogleFonts.poppins(fontSize: 12, color: Colors.white54)),
+                  Text(titre,
+                      style: GoogleFonts.poppins(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 16,
+                          color: Colors.white)),
+                  Text(sousTitre,
+                      style: GoogleFonts.poppins(
+                          fontSize: 12, color: Colors.white54)),
                 ],
               ),
             ),
             if (estSelectionne)
               Container(
                 padding: const EdgeInsets.all(4),
-                decoration: BoxDecoration(color: brandColor, shape: BoxShape.circle),
+                decoration:
+                    BoxDecoration(color: brandColor, shape: BoxShape.circle),
                 child: const Icon(Icons.check, color: Colors.white, size: 16),
               ),
           ],
@@ -430,17 +525,28 @@ class _EcranPaiementState extends ConsumerState<EcranPaiement> {
       controller: controller,
       focusNode: focusNode,
       keyboardType: keyboardType,
-      style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.w500),
+      style:
+          GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.w500),
       decoration: InputDecoration(
         hintText: hint,
-        hintStyle: GoogleFonts.poppins(color: const Color(0xFF64748B), fontWeight: FontWeight.w400),
+        hintStyle: GoogleFonts.poppins(
+            color: const Color(0xFF64748B), fontWeight: FontWeight.w400),
         prefixIcon: Icon(icon, color: const Color(0xFF94A3B8), size: 20),
         filled: true,
         fillColor: const Color(0xFF0F172A).withValues(alpha: 0.7),
-        contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.05))),
-        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.05))),
-        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: const BorderSide(color: Color(0xFF3B82F6), width: 1.5)),
+        contentPadding:
+            const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+        border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(16),
+            borderSide:
+                BorderSide(color: Colors.white.withValues(alpha: 0.05))),
+        enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(16),
+            borderSide:
+                BorderSide(color: Colors.white.withValues(alpha: 0.05))),
+        focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(16),
+            borderSide: const BorderSide(color: Color(0xFF3B82F6), width: 1.5)),
       ),
     );
   }

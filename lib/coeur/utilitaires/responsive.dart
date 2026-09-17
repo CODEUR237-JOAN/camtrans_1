@@ -29,11 +29,9 @@ class Responsive extends StatelessWidget {
       builder: (context, constraints) {
         if (constraints.maxWidth >= 1100) {
           return bureau;
-        }
-        else if (constraints.maxWidth >= 650) {
+        } else if (constraints.maxWidth >= 650) {
           return tablette ?? mobile;
-        }
-        else {
+        } else {
           return mobile;
         }
       },

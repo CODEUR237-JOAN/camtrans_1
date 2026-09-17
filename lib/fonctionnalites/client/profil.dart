@@ -12,6 +12,7 @@ import 'package:update_camtrans/coeur/etat/course_provider.dart';
 import 'package:update_camtrans/coeur/constantes/statuts.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:update_camtrans/coeur/routes/routes.dart';
+
 class Profil extends ConsumerWidget {
   const Profil({super.key});
 
@@ -24,7 +25,8 @@ class Profil extends ConsumerWidget {
     return Scaffold(
       backgroundColor: const Color(0xFF08111F),
       appBar: AppBar(
-        title: const Text("Mon Profil", style: TextStyle(fontWeight: FontWeight.bold)),
+        title: const Text("Mon Profil",
+            style: TextStyle(fontWeight: FontWeight.bold)),
         backgroundColor: const Color(0xFF08111F),
         elevation: 0,
         automaticallyImplyLeading: false,
@@ -34,9 +36,12 @@ class Profil extends ConsumerWidget {
         error: (err, stack) => Center(child: Text("Erreur: $err")),
         data: (client) {
           final user = auth.utilisateur;
-          final userName = client != null ? "${client.prenom} ${client.nom}" : (user?.displayName ?? "Utilisateur");
+          final userName = client != null
+              ? "${client.prenom} ${client.nom}"
+              : (user?.displayName ?? "Utilisateur");
           final userEmail = client?.email ?? user?.email ?? "Non renseigné";
-          final userPhone = client?.telephone ?? user?.phoneNumber ?? "Non renseigné";
+          final userPhone =
+              client?.telephone ?? user?.phoneNumber ?? "Non renseigné";
           final userPhoto = client?.photo ?? user?.photoURL;
           final userVille = client?.ville ?? "Cameroun (Général)";
 
@@ -51,19 +56,27 @@ class Profil extends ConsumerWidget {
                     children: [
                       CircleAvatar(
                         radius: 60,
-                        backgroundColor: CouleursApp.primaire.withValues(alpha: 0.1),
-                        backgroundImage: userPhoto != null && userPhoto.isNotEmpty ? NetworkImage(userPhoto) : null,
+                        backgroundColor:
+                            CouleursApp.primaire.withValues(alpha: 0.1),
+                        backgroundImage:
+                            userPhoto != null && userPhoto.isNotEmpty
+                                ? NetworkImage(userPhoto)
+                                : null,
                         child: (userPhoto == null || userPhoto.isEmpty)
-                          ? const Icon(Icons.person, size: 60, color: CouleursApp.primaire)
-                          : null,
+                            ? const Icon(Icons.person,
+                                size: 60, color: CouleursApp.primaire)
+                            : null,
                       ),
                       Positioned(
                         bottom: 0,
                         right: 0,
                         child: Container(
                           padding: const EdgeInsets.all(8),
-                          decoration: const BoxDecoration(color: CouleursApp.primaire, shape: BoxShape.circle),
-                          child: const Icon(Icons.camera_alt, color: Colors.white, size: 20),
+                          decoration: const BoxDecoration(
+                              color: CouleursApp.primaire,
+                              shape: BoxShape.circle),
+                          child: const Icon(Icons.camera_alt,
+                              color: Colors.white, size: 20),
                         ),
                       ),
                     ],
@@ -74,12 +87,14 @@ class Profil extends ConsumerWidget {
 
                 Text(
                   userName,
-                  style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                      fontSize: 24, fontWeight: FontWeight.bold),
                 ),
 
                 const Text(
                   "Client TransConnect",
-                  style: TextStyle(color: Colors.white70, fontWeight: FontWeight.w500),
+                  style: TextStyle(
+                      color: Colors.white70, fontWeight: FontWeight.w500),
                 ),
 
                 const SizedBox(height: 30),
@@ -87,13 +102,23 @@ class Profil extends ConsumerWidget {
                 // Statistiques extraites de l'accueil
                 coursesAsync.when(
                   data: (toutesLesCourses) {
-                    final courses = toutesLesCourses.where((c) => c.archivePourClient != true).toList();
-                    final enCours = courses.where((c) => !StatutCourse.estTerminee(c.statut)).toList();
-                    final livrees = courses.where((c) => c.statut == StatutCourse.arriveDestination || c.statut == StatutCourse.terminee).toList();
-                    
-                    double depenses = livrees.fold(0, (sum, c) => sum + c.prixFinal);
+                    final courses = toutesLesCourses
+                        .where((c) => c.archivePourClient != true)
+                        .toList();
+                    final enCours = courses
+                        .where((c) => !StatutCourse.estTerminee(c.statut))
+                        .toList();
+                    final livrees = courses
+                        .where((c) =>
+                            c.statut == StatutCourse.arriveDestination ||
+                            c.statut == StatutCourse.terminee)
+                        .toList();
+
+                    double depenses =
+                        livrees.fold(0, (sum, c) => sum + c.prixFinal);
                     if (depenses == 0) {
-                       depenses = livrees.fold(0, (sum, c) => sum + c.prixEstime);
+                      depenses =
+                          livrees.fold(0, (sum, c) => sum + c.prixEstime);
                     }
 
                     return _buildStats(
@@ -102,7 +127,9 @@ class Profil extends ConsumerWidget {
                       enCours: enCours.length,
                     );
                   },
-                  loading: () => const SizedBox(height: 100, child: Center(child: CircularProgressIndicator())),
+                  loading: () => const SizedBox(
+                      height: 100,
+                      child: Center(child: CircularProgressIndicator())),
                   error: (err, stack) => const SizedBox(),
                 ),
 
@@ -113,15 +140,27 @@ class Profil extends ConsumerWidget {
                   decoration: BoxDecoration(
                     color: Colors.white.withValues(alpha: 0.03),
                     borderRadius: BorderRadius.circular(24),
-                    border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+                    border:
+                        Border.all(color: Colors.white.withValues(alpha: 0.08)),
                   ),
                   child: Column(
                     children: [
-                      _ligneInformation(Iconsax.call_copy, "Téléphone", userPhone),
-                      const Divider(color: Colors.white10, height: 1, indent: 60, endIndent: 20),
-                      _ligneInformation(Iconsax.sms_copy, "Adresse e-mail", userEmail),
-                      const Divider(color: Colors.white10, height: 1, indent: 60, endIndent: 20),
-                      _ligneInformation(Iconsax.location_copy, "Ville", userVille),
+                      _ligneInformation(
+                          Iconsax.call_copy, "Téléphone", userPhone),
+                      const Divider(
+                          color: Colors.white10,
+                          height: 1,
+                          indent: 60,
+                          endIndent: 20),
+                      _ligneInformation(
+                          Iconsax.sms_copy, "Adresse e-mail", userEmail),
+                      const Divider(
+                          color: Colors.white10,
+                          height: 1,
+                          indent: 60,
+                          endIndent: 20),
+                      _ligneInformation(
+                          Iconsax.location_copy, "Ville", userVille),
                     ],
                   ),
                 ),
@@ -131,7 +170,11 @@ class Profil extends ConsumerWidget {
                 // Section Gestion & Paramètres
                 const Align(
                   alignment: Alignment.centerLeft,
-                  child: Text("Paramètres", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
+                  child: Text("Paramètres",
+                      style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white)),
                 ),
                 const SizedBox(height: 15),
 
@@ -139,21 +182,57 @@ class Profil extends ConsumerWidget {
                   decoration: BoxDecoration(
                     color: Colors.white.withValues(alpha: 0.03),
                     borderRadius: BorderRadius.circular(24),
-                    border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+                    border:
+                        Border.all(color: Colors.white.withValues(alpha: 0.08)),
                   ),
                   child: Column(
                     children: [
-                      _ligneAction(context, Iconsax.location_add_copy, "Mes Adresses", () => context.push("/adresses-favorites")),
-                      const Divider(color: Colors.white10, height: 1, indent: 60, endIndent: 20),
-                      _ligneAction(context, Iconsax.user_edit_copy, "Modifier le profil", () => context.push("/modifier-profil")),
-                      const Divider(color: Colors.white10, height: 1, indent: 60, endIndent: 20),
-                      _ligneAction(context, Iconsax.key_copy, "Mot de passe", () => context.push("/changer-mot-de-passe")),
-                      const Divider(color: Colors.white10, height: 1, indent: 60, endIndent: 20),
-                      _ligneAction(context, Iconsax.wallet_2_copy, "Moyens de paiement", () {}),
-                      const Divider(color: Colors.white10, height: 1, indent: 60, endIndent: 20),
-                      _ligneAction(context, Iconsax.document_copy, "Mes Factures", () => context.push(RoutesApplication.factures)),
-                      const Divider(color: Colors.white10, height: 1, indent: 60, endIndent: 20),
-                      _ligneAction(context, Iconsax.setting_2_copy, "Paramètres généraux", () {}),
+                      _ligneAction(
+                          context,
+                          Iconsax.location_add_copy,
+                          "Mes Adresses",
+                          () => context.push("/adresses-favorites")),
+                      const Divider(
+                          color: Colors.white10,
+                          height: 1,
+                          indent: 60,
+                          endIndent: 20),
+                      _ligneAction(
+                          context,
+                          Iconsax.user_edit_copy,
+                          "Modifier le profil",
+                          () => context.push("/modifier-profil")),
+                      const Divider(
+                          color: Colors.white10,
+                          height: 1,
+                          indent: 60,
+                          endIndent: 20),
+                      _ligneAction(context, Iconsax.key_copy, "Mot de passe",
+                          () => context.push("/changer-mot-de-passe")),
+                      const Divider(
+                          color: Colors.white10,
+                          height: 1,
+                          indent: 60,
+                          endIndent: 20),
+                      _ligneAction(context, Iconsax.wallet_2_copy,
+                          "Moyens de paiement", () {}),
+                      const Divider(
+                          color: Colors.white10,
+                          height: 1,
+                          indent: 60,
+                          endIndent: 20),
+                      _ligneAction(
+                          context,
+                          Iconsax.document_copy,
+                          "Mes Factures",
+                          () => context.push(RoutesApplication.factures)),
+                      const Divider(
+                          color: Colors.white10,
+                          height: 1,
+                          indent: 60,
+                          endIndent: 20),
+                      _ligneAction(context, Iconsax.setting_2_copy,
+                          "Paramètres généraux", () {}),
                     ],
                   ),
                 ),
@@ -170,7 +249,8 @@ class Profil extends ConsumerWidget {
                       elevation: 0,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(20),
-                        side: BorderSide(color: Colors.red.withValues(alpha: 0.2)),
+                        side: BorderSide(
+                            color: Colors.red.withValues(alpha: 0.2)),
                       ),
                     ),
                     onPressed: () async {
@@ -180,7 +260,9 @@ class Profil extends ConsumerWidget {
                       }
                     },
                     icon: const Icon(Iconsax.logout_copy),
-                    label: const Text("Se déconnecter", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                    label: const Text("Se déconnecter",
+                        style: TextStyle(
+                            fontWeight: FontWeight.bold, fontSize: 16)),
                   ),
                 ),
 
@@ -193,32 +275,46 @@ class Profil extends ConsumerWidget {
     );
   }
 
-  Widget _buildStats({required int livraisons, required double depenses, required int enCours}) {
-    String depensesText = depenses >= 1000 ? "${(depenses / 1000).toStringAsFixed(1)}k" : depenses.toStringAsFixed(0);
+  Widget _buildStats(
+      {required int livraisons,
+      required double depenses,
+      required int enCours}) {
+    String depensesText = depenses >= 1000
+        ? "${(depenses / 1000).toStringAsFixed(1)}k"
+        : depenses.toStringAsFixed(0);
 
     return SizedBox(
       height: 100,
       child: ListView(
         scrollDirection: Axis.horizontal,
         children: [
-          _buildStatCard("Livraisons", livraisons.toString(), Iconsax.box_tick_copy, CouleursApp.succes),
+          _buildStatCard("Livraisons", livraisons.toString(),
+              Iconsax.box_tick_copy, CouleursApp.succes),
           const SizedBox(width: 15),
-          _buildStatCard("Dépenses", depensesText, Iconsax.coin_copy, CouleursApp.avertissement),
+          _buildStatCard("Dépenses", depensesText, Iconsax.coin_copy,
+              CouleursApp.avertissement),
           const SizedBox(width: 15),
-          _buildStatCard("En cours", enCours.toString(), Iconsax.truck_copy, CouleursApp.primaire),
+          _buildStatCard("En cours", enCours.toString(), Iconsax.truck_copy,
+              CouleursApp.primaire),
         ],
       ),
     );
   }
 
-  Widget _buildStatCard(String title, String value, IconData icon, Color color) {
+  Widget _buildStatCard(
+      String title, String value, IconData icon, Color color) {
     return Container(
       width: 155,
       padding: const EdgeInsets.all(15),
       decoration: BoxDecoration(
         color: const Color(0xFF10192A),
         borderRadius: BorderRadius.circular(20),
-        boxShadow: [BoxShadow(color: color.withValues(alpha: 0.1), blurRadius: 15, offset: const Offset(0, 5))],
+        boxShadow: [
+          BoxShadow(
+              color: color.withValues(alpha: 0.1),
+              blurRadius: 15,
+              offset: const Offset(0, 5))
+        ],
         border: Border.all(color: color.withValues(alpha: 0.1)),
       ),
       child: Column(
@@ -229,11 +325,17 @@ class Profil extends ConsumerWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Icon(icon, color: color, size: 24),
-              Text(value, style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: color)),
+              Text(value,
+                  style: TextStyle(
+                      fontSize: 22, fontWeight: FontWeight.bold, color: color)),
             ],
           ),
           const Spacer(),
-          Text(title, style: const TextStyle(fontSize: 14, color: Colors.white70, fontWeight: FontWeight.w600)),
+          Text(title,
+              style: const TextStyle(
+                  fontSize: 14,
+                  color: Colors.white70,
+                  fontWeight: FontWeight.w600)),
         ],
       ),
     );
@@ -250,17 +352,23 @@ class Profil extends ConsumerWidget {
         ),
         child: Icon(icone, color: CouleursApp.primaire, size: 22),
       ),
-      title: Text(titre, style: const TextStyle(fontSize: 13, color: Colors.white54)),
-      subtitle: Text(valeur, style: const TextStyle(fontWeight: FontWeight.w600, color: Colors.white, fontSize: 15)),
+      title: Text(titre,
+          style: const TextStyle(fontSize: 13, color: Colors.white54)),
+      subtitle: Text(valeur,
+          style: const TextStyle(
+              fontWeight: FontWeight.w600, color: Colors.white, fontSize: 15)),
     );
   }
 
-  Widget _ligneAction(BuildContext context, IconData icone, String texte, VoidCallback action) {
+  Widget _ligneAction(
+      BuildContext context, IconData icone, String texte, VoidCallback action) {
     return ListTile(
       contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
       leading: Icon(icone, color: Colors.white70, size: 24),
-      title: Text(texte, style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 16)),
-      trailing: const Icon(Icons.arrow_forward_ios, size: 14, color: Colors.white30),
+      title: Text(texte,
+          style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 16)),
+      trailing:
+          const Icon(Icons.arrow_forward_ios, size: 14, color: Colors.white30),
       onTap: action,
     );
   }

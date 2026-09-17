@@ -32,11 +32,11 @@ class CouleursApp {
   static const Color secondaireFonce = Color(0xFFEA580C);
 
   /// Couleurs d'accent (aliases et variantes)
-  static const Color accent = Color(0xFF00C896);         // alias de primaire
-  static const Color accentOrange = Color(0xFFF97316);   // alias de secondaire
-  static const Color accentRose = Color(0xFFEC4899);     // Rose vibrant
-  static const Color accentNeon = Color(0xFF06B6D4);     // Cyan néon
-  static const Color accentViolet = Color(0xFF8B5CF6);   // Violet tech
+  static const Color accent = Color(0xFF00C896); // alias de primaire
+  static const Color accentOrange = Color(0xFFF97316); // alias de secondaire
+  static const Color accentRose = Color(0xFFEC4899); // Rose vibrant
+  static const Color accentNeon = Color(0xFF06B6D4); // Cyan néon
+  static const Color accentViolet = Color(0xFF8B5CF6); // Violet tech
 
   // ==========================
   // Couleurs de fond

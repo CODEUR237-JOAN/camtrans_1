@@ -18,7 +18,9 @@ class BoutonAssistantVocal extends ConsumerWidget {
     final service = ref.read(serviceAssistantVocalProvider.notifier);
 
     // Ne s'affiche que si l'état est "repos", "veille" ou "erreur"
-    if (etatAssistant != EtatAssistant.repos && etatAssistant != EtatAssistant.veille && etatAssistant != EtatAssistant.erreur) {
+    if (etatAssistant != EtatAssistant.repos &&
+        etatAssistant != EtatAssistant.veille &&
+        etatAssistant != EtatAssistant.erreur) {
       return const SizedBox.shrink();
     }
 
@@ -28,8 +30,9 @@ class BoutonAssistantVocal extends ConsumerWidget {
     return GestureDetector(
       onTap: () {
         _afficherBottomSheet(context, ref, service);
-        if (etatAssistant == EtatAssistant.repos || etatAssistant == EtatAssistant.erreur) {
-           service.demarrerEcoute(isWakeWord: true);
+        if (etatAssistant == EtatAssistant.repos ||
+            etatAssistant == EtatAssistant.erreur) {
+          service.demarrerEcoute(isWakeWord: true);
         }
       },
       child: Container(
@@ -46,19 +49,30 @@ class BoutonAssistantVocal extends ConsumerWidget {
             ),
           ],
         ),
-        child: Icon(Iconsax.microphone_2_copy, color: Colors.white, size: iconSize),
+        child: Icon(Iconsax.microphone_2_copy,
+            color: Colors.white, size: iconSize),
       ),
     )
-    .animate(onPlay: (controller) => controller.repeat(reverse: true))
-    .scale(begin: const Offset(1, 1), end: const Offset(1.05, 1.05), duration: 1500.ms)
-    .boxShadow(
-      begin: BoxShadow(color: CouleursApp.primaire.withValues(alpha: 0.3), blurRadius: 10, spreadRadius: 0),
-      end: BoxShadow(color: CouleursApp.primaire.withValues(alpha: 0.7), blurRadius: 25, spreadRadius: 5),
-      duration: 1500.ms,
-    );
+        .animate(onPlay: (controller) => controller.repeat(reverse: true))
+        .scale(
+            begin: const Offset(1, 1),
+            end: const Offset(1.05, 1.05),
+            duration: 1500.ms)
+        .boxShadow(
+          begin: BoxShadow(
+              color: CouleursApp.primaire.withValues(alpha: 0.3),
+              blurRadius: 10,
+              spreadRadius: 0),
+          end: BoxShadow(
+              color: CouleursApp.primaire.withValues(alpha: 0.7),
+              blurRadius: 25,
+              spreadRadius: 5),
+          duration: 1500.ms,
+        );
   }
 
-  void _afficherBottomSheet(BuildContext context, WidgetRef ref, ServiceAssistantVocal service) {
+  void _afficherBottomSheet(
+      BuildContext context, WidgetRef ref, ServiceAssistantVocal service) {
     showModalBottomSheet(
       context: context,
       isDismissible: false,
@@ -75,7 +89,8 @@ class AssistantBottomSheet extends ConsumerStatefulWidget {
   const AssistantBottomSheet({super.key});
 
   @override
-  ConsumerState<AssistantBottomSheet> createState() => _AssistantBottomSheetState();
+  ConsumerState<AssistantBottomSheet> createState() =>
+      _AssistantBottomSheetState();
 }
 
 class _AssistantBottomSheetState extends ConsumerState<AssistantBottomSheet> {
@@ -93,7 +108,7 @@ class _AssistantBottomSheetState extends ConsumerState<AssistantBottomSheet> {
           });
         }
       };
-      
+
       service.onNavigate = (route) {
         if (mounted) {
           Navigator.pop(context); // Fermer le bottom sheet
@@ -114,7 +129,10 @@ class _AssistantBottomSheetState extends ConsumerState<AssistantBottomSheet> {
         color: const Color(0xFF0F172A),
         borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
         boxShadow: [
-          BoxShadow(color: Colors.black.withValues(alpha: 0.5), blurRadius: 30, offset: const Offset(0, -10))
+          BoxShadow(
+              color: Colors.black.withValues(alpha: 0.5),
+              blurRadius: 30,
+              offset: const Offset(0, -10))
         ],
       ),
       // Le SingleChildScrollView permet au contenu de défiler si l'écran est trop petit,
@@ -133,7 +151,7 @@ class _AssistantBottomSheetState extends ConsumerState<AssistantBottomSheet> {
                 },
               ),
             ),
-            
+
             const SizedBox(height: 10),
 
             // Animation centrale qui change selon l'état de l'assistant
@@ -149,9 +167,13 @@ class _AssistantBottomSheetState extends ConsumerState<AssistantBottomSheet> {
                 key: ValueKey<String>(_texteAffiche),
                 textAlign: TextAlign.center,
                 style: TextStyle(
-                  color: etatAssistant == EtatAssistant.erreur ? Colors.redAccent : Colors.white,
+                  color: etatAssistant == EtatAssistant.erreur
+                      ? Colors.redAccent
+                      : Colors.white,
                   fontSize: 18,
-                  fontWeight: etatAssistant == EtatAssistant.parle ? FontWeight.normal : FontWeight.w600,
+                  fontWeight: etatAssistant == EtatAssistant.parle
+                      ? FontWeight.normal
+                      : FontWeight.w600,
                 ),
               ),
             ),
@@ -159,7 +181,8 @@ class _AssistantBottomSheetState extends ConsumerState<AssistantBottomSheet> {
             const SizedBox(height: 40),
 
             // Bouton d'action dont l'icône change selon l'état de l'assistant
-            if (etatAssistant == EtatAssistant.ecoute || etatAssistant == EtatAssistant.veille)
+            if (etatAssistant == EtatAssistant.ecoute ||
+                etatAssistant == EtatAssistant.veille)
               ElevatedButton(
                 onPressed: () => service.arreterEcoute(),
                 style: ElevatedButton.styleFrom(
@@ -169,7 +192,8 @@ class _AssistantBottomSheetState extends ConsumerState<AssistantBottomSheet> {
                 ),
                 child: const Icon(Icons.stop, color: Colors.white, size: 28),
               )
-            else if (etatAssistant == EtatAssistant.repos || etatAssistant == EtatAssistant.erreur)
+            else if (etatAssistant == EtatAssistant.repos ||
+                etatAssistant == EtatAssistant.erreur)
               ElevatedButton(
                 onPressed: () => service.demarrerEcoute(isWakeWord: false),
                 style: ElevatedButton.styleFrom(
@@ -189,7 +213,7 @@ class _AssistantBottomSheetState extends ConsumerState<AssistantBottomSheet> {
                 ),
                 child: const Icon(Icons.close, color: Colors.white, size: 28),
               ),
-              
+
             const SizedBox(height: 20),
           ],
         ),
@@ -206,11 +230,15 @@ class _AssistantBottomSheetState extends ConsumerState<AssistantBottomSheet> {
       case EtatAssistant.traitement:
         return const CircularProgressIndicator(color: CouleursApp.succes)
             .animate(onPlay: (controller) => controller.repeat())
-            .scale(begin: const Offset(0.8, 0.8), end: const Offset(1.2, 1.2), duration: 800.ms);
+            .scale(
+                begin: const Offset(0.8, 0.8),
+                end: const Offset(1.2, 1.2),
+                duration: 800.ms);
       case EtatAssistant.parle:
         return _buildPulsingMic(CouleursApp.succes);
       case EtatAssistant.erreur:
-        return const Icon(Icons.error_outline, color: Colors.redAccent, size: 60);
+        return const Icon(Icons.error_outline,
+            color: Colors.redAccent, size: 60);
       default:
         return const Icon(Icons.mic_none, color: Colors.white54, size: 60);
     }
@@ -225,12 +253,19 @@ class _AssistantBottomSheetState extends ConsumerState<AssistantBottomSheet> {
       ),
       child: Icon(Iconsax.microphone_2_copy, color: couleur, size: 40),
     )
-    .animate(onPlay: (controller) => controller.repeat(reverse: true))
-    .scale(begin: const Offset(1, 1), end: const Offset(1.3, 1.3), duration: 800.ms)
-    .boxShadow(
-      begin: BoxShadow(color: couleur.withValues(alpha: 0.0), blurRadius: 0),
-      end: BoxShadow(color: couleur.withValues(alpha: 0.5), blurRadius: 20, spreadRadius: 10),
-      duration: 800.ms,
-    );
+        .animate(onPlay: (controller) => controller.repeat(reverse: true))
+        .scale(
+            begin: const Offset(1, 1),
+            end: const Offset(1.3, 1.3),
+            duration: 800.ms)
+        .boxShadow(
+          begin:
+              BoxShadow(color: couleur.withValues(alpha: 0.0), blurRadius: 0),
+          end: BoxShadow(
+              color: couleur.withValues(alpha: 0.5),
+              blurRadius: 20,
+              spreadRadius: 10),
+          duration: 800.ms,
+        );
   }
 }

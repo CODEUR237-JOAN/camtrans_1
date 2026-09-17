@@ -21,7 +21,6 @@ class StatutCourse {
   /// ✅ NOUVEAU (Phase 4.4) : La course est proposée en exclusivité à un chauffeur spécifique
   static const String propose = 'propose';
 
-
   /// Un transporteur a été attribué
   static const String attribue = 'attribue';
 

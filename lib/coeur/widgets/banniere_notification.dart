@@ -53,13 +53,15 @@ class _EcouteurNotificationsAppState extends State<EcouteurNotificationsApp> {
           left: 16,
           right: 16,
           child: Column(
-            children: _bannieres.map((e) => _BanniereNotification(
-              key: e.key,
-              notif: e.notif,
-              onDismiss: () {
-                if (mounted) setState(() => _bannieres.remove(e));
-              },
-            )).toList(),
+            children: _bannieres
+                .map((e) => _BanniereNotification(
+                      key: e.key,
+                      notif: e.notif,
+                      onDismiss: () {
+                        if (mounted) setState(() => _bannieres.remove(e));
+                      },
+                    ))
+                .toList(),
           ),
         ),
       ],
@@ -143,7 +145,8 @@ class _BanniereNotification extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: _couleurAccent.withValues(alpha: 0.15),
                   shape: BoxShape.circle,
-                  border: Border.all(color: _couleurAccent.withValues(alpha: 0.3)),
+                  border:
+                      Border.all(color: _couleurAccent.withValues(alpha: 0.3)),
                 ),
                 child: Icon(_icone, color: _couleurAccent, size: 20),
               ),
@@ -179,8 +182,7 @@ class _BanniereNotification extends StatelessWidget {
               Icon(Icons.close, color: Colors.white38, size: 16),
             ],
           ),
-        )
-        ,
+        ),
       ),
     );
   }

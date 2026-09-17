@@ -14,7 +14,6 @@ import 'pages/page_abonnements_admin.dart';
 import 'pages/page_litiges.dart';
 import 'pages/page_gestion_textes.dart';
 
-
 class TableauDeBordAdmin extends ConsumerStatefulWidget {
   const TableauDeBordAdmin({super.key});
 
@@ -62,19 +61,22 @@ class _TableauDeBordAdminState extends ConsumerState<TableauDeBordAdmin> {
               backgroundColor: const Color(0xFF08111F),
               elevation: 0,
               iconTheme: const IconThemeData(color: Colors.white),
-              title: const Text("CamTrans Admin", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+              title: const Text("CamTrans Admin",
+                  style: TextStyle(
+                      color: Colors.white, fontWeight: FontWeight.bold)),
             )
           : null, // Pas d'appBar sur Desktop, la sidebar gère tout
       body: Row(
         children: [
           // Sidebar pour Desktop
           if (isDesktop) const SidebarAdmin(),
-          
+
           // Zone de contenu
           Expanded(
             child: PageView(
               controller: _pageController,
-              physics: const NeverScrollableScrollPhysics(), // Désactive le swipe manuel
+              physics:
+                  const NeverScrollableScrollPhysics(), // Désactive le swipe manuel
               children: [
                 const PageVueEnsemble(),
                 const PageUtilisateurs(),

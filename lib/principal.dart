@@ -24,13 +24,10 @@ class MonApplication extends ConsumerWidget {
         return MaterialApp.router(
           debugShowCheckedModeBanner: false,
           title: "Transport Intelligent",
-
           builder: (context, child) => EcouteurNotificationsApp(child: child!),
-
           theme: ThemeApplication.themeClair,
           darkTheme: ThemeApplication.themeSombre,
           themeMode: ThemeMode.dark,
-
           localizationsDelegates: const [
             GlobalMaterialLocalizations.delegate,
             GlobalWidgetsLocalizations.delegate,
@@ -39,7 +36,6 @@ class MonApplication extends ConsumerWidget {
           supportedLocales: const [
             Locale('fr', ''),
           ],
-
           routerConfig: RoutesApplication.routeur,
         );
       },

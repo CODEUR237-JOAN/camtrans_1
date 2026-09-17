@@ -17,12 +17,14 @@ class ServiceStockage {
   }) async {
     try {
       final extensionFichier = fichier.name.split('.').last;
-      final ref = _storage.ref().child('$dossier/$nomFichier.$extensionFichier');
-      
+      final ref =
+          _storage.ref().child('$dossier/$nomFichier.$extensionFichier');
+
       if (kIsWeb) {
         // Sur le Web, on utilise putData ou putBlob
         final bytes = await fichier.readAsBytes();
-        final uploadTask = await ref.putData(bytes, SettableMetadata(contentType: 'image/$extensionFichier'));
+        final uploadTask = await ref.putData(
+            bytes, SettableMetadata(contentType: 'image/$extensionFichier'));
         return await uploadTask.ref.getDownloadURL();
       } else {
         // Sur Mobile, on peut continuer à utiliser putFile en convertissant en File de dart:io

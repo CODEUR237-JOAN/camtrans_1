@@ -125,7 +125,8 @@ class ChoixProfil extends StatelessWidget {
                         const SizedBox(height: 28),
                         Center(
                           child: TextButton(
-                            onPressed: () => context.go(RoutesApplication.connexion),
+                            onPressed: () =>
+                                context.go(RoutesApplication.connexion),
                             child: const Text(
                               'J\'ai deja un compte. Se connecter',
                               style: TextStyle(fontWeight: FontWeight.w800),
@@ -235,7 +236,8 @@ class ChoixProfil extends StatelessWidget {
                           ),
                           const SizedBox(height: 14),
                           Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 10, vertical: 6),
                             decoration: BoxDecoration(
                               color: couleur.withValues(alpha: 0.10),
                               borderRadius: BorderRadius.circular(99),

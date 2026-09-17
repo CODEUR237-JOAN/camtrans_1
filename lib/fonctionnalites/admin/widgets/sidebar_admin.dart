@@ -13,7 +13,8 @@ class SidebarAdmin extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final indexSelectionne = ref.watch(adminMenuIndexProvider);
-    final pendingCount = ref.watch(adminPendingApprovalsCountProvider).valueOrNull ?? 0;
+    final pendingCount =
+        ref.watch(adminPendingApprovalsCountProvider).valueOrNull ?? 0;
     final notifAdminCount = ref.watch(badgeNotificationsAdminProvider);
     // La gestion Desktop/Mobile est faite dans le parent (TableauDeBordAdmin)
     // Nous retournons toujours le contenu du menu ici.
@@ -21,7 +22,8 @@ class SidebarAdmin extends ConsumerWidget {
       width: 250,
       decoration: BoxDecoration(
         color: const Color(0xFF0F172A), // Dark slate
-        border: Border(right: BorderSide(color: Colors.white.withValues(alpha: 0.1))),
+        border: Border(
+            right: BorderSide(color: Colors.white.withValues(alpha: 0.1))),
       ),
       child: Column(
         children: [
@@ -37,13 +39,17 @@ class SidebarAdmin extends ConsumerWidget {
                     color: CouleursApp.primaire.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: const Icon(Icons.admin_panel_settings, color: CouleursApp.primaire),
+                  child: const Icon(Icons.admin_panel_settings,
+                      color: CouleursApp.primaire),
                 ),
                 const SizedBox(width: 12),
                 const Expanded(
                   child: Text(
                     "CamTrans\nConsole",
-                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Colors.white),
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                        color: Colors.white),
                   ),
                 ),
               ],
@@ -62,20 +68,22 @@ class SidebarAdmin extends ConsumerWidget {
                   icone: Icons.dashboard_outlined,
                   index: 0,
                   currentIndex: indexSelectionne,
-                  onTap: () => ref.read(adminMenuIndexProvider.notifier).state = 0,
+                  onTap: () =>
+                      ref.read(adminMenuIndexProvider.notifier).state = 0,
                 ),
                 const SizedBox(height: 20),
-                
+
                 _SectionTitle(titre: "UTILISATEURS"),
                 _MenuItem(
                   titre: "Tous les utilisateurs",
                   icone: Icons.people_outline,
                   index: 1,
                   currentIndex: indexSelectionne,
-                  onTap: () => ref.read(adminMenuIndexProvider.notifier).state = 1,
+                  onTap: () =>
+                      ref.read(adminMenuIndexProvider.notifier).state = 1,
                 ),
                 const SizedBox(height: 20),
-                
+
                 _SectionTitle(titre: "MODÉRATION"),
                 _MenuItem(
                   titre: "Documents en attente",
@@ -83,7 +91,8 @@ class SidebarAdmin extends ConsumerWidget {
                   index: 2,
                   currentIndex: indexSelectionne,
                   badge: pendingCount > 0 ? "$pendingCount" : null,
-                  onTap: () => ref.read(adminMenuIndexProvider.notifier).state = 2,
+                  onTap: () =>
+                      ref.read(adminMenuIndexProvider.notifier).state = 2,
                 ),
                 const SizedBox(height: 20),
 
@@ -93,14 +102,16 @@ class SidebarAdmin extends ConsumerWidget {
                   icone: Icons.map_outlined,
                   index: 3,
                   currentIndex: indexSelectionne,
-                  onTap: () => ref.read(adminMenuIndexProvider.notifier).state = 3,
+                  onTap: () =>
+                      ref.read(adminMenuIndexProvider.notifier).state = 3,
                 ),
                 _MenuItem(
                   titre: "Toutes les courses",
                   icone: Icons.history,
                   index: 4,
                   currentIndex: indexSelectionne,
-                  onTap: () => ref.read(adminMenuIndexProvider.notifier).state = 4,
+                  onTap: () =>
+                      ref.read(adminMenuIndexProvider.notifier).state = 4,
                 ),
                 const SizedBox(height: 20),
 
@@ -110,14 +121,16 @@ class SidebarAdmin extends ConsumerWidget {
                   icone: Icons.notifications_none,
                   index: 5,
                   currentIndex: indexSelectionne,
-                  onTap: () => ref.read(adminMenuIndexProvider.notifier).state = 5,
+                  onTap: () =>
+                      ref.read(adminMenuIndexProvider.notifier).state = 5,
                 ),
                 _MenuItem(
                   titre: "Paramètres",
                   icone: Icons.settings_outlined,
                   index: 6,
                   currentIndex: indexSelectionne,
-                  onTap: () => ref.read(adminMenuIndexProvider.notifier).state = 6,
+                  onTap: () =>
+                      ref.read(adminMenuIndexProvider.notifier).state = 6,
                 ),
                 _MenuItem(
                   titre: "Abonnements",
@@ -125,24 +138,27 @@ class SidebarAdmin extends ConsumerWidget {
                   index: 7,
                   currentIndex: indexSelectionne,
                   badge: notifAdminCount > 0 ? "$notifAdminCount" : null,
-                  onTap: () => ref.read(adminMenuIndexProvider.notifier).state = 7,
+                  onTap: () =>
+                      ref.read(adminMenuIndexProvider.notifier).state = 7,
                 ),
                 _MenuItem(
                   titre: "Supervision & Litiges",
                   icone: Icons.gavel,
                   index: 8,
                   currentIndex: indexSelectionne,
-                  onTap: () => ref.read(adminMenuIndexProvider.notifier).state = 8,
+                  onTap: () =>
+                      ref.read(adminMenuIndexProvider.notifier).state = 8,
                 ),
                 _MenuItem(
                   titre: "Gestion des Textes",
                   icone: Icons.text_fields_rounded,
                   index: 9,
                   currentIndex: indexSelectionne,
-                  onTap: () => ref.read(adminMenuIndexProvider.notifier).state = 9,
+                  onTap: () =>
+                      ref.read(adminMenuIndexProvider.notifier).state = 9,
                 ),
                 const SizedBox(height: 30),
-                
+
                 // Add more items like signalements, paiements here in the future
               ],
             ),
@@ -152,9 +168,12 @@ class SidebarAdmin extends ConsumerWidget {
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: ListTile(
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12)),
               leading: const Icon(Icons.logout, color: Colors.redAccent),
-              title: const Text("Quitter l'Admin", style: TextStyle(color: Colors.redAccent, fontWeight: FontWeight.bold)),
+              title: const Text("Quitter l'Admin",
+                  style: TextStyle(
+                      color: Colors.redAccent, fontWeight: FontWeight.bold)),
               onTap: () {
                 context.go(RoutesApplication.connexion);
               },
@@ -212,7 +231,9 @@ class _MenuItem extends StatelessWidget {
       duration: const Duration(milliseconds: 200),
       margin: const EdgeInsets.only(bottom: 5),
       decoration: BoxDecoration(
-        color: isSelected ? CouleursApp.primaire.withValues(alpha: 0.1) : Colors.transparent,
+        color: isSelected
+            ? CouleursApp.primaire.withValues(alpha: 0.1)
+            : Colors.transparent,
         borderRadius: BorderRadius.circular(12),
       ),
       child: ListTile(
@@ -237,7 +258,10 @@ class _MenuItem extends StatelessWidget {
                 ),
                 child: Text(
                   badge!,
-                  style: const TextStyle(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold),
                 ),
               )
             : null,

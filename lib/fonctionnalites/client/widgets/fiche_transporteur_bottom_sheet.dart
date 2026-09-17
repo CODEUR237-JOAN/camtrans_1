@@ -61,16 +61,19 @@ class FicheTransporteurBottomSheet extends ConsumerWidget {
                         const Icon(Icons.star, color: Colors.amber, size: 18),
                         const SizedBox(width: 4),
                         Text(
-                          transporteur.noteMoyenne > 0 
-                            ? transporteur.noteMoyenne.toStringAsFixed(1) 
-                            : "Nouveau",
+                          transporteur.noteMoyenne > 0
+                              ? transporteur.noteMoyenne.toStringAsFixed(1)
+                              : "Nouveau",
                           style: Theme.of(context).textTheme.bodyMedium,
                         ),
                         const SizedBox(width: 16),
-                        const Icon(Icons.directions_car, color: Colors.grey, size: 18),
+                        const Icon(Icons.directions_car,
+                            color: Colors.grey, size: 18),
                         const SizedBox(width: 4),
                         Text(
-                          transporteur.typeVehicule.isNotEmpty ? transporteur.typeVehicule : "Véhicule non défini",
+                          transporteur.typeVehicule.isNotEmpty
+                              ? transporteur.typeVehicule
+                              : "Véhicule non défini",
                           style: Theme.of(context).textTheme.bodyMedium,
                         ),
                       ],
@@ -89,7 +92,10 @@ class FicheTransporteurBottomSheet extends ConsumerWidget {
                 children: [
                   Text(
                     "Distance",
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.grey),
+                    style: Theme.of(context)
+                        .textTheme
+                        .bodySmall
+                        ?.copyWith(color: Colors.grey),
                   ),
                   const SizedBox(height: 4),
                   Text(
@@ -103,7 +109,10 @@ class FicheTransporteurBottomSheet extends ConsumerWidget {
                 children: [
                   Text(
                     "Statut",
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.grey),
+                    style: Theme.of(context)
+                        .textTheme
+                        .bodySmall
+                        ?.copyWith(color: Colors.grey),
                   ),
                   const SizedBox(height: 4),
                   Row(
@@ -119,7 +128,10 @@ class FicheTransporteurBottomSheet extends ConsumerWidget {
                       const SizedBox(width: 6),
                       Text(
                         "Disponible",
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(color: Colors.green),
+                        style: Theme.of(context)
+                            .textTheme
+                            .titleMedium
+                            ?.copyWith(color: Colors.green),
                       ),
                     ],
                   ),
@@ -135,7 +147,9 @@ class FicheTransporteurBottomSheet extends ConsumerWidget {
                 // Action pour choisir ce transporteur
                 Navigator.pop(context);
                 ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text("Vous avez sélectionné ${transporteur.prenom}")),
+                  SnackBar(
+                      content:
+                          Text("Vous avez sélectionné ${transporteur.prenom}")),
                 );
               },
               child: const Text("Sélectionner ce transporteur"),

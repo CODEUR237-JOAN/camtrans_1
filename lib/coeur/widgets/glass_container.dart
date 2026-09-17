@@ -30,7 +30,7 @@ class GlassContainer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final defaultRadius = borderRadius ?? BorderRadius.circular(24);
-    
+
     return Container(
       margin: margin,
       width: width,
@@ -54,10 +54,11 @@ class GlassContainer extends StatelessWidget {
             decoration: BoxDecoration(
               color: Colors.white.withValues(alpha: opaciteFond),
               borderRadius: defaultRadius,
-              border: customBorder ?? Border.all(
-                color: Colors.white.withValues(alpha: 0.15),
-                width: 1.0,
-              ),
+              border: customBorder ??
+                  Border.all(
+                    color: Colors.white.withValues(alpha: 0.15),
+                    width: 1.0,
+                  ),
             ),
             child: child,
           ),

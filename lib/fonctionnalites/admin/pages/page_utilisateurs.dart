@@ -10,7 +10,6 @@ import 'package:update_camtrans/services/service_firestore.dart';
 import 'package:update_camtrans/coeur/constantes/couleurs.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
-
 class PageUtilisateurs extends ConsumerStatefulWidget {
   const PageUtilisateurs({super.key});
 
@@ -18,7 +17,8 @@ class PageUtilisateurs extends ConsumerStatefulWidget {
   ConsumerState<PageUtilisateurs> createState() => _PageUtilisateursState();
 }
 
-class _PageUtilisateursState extends ConsumerState<PageUtilisateurs> with SingleTickerProviderStateMixin {
+class _PageUtilisateursState extends ConsumerState<PageUtilisateurs>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
   String _searchQuery = "";
 
@@ -37,7 +37,8 @@ class _PageUtilisateursState extends ConsumerState<PageUtilisateurs> with Single
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.transparent, // Sera géré par le Row parent ou on met le #08111F
+      backgroundColor: Colors
+          .transparent, // Sera géré par le Row parent ou on met le #08111F
       body: Stack(
         children: [
           // Background commun
@@ -52,9 +53,15 @@ class _PageUtilisateursState extends ConsumerState<PageUtilisateurs> with Single
                 color: CouleursApp.primaire.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
-            ).animate(onPlay: (controller) => controller.repeat(reverse: true)).scale(duration: 4.seconds, begin: const Offset(1,1), end: const Offset(1.2,1.2)),
+            )
+                .animate(
+                    onPlay: (controller) => controller.repeat(reverse: true))
+                .scale(
+                    duration: 4.seconds,
+                    begin: const Offset(1, 1),
+                    end: const Offset(1.2, 1.2)),
           ),
-          
+
           Column(
             children: [
               _buildHeader(),
@@ -83,7 +90,11 @@ class _PageUtilisateursState extends ConsumerState<PageUtilisateurs> with Single
         children: [
           Text(
             "Gestion des Utilisateurs",
-            style: GoogleFonts.inter(fontSize: 32, fontWeight: FontWeight.bold, color: Colors.white, letterSpacing: -1),
+            style: GoogleFonts.inter(
+                fontSize: 32,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+                letterSpacing: -1),
           ),
           const SizedBox(height: 24),
           Row(
@@ -94,18 +105,22 @@ class _PageUtilisateursState extends ConsumerState<PageUtilisateurs> with Single
                   decoration: BoxDecoration(
                     color: Colors.white.withValues(alpha: 0.05),
                     borderRadius: BorderRadius.circular(16),
-                    border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+                    border:
+                        Border.all(color: Colors.white.withValues(alpha: 0.1)),
                   ),
                   child: TextField(
                     style: GoogleFonts.inter(color: Colors.white),
                     decoration: InputDecoration(
                       hintText: "Rechercher par nom ou email...",
                       hintStyle: GoogleFonts.inter(color: Colors.white54),
-                      prefixIcon: const Icon(Iconsax.search_normal_copy, color: Colors.white54, size: 20),
+                      prefixIcon: const Icon(Iconsax.search_normal_copy,
+                          color: Colors.white54, size: 20),
                       border: InputBorder.none,
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 16, vertical: 14),
                     ),
-                    onChanged: (value) => setState(() => _searchQuery = value.toLowerCase()),
+                    onChanged: (value) =>
+                        setState(() => _searchQuery = value.toLowerCase()),
                   ),
                 ),
               ),
@@ -116,7 +131,8 @@ class _PageUtilisateursState extends ConsumerState<PageUtilisateurs> with Single
                 decoration: BoxDecoration(
                   color: Colors.white.withValues(alpha: 0.05),
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+                  border:
+                      Border.all(color: Colors.white.withValues(alpha: 0.1)),
                 ),
                 child: TabBar(
                   controller: _tabController,
@@ -146,15 +162,20 @@ class _PageUtilisateursState extends ConsumerState<PageUtilisateurs> with Single
 
     return clientsAsync.when(
       loading: () => const EtatChargement(),
-      error: (err, _) => EtatErreur(erreur: err.toString(), onRetry: () => ref.refresh(adminClientsProvider)),
+      error: (err, _) => EtatErreur(
+          erreur: err.toString(),
+          onRetry: () => ref.refresh(adminClientsProvider)),
       data: (tousClients) {
         final clients = tousClients.where((c) {
           final nomComplet = "${c.prenom} ${c.nom}".toLowerCase();
-          return nomComplet.contains(_searchQuery) || c.email.toLowerCase().contains(_searchQuery);
+          return nomComplet.contains(_searchQuery) ||
+              c.email.toLowerCase().contains(_searchQuery);
         }).toList();
 
         if (clients.isEmpty) {
-          return Center(child: Text("Aucun client trouvé.", style: GoogleFonts.inter(color: Colors.white54)));
+          return Center(
+              child: Text("Aucun client trouvé.",
+                  style: GoogleFonts.inter(color: Colors.white54)));
         }
 
         return ListView.builder(
@@ -162,9 +183,14 @@ class _PageUtilisateursState extends ConsumerState<PageUtilisateurs> with Single
           itemCount: clients.length,
           itemBuilder: (context, index) {
             final client = clients[index];
-            final initiale = (client.nom.isNotEmpty ? client.nom[0] : (client.prenom.isNotEmpty ? client.prenom[0] : '?')).toUpperCase();
+            final initiale = (client.nom.isNotEmpty
+                    ? client.nom[0]
+                    : (client.prenom.isNotEmpty ? client.prenom[0] : '?'))
+                .toUpperCase();
             return _GlassListItem(
-              titre: "${client.prenom} ${client.nom}".trim().isNotEmpty ? "${client.prenom} ${client.nom}".trim() : client.email,
+              titre: "${client.prenom} ${client.nom}".trim().isNotEmpty
+                  ? "${client.prenom} ${client.nom}".trim()
+                  : client.email,
               sousTitre: client.email,
               initiale: initiale,
               couleurInitiale: CouleursApp.primaire,
@@ -173,7 +199,8 @@ class _PageUtilisateursState extends ConsumerState<PageUtilisateurs> with Single
               derniereConnexion: client.derniereConnexion,
               onToggleActif: () => _basculerStatutClient(context, ref, client),
               onTap: () => _afficherDetailsClient(context, client),
-              onSupprimer: () => _supprimerCompte(context, client.id, 'client', "${client.prenom} ${client.nom}"),
+              onSupprimer: () => _supprimerCompte(context, client.id, 'client',
+                  "${client.prenom} ${client.nom}"),
             ).animate().slideX();
           },
         );
@@ -186,15 +213,20 @@ class _PageUtilisateursState extends ConsumerState<PageUtilisateurs> with Single
 
     return transporteursAsync.when(
       loading: () => const EtatChargement(),
-      error: (err, _) => EtatErreur(erreur: err.toString(), onRetry: () => ref.refresh(adminTransporteursProvider)),
+      error: (err, _) => EtatErreur(
+          erreur: err.toString(),
+          onRetry: () => ref.refresh(adminTransporteursProvider)),
       data: (tousTransporteurs) {
         final transporteurs = tousTransporteurs.where((t) {
           final nomComplet = "${t.prenom} ${t.nom}".toLowerCase();
-          return nomComplet.contains(_searchQuery) || t.email.toLowerCase().contains(_searchQuery);
+          return nomComplet.contains(_searchQuery) ||
+              t.email.toLowerCase().contains(_searchQuery);
         }).toList();
 
         if (transporteurs.isEmpty) {
-          return Center(child: Text("Aucun transporteur trouvé.", style: GoogleFonts.inter(color: Colors.white54)));
+          return Center(
+              child: Text("Aucun transporteur trouvé.",
+                  style: GoogleFonts.inter(color: Colors.white54)));
         }
 
         return ListView.builder(
@@ -211,9 +243,11 @@ class _PageUtilisateursState extends ConsumerState<PageUtilisateurs> with Single
               estEnLigne: transporteur.estEnLigne,
               derniereConnexion: transporteur.derniereConnexion,
               documentsValides: transporteur.documentsValides,
-              onToggleActif: () => _basculerStatutTransporteur(context, ref, transporteur),
+              onToggleActif: () =>
+                  _basculerStatutTransporteur(context, ref, transporteur),
               onTap: () => _afficherDetailsTransporteur(context, transporteur),
-              onSupprimer: () => _supprimerCompte(context, transporteur.id, 'transporteur', "${transporteur.prenom} ${transporteur.nom}"),
+              onSupprimer: () => _supprimerCompte(context, transporteur.id,
+                  'transporteur', "${transporteur.prenom} ${transporteur.nom}"),
             ).animate().slideX();
           },
         );
@@ -221,15 +255,24 @@ class _PageUtilisateursState extends ConsumerState<PageUtilisateurs> with Single
     );
   }
 
-  Future<void> _basculerStatutClient(BuildContext context, WidgetRef ref, dynamic client) async {
-    await ref.read(serviceFirestoreProvider).modifierDocument(collection: 'clients', id: client.id, donnees: {'actif': !client.actif});
+  Future<void> _basculerStatutClient(
+      BuildContext context, WidgetRef ref, dynamic client) async {
+    await ref.read(serviceFirestoreProvider).modifierDocument(
+        collection: 'clients',
+        id: client.id,
+        donnees: {'actif': !client.actif});
   }
 
-  Future<void> _basculerStatutTransporteur(BuildContext context, WidgetRef ref, Transporteur transporteur) async {
-    await ref.read(serviceFirestoreProvider).modifierDocument(collection: 'transporteurs', id: transporteur.id, donnees: {'actif': !transporteur.actif});
+  Future<void> _basculerStatutTransporteur(
+      BuildContext context, WidgetRef ref, Transporteur transporteur) async {
+    await ref.read(serviceFirestoreProvider).modifierDocument(
+        collection: 'transporteurs',
+        id: transporteur.id,
+        donnees: {'actif': !transporteur.actif});
   }
 
-  Future<void> _supprimerCompte(BuildContext context, String userId, String role, String nom) async {
+  Future<void> _supprimerCompte(
+      BuildContext context, String userId, String role, String nom) async {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
@@ -239,7 +282,12 @@ class _PageUtilisateursState extends ConsumerState<PageUtilisateurs> with Single
           children: [
             Icon(Icons.person_remove_rounded, color: CouleursApp.erreur),
             const SizedBox(width: 10),
-            const Expanded(child: Text("Supprimer ce compte ?", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16))),
+            const Expanded(
+                child: Text("Supprimer ce compte ?",
+                    style: TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16))),
           ],
         ),
         content: Text(
@@ -247,9 +295,16 @@ class _PageUtilisateursState extends ConsumerState<PageUtilisateurs> with Single
           style: const TextStyle(color: Colors.white70),
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context, false), child: const Text("Annuler", style: TextStyle(color: Colors.white54))),
+          TextButton(
+              onPressed: () => Navigator.pop(context, false),
+              child: const Text("Annuler",
+                  style: TextStyle(color: Colors.white54))),
           ElevatedButton(
-            style: ElevatedButton.styleFrom(backgroundColor: CouleursApp.erreur, foregroundColor: Colors.white, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
+            style: ElevatedButton.styleFrom(
+                backgroundColor: CouleursApp.erreur,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12))),
             onPressed: () => Navigator.pop(context, true),
             child: const Text("Supprimer"),
           ),
@@ -257,10 +312,14 @@ class _PageUtilisateursState extends ConsumerState<PageUtilisateurs> with Single
       ),
     );
     if (confirm != true || !mounted) return;
-    await ref.read(serviceFirestoreProvider).supprimerCompteUtilisateur(userId, role);
+    await ref
+        .read(serviceFirestoreProvider)
+        .supprimerCompteUtilisateur(userId, role);
     if (context.mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Compte de $nom supprimé"), backgroundColor: Colors.green),
+        SnackBar(
+            content: Text("Compte de $nom supprimé"),
+            backgroundColor: Colors.green),
       );
     }
   }
@@ -269,25 +328,33 @@ class _PageUtilisateursState extends ConsumerState<PageUtilisateurs> with Single
     // Reste identique pour le moment
   }
 
-  void _afficherDetailsTransporteur(BuildContext context, Transporteur transporteur) {
+  void _afficherDetailsTransporteur(
+      BuildContext context, Transporteur transporteur) {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
         backgroundColor: const Color(0xFF111827),
-        title: Text("Validation Transporteur", style: GoogleFonts.inter(color: Colors.white)),
+        title: Text("Validation Transporteur",
+            style: GoogleFonts.inter(color: Colors.white)),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("Nom: ${transporteur.prenom} ${transporteur.nom}", style: const TextStyle(color: Colors.white70)),
+            Text("Nom: ${transporteur.prenom} ${transporteur.nom}",
+                style: const TextStyle(color: Colors.white70)),
             const SizedBox(height: 8),
-            Text("Email: ${transporteur.email}", style: const TextStyle(color: Colors.white70)),
+            Text("Email: ${transporteur.email}",
+                style: const TextStyle(color: Colors.white70)),
             const SizedBox(height: 8),
-            Text("Véhicule: ${transporteur.typeVehicule}", style: const TextStyle(color: Colors.white70)),
+            Text("Véhicule: ${transporteur.typeVehicule}",
+                style: const TextStyle(color: Colors.white70)),
             const SizedBox(height: 8),
-            Text("Immatriculation: ${transporteur.immatriculation}", style: const TextStyle(color: Colors.white70)),
+            Text("Immatriculation: ${transporteur.immatriculation}",
+                style: const TextStyle(color: Colors.white70)),
             const SizedBox(height: 16),
-            const Text("Action requise :", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+            const Text("Action requise :",
+                style: TextStyle(
+                    color: Colors.white, fontWeight: FontWeight.bold)),
           ],
         ),
         actions: [
@@ -297,7 +364,8 @@ class _PageUtilisateursState extends ConsumerState<PageUtilisateurs> with Single
           ),
           if (!transporteur.documentsValides)
             ElevatedButton(
-              style: ElevatedButton.styleFrom(backgroundColor: CouleursApp.succes),
+              style:
+                  ElevatedButton.styleFrom(backgroundColor: CouleursApp.succes),
               onPressed: () async {
                 await ref.read(serviceFirestoreProvider).modifierDocument(
                   collection: 'transporteurs',
@@ -306,11 +374,13 @@ class _PageUtilisateursState extends ConsumerState<PageUtilisateurs> with Single
                 );
                 if (context.mounted) Navigator.pop(ctx);
               },
-              child: const Text("Approuver les documents", style: TextStyle(color: Colors.white)),
+              child: const Text("Approuver les documents",
+                  style: TextStyle(color: Colors.white)),
             )
           else
             ElevatedButton(
-              style: ElevatedButton.styleFrom(backgroundColor: CouleursApp.erreur),
+              style:
+                  ElevatedButton.styleFrom(backgroundColor: CouleursApp.erreur),
               onPressed: () async {
                 await ref.read(serviceFirestoreProvider).modifierDocument(
                   collection: 'transporteurs',
@@ -319,27 +389,34 @@ class _PageUtilisateursState extends ConsumerState<PageUtilisateurs> with Single
                 );
                 if (context.mounted) Navigator.pop(ctx);
               },
-              child: const Text("Révoquer l'approbation", style: TextStyle(color: Colors.white)),
+              child: const Text("Révoquer l'approbation",
+                  style: TextStyle(color: Colors.white)),
             ),
         ],
       ),
     );
   }
-  
+
   Widget _buildDemandesConfort(WidgetRef ref) {
     final transporteursAsync = ref.watch(adminTransporteursProvider);
 
     return transporteursAsync.when(
       loading: () => const EtatChargement(),
-      error: (err, _) => EtatErreur(erreur: err.toString(), onRetry: () => ref.refresh(adminTransporteursProvider)),
+      error: (err, _) => EtatErreur(
+          erreur: err.toString(),
+          onRetry: () => ref.refresh(adminTransporteursProvider)),
       data: (tousTransporteurs) {
         final demandes = tousTransporteurs.where((t) {
-          final isMatchSearch = ("${t.prenom} ${t.nom}".toLowerCase().contains(_searchQuery) || t.email.toLowerCase().contains(_searchQuery));
+          final isMatchSearch =
+              ("${t.prenom} ${t.nom}".toLowerCase().contains(_searchQuery) ||
+                  t.email.toLowerCase().contains(_searchQuery));
           return t.gamme == "Confort" && !t.gammeValidee && isMatchSearch;
         }).toList();
 
         if (demandes.isEmpty) {
-          return Center(child: Text("Aucune demande de validation Confort en attente.", style: GoogleFonts.inter(color: Colors.white54)));
+          return Center(
+              child: Text("Aucune demande de validation Confort en attente.",
+                  style: GoogleFonts.inter(color: Colors.white54)));
         }
 
         return ListView.builder(
@@ -347,10 +424,16 @@ class _PageUtilisateursState extends ConsumerState<PageUtilisateurs> with Single
           itemCount: demandes.length,
           itemBuilder: (context, index) {
             final t = demandes[index];
-            final initiale = (t.nom.isNotEmpty ? t.nom[0] : (t.prenom.isNotEmpty ? t.prenom[0] : '?')).toUpperCase();
+            final initiale = (t.nom.isNotEmpty
+                    ? t.nom[0]
+                    : (t.prenom.isNotEmpty ? t.prenom[0] : '?'))
+                .toUpperCase();
             return _GlassListItem(
-              titre: "${t.prenom} ${t.nom}".trim().isNotEmpty ? "${t.prenom} ${t.nom}".trim() : t.email,
-              sousTitre: "Immatriculation: ${t.immatriculation} | Véhicule: ${t.typeVehicule}",
+              titre: "${t.prenom} ${t.nom}".trim().isNotEmpty
+                  ? "${t.prenom} ${t.nom}".trim()
+                  : t.email,
+              sousTitre:
+                  "Immatriculation: ${t.immatriculation} | Véhicule: ${t.typeVehicule}",
               initiale: initiale,
               couleurInitiale: Colors.amber,
               estActif: t.actif,
@@ -366,24 +449,32 @@ class _PageUtilisateursState extends ConsumerState<PageUtilisateurs> with Single
     );
   }
 
-  void _afficherDetailsDemandeConfort(BuildContext context, WidgetRef ref, Transporteur t) {
+  void _afficherDetailsDemandeConfort(
+      BuildContext context, WidgetRef ref, Transporteur t) {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
         backgroundColor: const Color(0xFF0F172A),
-        title: Text("Validation Confort : ${t.prenom} ${t.nom}", style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+        title: Text("Validation Confort : ${t.prenom} ${t.nom}",
+            style: const TextStyle(
+                color: Colors.white, fontWeight: FontWeight.bold)),
         content: SingleChildScrollView(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              Text("Véhicule: ${t.typeVehicule}", style: const TextStyle(color: Colors.white70)),
-              Text("Immatriculation: ${t.immatriculation}", style: const TextStyle(color: Colors.white70)),
+              Text("Véhicule: ${t.typeVehicule}",
+                  style: const TextStyle(color: Colors.white70)),
+              Text("Immatriculation: ${t.immatriculation}",
+                  style: const TextStyle(color: Colors.white70)),
               const SizedBox(height: 15),
-              const Text("Photos de vérification :", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+              const Text("Photos de vérification :",
+                  style: TextStyle(
+                      color: Colors.white, fontWeight: FontWeight.bold)),
               const SizedBox(height: 10),
               if (t.photosInspectionVehicule.isEmpty)
-                const Text("Aucune photo fournie.", style: TextStyle(color: Colors.redAccent))
+                const Text("Aucune photo fournie.",
+                    style: TextStyle(color: Colors.redAccent))
               else
                 Wrap(
                   spacing: 10,
@@ -391,10 +482,17 @@ class _PageUtilisateursState extends ConsumerState<PageUtilisateurs> with Single
                   children: t.photosInspectionVehicule.map((url) {
                     return ClipRRect(
                       borderRadius: BorderRadius.circular(8),
-                      child: Image.network(url, width: 120, height: 120, fit: BoxFit.cover,
+                      child: Image.network(
+                        url,
+                        width: 120,
+                        height: 120,
+                        fit: BoxFit.cover,
                         errorBuilder: (context, error, stackTrace) => Container(
-                          width: 120, height: 120, color: Colors.grey[800],
-                          child: const Icon(Icons.broken_image, color: Colors.white54),
+                          width: 120,
+                          height: 120,
+                          color: Colors.grey[800],
+                          child: const Icon(Icons.broken_image,
+                              color: Colors.white54),
                         ),
                       ),
                     );
@@ -409,7 +507,8 @@ class _PageUtilisateursState extends ConsumerState<PageUtilisateurs> with Single
               Navigator.pop(context);
               _rejeterDemandeConfort(context, ref, t);
             },
-            child: const Text("Rejeter (Gamme Éco)", style: TextStyle(color: Colors.redAccent)),
+            child: const Text("Rejeter (Gamme Éco)",
+                style: TextStyle(color: Colors.redAccent)),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(backgroundColor: Colors.green),
@@ -417,14 +516,16 @@ class _PageUtilisateursState extends ConsumerState<PageUtilisateurs> with Single
               Navigator.pop(context);
               _validerDemandeConfort(context, ref, t);
             },
-            child: const Text("Valider Confort", style: TextStyle(color: Colors.white)),
+            child: const Text("Valider Confort",
+                style: TextStyle(color: Colors.white)),
           )
         ],
       ),
     );
   }
 
-  Future<void> _validerDemandeConfort(BuildContext context, WidgetRef ref, Transporteur t) async {
+  Future<void> _validerDemandeConfort(
+      BuildContext context, WidgetRef ref, Transporteur t) async {
     try {
       final db = ref.read(serviceFirestoreProvider);
       await db.modifierDocument(
@@ -433,16 +534,20 @@ class _PageUtilisateursState extends ConsumerState<PageUtilisateurs> with Single
         donnees: {'gammeValidee': true},
       );
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Statut Confort validé avec succès."), backgroundColor: Colors.green));
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text("Statut Confort validé avec succès."),
+            backgroundColor: Colors.green));
       }
-    } catch(e) {
+    } catch (e) {
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Erreur : $e"), backgroundColor: Colors.red));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text("Erreur : $e"), backgroundColor: Colors.red));
       }
     }
   }
 
-  Future<void> _rejeterDemandeConfort(BuildContext context, WidgetRef ref, Transporteur t) async {
+  Future<void> _rejeterDemandeConfort(
+      BuildContext context, WidgetRef ref, Transporteur t) async {
     try {
       final db = ref.read(serviceFirestoreProvider);
       await db.modifierDocument(
@@ -451,11 +556,14 @@ class _PageUtilisateursState extends ConsumerState<PageUtilisateurs> with Single
         donnees: {'gamme': 'Éco', 'gammeValidee': true},
       );
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Demande rejetée, le transporteur passe en Éco."), backgroundColor: Colors.orange));
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text("Demande rejetée, le transporteur passe en Éco."),
+            backgroundColor: Colors.orange));
       }
-    } catch(e) {
+    } catch (e) {
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Erreur : $e"), backgroundColor: Colors.red));
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text("Erreur : $e"), backgroundColor: Colors.red));
       }
     }
   }
@@ -509,7 +617,8 @@ class _GlassListItem extends StatelessWidget {
             child: Row(
               children: [
                 Container(
-                  width: 50, height: 50,
+                  width: 50,
+                  height: 50,
                   decoration: BoxDecoration(
                     color: couleurInitiale.withValues(alpha: 0.15),
                     shape: BoxShape.circle,
@@ -520,7 +629,11 @@ class _GlassListItem extends StatelessWidget {
                     children: [
                       icone != null
                           ? Icon(icone, color: couleurInitiale)
-                          : Text(initiale ?? "", style: GoogleFonts.inter(color: couleurInitiale, fontWeight: FontWeight.bold, fontSize: 18)),
+                          : Text(initiale ?? "",
+                              style: GoogleFonts.inter(
+                                  color: couleurInitiale,
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 18)),
                       // Indicateur vert "en ligne"
                       if (estEnLigne)
                         Positioned(
@@ -534,11 +647,13 @@ class _GlassListItem extends StatelessWidget {
                               shape: BoxShape.circle,
                               border: Border.all(color: Colors.white, width: 2),
                             ),
-                          ).animate(onPlay: (c) => c.repeat(reverse: true)).scale(
-                            begin: const Offset(0.8, 0.8),
-                            end: const Offset(1.1, 1.1),
-                            duration: 1200.ms,
-                          ),
+                          )
+                              .animate(onPlay: (c) => c.repeat(reverse: true))
+                              .scale(
+                                begin: const Offset(0.8, 0.8),
+                                end: const Offset(1.1, 1.1),
+                                duration: 1200.ms,
+                              ),
                         ),
                     ],
                   ),
@@ -548,19 +663,29 @@ class _GlassListItem extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(titre, style: GoogleFonts.inter(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16)),
+                      Text(titre,
+                          style: GoogleFonts.inter(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16)),
                       const SizedBox(height: 4),
                       Row(
                         children: [
-                          Text(sousTitre, style: GoogleFonts.inter(color: Colors.white54, fontSize: 13)),
-                          if (estEnLigne) ...
-                          [
+                          Text(sousTitre,
+                              style: GoogleFonts.inter(
+                                  color: Colors.white54, fontSize: 13)),
+                          if (estEnLigne) ...[
                             const SizedBox(width: 8),
-                            Text("En ligne", style: GoogleFonts.inter(color: CouleursApp.succes, fontSize: 12, fontWeight: FontWeight.w600)),
-                          ] else if (derniereConnexion != null) ...
-                          [
+                            Text("En ligne",
+                                style: GoogleFonts.inter(
+                                    color: CouleursApp.succes,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600)),
+                          ] else if (derniereConnexion != null) ...[
                             const SizedBox(width: 8),
-                            Text(_formatDerniereConnexion(derniereConnexion!), style: GoogleFonts.inter(color: Colors.white38, fontSize: 11)),
+                            Text(_formatDerniereConnexion(derniereConnexion!),
+                                style: GoogleFonts.inter(
+                                    color: Colors.white38, fontSize: 11)),
                           ]
                         ],
                       ),
@@ -570,21 +695,32 @@ class _GlassListItem extends StatelessWidget {
                 if (documentsValides != null)
                   Container(
                     margin: const EdgeInsets.only(right: 16),
-                    padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                     decoration: BoxDecoration(
-                      color: documentsValides! ? CouleursApp.succes.withValues(alpha: 0.1) : CouleursApp.erreur.withValues(alpha: 0.1),
+                      color: documentsValides!
+                          ? CouleursApp.succes.withValues(alpha: 0.1)
+                          : CouleursApp.erreur.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: Text(documentsValides! ? "Approuvé" : "En attente", style: GoogleFonts.inter(color: documentsValides! ? CouleursApp.succes : CouleursApp.erreur, fontSize: 12, fontWeight: FontWeight.bold)),
+                    child: Text(documentsValides! ? "Approuvé" : "En attente",
+                        style: GoogleFonts.inter(
+                            color: documentsValides!
+                                ? CouleursApp.succes
+                                : CouleursApp.erreur,
+                            fontSize: 12,
+                            fontWeight: FontWeight.bold)),
                   ),
                 IconButton(
-                  icon: Icon(estActif ? Iconsax.unlock_copy : Iconsax.lock_copy, color: estActif ? Colors.white54 : CouleursApp.erreur),
+                  icon: Icon(estActif ? Iconsax.unlock_copy : Iconsax.lock_copy,
+                      color: estActif ? Colors.white54 : CouleursApp.erreur),
                   onPressed: onToggleActif,
                   tooltip: estActif ? "Désactiver" : "Activer",
                 ),
                 if (onSupprimer != null)
                   IconButton(
-                    icon: const Icon(Icons.person_remove_rounded, color: CouleursApp.erreur),
+                    icon: const Icon(Icons.person_remove_rounded,
+                        color: CouleursApp.erreur),
                     onPressed: onSupprimer,
                     tooltip: "Supprimer le compte",
                   ),

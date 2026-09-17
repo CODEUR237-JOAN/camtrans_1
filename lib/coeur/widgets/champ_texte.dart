@@ -4,7 +4,6 @@ import 'package:update_camtrans/coeur/constantes/couleurs.dart';
 import 'package:update_camtrans/coeur/constantes/tailles.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
-
 /// =======================================================
 /// CHAMP TEXTE MODERNISÉ
 /// Avec animation au focus, icône animée, et style glassmorphism optionnel
@@ -151,7 +150,8 @@ class _ChampTexteState extends State<ChampTexte>
                       duration: const Duration(milliseconds: 200),
                       transitionBuilder: (child, anim) {
                         return RotationTransition(
-                          turns: Tween<double>(begin: 0.5, end: 1.0).animate(anim),
+                          turns:
+                              Tween<double>(begin: 0.5, end: 1.0).animate(anim),
                           child: FadeTransition(
                             opacity: anim,
                             child: child,
@@ -171,12 +171,8 @@ class _ChampTexteState extends State<ChampTexte>
                 : widget.suffixe,
             filled: true,
             fillColor: widget.glassmorphism
-                ? (isDark
-                    ? CouleursApp.glassNoir
-                    : CouleursApp.glassBlanc)
-                : (isDark
-                    ? const Color(0xFF252538)
-                    : CouleursApp.surface),
+                ? (isDark ? CouleursApp.glassNoir : CouleursApp.glassBlanc)
+                : (isDark ? const Color(0xFF252538) : CouleursApp.surface),
             contentPadding: const EdgeInsets.symmetric(
               horizontal: 20,
               vertical: 18,
@@ -235,18 +231,19 @@ class _ChampTexteState extends State<ChampTexte>
             ),
             hintStyle: TextStyle(
               fontSize: 14,
-              color: isDark
-                  ? const Color(0xFF6B6B8C)
-                  : CouleursApp.texteTertiaire,
+              color:
+                  isDark ? const Color(0xFF6B6B8C) : CouleursApp.texteTertiaire,
             ),
           ),
-        ).animate(
-          target: _isFocused ? 1 : 0,
-        ).scale(
-          begin: const Offset(1.0, 1.0),
-          end: const Offset(1.01, 1.01),
-          duration: const Duration(milliseconds: 200),
-        ),
+        )
+            .animate(
+              target: _isFocused ? 1 : 0,
+            )
+            .scale(
+              begin: const Offset(1.0, 1.0),
+              end: const Offset(1.01, 1.01),
+              duration: const Duration(milliseconds: 200),
+            ),
       ),
     );
   }

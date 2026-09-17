@@ -7,7 +7,7 @@ import 'package:update_camtrans/coeur/constantes/statuts.dart';
 final coursesClientProvider = StreamProvider.autoDispose<List<Course>>((ref) {
   final authState = ref.watch(authStateProvider);
   final firestoreService = ref.watch(serviceFirestoreProvider);
-  
+
   final userId = authState.value?.uid;
   if (userId == null) {
     return Stream.value([]);

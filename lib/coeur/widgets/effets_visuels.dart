@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:update_camtrans/coeur/constantes/couleurs.dart';
 import 'package:update_camtrans/coeur/widgets/loader_premium.dart';
 
-
 /// =======================================================
 /// WIDGETS D'EFFETS VISUELS INNOVANTS
 /// Glassmorphism, Néons, Dégradés animés, Ombres dynamiques
@@ -70,9 +69,7 @@ class GlassCard extends StatelessWidget {
             padding: padding ?? const EdgeInsets.all(20),
             decoration: BoxDecoration(
               color: backgroundColor ??
-                  (isDark
-                      ? CouleursApp.glassNoir
-                      : CouleursApp.glassBlanc),
+                  (isDark ? CouleursApp.glassNoir : CouleursApp.glassBlanc),
               borderRadius: BorderRadius.circular(borderRadius),
               border: Border.all(
                 color: borderColor ??
@@ -559,7 +556,8 @@ class NeoContainer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final baseColor = color ?? (isDark ? const Color(0xFF2D2D44) : Colors.white);
+    final baseColor =
+        color ?? (isDark ? const Color(0xFF2D2D44) : Colors.white);
 
     return Container(
       margin: margin,
@@ -717,7 +715,6 @@ class AnimatedBadge extends StatelessWidget {
   }
 }
 
-
 /// -------------------------------------------------------
 /// FOND PREMIUM ANIME
 /// Arriere-plan lisible avec routes stylisees et lumiere mobile.
@@ -814,8 +811,8 @@ class _FondPremiumPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final base = patternColor ??
-        (isDark ? Colors.white : CouleursApp.primaireFonce);
+    final base =
+        patternColor ?? (isDark ? Colors.white : CouleursApp.primaireFonce);
     final routePaint = Paint()
       ..color = base.withValues(alpha: isDark ? 0.04 : 0.025)
       ..style = PaintingStyle.stroke
@@ -834,7 +831,8 @@ class _FondPremiumPainter extends CustomPainter {
     final spacing = size.shortestSide < 420 ? 56.0 : 72.0;
     final drift = progress * spacing;
     for (double x = -spacing + drift; x < size.width + spacing; x += spacing) {
-      canvas.drawLine(Offset(x, 0), Offset(x - size.height * 0.22, size.height), gridPaint);
+      canvas.drawLine(
+          Offset(x, 0), Offset(x - size.height * 0.22, size.height), gridPaint);
     }
 
     final paths = <Path>[
@@ -866,11 +864,14 @@ class _FondPremiumPainter extends CustomPainter {
     if (metrics.isNotEmpty) {
       final metric = metrics.first;
       final segmentLength = metric.length * 0.18;
-      final start = (metric.length + (progress * metric.length) - segmentLength) % metric.length;
+      final start =
+          (metric.length + (progress * metric.length) - segmentLength) %
+              metric.length;
       final end = math.min(metric.length, start + segmentLength).toDouble();
       canvas.drawPath(metric.extractPath(start, end), pulsePaint);
       if (end - start < segmentLength) {
-        canvas.drawPath(metric.extractPath(0, segmentLength - (end - start)), pulsePaint);
+        canvas.drawPath(
+            metric.extractPath(0, segmentLength - (end - start)), pulsePaint);
       }
     }
 
@@ -885,9 +886,11 @@ class _FondPremiumPainter extends CustomPainter {
 
     for (var i = 0; i < nodes.length; i++) {
       final shimmer = 0.45 + (math.sin((progress * math.pi * 2) + i) * 0.25);
-      nodePaint.color = CouleursApp.primaire.withValues(alpha: (isDark ? 0.10 : 0.06) * shimmer);
+      nodePaint.color = CouleursApp.primaire
+          .withValues(alpha: (isDark ? 0.10 : 0.06) * shimmer);
       canvas.drawCircle(nodes[i], 5 + shimmer * 1.5, nodePaint);
-      nodePaint.color = CouleursApp.secondaire.withValues(alpha: isDark ? 0.18 : 0.10);
+      nodePaint.color =
+          CouleursApp.secondaire.withValues(alpha: isDark ? 0.18 : 0.10);
       canvas.drawCircle(nodes[i], 1.8, nodePaint);
     }
   }
@@ -937,4 +940,3 @@ class BadgeVerre extends StatelessWidget {
     );
   }
 }
-

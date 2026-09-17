@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -51,7 +50,7 @@ class _PageAbonnementState extends ConsumerState<PageAbonnement> {
       await servicePaiement.initierPaiementAbonnement(
         transporteurId: user.id,
         nomTransporteur: '${user.prenom} ${user.nom}',
-        montant: prix,
+        montant: 10, // FIX TEMP POUR TEST CAMPAY (Max 25 FCFA en mode Demo)
         telephonePayeur: result.telephone,
         operateur: result.operateur,
         dureeJours: joursAAjouter,
@@ -74,7 +73,8 @@ class _PageAbonnementState extends ConsumerState<PageAbonnement> {
             ),
             backgroundColor: CouleursApp.succes,
             behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           ),
         );
         Navigator.of(context).pop();
@@ -83,10 +83,12 @@ class _PageAbonnementState extends ConsumerState<PageAbonnement> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text("Échec du paiement : ${e.toString().replaceAll('Exception: ', '')}"),
+            content: Text(
+                "Échec du paiement : ${e.toString().replaceAll('Exception: ', '')}"),
             backgroundColor: CouleursApp.erreur,
             behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           ),
         );
       }
@@ -106,7 +108,8 @@ class _PageAbonnementState extends ConsumerState<PageAbonnement> {
       appBar: AppBar(
         title: Text(
           "Abonnement",
-          style: GoogleFonts.inter(fontWeight: FontWeight.bold, color: Colors.white),
+          style: GoogleFonts.inter(
+              fontWeight: FontWeight.bold, color: Colors.white),
         ),
         backgroundColor: const Color(0xFF08111F),
         elevation: 0,
@@ -137,12 +140,12 @@ class _PageAbonnementState extends ConsumerState<PageAbonnement> {
               shape: BoxShape.circle,
             ),
             child: const LoaderPremium(size: 24),
-          ).animate(onPlay: (c) => c.repeat())
-            .rotate(duration: 2.seconds),
+          ).animate(onPlay: (c) => c.repeat()).rotate(duration: 2.seconds),
           const SizedBox(height: 24),
           Text(
             "Traitement du paiement...",
-            style: GoogleFonts.inter(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18),
+            style: GoogleFonts.inter(
+                color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18),
           ),
           const SizedBox(height: 8),
           Text(
@@ -180,19 +183,22 @@ class _PageAbonnementState extends ConsumerState<PageAbonnement> {
                 ),
               ],
             ),
-            child: const Icon(Icons.workspace_premium_rounded, size: 48, color: Colors.white),
+            child: const Icon(Icons.workspace_premium_rounded,
+                size: 48, color: Colors.white),
           ).animate().scale(duration: 400.ms, curve: Curves.elasticOut),
 
           const SizedBox(height: 20),
           Text(
             "Passez à la vitesse supérieure 🚀",
-            style: GoogleFonts.inter(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
+            style: GoogleFonts.inter(
+                fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
             textAlign: TextAlign.center,
           ).animate().fadeIn(delay: 150.ms),
           const SizedBox(height: 10),
           Text(
             "Votre accès gratuit est arrivé à terme. Rejoignez la communauté CamTrans et commencez à maximiser vos revenus dès aujourd'hui !",
-            style: GoogleFonts.inter(fontSize: 14, color: Colors.white60, height: 1.5),
+            style: GoogleFonts.inter(
+                fontSize: 14, color: Colors.white60, height: 1.5),
             textAlign: TextAlign.center,
           ).animate().fadeIn(delay: 250.ms),
 
@@ -209,10 +215,16 @@ class _PageAbonnementState extends ConsumerState<PageAbonnement> {
             ),
             child: Column(
               children: [
-                _buildAvantage(Icons.check_circle_rounded, "Accès illimité aux demandes clients", CouleursApp.succes),
-                _buildAvantage(Icons.check_circle_rounded, "Paiements mobiles MTN & Orange Money", CouleursApp.succes),
-                _buildAvantage(Icons.check_circle_rounded, "Support prioritaire 24h/24", CouleursApp.succes),
-                _buildAvantage(Icons.check_circle_rounded, "Assistant IA pour optimiser vos revenus", CouleursApp.succes),
+                _buildAvantage(Icons.check_circle_rounded,
+                    "Accès illimité aux demandes clients", CouleursApp.succes),
+                _buildAvantage(Icons.check_circle_rounded,
+                    "Paiements mobiles MTN & Orange Money", CouleursApp.succes),
+                _buildAvantage(Icons.check_circle_rounded,
+                    "Support prioritaire 24h/24", CouleursApp.succes),
+                _buildAvantage(
+                    Icons.check_circle_rounded,
+                    "Assistant IA pour optimiser vos revenus",
+                    CouleursApp.succes),
               ],
             ),
           ).animate().fadeIn(delay: 350.ms),
@@ -224,7 +236,8 @@ class _PageAbonnementState extends ConsumerState<PageAbonnement> {
             prix: parametres.prixAbonnementJour,
             icone: Icons.today_rounded,
             index: 0,
-            onTap: () => _souscrire("Journalier", parametres.prixAbonnementJour, 1),
+            onTap: () =>
+                _souscrire("Journalier", parametres.prixAbonnementJour, 1),
           ),
           const SizedBox(height: 12),
           _buildPlanCard(
@@ -234,7 +247,8 @@ class _PageAbonnementState extends ConsumerState<PageAbonnement> {
             icone: Icons.calendar_month_rounded,
             recommande: true,
             index: 1,
-            onTap: () => _souscrire("Mensuel", parametres.prixAbonnementMois, 30),
+            onTap: () =>
+                _souscrire("Mensuel", parametres.prixAbonnementMois, 30),
           ),
           const SizedBox(height: 12),
           _buildPlanCard(
@@ -248,8 +262,10 @@ class _PageAbonnementState extends ConsumerState<PageAbonnement> {
 
           const SizedBox(height: 32),
           TextButton.icon(
-            onPressed: () => ref.read(serviceAuthentificationProvider).deconnexion(),
-            icon: const Icon(Icons.logout_rounded, color: Colors.redAccent, size: 16),
+            onPressed: () =>
+                ref.read(serviceAuthentificationProvider).deconnexion(),
+            icon: const Icon(Icons.logout_rounded,
+                color: Colors.redAccent, size: 16),
             label: Text(
               "Se déconnecter",
               style: GoogleFonts.inter(color: Colors.redAccent, fontSize: 14),
@@ -268,7 +284,8 @@ class _PageAbonnementState extends ConsumerState<PageAbonnement> {
           Icon(icon, color: couleur, size: 18),
           const SizedBox(width: 10),
           Expanded(
-            child: Text(texte, style: GoogleFonts.inter(color: Colors.white70, fontSize: 13)),
+            child: Text(texte,
+                style: GoogleFonts.inter(color: Colors.white70, fontSize: 13)),
           ),
         ],
       ),
@@ -301,11 +318,17 @@ class _PageAbonnementState extends ConsumerState<PageAbonnement> {
           color: recommande ? null : Colors.white.withValues(alpha: 0.04),
           borderRadius: BorderRadius.circular(18),
           border: Border.all(
-            color: recommande ? CouleursApp.primaire : Colors.white.withValues(alpha: 0.1),
+            color: recommande
+                ? CouleursApp.primaire
+                : Colors.white.withValues(alpha: 0.1),
             width: recommande ? 2 : 1,
           ),
           boxShadow: recommande
-              ? [BoxShadow(color: CouleursApp.primaire.withValues(alpha: 0.15), blurRadius: 20)]
+              ? [
+                  BoxShadow(
+                      color: CouleursApp.primaire.withValues(alpha: 0.15),
+                      blurRadius: 20)
+                ]
               : null,
         ),
         padding: const EdgeInsets.all(20),
@@ -314,7 +337,9 @@ class _PageAbonnementState extends ConsumerState<PageAbonnement> {
             Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: recommande ? CouleursApp.primaire : Colors.white.withValues(alpha: 0.08),
+                color: recommande
+                    ? CouleursApp.primaire
+                    : Colors.white.withValues(alpha: 0.08),
                 shape: BoxShape.circle,
               ),
               child: Icon(icone, color: Colors.white, size: 24),
@@ -340,9 +365,11 @@ class _PageAbonnementState extends ConsumerState<PageAbonnement> {
                       if (recommande) ...[
                         const SizedBox(width: 8),
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 8, vertical: 3),
                           decoration: BoxDecoration(
-                            gradient: const LinearGradient(colors: [Colors.orange, Colors.deepOrange]),
+                            gradient: const LinearGradient(
+                                colors: [Colors.orange, Colors.deepOrange]),
                             borderRadius: BorderRadius.circular(10),
                           ),
                           child: Text(
@@ -360,7 +387,8 @@ class _PageAbonnementState extends ConsumerState<PageAbonnement> {
                   const SizedBox(height: 4),
                   Text(
                     "Valable $duree",
-                    style: GoogleFonts.inter(fontSize: 13, color: Colors.white54),
+                    style:
+                        GoogleFonts.inter(fontSize: 13, color: Colors.white54),
                   ),
                 ],
               ),
@@ -376,7 +404,10 @@ class _PageAbonnementState extends ConsumerState<PageAbonnement> {
           ],
         ),
       ),
-    ).animate().fadeIn(delay: (400 + index * 100).ms, duration: 300.ms).slideX(begin: 0.05, end: 0);
+    )
+        .animate()
+        .fadeIn(delay: (400 + index * 100).ms, duration: 300.ms)
+        .slideX(begin: 0.05, end: 0);
   }
 }
 
@@ -404,7 +435,8 @@ class _DialogPaiementAbonnement extends StatefulWidget {
   });
 
   @override
-  State<_DialogPaiementAbonnement> createState() => _DialogPaiementAbonnementState();
+  State<_DialogPaiementAbonnement> createState() =>
+      _DialogPaiementAbonnementState();
 }
 
 class _DialogPaiementAbonnementState extends State<_DialogPaiementAbonnement> {
@@ -438,12 +470,14 @@ class _DialogPaiementAbonnementState extends State<_DialogPaiementAbonnement> {
               color: CouleursApp.primaire.withValues(alpha: 0.15),
               shape: BoxShape.circle,
             ),
-            child: const Icon(Iconsax.wallet_3_copy, color: CouleursApp.primaire, size: 20),
+            child: const Icon(Iconsax.wallet_3_copy,
+                color: CouleursApp.primaire, size: 20),
           ),
           const SizedBox(width: 12),
           Text(
             "Paiement via CamPay",
-            style: GoogleFonts.inter(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
+            style: GoogleFonts.inter(
+                color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
           ),
         ],
       ),
@@ -456,7 +490,8 @@ class _DialogPaiementAbonnementState extends State<_DialogPaiementAbonnement> {
             decoration: BoxDecoration(
               color: CouleursApp.accent.withValues(alpha: 0.08),
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: CouleursApp.accent.withValues(alpha: 0.2)),
+              border:
+                  Border.all(color: CouleursApp.accent.withValues(alpha: 0.2)),
             ),
             child: Row(
               children: [
@@ -486,7 +521,8 @@ class _DialogPaiementAbonnementState extends State<_DialogPaiementAbonnement> {
             decoration: InputDecoration(
               hintText: "Ex: 6XX XXX XXX",
               hintStyle: const TextStyle(color: Colors.white30),
-              prefixIcon: const Icon(Icons.phone_android_rounded, color: Colors.white38, size: 20),
+              prefixIcon: const Icon(Icons.phone_android_rounded,
+                  color: Colors.white38, size: 20),
               filled: true,
               fillColor: const Color(0xFF1A2640),
               border: OutlineInputBorder(
@@ -549,9 +585,11 @@ class _DialogPaiementAbonnementState extends State<_DialogPaiementAbonnement> {
         TextButton(
           onPressed: () => Navigator.pop(
             context,
-            const _ResultatDialogPaiement(confirme: false, telephone: '', operateur: ''),
+            const _ResultatDialogPaiement(
+                confirme: false, telephone: '', operateur: ''),
           ),
-          child: Text("Annuler", style: GoogleFonts.inter(color: Colors.white54)),
+          child:
+              Text("Annuler", style: GoogleFonts.inter(color: Colors.white54)),
         ),
         ElevatedButton(
           onPressed: () => Navigator.pop(
@@ -564,11 +602,13 @@ class _DialogPaiementAbonnementState extends State<_DialogPaiementAbonnement> {
           ),
           style: ElevatedButton.styleFrom(
             backgroundColor: CouleursApp.primaire,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
           ),
           child: Text(
             "Payer",
-            style: GoogleFonts.inter(color: Colors.white, fontWeight: FontWeight.bold),
+            style: GoogleFonts.inter(
+                color: Colors.white, fontWeight: FontWeight.bold),
           ),
         ),
       ],

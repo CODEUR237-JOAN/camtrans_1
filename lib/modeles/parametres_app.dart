@@ -65,7 +65,8 @@ class ParametresApp {
       prixKmMoto: prixKmMoto ?? this.prixKmMoto,
       prixKmCamion: prixKmCamion ?? this.prixKmCamion,
       prixKmFourgon: prixKmFourgon ?? this.prixKmFourgon,
-      approbationAutomatique: approbationAutomatique ?? this.approbationAutomatique,
+      approbationAutomatique:
+          approbationAutomatique ?? this.approbationAutomatique,
       paiementEspeceActif: paiementEspeceActif ?? this.paiementEspeceActif,
       prixAbonnementJour: prixAbonnementJour ?? this.prixAbonnementJour,
       prixAbonnementMois: prixAbonnementMois ?? this.prixAbonnementMois,

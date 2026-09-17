@@ -18,10 +18,12 @@ class PopupPropositionCourse extends ConsumerStatefulWidget {
   const PopupPropositionCourse({super.key, required this.course});
 
   @override
-  ConsumerState<PopupPropositionCourse> createState() => _PopupPropositionCourseState();
+  ConsumerState<PopupPropositionCourse> createState() =>
+      _PopupPropositionCourseState();
 }
 
-class _PopupPropositionCourseState extends ConsumerState<PopupPropositionCourse> {
+class _PopupPropositionCourseState
+    extends ConsumerState<PopupPropositionCourse> {
   Timer? _timer;
   int _secondesRestantes = 30;
   bool _enCoursTraitement = false;
@@ -36,7 +38,9 @@ class _PopupPropositionCourseState extends ConsumerState<PopupPropositionCourse>
 
   void _calculerTempsRestant() {
     if (widget.course.expirationProposition != null) {
-      final diff = widget.course.expirationProposition!.difference(DateTime.now()).inSeconds;
+      final diff = widget.course.expirationProposition!
+          .difference(DateTime.now())
+          .inSeconds;
       _secondesRestantes = diff > 0 ? diff : 0;
     }
   }
@@ -53,7 +57,7 @@ class _PopupPropositionCourseState extends ConsumerState<PopupPropositionCourse>
         } else {
           timer.cancel();
           if (!_enCoursTraitement) {
-             _refuserCourse(expiration: true);
+            _refuserCourse(expiration: true);
           }
         }
       });
@@ -72,25 +76,28 @@ class _PopupPropositionCourseState extends ConsumerState<PopupPropositionCourse>
     _timer?.cancel();
 
     try {
-      await ref.read(transporteurActionsProvider).accepterPropositionCourse(widget.course.id);
+      await ref
+          .read(transporteurActionsProvider)
+          .accepterPropositionCourse(widget.course.id);
       HapticFeedback.heavyImpact();
       if (mounted) {
         Navigator.pop(context); // Fermer le popup
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text("Course acceptée ! 🎉", style: GoogleFonts.inter(color: Colors.white, fontWeight: FontWeight.bold)),
-            backgroundColor: CouleursApp.succes,
-          )
-        );
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text("Course acceptée ! 🎉",
+              style: GoogleFonts.inter(
+                  color: Colors.white, fontWeight: FontWeight.bold)),
+          backgroundColor: CouleursApp.succes,
+        ));
         // Rediriger le transporteur vers SA page de suivi spécifique
         context.push('/suivi-transporteur/${widget.course.id}');
       }
     } catch (e) {
       if (mounted) {
         setState(() => _enCoursTraitement = false);
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Erreur: ${e.toString().replaceAll('Exception: ', '')}"), backgroundColor: CouleursApp.erreur)
-        );
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content:
+                Text("Erreur: ${e.toString().replaceAll('Exception: ', '')}"),
+            backgroundColor: CouleursApp.erreur));
       }
     }
   }
@@ -101,16 +108,17 @@ class _PopupPropositionCourseState extends ConsumerState<PopupPropositionCourse>
     _timer?.cancel();
 
     try {
-      await ref.read(transporteurActionsProvider).refuserPropositionCourse(widget.course.id);
+      await ref
+          .read(transporteurActionsProvider)
+          .refuserPropositionCourse(widget.course.id);
       if (mounted) {
         Navigator.pop(context); // Fermer le popup
         if (!expiration) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text("Course refusée.", style: GoogleFonts.inter(color: Colors.white)),
-              backgroundColor: Colors.grey.shade800,
-            )
-          );
+          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+            content: Text("Course refusée.",
+                style: GoogleFonts.inter(color: Colors.white)),
+            backgroundColor: Colors.grey.shade800,
+          ));
         }
       }
     } catch (e) {
@@ -124,7 +132,8 @@ class _PopupPropositionCourseState extends ConsumerState<PopupPropositionCourse>
   @override
   Widget build(BuildContext context) {
     // Écouter le flux de la proposition. Si elle disparaît (annulée, expirée ou transférée), on ferme le popup.
-    ref.listen<AsyncValue<Course?>>(fluxCourseProposeeProvider, (previous, next) {
+    ref.listen<AsyncValue<Course?>>(fluxCourseProposeeProvider,
+        (previous, next) {
       if (next.hasValue && next.value == null) {
         if (mounted && !_enCoursTraitement) {
           Navigator.of(context).pop();
@@ -151,7 +160,8 @@ class _PopupPropositionCourseState extends ConsumerState<PopupPropositionCourse>
           decoration: BoxDecoration(
             color: const Color(0xFF0F172A),
             borderRadius: BorderRadius.circular(24),
-            border: Border.all(color: CouleursApp.primaire.withValues(alpha: 0.3)),
+            border:
+                Border.all(color: CouleursApp.primaire.withValues(alpha: 0.3)),
             boxShadow: [
               BoxShadow(
                 color: CouleursApp.primaire.withValues(alpha: 0.2),
@@ -175,14 +185,17 @@ class _PopupPropositionCourseState extends ConsumerState<PopupPropositionCourse>
                       strokeWidth: 8,
                       backgroundColor: Colors.white10,
                       valueColor: AlwaysStoppedAnimation<Color>(
-                        _secondesRestantes > 10 ? CouleursApp.primaire : CouleursApp.erreur
-                      ),
+                          _secondesRestantes > 10
+                              ? CouleursApp.primaire
+                              : CouleursApp.erreur),
                     ),
                     Center(
                       child: Text(
                         "$_secondesRestantes",
                         style: GoogleFonts.inter(
-                          color: _secondesRestantes > 10 ? Colors.white : CouleursApp.erreur,
+                          color: _secondesRestantes > 10
+                              ? Colors.white
+                              : CouleursApp.erreur,
                           fontSize: 32,
                           fontWeight: FontWeight.bold,
                         ),
@@ -190,7 +203,8 @@ class _PopupPropositionCourseState extends ConsumerState<PopupPropositionCourse>
                     ),
                   ],
                 ),
-              ).animate().scale(delay: 200.ms, duration: 400.ms, curve: Curves.elasticOut),
+              ).animate().scale(
+                  delay: 200.ms, duration: 400.ms, curve: Curves.elasticOut),
 
               const SizedBox(height: 24),
 
@@ -202,7 +216,9 @@ class _PopupPropositionCourseState extends ConsumerState<PopupPropositionCourse>
                   fontSize: 16,
                   letterSpacing: 2,
                 ),
-              ).animate(onPlay: (c) => c.repeat(reverse: true)).fade(begin: 0.5, end: 1.0, duration: 800.ms),
+              )
+                  .animate(onPlay: (c) => c.repeat(reverse: true))
+                  .fade(begin: 0.5, end: 1.0, duration: 800.ms),
 
               const SizedBox(height: 16),
 
@@ -220,16 +236,26 @@ class _PopupPropositionCourseState extends ConsumerState<PopupPropositionCourse>
                       children: [
                         Row(
                           children: [
-                            const Icon(Iconsax.routing_2_copy, color: Colors.white54, size: 16),
+                            const Icon(Iconsax.routing_2_copy,
+                                color: Colors.white54, size: 16),
                             const SizedBox(width: 8),
-                            Text("${widget.course.distanceKm.toStringAsFixed(1)} km", style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                            Text(
+                                "${widget.course.distanceKm.toStringAsFixed(1)} km",
+                                style: const TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold)),
                           ],
                         ),
                         Row(
                           children: [
-                            const Icon(Icons.attach_money, color: CouleursApp.succes, size: 16),
+                            const Icon(Icons.attach_money,
+                                color: CouleursApp.succes, size: 16),
                             const SizedBox(width: 4),
-                            Text("${widget.course.prixEstime.toInt()} FCFA", style: const TextStyle(color: CouleursApp.succes, fontWeight: FontWeight.w900, fontSize: 16)),
+                            Text("${widget.course.prixEstime.toInt()} FCFA",
+                                style: const TextStyle(
+                                    color: CouleursApp.succes,
+                                    fontWeight: FontWeight.w900,
+                                    fontSize: 16)),
                           ],
                         ),
                       ],
@@ -238,10 +264,15 @@ class _PopupPropositionCourseState extends ConsumerState<PopupPropositionCourse>
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Icon(Icons.location_on, color: CouleursApp.accent, size: 18),
+                        const Icon(Icons.location_on,
+                            color: CouleursApp.accent, size: 18),
                         const SizedBox(width: 8),
                         Expanded(
-                          child: Text(widget.course.adresseDepart, style: const TextStyle(color: Colors.white70, fontSize: 13), maxLines: 2, overflow: TextOverflow.ellipsis),
+                          child: Text(widget.course.adresseDepart,
+                              style: const TextStyle(
+                                  color: Colors.white70, fontSize: 13),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis),
                         ),
                       ],
                     ),
@@ -250,18 +281,21 @@ class _PopupPropositionCourseState extends ConsumerState<PopupPropositionCourse>
               ),
 
               const SizedBox(height: 16),
-              
+
               // Badge de Tarification Standardisée
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 decoration: BoxDecoration(
                   color: CouleursApp.succes.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: CouleursApp.succes.withValues(alpha: 0.3)),
+                  border: Border.all(
+                      color: CouleursApp.succes.withValues(alpha: 0.3)),
                 ),
                 child: Row(
                   children: [
-                    const Icon(Icons.verified, color: CouleursApp.succes, size: 20),
+                    const Icon(Icons.verified,
+                        color: CouleursApp.succes, size: 20),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Column(
@@ -269,12 +303,16 @@ class _PopupPropositionCourseState extends ConsumerState<PopupPropositionCourse>
                         children: [
                           const Text(
                             "Tarif Standardisé CamTrans",
-                            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: CouleursApp.succes),
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 13,
+                                color: CouleursApp.succes),
                           ),
                           const SizedBox(height: 2),
                           Text(
                             "Calculé équitablement. Le prix est fixe et non négociable.",
-                            style: TextStyle(color: Colors.white70, fontSize: 11),
+                            style:
+                                TextStyle(color: Colors.white70, fontSize: 11),
                           ),
                         ],
                       ),
@@ -298,9 +336,12 @@ class _PopupPropositionCourseState extends ConsumerState<PopupPropositionCourse>
                           foregroundColor: Colors.white70,
                           side: const BorderSide(color: Colors.white24),
                           padding: const EdgeInsets.symmetric(vertical: 16),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12)),
                         ),
-                        child: Text("Refuser", style: GoogleFonts.inter(fontWeight: FontWeight.bold)),
+                        child: Text("Refuser",
+                            style:
+                                GoogleFonts.inter(fontWeight: FontWeight.bold)),
                       ),
                     ),
                     const SizedBox(width: 16),
@@ -311,11 +352,15 @@ class _PopupPropositionCourseState extends ConsumerState<PopupPropositionCourse>
                           backgroundColor: CouleursApp.primaire,
                           foregroundColor: Colors.white,
                           padding: const EdgeInsets.symmetric(vertical: 16),
-                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12)),
                           elevation: 10,
-                          shadowColor: CouleursApp.primaire.withValues(alpha: 0.5),
+                          shadowColor:
+                              CouleursApp.primaire.withValues(alpha: 0.5),
                         ),
-                        child: Text("ACCEPTER", style: GoogleFonts.inter(fontWeight: FontWeight.bold, fontSize: 16)),
+                        child: Text("ACCEPTER",
+                            style: GoogleFonts.inter(
+                                fontWeight: FontWeight.bold, fontSize: 16)),
                       ),
                     ),
                   ],

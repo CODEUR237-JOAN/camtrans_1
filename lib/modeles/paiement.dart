@@ -67,6 +67,57 @@ class Paiement {
     required this.facturePdf,
   });
 
+  /// Copie de l'objet avec modification partielle de certaines valeurs.
+  /// Indispensable pour les mises à jour d'état sans reconstruire tout l'objet.
+  Paiement copyWith({
+    String? id,
+    String? courseId,
+    String? clientId,
+    String? transporteurId,
+    double? montant,
+    String? devise,
+    String? methodePaiement,
+    String? numeroTransaction,
+    String? statut,
+    DateTime? datePaiement,
+    bool? paiementConfirme,
+    String? reference,
+    String? operateur,
+    String? telephonePayeur,
+    String? commentaire,
+    double? fraisTransaction,
+    double? montantNet,
+    bool? remboursementEffectue,
+    DateTime? dateRemboursement,
+    String? motifRemboursement,
+    String? facturePdf,
+  }) {
+    return Paiement(
+      id: id ?? this.id,
+      courseId: courseId ?? this.courseId,
+      clientId: clientId ?? this.clientId,
+      transporteurId: transporteurId ?? this.transporteurId,
+      montant: montant ?? this.montant,
+      devise: devise ?? this.devise,
+      methodePaiement: methodePaiement ?? this.methodePaiement,
+      numeroTransaction: numeroTransaction ?? this.numeroTransaction,
+      statut: statut ?? this.statut,
+      datePaiement: datePaiement ?? this.datePaiement,
+      paiementConfirme: paiementConfirme ?? this.paiementConfirme,
+      reference: reference ?? this.reference,
+      operateur: operateur ?? this.operateur,
+      telephonePayeur: telephonePayeur ?? this.telephonePayeur,
+      commentaire: commentaire ?? this.commentaire,
+      fraisTransaction: fraisTransaction ?? this.fraisTransaction,
+      montantNet: montantNet ?? this.montantNet,
+      remboursementEffectue:
+          remboursementEffectue ?? this.remboursementEffectue,
+      dateRemboursement: dateRemboursement ?? this.dateRemboursement,
+      motifRemboursement: motifRemboursement ?? this.motifRemboursement,
+      facturePdf: facturePdf ?? this.facturePdf,
+    );
+  }
+
   Map<String, dynamic> toMap() {
     return {
       "id": id,
@@ -87,15 +138,13 @@ class Paiement {
       "fraisTransaction": fraisTransaction,
       "montantNet": montantNet,
       "remboursementEffectue": remboursementEffectue,
-      "dateRemboursement":
-      dateRemboursement?.toIso8601String(),
+      "dateRemboursement": dateRemboursement?.toIso8601String(),
       "motifRemboursement": motifRemboursement,
       "facturePdf": facturePdf,
     };
   }
 
-  factory Paiement.fromMap(
-      Map<String, dynamic> map) {
+  factory Paiement.fromMap(Map<String, dynamic> map) {
     return Paiement(
       id: map["id"] ?? "",
       courseId: map["courseId"] ?? "",
@@ -103,37 +152,28 @@ class Paiement {
       transporteurId: map["transporteurId"] ?? "",
       montant: Parseur.toDouble(map["montant"]),
       devise: map["devise"] ?? "FCFA",
-      methodePaiement:
-      map["methodePaiement"] ?? "",
-      numeroTransaction:
-      map["numeroTransaction"] ?? "",
+      methodePaiement: map["methodePaiement"] ?? "",
+      numeroTransaction: map["numeroTransaction"] ?? "",
       statut: map["statut"] ?? "En attente",
       datePaiement: Parseur.toDateTime(map["datePaiement"]),
-      paiementConfirme:
-      map["paiementConfirme"] ?? false,
+      paiementConfirme: map["paiementConfirme"] ?? false,
       reference: map["reference"] ?? "",
       operateur: map["operateur"] ?? "",
-      telephonePayeur:
-      map["telephonePayeur"] ?? "",
+      telephonePayeur: map["telephonePayeur"] ?? "",
       commentaire: map["commentaire"] ?? "",
       fraisTransaction: Parseur.toDouble(map["fraisTransaction"]),
       montantNet: Parseur.toDouble(map["montantNet"]),
-      remboursementEffectue:
-      map["remboursementEffectue"] ??
-          false,
-      dateRemboursement:
-      map["dateRemboursement"] != null
+      remboursementEffectue: map["remboursementEffectue"] ?? false,
+      dateRemboursement: map["dateRemboursement"] != null
           ? Parseur.toDateTime(map["dateRemboursement"])
           : null,
-      motifRemboursement:
-      map["motifRemboursement"] ?? "",
+      motifRemboursement: map["motifRemboursement"] ?? "",
       facturePdf: map["facturePdf"] ?? "",
     );
   }
 
   Map<String, dynamic> toJson() => toMap();
 
-  factory Paiement.fromJson(
-      Map<String, dynamic> json) =>
+  factory Paiement.fromJson(Map<String, dynamic> json) =>
       Paiement.fromMap(json);
 }

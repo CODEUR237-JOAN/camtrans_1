@@ -6,36 +6,29 @@ final serviceFirestoreProvider = Provider<ServiceFirestore>((ref) {
 });
 
 class ServiceFirestore {
-  final FirebaseFirestore _db =
-      FirebaseFirestore.instance;
+  final FirebaseFirestore _db = FirebaseFirestore.instance;
 
   // ===========================
   // Accès aux Collections Principales
   // Ces getters fournissent un accès direct aux tables de la base de données Firestore.
   // ===========================
 
-  CollectionReference<Map<String, dynamic>>
-  get utilisateurs =>
+  CollectionReference<Map<String, dynamic>> get utilisateurs =>
       _db.collection("utilisateurs");
 
-  CollectionReference<Map<String, dynamic>>
-  get clients =>
+  CollectionReference<Map<String, dynamic>> get clients =>
       _db.collection("clients");
 
-  CollectionReference<Map<String, dynamic>>
-  get transporteurs =>
+  CollectionReference<Map<String, dynamic>> get transporteurs =>
       _db.collection("transporteurs");
 
-  CollectionReference<Map<String, dynamic>>
-  get courses =>
+  CollectionReference<Map<String, dynamic>> get courses =>
       _db.collection("courses");
 
-  CollectionReference<Map<String, dynamic>>
-  get paiements =>
+  CollectionReference<Map<String, dynamic>> get paiements =>
       _db.collection("paiements");
 
-  CollectionReference<Map<String, dynamic>>
-  get notifications =>
+  CollectionReference<Map<String, dynamic>> get notifications =>
       _db.collection("notifications");
 
   // ===========================
@@ -50,10 +43,7 @@ class ServiceFirestore {
     required String id,
     required Map<String, dynamic> donnees,
   }) async {
-    await _db
-        .collection(collection)
-        .doc(id)
-        .set(donnees);
+    await _db.collection(collection).doc(id).set(donnees);
   }
 
   // ===========================
@@ -61,7 +51,7 @@ class ServiceFirestore {
   // ===========================
 
   /// Met à jour les champs spécifiques d'un document existant.
-  /// Utilise `SetOptions(merge: true)` pour garantir que si le document 
+  /// Utilise `SetOptions(merge: true)` pour garantir que si le document
   /// n'existe pas encore, il sera créé sans provoquer d'erreur technique.
   Future<void> modifierDocument({
     required String collection,
@@ -84,23 +74,20 @@ class ServiceFirestore {
     required String collection,
     required String id,
   }) async {
-    await _db
-        .collection(collection)
-        .doc(id)
-        .delete();
+    await _db.collection(collection).doc(id).delete();
   }
 
   /// Masque les courses terminées du CLIENT dans son historique.
   /// Chaque rôle a son propre flag d'archivage — l'admin voit toujours tout.
-  Future<int> supprimerCoursesTerminees(String userId, {bool estClient = true}) async {
+  Future<int> supprimerCoursesTerminees(String userId,
+      {bool estClient = true}) async {
     if (!estClient) {
       return archiverCoursesTerminees(userId);
     }
     final snapshot = await _db
         .collection('courses')
         .where('clientId', isEqualTo: userId)
-        .where('statut', whereIn: ['terminee', 'annulee'])
-        .get();
+        .where('statut', whereIn: ['terminee', 'annulee']).get();
     final batch = _db.batch();
     for (final doc in snapshot.docs) {
       // Archivage logique : le client masque sa vue, l'admin et le transporteur
@@ -119,8 +106,7 @@ class ServiceFirestore {
     final snapshot = await _db
         .collection('courses')
         .where('transporteurId', isEqualTo: userId)
-        .where('statut', whereIn: ['terminee', 'annulee'])
-        .get();
+        .where('statut', whereIn: ['terminee', 'annulee']).get();
     final batch = _db.batch();
     for (final doc in snapshot.docs) {
       batch.update(doc.reference, {'archivePourTransporteur': true});
@@ -135,8 +121,7 @@ class ServiceFirestore {
   Future<int> purgerHistoriqueGlobal() async {
     final snapshot = await _db
         .collection('courses')
-        .where('statut', whereIn: ['terminee', 'annulee'])
-        .get();
+        .where('statut', whereIn: ['terminee', 'annulee']).get();
     final batch = _db.batch();
     for (final doc in snapshot.docs) {
       batch.delete(doc.reference);
@@ -153,12 +138,18 @@ class ServiceFirestore {
     final collection = role == 'transporteur' ? 'transporteurs' : 'clients';
     batch.delete(_db.collection(collection).doc(userId));
     // Supprimer ses courses (en tant que client)
-    final coursesClient = await _db.collection('courses').where('clientId', isEqualTo: userId).get();
+    final coursesClient = await _db
+        .collection('courses')
+        .where('clientId', isEqualTo: userId)
+        .get();
     for (final doc in coursesClient.docs) {
       batch.delete(doc.reference);
     }
     // Supprimer ses courses (en tant que transporteur)
-    final coursesTransp = await _db.collection('courses').where('transporteurId', isEqualTo: userId).get();
+    final coursesTransp = await _db
+        .collection('courses')
+        .where('transporteurId', isEqualTo: userId)
+        .get();
     for (final doc in coursesTransp.docs) {
       batch.delete(doc.reference);
     }
@@ -171,15 +162,11 @@ class ServiceFirestore {
 
   /// Récupère les informations d'un document spécifique de manière asynchrone (une seule fois).
 
-  Future<DocumentSnapshot<Map<String, dynamic>>>
-  lireDocument({
+  Future<DocumentSnapshot<Map<String, dynamic>>> lireDocument({
     required String collection,
     required String id,
   }) async {
-    return await _db
-        .collection(collection)
-        .doc(id)
-        .get();
+    return await _db.collection(collection).doc(id).get();
   }
 
   // ===========================
@@ -189,15 +176,11 @@ class ServiceFirestore {
   /// Permet d'écouter les modifications d'un document en temps réel.
   /// L'interface utilisateur se mettra à jour automatiquement dès que les données changent dans Firestore.
 
-  Stream<DocumentSnapshot<Map<String, dynamic>>>
-  fluxDocument({
+  Stream<DocumentSnapshot<Map<String, dynamic>>> fluxDocument({
     required String collection,
     required String id,
   }) {
-    return _db
-        .collection(collection)
-        .doc(id)
-        .snapshots();
+    return _db.collection(collection).doc(id).snapshots();
   }
 
   // ===========================
@@ -206,8 +189,7 @@ class ServiceFirestore {
 
   /// Permet d'écouter les modifications sur l'ensemble d'une collection.
 
-  Stream<QuerySnapshot<Map<String, dynamic>>>
-  fluxCollection({
+  Stream<QuerySnapshot<Map<String, dynamic>>> fluxCollection({
     required String collection,
   }) {
     return _db.collection(collection).snapshots();
@@ -217,7 +199,8 @@ class ServiceFirestore {
   // Messagerie
   // ===========================
 
-  Stream<QuerySnapshot<Map<String, dynamic>>> fluxMessages(String conversationId) {
+  Stream<QuerySnapshot<Map<String, dynamic>>> fluxMessages(
+      String conversationId) {
     return _db
         .collection('messages')
         .where('conversationId', isEqualTo: conversationId)
@@ -230,8 +213,6 @@ class ServiceFirestore {
     donneesMessage['id'] = ref.id;
     await ref.set(donneesMessage);
   }
-
-
 
   // ===========================
   // Flux d'une collection avec condition
@@ -265,7 +246,8 @@ class ServiceFirestore {
   // Flux des courses (Client)
   // ===========================
 
-  Stream<QuerySnapshot<Map<String, dynamic>>> fluxCoursesClient(String clientId) {
+  Stream<QuerySnapshot<Map<String, dynamic>>> fluxCoursesClient(
+      String clientId) {
     return _db
         .collection("courses")
         .where("clientId", isEqualTo: clientId)
@@ -277,7 +259,8 @@ class ServiceFirestore {
   // Flux des courses (Transporteur)
   // ===========================
 
-  Stream<QuerySnapshot<Map<String, dynamic>>> fluxCoursesTransporteur(String transporteurId) {
+  Stream<QuerySnapshot<Map<String, dynamic>>> fluxCoursesTransporteur(
+      String transporteurId) {
     return _db
         .collection("courses")
         .where("transporteurId", isEqualTo: transporteurId)
@@ -289,7 +272,8 @@ class ServiceFirestore {
   // Flux des courses proposees (Transporteur)
   // ===========================
 
-  Stream<QuerySnapshot<Map<String, dynamic>>> fluxCoursesProposeesTransporteur(String transporteurId) {
+  Stream<QuerySnapshot<Map<String, dynamic>>> fluxCoursesProposeesTransporteur(
+      String transporteurId) {
     return _db
         .collection("courses")
         .where("statut", isEqualTo: "propose")
@@ -305,10 +289,7 @@ class ServiceFirestore {
     required String collection,
     required String id,
   }) async {
-    final doc = await _db
-        .collection(collection)
-        .doc(id)
-        .get();
+    final doc = await _db.collection(collection).doc(id).get();
 
     return doc.exists;
   }

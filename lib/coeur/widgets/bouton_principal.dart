@@ -5,7 +5,6 @@ import 'package:update_camtrans/coeur/constantes/tailles.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:update_camtrans/coeur/widgets/indicateur_chargement.dart';
 
-
 /// =======================================================
 /// BOUTON PRINCIPAL MODERNISÉ
 /// Avec effet de pression, scale animation, et glow optionnel
@@ -148,15 +147,15 @@ class _BoutonPrincipalState extends State<BoutonPrincipal>
                             Icon(widget.icone, size: 22, color: fgColor),
                             const SizedBox(width: 10),
                           ],
-                            Text(
-                              widget.texte,
-                              style: GoogleFonts.inter(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                                color: fgColor,
-                                letterSpacing: -0.3,
-                              ),
+                          Text(
+                            widget.texte,
+                            style: GoogleFonts.inter(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: fgColor,
+                              letterSpacing: -0.3,
                             ),
+                          ),
                         ],
                       ),
               ),

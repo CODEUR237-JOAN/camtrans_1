@@ -20,7 +20,7 @@ final serviceIAProvider = Provider<ServiceIA>((ref) {
 // communications avec Google Gemini. Il gère :
 //   - Le chat en streaming (effet machine à écrire)
 //   - L'estimation logistique (véhicule, volume, prix)
-//   - L'estimation de la masse d'un véhicule (remorquage)
+//   - L'estimation de la masse d'un véhicule (charge utile)
 //   - L'analyse de commandes vocales
 //
 // Modèle utilisé : gemini-3.1-flash-lite
@@ -71,9 +71,8 @@ class ServiceIA {
           ? GenerationConfig(responseMimeType: 'application/json')
           : GenerationConfig(temperature: 0.3),
       // L'instruction système conditionne le comportement du modèle
-      systemInstruction: contexteSysteme != null
-          ? Content.system(contexteSysteme)
-          : null,
+      systemInstruction:
+          contexteSysteme != null ? Content.system(contexteSysteme) : null,
     );
   }
 
@@ -134,12 +133,14 @@ class ServiceIA {
         if (data != null) return data;
 
         // Si le JSON est invalide, on réessaie
-        debugPrint("[IA] Tentative $tentative : réponse non JSON reçue. Nouvelle tentative...");
+        debugPrint(
+            "[IA] Tentative $tentative : réponse non JSON reçue. Nouvelle tentative...");
       } catch (e) {
         debugPrint("[IA] Tentative $tentative échouée : $e");
         if (tentative == _maxTentatives) {
           // Toutes les tentatives sont épuisées : on retourne le défaut
-          debugPrint("[IA] Toutes les tentatives ont échoué. Retour de la réponse par défaut.");
+          debugPrint(
+              "[IA] Toutes les tentatives ont échoué. Retour de la réponse par défaut.");
           return reponseParDefaut;
         }
       }
@@ -174,10 +175,13 @@ class ServiceIA {
     try {
       final modele = _getModele(
         contexteSysteme:
-            "Tu es l'assistant IA officiel de CamTrans, une application de logistique et de transport de marchandises au Cameroun. "
-            "Ton rôle est d'aider les clients à estimer les prix, choisir le bon véhicule (moto, voiture, camionnette, camion léger, camion lourd), "
-            "estimer les volumes et donner des conseils d'emballage ou de transport. "
-            "Sois concis, professionnel et rassurant. Formate tes réponses clairement.",
+            "Tu es l'assistant IA officiel de CamTrans, une application camerounaise qui met en relation "
+            "des clients avec des chauffeurs de camions (lourds et légers) sur l'ensemble du territoire camerounais. "
+            "Les services proposés sont : transport de marchandises générales, déménagement, "
+            "matériaux de construction, produits agricoles, transport frigorifique, convoi de véhicules, remorquage. "
+            "Tu peux estimer les prix, recommander le véhicule adapté parmi (Moto, Pick-up, Camionnette, Camion léger, Camion lourd, Camion Plateau, Camion Frigo, Dépanneuse), "
+            "estimer les volumes, et donner des conseils pratiques de transport et d'emballage. "
+            "Sois concis, professionnel et rassurant. Réponds toujours en français.",
       );
 
       // Construction du contenu (texte + éventuelles images)
@@ -220,7 +224,7 @@ class ServiceIA {
   }
 
   // ============================================================
-  // MÉTHODE PUBLIQUE 2 : Estimation d'une expédition
+  // MÉTHODE PUBLIQUE 2 : Estimation d'une course
   //
   // Analyse le type de marchandise, le départ et l'arrivée pour
   // recommander le meilleur véhicule et estimer le prix.
@@ -236,9 +240,8 @@ class ServiceIA {
     required String destination,
     List<XFile>? fichiersImages,
   }) async {
-    final prompt =
-        "Tu es un expert en logistique pour CamTrans au Cameroun. "
-        "Estime cette expédition :\n"
+    final prompt = "Tu es un expert en logistique pour CamTrans au Cameroun. "
+        "Estime cette course :\n"
         "- Départ : ${depart.isEmpty ? 'Non précisé' : depart}\n"
         "- Destination : ${destination.isEmpty ? 'Non précisé' : destination}\n"
         "- Catégorie : ${marchandise.isEmpty ? 'Non précisé' : marchandise}\n"
@@ -275,20 +278,19 @@ class ServiceIA {
       "vehicule": data["vehicule"]?.toString() ?? "Camionnette",
       "volume": data["volume"]?.toString() ?? "Non estimé",
       "prix": data["prix"]?.toString() ?? "Sur devis",
-      "conseil": data["conseil"]?.toString() ??
-          "Emballez soigneusement vos articles.",
+      "conseil":
+          data["conseil"]?.toString() ?? "Emballez soigneusement vos articles.",
     };
   }
 
   // ============================================================
   // MÉTHODE PUBLIQUE 3 : Estimation de la masse d'un véhicule
   //
-  // Utilisé pour calculer la capacité de remorquage nécessaire.
+  // Utilisé pour calculer la charge utile nécessaire.
   // En cas d'erreur, retourne 1500 kg (valeur moyenne standard).
   // ============================================================
   Future<double> estimerMasseVehicule(String marque, String modele) async {
-    final prompt =
-        "Tu es un expert automobile. "
+    final prompt = "Tu es un expert automobile. "
         "Donne le poids à vide moyen en kg pour le véhicule suivant :\n"
         "Marque : $marque\n"
         "Modèle : $modele\n\n"
@@ -337,22 +339,24 @@ class ServiceIA {
           "Désolé, je n'ai pas pu comprendre votre demande. Pourriez-vous répéter ?",
     };
 
-    final prompt =
-        "L'utilisateur a dit : \"$texte\"\n\n"
+    final prompt = "L'utilisateur a dit : \"$texte\"\n\n"
         "Analyse cette phrase et extrais une intention de commande de transport.\n"
         "Réponds UNIQUEMENT en JSON avec ces clés :\n"
-        "- intention : 'CREER_COURSE' si c'est une demande de transport, sinon 'INCONNU'\n"
-        "- depart : lieu de départ (chaîne vide si non mentionné)\n"
-        "- arrivee : lieu d'arrivée (chaîne vide si non mentionné)\n"
-        "- marchandise : type de marchandise déduit (Déménagement, Marchandise standard, Remorque, etc.) ou chaîne vide\n"
-        "- complet : true seulement si on a au moins un départ, une arrivée et un type de marchandise. Sinon false.\n"
-        "- reponse_vocale : phrase à dire à l'utilisateur. Si complet=true, confirme la création. Sinon, demande poliment l'information manquante.";
+        "- intention : 'CREER_COURSE' si c'est une demande de transport/remorquage/livraison, 'CONSULTER_COURSES' si l'utilisateur veut voir ses commandes ou courses, 'CONSULTER_REVENUS' si le chauffeur demande ses gains, 'INFO_SERVICE' si c'est une question sur les services, sinon 'INCONNU'\n"
+        "- depart : lieu de départ au Cameroun (chaîne vide si non mentionné)\n"
+        "- arrivee : lieu d'arrivée au Cameroun (chaîne vide si non mentionné)\n"
+        "- marchandise : type de service parmi (Marchandises générales, Déménagement, Matériaux de construction, Produits agricoles, Transport frigorifique, Convoi de véhicules, Remorquage) ou chaîne vide\n"
+        "- complet : true seulement si on a au moins un départ, une arrivée et un type de service. Sinon false.\n"
+        "- reponse_vocale : phrase à dire à l'utilisateur en français. Si complet=true, confirme la création de la commande. Sinon, demande poliment l'information manquante.";
 
     return await _appelJsonAvecReessai(
       contenu: [Content.text(prompt)],
       contexteSysteme:
-          "Tu es CamTrans Voice, l'assistant vocal intelligent de l'application CamTrans "
-          "pour commander des transports et déménagements au Cameroun. "
+          "Tu es CamTrans Voice, l'assistant vocal de l'application CamTrans au Cameroun. "
+          "CamTrans met en relation des clients avec des chauffeurs de camions (lourds et légers). "
+          "Services : transport de marchandises, déménagement, matériaux de construction, produits agricoles, "
+          "transport frigorifique, convoi de véhicules, remorquage. "
+          "Aide les clients à créer une commande, et les chauffeurs à consulter leurs courses ou leurs revenus. "
           "Réponds UNIQUEMENT en JSON valide, sans texte avant ni après.",
       reponseParDefaut: reponseErreur,
     );

@@ -19,19 +19,18 @@ class HistoriqueLivraisons extends ConsumerStatefulWidget {
       _HistoriquelivraisonsState();
 }
 
-class _HistoriquelivraisonsState
-    extends ConsumerState<HistoriqueLivraisons> {
+class _HistoriquelivraisonsState extends ConsumerState<HistoriqueLivraisons> {
   bool _suppressionEnCours = false;
 
-  bool _peutSupprimer(Course course) =>
-      StatutCourse.estTerminee(course.statut);
+  bool _peutSupprimer(Course course) => StatutCourse.estTerminee(course.statut);
 
   Future<void> _supprimerTout() async {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (_) => _DialogConfirmation(
         titre: "Vider l'historique ?",
-        message: "Toutes vos livraisons terminées/annulées seront supprimées définitivement.",
+        message:
+            "Toutes vos livraisons terminées/annulées seront supprimées définitivement.",
         bouton: "Tout supprimer",
         couleur: CouleursApp.erreur,
       ),
@@ -76,9 +75,7 @@ class _HistoriquelivraisonsState
             child: IconButton(
               icon: _suppressionEnCours
                   ? const SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: LoaderPremium(size: 20))
+                      width: 20, height: 20, child: LoaderPremium(size: 20))
                   : const Icon(Icons.delete_sweep_rounded,
                       color: CouleursApp.erreur),
               onPressed: _suppressionEnCours ? null : _supprimerTout,
@@ -121,8 +118,9 @@ class _HistoriquelivraisonsState
             Expanded(
               child: coursesAsync.when(
                 loading: () => Center(child: LoaderPremium()),
-                error: (error, _) =>
-                    Center(child: Text("Impossible de charger l'historique : $error 🔧")),
+                error: (error, _) => Center(
+                    child:
+                        Text("Impossible de charger l'historique : $error 🔧")),
                 data: (courses) {
                   // Exclure les courses archivées côté transporteur (swipe suppression logique)
                   final coursesVisibles = courses
@@ -130,8 +128,8 @@ class _HistoriquelivraisonsState
                       .toList();
                   if (coursesVisibles.isEmpty) {
                     return const Center(
-                        child:
-                            Text("Aucune livraison complétée. C'est le moment de prendre la route ! 🚚"));
+                        child: Text(
+                            "Aucune livraison complétée. C'est le moment de prendre la route ! 🚚"));
                   }
 
                   return ListView.builder(
@@ -156,9 +154,7 @@ class _HistoriquelivraisonsState
                               peutSuppr
                                   ? Icons.check_circle
                                   : Icons.local_shipping,
-                              color: peutSuppr
-                                  ? Colors.green
-                                  : Colors.orange,
+                              color: peutSuppr ? Colors.green : Colors.orange,
                             ),
                           ),
                           title: Text(
@@ -200,8 +196,8 @@ class _HistoriquelivraisonsState
                           onTap: () {
                             ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
-                                    content: Text(
-                                        "Détails bientôt disponibles.")));
+                                    content:
+                                        Text("Détails bientôt disponibles.")));
                           },
                         ),
                       );
@@ -289,8 +285,8 @@ class _DialogConfirmation extends StatelessWidget {
           const SizedBox(width: 10),
           Expanded(
             child: Text(titre,
-                style: const TextStyle(
-                    fontWeight: FontWeight.bold, fontSize: 16)),
+                style:
+                    const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
           ),
         ],
       ),
@@ -304,8 +300,8 @@ class _DialogConfirmation extends StatelessWidget {
           style: ElevatedButton.styleFrom(
             backgroundColor: couleur,
             foregroundColor: Colors.white,
-            shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12)),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           ),
           onPressed: () => Navigator.pop(context, true),
           child: Text(bouton),

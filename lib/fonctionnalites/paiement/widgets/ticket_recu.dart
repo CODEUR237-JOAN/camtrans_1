@@ -20,7 +20,8 @@ class TicketRecu extends StatelessWidget {
       decoration: BoxDecoration(
         color: const Color(0xFF1E293B).withValues(alpha: 0.6),
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: CouleursApp.succes.withValues(alpha: 0.3), width: 1.5),
+        border: Border.all(
+            color: CouleursApp.succes.withValues(alpha: 0.3), width: 1.5),
         boxShadow: [
           BoxShadow(
             color: CouleursApp.succes.withValues(alpha: 0.15),
@@ -41,7 +42,8 @@ class TicketRecu extends StatelessWidget {
               children: [
                 // En-tête vert néon
                 Container(
-                  padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
                   decoration: BoxDecoration(
                     color: CouleursApp.succes.withValues(alpha: 0.1),
                   ),
@@ -54,7 +56,8 @@ class TicketRecu extends StatelessWidget {
                           color: CouleursApp.succes.withValues(alpha: 0.2),
                           shape: BoxShape.circle,
                         ),
-                        child: const Icon(Icons.check_circle_outline, color: CouleursApp.succes, size: 28),
+                        child: const Icon(Icons.check_circle_outline,
+                            color: CouleursApp.succes, size: 28),
                       ),
                       const SizedBox(width: 12),
                       Text(
@@ -68,7 +71,7 @@ class TicketRecu extends StatelessWidget {
                     ],
                   ),
                 ),
-                
+
                 // Ligne de découpe (Dashed line) moderne
                 Row(
                   children: List.generate(30, (index) {
@@ -76,12 +79,14 @@ class TicketRecu extends StatelessWidget {
                       child: Container(
                         margin: const EdgeInsets.symmetric(horizontal: 2),
                         height: 2,
-                        color: index % 2 == 0 ? CouleursApp.succes.withValues(alpha: 0.3) : Colors.transparent,
+                        color: index % 2 == 0
+                            ? CouleursApp.succes.withValues(alpha: 0.3)
+                            : Colors.transparent,
                       ),
                     );
                   }),
                 ),
-                
+
                 Padding(
                   padding: const EdgeInsets.all(32.0),
                   child: Column(
@@ -96,27 +101,32 @@ class TicketRecu extends StatelessWidget {
                         ),
                       ),
                       const SizedBox(height: 32),
-                      
-                      _buildLigneDetails("Méthode", paiement.methodePaiement.toUpperCase()),
+
+                      _buildLigneDetails(
+                          "Méthode", paiement.methodePaiement.toUpperCase()),
                       const Divider(height: 32, color: Colors.white12),
-                      _buildLigneDetails("N° Transaction", paiement.numeroTransaction),
+                      _buildLigneDetails(
+                          "N° Transaction", paiement.numeroTransaction),
                       const Divider(height: 32, color: Colors.white12),
                       _buildLigneDetails("Réf. Course", paiement.reference),
                       const Divider(height: 32, color: Colors.white12),
-                      _buildLigneDetails("Date", "${paiement.datePaiement.day.toString().padLeft(2, '0')}/${paiement.datePaiement.month.toString().padLeft(2, '0')}/${paiement.datePaiement.year} à ${paiement.datePaiement.hour.toString().padLeft(2, '0')}:${paiement.datePaiement.minute.toString().padLeft(2, '0')}"),
-                      
+                      _buildLigneDetails("Date",
+                          "${paiement.datePaiement.day.toString().padLeft(2, '0')}/${paiement.datePaiement.month.toString().padLeft(2, '0')}/${paiement.datePaiement.year} à ${paiement.datePaiement.hour.toString().padLeft(2, '0')}:${paiement.datePaiement.minute.toString().padLeft(2, '0')}"),
+
                       const SizedBox(height: 40),
-                      
+
                       // QR Code inversé (Blanc sur transparent)
                       Container(
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(20),
-                          boxShadow: [
-                            BoxShadow(color: Colors.white.withValues(alpha: 0.2), blurRadius: 20, offset: const Offset(0, 5))
-                          ]
-                        ),
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(20),
+                            boxShadow: [
+                              BoxShadow(
+                                  color: Colors.white.withValues(alpha: 0.2),
+                                  blurRadius: 20,
+                                  offset: const Offset(0, 5))
+                            ]),
                         child: QrImageView(
                           data: paiement.numeroTransaction,
                           version: QrVersions.auto,
@@ -134,11 +144,14 @@ class TicketRecu extends StatelessWidget {
                       const SizedBox(height: 16),
                       Text(
                         "Scannez pour valider avec le transporteur",
-                        style: GoogleFonts.poppins(color: Colors.white54, fontSize: 11, fontWeight: FontWeight.w500),
+                        style: GoogleFonts.poppins(
+                            color: Colors.white54,
+                            fontSize: 11,
+                            fontWeight: FontWeight.w500),
                       ),
-                      
+
                       const SizedBox(height: 40),
-                      
+
                       SizedBox(
                         width: double.infinity,
                         height: 56,
@@ -148,17 +161,23 @@ class TicketRecu extends StatelessWidget {
                             onFermer();
                           },
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: CouleursApp.succes.withValues(alpha: 0.15),
+                            backgroundColor:
+                                CouleursApp.succes.withValues(alpha: 0.15),
                             foregroundColor: CouleursApp.succes,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(16),
-                              side: BorderSide(color: CouleursApp.succes.withValues(alpha: 0.3)),
+                              side: BorderSide(
+                                  color: CouleursApp.succes
+                                      .withValues(alpha: 0.3)),
                             ),
                             elevation: 0,
                           ),
                           child: Text(
                             "Terminer",
-                            style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.bold, letterSpacing: 1),
+                            style: GoogleFonts.poppins(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                letterSpacing: 1),
                           ),
                         ),
                       )
@@ -177,8 +196,13 @@ class TicketRecu extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(titre, style: GoogleFonts.poppins(color: Colors.white54, fontSize: 14)),
-        Text(valeur, style: GoogleFonts.poppins(fontWeight: FontWeight.bold, fontSize: 14, color: Colors.white)),
+        Text(titre,
+            style: GoogleFonts.poppins(color: Colors.white54, fontSize: 14)),
+        Text(valeur,
+            style: GoogleFonts.poppins(
+                fontWeight: FontWeight.bold,
+                fontSize: 14,
+                color: Colors.white)),
       ],
     );
   }

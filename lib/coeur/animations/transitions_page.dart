@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:vector_math/vector_math_64.dart' show Vector3;
 
-
 /// =======================================================
 /// TRANSITIONS DE PAGE PERSONNALISÉES
 /// Pour GoRouter - Effets fluides et modernes
@@ -66,7 +65,8 @@ class SlideUpTransition extends CustomTransitionPage {
             return FadeTransition(
               opacity: animation.drive(
                 Tween(begin: 0.0, end: 1.0).chain(
-                  CurveTween(curve: const Interval(0, 0.5, curve: Curves.easeOut)),
+                  CurveTween(
+                      curve: const Interval(0, 0.5, curve: Curves.easeOut)),
                 ),
               ),
               child: SlideTransition(
@@ -202,17 +202,20 @@ class CubicTransition extends CustomTransitionPage {
               animation: animation,
               builder: (context, child) {
                 final rotateAnim = Tween<double>(begin: 0.1, end: 0.0).animate(
-                  CurvedAnimation(parent: animation, curve: Curves.easeOutCubic),
+                  CurvedAnimation(
+                      parent: animation, curve: Curves.easeOutCubic),
                 );
                 final scaleAnim = Tween<double>(begin: 0.9, end: 1.0).animate(
-                  CurvedAnimation(parent: animation, curve: Curves.easeOutCubic),
+                  CurvedAnimation(
+                      parent: animation, curve: Curves.easeOutCubic),
                 );
 
                 return Transform(
                   transform: Matrix4.identity()
                     ..setEntry(3, 2, 0.001)
                     ..rotateY(rotateAnim.value)
-                    ..scaleByVector3(Vector3(scaleAnim.value, scaleAnim.value, 1.0)),
+                    ..scaleByVector3(
+                        Vector3(scaleAnim.value, scaleAnim.value, 1.0)),
                   alignment: Alignment.centerLeft,
                   child: FadeTransition(
                     opacity: animation.drive(
@@ -231,4 +234,3 @@ class CubicTransition extends CustomTransitionPage {
           reverseTransitionDuration: const Duration(milliseconds: 400),
         );
 }
-

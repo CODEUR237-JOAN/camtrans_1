@@ -1,9 +1,7 @@
 import 'package:flutter/material.dart';
 
-
 import 'package:update_camtrans/coeur/constantes/couleurs.dart';
 import 'package:google_fonts/google_fonts.dart';
-
 
 /// =======================================================
 /// CARTE INFORMATION MODERNISÉE
@@ -105,9 +103,14 @@ class _CarteInformationState extends State<CarteInformation>
             child: Container(
               margin: widget.marge ?? const EdgeInsets.symmetric(vertical: 6),
               decoration: BoxDecoration(
-                color: widget.couleur ?? (isDark ? CouleursApp.carteSombre : CouleursApp.carte),
+                color: widget.couleur ??
+                    (isDark ? CouleursApp.carteSombre : CouleursApp.carte),
                 borderRadius: BorderRadius.circular(24),
-                border: Border.all(color: isDark ? CouleursApp.bordureSombre : CouleursApp.bordure.withValues(alpha: 0.5), width: 1),
+                border: Border.all(
+                    color: isDark
+                        ? CouleursApp.bordureSombre
+                        : CouleursApp.bordure.withValues(alpha: 0.5),
+                    width: 1),
                 gradient: widget.gradient,
                 boxShadow: _isPressed
                     ? []
@@ -121,7 +124,8 @@ class _CarteInformationState extends State<CarteInformation>
                         ),
                         if (widget.glow)
                           BoxShadow(
-                            color: iconColor.withValues(alpha: isDark ? 0.08 : 0.06),
+                            color: iconColor.withValues(
+                                alpha: isDark ? 0.08 : 0.06),
                             blurRadius: 24,
                             spreadRadius: 0,
                             offset: const Offset(0, 4),
@@ -131,7 +135,8 @@ class _CarteInformationState extends State<CarteInformation>
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(24),
                 child: Padding(
-                  padding: widget.remplissage ?? const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
+                  padding: widget.remplissage ??
+                      const EdgeInsets.symmetric(horizontal: 18, vertical: 16),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     mainAxisSize: MainAxisSize.min,
@@ -146,8 +151,10 @@ class _CarteInformationState extends State<CarteInformation>
                               decoration: BoxDecoration(
                                 gradient: LinearGradient(
                                   colors: [
-                                    iconColor.withValues(alpha: isDark ? 0.25 : 0.12),
-                                    iconColor.withValues(alpha: isDark ? 0.15 : 0.06),
+                                    iconColor.withValues(
+                                        alpha: isDark ? 0.25 : 0.12),
+                                    iconColor.withValues(
+                                        alpha: isDark ? 0.15 : 0.06),
                                   ],
                                   begin: Alignment.topLeft,
                                   end: Alignment.bottomRight,
@@ -156,7 +163,8 @@ class _CarteInformationState extends State<CarteInformation>
                                 boxShadow: widget.glow
                                     ? [
                                         BoxShadow(
-                                          color: iconColor.withValues(alpha: 0.15),
+                                          color:
+                                              iconColor.withValues(alpha: 0.15),
                                           blurRadius: 12,
                                           spreadRadius: 1,
                                         ),
@@ -182,7 +190,9 @@ class _CarteInformationState extends State<CarteInformation>
                                   style: GoogleFonts.inter(
                                     fontSize: 15,
                                     fontWeight: FontWeight.w600,
-                                    color: isDark ? Colors.white : CouleursApp.textePrincipal,
+                                    color: isDark
+                                        ? Colors.white
+                                        : CouleursApp.textePrincipal,
                                     letterSpacing: -0.2,
                                   ),
                                 ),
@@ -195,7 +205,9 @@ class _CarteInformationState extends State<CarteInformation>
                                       overflow: TextOverflow.ellipsis,
                                       style: GoogleFonts.inter(
                                         fontSize: 13,
-                                        color: isDark ? CouleursApp.texteSombreSecondaire : CouleursApp.texteSecondaire,
+                                        color: isDark
+                                            ? CouleursApp.texteSombreSecondaire
+                                            : CouleursApp.texteSecondaire,
                                       ),
                                     ),
                                   ),
@@ -204,9 +216,11 @@ class _CarteInformationState extends State<CarteInformation>
                           ),
                           if (widget.valeur != null)
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 10, vertical: 4),
                               decoration: BoxDecoration(
-                                color: (widget.couleurValeur ?? iconColor).withValues(alpha: isDark ? 0.15 : 0.08),
+                                color: (widget.couleurValeur ?? iconColor)
+                                    .withValues(alpha: isDark ? 0.15 : 0.08),
                                 borderRadius: BorderRadius.circular(10),
                               ),
                               child: Text(

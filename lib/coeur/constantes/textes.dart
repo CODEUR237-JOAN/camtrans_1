@@ -16,8 +16,7 @@ class TextesApp {
 
   static const String nomApplication = "CamTrans";
 
-  static const String slogan =
-      "Votre remorquage d'urgence au Cameroun, 24h/24";
+  static const String slogan = "Votre partenaire transport de confiance au Cameroun, 24h/24";
 
   // ==========================
   // Boutons
@@ -111,8 +110,7 @@ class TextesApp {
   static const String succes = "Opération effectuée avec succès";
   static const String connexionReussie = "Connexion réussie";
   static const String compteCree = "Compte créé avec succès";
-  static const String emailEnvoye =
-      "Un e-mail de vérification a été envoyé.";
+  static const String emailEnvoye = "Un e-mail de vérification a été envoyé.";
 
   // ==========================
   // Onboarding
@@ -124,14 +122,12 @@ class TextesApp {
   static const String descriptionOnboarding1 =
       "Trouvez rapidement un transporteur fiable pour vos marchandises.";
 
-  static const String titreOnboarding2 =
-      "Suivez votre transport en temps réel";
+  static const String titreOnboarding2 = "Suivez votre transport en temps réel";
 
   static const String descriptionOnboarding2 =
       "Visualisez la position de votre transporteur grâce au GPS.";
 
-  static const String titreOnboarding3 =
-      "La technologie à votre service";
+  static const String titreOnboarding3 = "La technologie à votre service";
 
   static const String descriptionOnboarding3 =
       "Estimez automatiquement le volume de vos marchandises et choisissez le véhicule idéal.";

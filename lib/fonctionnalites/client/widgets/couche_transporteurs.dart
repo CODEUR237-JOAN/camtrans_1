@@ -30,9 +30,10 @@ class CoucheTransporteurs extends ConsumerWidget {
     }
   }
 
-  void _afficherDetails(BuildContext context, Transporteur transporteur, LatLng? positionClient) {
+  void _afficherDetails(
+      BuildContext context, Transporteur transporteur, LatLng? positionClient) {
     if (positionClient == null) return;
-    
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -52,14 +53,16 @@ class CoucheTransporteurs extends ConsumerWidget {
     return transporteursAsync.when(
       data: (transporteurs) {
         final markers = transporteurs.map((transporteur) {
-          final position = LatLng(transporteur.latitude, transporteur.longitude);
-          
+          final position =
+              LatLng(transporteur.latitude, transporteur.longitude);
+
           return Marker(
             point: position,
             width: 50,
             height: 50,
             child: GestureDetector(
-              onTap: () => _afficherDetails(context, transporteur, etatCarte.positionActuelle),
+              onTap: () => _afficherDetails(
+                  context, transporteur, etatCarte.positionActuelle),
               child: Container(
                 decoration: BoxDecoration(
                   color: Colors.white,
@@ -80,10 +83,10 @@ class CoucheTransporteurs extends ConsumerWidget {
                 ),
               ),
             ).animate().scale(
-              end: const Offset(1.0, 1.0),
-              duration: 400.ms,
-              curve: Curves.easeOutBack,
-            ),
+                  end: const Offset(1.0, 1.0),
+                  duration: 400.ms,
+                  curve: Curves.easeOutBack,
+                ),
           );
         }).toList();
 

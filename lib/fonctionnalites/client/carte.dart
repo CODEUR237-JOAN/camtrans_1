@@ -11,7 +11,6 @@ import 'widgets/couche_transporteurs.dart';
 import 'package:update_camtrans/coeur/widgets/loader_premium.dart';
 import 'package:update_camtrans/coeur/widgets/marqueur_premium.dart';
 
-
 class VueCarte extends ConsumerStatefulWidget {
   const VueCarte({super.key});
 
@@ -19,7 +18,8 @@ class VueCarte extends ConsumerStatefulWidget {
   ConsumerState<VueCarte> createState() => _VueCarteState();
 }
 
-class _VueCarteState extends ConsumerState<VueCarte> with TickerProviderStateMixin {
+class _VueCarteState extends ConsumerState<VueCarte>
+    with TickerProviderStateMixin {
   final MapController _mapController = MapController();
 
   void _centrerSurMoi(LatLng? position) {
@@ -60,7 +60,8 @@ class _VueCarteState extends ConsumerState<VueCarte> with TickerProviderStateMix
     });
 
     animation.addStatusListener((status) {
-      if (status == AnimationStatus.completed || status == AnimationStatus.dismissed) {
+      if (status == AnimationStatus.completed ||
+          status == AnimationStatus.dismissed) {
         animationController.dispose();
       }
     });
@@ -94,7 +95,8 @@ class _VueCarteState extends ConsumerState<VueCarte> with TickerProviderStateMix
                   SizedBox(width: 8),
                   Text(
                     "Mode hors ligne actif.",
-                    style: TextStyle(color: Colors.orange, fontWeight: FontWeight.bold),
+                    style: TextStyle(
+                        color: Colors.orange, fontWeight: FontWeight.bold),
                   ),
                 ],
               ),
@@ -103,7 +105,8 @@ class _VueCarteState extends ConsumerState<VueCarte> with TickerProviderStateMix
             Container(
               width: double.infinity,
               color: CouleursApp.erreur.withValues(alpha: 0.1),
-              padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
               child: Row(
                 children: [
                   const Icon(Icons.location_off, color: CouleursApp.erreur),
@@ -131,14 +134,16 @@ class _VueCarteState extends ConsumerState<VueCarte> with TickerProviderStateMix
                 : FlutterMap(
                     mapController: _mapController,
                     options: MapOptions(
-                      initialCenter: etatCarte.positionActuelle ?? const LatLng(3.8480, 11.5021),
+                      initialCenter: etatCarte.positionActuelle ??
+                          const LatLng(3.8480, 11.5021),
                       initialZoom: 15.0,
                       maxZoom: 19.0,
                       minZoom: 3.0,
                     ),
                     children: [
                       TileLayer(
-                        urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                        urlTemplate:
+                            'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
                         userAgentPackageName: 'com.joan.update_camtrans',
                         // Utilisation du provider par défaut pour éviter l'erreur "Client already closed"
                       ),
@@ -150,7 +155,8 @@ class _VueCarteState extends ConsumerState<VueCarte> with TickerProviderStateMix
                               point: etatCarte.positionActuelle!,
                               width: 60,
                               height: 60,
-                              child: const MarqueurPremium(type: TypeMarqueur.depart),
+                              child: const MarqueurPremium(
+                                  type: TypeMarqueur.depart),
                             ),
                           ],
                         ),
@@ -169,4 +175,3 @@ class _VueCarteState extends ConsumerState<VueCarte> with TickerProviderStateMix
     );
   }
 }
-

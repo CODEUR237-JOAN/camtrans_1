@@ -26,12 +26,20 @@ class RechercheRadar extends StatelessWidget {
                     height: 100.0 + (index * 80),
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      border: Border.all(color: CouleursApp.primaire.withValues(alpha: 0.3), width: 2),
+                      border: Border.all(
+                          color: CouleursApp.primaire.withValues(alpha: 0.3),
+                          width: 2),
                     ),
                   )
                       .animate(onPlay: (controller) => controller.repeat())
-                      .scale(duration: const Duration(seconds: 2), begin: const Offset(0.5, 0.5), end: const Offset(1.5, 1.5))
-                      .fade(duration: const Duration(seconds: 2), begin: 0.8, end: 0.0);
+                      .scale(
+                          duration: const Duration(seconds: 2),
+                          begin: const Offset(0.5, 0.5),
+                          end: const Offset(1.5, 1.5))
+                      .fade(
+                          duration: const Duration(seconds: 2),
+                          begin: 0.8,
+                          end: 0.0);
                 }),
 
                 // Balayage Radar (Sweep)
@@ -56,7 +64,7 @@ class RechercheRadar extends StatelessWidget {
                 )
                     .animate(onPlay: (controller) => controller.repeat())
                     .rotate(duration: const Duration(milliseconds: 1500)),
-                
+
                 // Point central
                 Container(
                   width: 60,
@@ -72,25 +80,41 @@ class RechercheRadar extends StatelessWidget {
                       )
                     ],
                   ),
-                  child: const Icon(Icons.search, color: Colors.white, size: 30),
+                  child:
+                      const Icon(Icons.search, color: Colors.white, size: 30),
                 )
-                    .animate(onPlay: (controller) => controller.repeat(reverse: true))
-                    .scale(duration: const Duration(milliseconds: 800), begin: const Offset(0.9, 0.9), end: const Offset(1.1, 1.1)),
+                    .animate(
+                        onPlay: (controller) =>
+                            controller.repeat(reverse: true))
+                    .scale(
+                        duration: const Duration(milliseconds: 800),
+                        begin: const Offset(0.9, 0.9),
+                        end: const Offset(1.1, 1.1)),
               ],
             ),
             const SizedBox(height: 60),
-            
+
             // Texte
             Text(
               "Recherche du meilleur transporteur...",
-              style: GoogleFonts.poppins(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold),
-            ).animate(onPlay: (controller) => controller.repeat(reverse: true)).fade(duration: const Duration(seconds: 1), begin: 0.5, end: 1.0),
-            
+              style: GoogleFonts.poppins(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold),
+            )
+                .animate(
+                    onPlay: (controller) => controller.repeat(reverse: true))
+                .fade(
+                    duration: const Duration(seconds: 1), begin: 0.5, end: 1.0),
+
             const SizedBox(height: 12),
             Text(
               "Service d'Urgence 24h/24\nDélai d'intervention estimé : 30 minutes",
               textAlign: TextAlign.center,
-              style: GoogleFonts.poppins(color: Colors.white, fontSize: 14, fontWeight: FontWeight.w600),
+              style: GoogleFonts.poppins(
+                  color: Colors.white,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600),
             ),
           ],
         ),

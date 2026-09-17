@@ -71,18 +71,11 @@ class Client extends Utilisateur {
       estEnLigne: estEnLigne ?? this.estEnLigne,
       derniereConnexion: derniereConnexion ?? this.derniereConnexion,
       nombreCourses: nombreCourses ?? this.nombreCourses,
-      nombreDemenagements:
-      nombreDemenagements ?? this.nombreDemenagements,
-      adressesFavorites:
-      adressesFavorites ?? this.adressesFavorites,
-      entreprisesFavorites:
-      entreprisesFavorites ??
-          this.entreprisesFavorites,
-      noteMoyenne:
-      noteMoyenne ?? this.noteMoyenne,
-      moyenPaiementPrefere:
-      moyenPaiementPrefere ??
-          this.moyenPaiementPrefere,
+      nombreDemenagements: nombreDemenagements ?? this.nombreDemenagements,
+      adressesFavorites: adressesFavorites ?? this.adressesFavorites,
+      entreprisesFavorites: entreprisesFavorites ?? this.entreprisesFavorites,
+      noteMoyenne: noteMoyenne ?? this.noteMoyenne,
+      moyenPaiementPrefere: moyenPaiementPrefere ?? this.moyenPaiementPrefere,
     );
   }
 
@@ -96,15 +89,13 @@ class Client extends Utilisateur {
       "adressesFavorites": adressesFavorites,
       "entreprisesFavorites": entreprisesFavorites,
       "noteMoyenne": noteMoyenne,
-      "moyenPaiementPrefere":
-      moyenPaiementPrefere,
+      "moyenPaiementPrefere": moyenPaiementPrefere,
     });
 
     return map;
   }
 
-  factory Client.fromMap(
-      Map<String, dynamic> map) {
+  factory Client.fromMap(Map<String, dynamic> map) {
     return Client(
       id: map["id"] ?? "",
       nom: map["nom"] ?? "",
@@ -118,36 +109,30 @@ class Client extends Utilisateur {
       actif: map["actif"] ?? true,
       emailVerifie: map["emailVerifie"] ?? false,
       dateCreation: Parseur.toDateTime(map["dateCreation"]),
-      
-      // LOGIQUE DE PRESENCE : Si pas de signal depuis 1 minute, on force a hors ligne
-      estEnLigne: (map["estEnLigne"] ?? false) && 
-                  (map["derniereConnexion"] != null && 
-                   DateTime.now().difference(Parseur.toDateTime(map["derniereConnexion"])).inSeconds <= 90),
 
-      derniereConnexion: map["derniereConnexion"] != null ? Parseur.toDateTime(map["derniereConnexion"]) : null,
+      // LOGIQUE DE PRESENCE : Si pas de signal depuis 1 minute, on force a hors ligne
+      estEnLigne: (map["estEnLigne"] ?? false) &&
+          (map["derniereConnexion"] != null &&
+              DateTime.now()
+                      .difference(Parseur.toDateTime(map["derniereConnexion"]))
+                      .inSeconds <=
+                  90),
+
+      derniereConnexion: map["derniereConnexion"] != null
+          ? Parseur.toDateTime(map["derniereConnexion"])
+          : null,
       nombreCourses: map["nombreCourses"] ?? 0,
-      nombreDemenagements:
-      map["nombreDemenagements"] ?? 0,
-      adressesFavorites:
-      List<String>.from(
-          map["adressesFavorites"] ??
-              []),
+      nombreDemenagements: map["nombreDemenagements"] ?? 0,
+      adressesFavorites: List<String>.from(map["adressesFavorites"] ?? []),
       entreprisesFavorites:
-      List<String>.from(
-          map["entreprisesFavorites"] ??
-              []),
+          List<String>.from(map["entreprisesFavorites"] ?? []),
       noteMoyenne: Parseur.toDouble(map["noteMoyenne"]),
-      moyenPaiementPrefere:
-      map["moyenPaiementPrefere"] ??
-          "",
+      moyenPaiementPrefere: map["moyenPaiementPrefere"] ?? "",
     );
   }
 
   @override
-  Map<String, dynamic> toJson() =>
-      toMap();
+  Map<String, dynamic> toJson() => toMap();
 
-  factory Client.fromJson(
-      Map<String, dynamic> json) =>
-      Client.fromMap(json);
+  factory Client.fromJson(Map<String, dynamic> json) => Client.fromMap(json);
 }

@@ -39,7 +39,9 @@ class _ChangerMotDePasseState extends ConsumerState<ChangerMotDePasse> {
 
     if (_nouveauController.text != _confirmerController.text) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Les nouveaux mots de passe ne correspondent pas."), backgroundColor: Colors.red),
+        const SnackBar(
+            content: Text("Les nouveaux mots de passe ne correspondent pas."),
+            backgroundColor: Colors.red),
       );
       return;
     }
@@ -53,22 +55,26 @@ class _ChangerMotDePasseState extends ConsumerState<ChangerMotDePasse> {
       if (email != null) {
         // 1. Ré-authentifier pour des raisons de sécurité (exigé par Firebase)
         await auth.reauthentifier(email, _actuelController.text);
-        
+
         // 2. Changer le mot de passe
         await auth.modifierMotDePasse(_nouveauController.text);
 
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Mot de passe modifié avec succès !"), backgroundColor: Colors.green),
+            const SnackBar(
+                content: Text("Mot de passe modifié avec succès !"),
+                backgroundColor: Colors.green),
           );
           context.pop();
         }
       }
     } catch (e) {
       if (mounted) {
-        String message = "Erreur lors du changement. Vérifiez votre mot de passe actuel.";
-        if (e.toString().contains("wrong-password")) message = "Mot de passe actuel incorrect.";
-        
+        String message =
+            "Erreur lors du changement. Vérifiez votre mot de passe actuel.";
+        if (e.toString().contains("wrong-password"))
+          message = "Mot de passe actuel incorrect.";
+
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(message), backgroundColor: Colors.red),
         );
@@ -97,37 +103,33 @@ class _ChangerMotDePasseState extends ConsumerState<ChangerMotDePasse> {
                 style: TextStyle(color: Colors.grey, fontSize: 14),
               ),
               const SizedBox(height: 30),
-
               _buildPasswordField(
                 label: "Mot de passe actuel",
                 controller: _actuelController,
                 masquer: _masquerActuel,
-                onToggle: () => setState(() => _masquerActuel = !_masquerActuel),
+                onToggle: () =>
+                    setState(() => _masquerActuel = !_masquerActuel),
               ),
-
               const SizedBox(height: 20),
               const Divider(),
               const SizedBox(height: 20),
-
               _buildPasswordField(
                 label: "Nouveau mot de passe",
                 controller: _nouveauController,
                 masquer: _masquerNouveau,
-                onToggle: () => setState(() => _masquerNouveau = !_masquerNouveau),
+                onToggle: () =>
+                    setState(() => _masquerNouveau = !_masquerNouveau),
                 validator: Validateurs.motDePasse,
               ),
-
               const SizedBox(height: 20),
-
               _buildPasswordField(
                 label: "Confirmer le nouveau mot de passe",
                 controller: _confirmerController,
                 masquer: _masquerConfirmer,
-                onToggle: () => setState(() => _masquerConfirmer = !_masquerConfirmer),
+                onToggle: () =>
+                    setState(() => _masquerConfirmer = !_masquerConfirmer),
               ),
-
               const SizedBox(height: 40),
-
               SizedBox(
                 width: double.infinity,
                 height: 55,
@@ -136,11 +138,14 @@ class _ChangerMotDePasseState extends ConsumerState<ChangerMotDePasse> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: CouleursApp.primaire,
                     foregroundColor: Colors.white,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(15)),
                   ),
-                  child: _chargement 
-                    ? const LoaderPremium(size: 24)
-                    : const Text("Mettre à jour le mot de passe", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
+                  child: _chargement
+                      ? const LoaderPremium(size: 24)
+                      : const Text("Mettre à jour le mot de passe",
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 16)),
                 ),
               ),
             ],
@@ -160,7 +165,8 @@ class _ChangerMotDePasseState extends ConsumerState<ChangerMotDePasse> {
     return TextFormField(
       controller: controller,
       obscureText: masquer,
-      validator: validator ?? (v) => (v == null || v.isEmpty) ? "Ce champ est requis" : null,
+      validator: validator ??
+          (v) => (v == null || v.isEmpty) ? "Ce champ est requis" : null,
       decoration: InputDecoration(
         labelText: label,
         prefixIcon: const Icon(Iconsax.lock_copy, color: CouleursApp.primaire),

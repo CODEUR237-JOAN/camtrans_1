@@ -64,8 +64,16 @@ class Course {
   //---------------- Archivage logique -------//
   /// Si true, la course est masquée dans l'historique du transporteur
   final bool archivePourTransporteur;
+
   /// Si true, la course est masquée dans l'historique du client
   final bool archivePourClient;
+
+  //---------------- Traçabilité & ETA -------//
+  /// Horodatage de la dernière modification (mis à jour à chaque changement de statut)
+  final DateTime? dateModification;
+
+  /// Temps estimé d'arrivée en minutes (issu de calculerETA() du service GPS, persisté en temps réel)
+  final int etaMinutes;
 
   const Course({
     required this.id,
@@ -120,6 +128,8 @@ class Course {
     this.fondsDebloques = false,
     this.archivePourTransporteur = false,
     this.archivePourClient = false,
+    this.dateModification,
+    this.etaMinutes = 0,
   });
 
   Course copyWith({
@@ -175,6 +185,8 @@ class Course {
     bool? fondsDebloques,
     bool? archivePourTransporteur,
     bool? archivePourClient,
+    DateTime? dateModification,
+    int? etaMinutes,
   }) {
     return Course(
       id: id ?? this.id,
@@ -183,7 +195,8 @@ class Course {
       nomClient: nomClient ?? this.nomClient,
       nomTransporteur: nomTransporteur ?? this.nomTransporteur,
       telephoneClient: telephoneClient ?? this.telephoneClient,
-      telephoneTransporteur: telephoneTransporteur ?? this.telephoneTransporteur,
+      telephoneTransporteur:
+          telephoneTransporteur ?? this.telephoneTransporteur,
       adresseDepart: adresseDepart ?? this.adresseDepart,
       adresseArrivee: adresseArrivee ?? this.adresseArrivee,
       latitudeDepart: latitudeDepart ?? this.latitudeDepart,
@@ -212,7 +225,8 @@ class Course {
       noteClient: noteClient ?? this.noteClient,
       noteTransporteur: noteTransporteur ?? this.noteTransporteur,
       commentaireClient: commentaireClient ?? this.commentaireClient,
-      commentaireTransporteur: commentaireTransporteur ?? this.commentaireTransporteur,
+      commentaireTransporteur:
+          commentaireTransporteur ?? this.commentaireTransporteur,
       scoreIA: scoreIA ?? this.scoreIA,
       vehiculeRecommandeIA: vehiculeRecommandeIA ?? this.vehiculeRecommandeIA,
       volumeEstimeIA: volumeEstimeIA ?? this.volumeEstimeIA,
@@ -224,11 +238,15 @@ class Course {
       tempsApprocheMin: tempsApprocheMin ?? this.tempsApprocheMin,
       candidats: candidats ?? this.candidats,
       indexCandidatActuel: indexCandidatActuel ?? this.indexCandidatActuel,
-      expirationProposition: expirationProposition ?? this.expirationProposition,
+      expirationProposition:
+          expirationProposition ?? this.expirationProposition,
       codePinLivraison: codePinLivraison ?? this.codePinLivraison,
       fondsDebloques: fondsDebloques ?? this.fondsDebloques,
-      archivePourTransporteur: archivePourTransporteur ?? this.archivePourTransporteur,
+      archivePourTransporteur:
+          archivePourTransporteur ?? this.archivePourTransporteur,
       archivePourClient: archivePourClient ?? this.archivePourClient,
+      dateModification: dateModification ?? this.dateModification,
+      etaMinutes: etaMinutes ?? this.etaMinutes,
     );
   }
 
@@ -287,6 +305,9 @@ class Course {
       // ✅ FIX : Champs d'archivage logique — étaient absents, causant une perte de données
       "archivePourTransporteur": archivePourTransporteur,
       "archivePourClient": archivePourClient,
+      // ✅ Traçabilité & ETA (Sprint 14)
+      "dateModification": dateModification?.toIso8601String(),
+      "etaMinutes": etaMinutes,
     };
   }
 
@@ -318,8 +339,11 @@ class Course {
       description: map["description"] ?? "",
       photos: List<String>.from(map["photos"] ?? []),
       dateCreation: Parseur.toDateTime(map["dateCreation"]),
-      dateDebut: map["dateDebut"] != null ? Parseur.toDateTime(map["dateDebut"]) : null,
-      dateFin: map["dateFin"] != null ? Parseur.toDateTime(map["dateFin"]) : null,
+      dateDebut: map["dateDebut"] != null
+          ? Parseur.toDateTime(map["dateDebut"])
+          : null,
+      dateFin:
+          map["dateFin"] != null ? Parseur.toDateTime(map["dateFin"]) : null,
       fragile: map["fragile"] ?? false,
       aideChargement: map["aideChargement"] ?? false,
       aideDechargement: map["aideDechargement"] ?? false,
@@ -337,13 +361,21 @@ class Course {
       detailsSpecifiques: map["detailsSpecifiques"] ?? "",
       distanceApprocheKm: Parseur.toDouble(map["distanceApprocheKm"]),
       tempsApprocheMin: map["tempsApprocheMin"] ?? 0,
-      candidats: map['candidats'] != null ? List<String>.from(map['candidats']) : const [],
+      candidats: map['candidats'] != null
+          ? List<String>.from(map['candidats'])
+          : const [],
       indexCandidatActuel: map['indexCandidatActuel'] ?? 0,
-      expirationProposition: map['expirationProposition'] != null ? Parseur.toDateTime(map['expirationProposition']) : null,
+      expirationProposition: map['expirationProposition'] != null
+          ? Parseur.toDateTime(map['expirationProposition'])
+          : null,
       codePinLivraison: map['codePinLivraison'] ?? "",
       fondsDebloques: map['fondsDebloques'] ?? false,
       archivePourTransporteur: map['archivePourTransporteur'] ?? false,
       archivePourClient: map['archivePourClient'] ?? false,
+      dateModification: map['dateModification'] != null
+          ? Parseur.toDateTime(map['dateModification'])
+          : null,
+      etaMinutes: map['etaMinutes'] ?? 0,
     );
   }
 
@@ -352,11 +384,17 @@ class Course {
 
   static String _normalizeStatut(String rawStatut) {
     String l = rawStatut.toLowerCase();
-    if (l.contains('termin') || l.contains('livr')) return StatutCourse.terminee;
+    if (l.contains('termin') || l.contains('livr'))
+      return StatutCourse.terminee;
     if (l.contains('annul')) return StatutCourse.annulee;
-    if (l.contains('cours') || l.contains('transit') || l.contains('rout') || l.contains('charge')) return StatutCourse.enTransit;
-    if (l.contains('attent') || l.contains('recherch')) return StatutCourse.recherche;
-    if (l.contains('accept') || l.contains('attribu')) return StatutCourse.attribue;
+    if (l.contains('cours') ||
+        l.contains('transit') ||
+        l.contains('rout') ||
+        l.contains('charge')) return StatutCourse.enTransit;
+    if (l.contains('attent') || l.contains('recherch'))
+      return StatutCourse.recherche;
+    if (l.contains('accept') || l.contains('attribu'))
+      return StatutCourse.attribue;
     return rawStatut; // Fallback
   }
 }

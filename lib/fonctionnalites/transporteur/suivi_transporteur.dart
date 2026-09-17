@@ -13,6 +13,7 @@ import 'package:update_camtrans/coeur/etat/suivi_provider.dart';
 import 'package:update_camtrans/services/service_firestore.dart';
 import 'package:update_camtrans/services/service_gps.dart';
 import 'package:update_camtrans/fonctionnalites/client/widgets/carte_suivi_abstraite.dart';
+import 'package:update_camtrans/services/service_navigation_vocale.dart';
 
 class SuiviTransporteur extends ConsumerStatefulWidget {
   final String courseId;
@@ -34,7 +35,8 @@ class _SuiviTransporteurState extends ConsumerState<SuiviTransporteur> {
         if (!autorise && mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text("Le GPS est nécessaire pour le suivi en temps réel."),
+              content:
+                  Text("Le GPS est nécessaire pour le suivi en temps réel."),
               backgroundColor: Colors.orange,
             ),
           );
@@ -55,7 +57,10 @@ class _SuiviTransporteurState extends ConsumerState<SuiviTransporteur> {
               const Icon(Icons.map_outlined, size: 80, color: Colors.white54),
               const SizedBox(height: 20),
               Text("Aucune course à suivre",
-                  style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
+                  style: GoogleFonts.poppins(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.white)),
             ],
           ),
         ),
@@ -67,7 +72,8 @@ class _SuiviTransporteurState extends ConsumerState<SuiviTransporteur> {
     if (etatSuivi.chargement) {
       return const Scaffold(
         backgroundColor: Color(0xFF08111F),
-        body: Center(child: CircularProgressIndicator(color: CouleursApp.primaire)),
+        body: Center(
+            child: CircularProgressIndicator(color: CouleursApp.primaire)),
       );
     }
 
@@ -79,7 +85,9 @@ class _SuiviTransporteurState extends ConsumerState<SuiviTransporteur> {
           foregroundColor: Colors.white,
           elevation: 0,
         ),
-        body: const Center(child: Text('Course introuvable.', style: TextStyle(color: Colors.white70))),
+        body: const Center(
+            child: Text('Course introuvable.',
+                style: TextStyle(color: Colors.white70))),
       );
     }
 
@@ -87,10 +95,13 @@ class _SuiviTransporteurState extends ConsumerState<SuiviTransporteur> {
     final transporteur = etatSuivi.transporteur;
 
     final LatLng depart = LatLng(course.latitudeDepart, course.longitudeDepart);
-    final LatLng arrivee = LatLng(course.latitudeArrivee, course.longitudeArrivee);
+    final LatLng arrivee =
+        LatLng(course.latitudeArrivee, course.longitudeArrivee);
 
     LatLng posTransporteur = depart;
-    if (transporteur != null && transporteur.latitude != 0 && transporteur.longitude != 0) {
+    if (transporteur != null &&
+        transporteur.latitude != 0 &&
+        transporteur.longitude != 0) {
       posTransporteur = LatLng(transporteur.latitude, transporteur.longitude);
     }
 
@@ -119,21 +130,50 @@ class _SuiviTransporteurState extends ConsumerState<SuiviTransporteur> {
                 decoration: BoxDecoration(
                   color: const Color(0xFF0F172A),
                   shape: BoxShape.circle,
-                  boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.3), blurRadius: 10)],
+                  boxShadow: [
+                    BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.3),
+                        blurRadius: 10)
+                  ],
                 ),
-                child: const Icon(Icons.arrow_back_ios_new_rounded, color: Colors.white, size: 18),
+                child: const Icon(Icons.arrow_back_ios_new_rounded,
+                    color: Colors.white, size: 18),
               ),
             ),
           ),
 
-          // 3. BOUTON RECENTRER
+          // 3. BOUTON RECENTRER ET MUTE VOCAL
           Positioned(
             right: 16,
             bottom: MediaQuery.of(context).size.height * 0.42,
-            child: FloatingActionButton.small(
-              backgroundColor: const Color(0xFF0F172A),
-              onPressed: () => _mapController?.move(posTransporteur, 14),
-              child: const Icon(Icons.my_location_rounded, color: CouleursApp.primaire),
+            child: Column(
+              children: [
+                FloatingActionButton.small(
+                  heroTag: "btn_mute_vocal",
+                  backgroundColor: const Color(0xFF0F172A),
+                  onPressed: () {
+                    final navVocale = ref.read(serviceNavigationVocaleProvider);
+                    navVocale.basculerMute();
+                    setState(() {}); // Rafraîchir l'icône
+                  },
+                  child: Icon(
+                    ref.watch(serviceNavigationVocaleProvider).estMute
+                        ? Icons.volume_off_rounded
+                        : Icons.volume_up_rounded,
+                    color: ref.watch(serviceNavigationVocaleProvider).estMute
+                        ? Colors.grey
+                        : CouleursApp.succes,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                FloatingActionButton.small(
+                  heroTag: "btn_recentrer",
+                  backgroundColor: const Color(0xFF0F172A),
+                  onPressed: () => _mapController?.move(posTransporteur, 14),
+                  child: const Icon(Icons.my_location_rounded,
+                      color: CouleursApp.primaire),
+                ),
+              ],
             ),
           ),
 
@@ -166,9 +206,12 @@ class _SuiviTransporteurState extends ConsumerState<SuiviTransporteur> {
             // Poignée
             Center(
               child: Container(
-                width: 40, height: 5,
+                width: 40,
+                height: 5,
                 margin: const EdgeInsets.only(bottom: 20),
-                decoration: BoxDecoration(color: Colors.white24, borderRadius: BorderRadius.circular(10)),
+                decoration: BoxDecoration(
+                    color: Colors.white24,
+                    borderRadius: BorderRadius.circular(10)),
               ),
             ),
 
@@ -179,20 +222,31 @@ class _SuiviTransporteurState extends ConsumerState<SuiviTransporteur> {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text("Course en cours", style: GoogleFonts.poppins(color: Colors.white54, fontSize: 12)),
-                    Text(course.codeSuivi, style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18)),
+                    Text("Course en cours",
+                        style: GoogleFonts.poppins(
+                            color: Colors.white54, fontSize: 12)),
+                    Text(course.codeSuivi,
+                        style: GoogleFonts.poppins(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18)),
                   ],
                 ),
                 Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                   decoration: BoxDecoration(
                     color: CouleursApp.succes.withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: CouleursApp.succes.withValues(alpha: 0.4)),
+                    border: Border.all(
+                        color: CouleursApp.succes.withValues(alpha: 0.4)),
                   ),
                   child: Text(
                     _libeleStatut(statut),
-                    style: GoogleFonts.inter(color: CouleursApp.succes, fontWeight: FontWeight.bold, fontSize: 12),
+                    style: GoogleFonts.inter(
+                        color: CouleursApp.succes,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 12),
                   ),
                 ),
               ],
@@ -206,16 +260,25 @@ class _SuiviTransporteurState extends ConsumerState<SuiviTransporteur> {
                 CircleAvatar(
                   radius: 24,
                   backgroundColor: CouleursApp.primaire.withValues(alpha: 0.15),
-                  child: const Icon(Icons.person_rounded, color: CouleursApp.primaire, size: 26),
+                  child: const Icon(Icons.person_rounded,
+                      color: CouleursApp.primaire, size: 26),
                 ),
                 const SizedBox(width: 14),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(course.nomClient.isNotEmpty ? course.nomClient : "Client",
-                          style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 15)),
-                      Text("Client", style: GoogleFonts.inter(color: Colors.white54, fontSize: 12)),
+                      Text(
+                          course.nomClient.isNotEmpty
+                              ? course.nomClient
+                              : "Client",
+                          style: GoogleFonts.poppins(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 15)),
+                      Text("Client",
+                          style: GoogleFonts.inter(
+                              color: Colors.white54, fontSize: 12)),
                     ],
                   ),
                 ),
@@ -223,13 +286,18 @@ class _SuiviTransporteurState extends ConsumerState<SuiviTransporteur> {
                   IconButton(
                     onPressed: () {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text("Appel de ${course.telephoneClient}...")),
+                        SnackBar(
+                            content:
+                                Text("Appel de ${course.telephoneClient}...")),
                       );
                     },
-                    icon: const Icon(Iconsax.call_copy, color: CouleursApp.succes, size: 22),
+                    icon: const Icon(Iconsax.call_copy,
+                        color: CouleursApp.succes, size: 22),
                     style: IconButton.styleFrom(
-                      backgroundColor: CouleursApp.succes.withValues(alpha: 0.1),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      backgroundColor:
+                          CouleursApp.succes.withValues(alpha: 0.1),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12)),
                     ),
                   ),
               ],
@@ -238,9 +306,11 @@ class _SuiviTransporteurState extends ConsumerState<SuiviTransporteur> {
             const SizedBox(height: 16),
 
             // Adresses
-            _buildInfoLigne(Icons.location_on, "Départ", course.adresseDepart, Colors.redAccent),
+            _buildInfoLigne(Icons.location_on, "Départ", course.adresseDepart,
+                Colors.redAccent),
             const SizedBox(height: 10),
-            _buildInfoLigne(Icons.flag_rounded, "Destination", course.adresseArrivee, Colors.greenAccent),
+            _buildInfoLigne(Icons.flag_rounded, "Destination",
+                course.adresseArrivee, Colors.greenAccent),
 
             const SizedBox(height: 16),
 
@@ -256,37 +326,53 @@ class _SuiviTransporteurState extends ConsumerState<SuiviTransporteur> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text("Détails de la mission",
-                      style: GoogleFonts.inter(color: Colors.white54, fontSize: 11, fontWeight: FontWeight.w700, letterSpacing: 0.8)),
+                      style: GoogleFonts.inter(
+                          color: Colors.white54,
+                          fontSize: 11,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 0.8)),
                   const SizedBox(height: 10),
                   if (course.categorieService.isNotEmpty)
-                    _buildInfoLigne(Icons.category_rounded, "Service", course.categorieService, CouleursApp.primaire),
+                    _buildInfoLigne(Icons.category_rounded, "Service",
+                        course.categorieService, CouleursApp.primaire),
                   if (course.optionGamme.isNotEmpty) ...[
                     const SizedBox(height: 8),
-                    _buildInfoLigne(Icons.star_rounded, "Gamme", course.optionGamme, Colors.amberAccent),
+                    _buildInfoLigne(Icons.star_rounded, "Gamme",
+                        course.optionGamme, Colors.amberAccent),
                   ],
                   if (course.typeVehicule.isNotEmpty) ...[
                     const SizedBox(height: 8),
-                    _buildInfoLigne(Icons.local_shipping_rounded, "Véhicule requis", course.typeVehicule, Colors.blueAccent),
+                    _buildInfoLigne(
+                        Icons.local_shipping_rounded,
+                        "Véhicule requis",
+                        course.typeVehicule,
+                        Colors.blueAccent),
                   ],
                   if (course.typeMarchandise.isNotEmpty) ...[
                     const SizedBox(height: 8),
-                    _buildInfoLigne(Icons.inventory_2_rounded, "Marchandise", course.typeMarchandise, Colors.orangeAccent),
+                    _buildInfoLigne(Icons.inventory_2_rounded, "Marchandise",
+                        course.typeMarchandise, Colors.orangeAccent),
                   ],
                   if (course.description.isNotEmpty) ...[
                     const SizedBox(height: 8),
-                    _buildInfoLigne(Icons.notes_rounded, "Description", course.description, Colors.white70),
+                    _buildInfoLigne(Icons.notes_rounded, "Description",
+                        course.description, Colors.white70),
                   ],
                   if (course.detailsSpecifiques.isNotEmpty) ...[
                     const SizedBox(height: 8),
-                    _buildInfoLigne(Icons.info_outline_rounded, "Détails", course.detailsSpecifiques, Colors.white54),
+                    _buildInfoLigne(Icons.info_outline_rounded, "Détails",
+                        course.detailsSpecifiques, Colors.white54),
                   ],
                   if (course.aideChargement) ...[
                     const SizedBox(height: 8),
                     Row(
                       children: [
-                        const Icon(Icons.check_circle_rounded, color: CouleursApp.succes, size: 16),
+                        const Icon(Icons.check_circle_rounded,
+                            color: CouleursApp.succes, size: 16),
                         const SizedBox(width: 8),
-                        Text("Aide au chargement incluse", style: GoogleFonts.inter(color: CouleursApp.succes, fontSize: 12)),
+                        Text("Aide au chargement incluse",
+                            style: GoogleFonts.inter(
+                                color: CouleursApp.succes, fontSize: 12)),
                       ],
                     ),
                   ],
@@ -308,10 +394,15 @@ class _SuiviTransporteurState extends ConsumerState<SuiviTransporteur> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text("Montant à percevoir", style: GoogleFonts.inter(color: Colors.white54, fontSize: 13)),
+                  Text("Montant à percevoir",
+                      style: GoogleFonts.inter(
+                          color: Colors.white54, fontSize: 13)),
                   Text(
                     "${(course.prixFinal > 0 ? course.prixFinal : course.prixEstime).toStringAsFixed(0)} FCFA",
-                    style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
+                    style: GoogleFonts.poppins(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16),
                   ),
                 ],
               ),
@@ -320,20 +411,26 @@ class _SuiviTransporteurState extends ConsumerState<SuiviTransporteur> {
             const SizedBox(height: 20),
 
             // Bouton Terminer (sans code PIN)
-            if (statut != StatutCourse.terminee && statut != StatutCourse.annulee)
+            if (statut != StatutCourse.terminee &&
+                statut != StatutCourse.annulee)
               SizedBox(
                 width: double.infinity,
                 height: 56,
                 child: ElevatedButton.icon(
                   onPressed: () => _terminerCourse(context, course),
-                  icon: const Icon(Icons.check_circle_rounded, color: Colors.white),
+                  icon: const Icon(Icons.check_circle_rounded,
+                      color: Colors.white),
                   label: Text(
                     "Terminer la course",
-                    style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 16),
+                    style: GoogleFonts.poppins(
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16),
                   ),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: CouleursApp.succes,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16)),
                     elevation: 0,
                   ),
                 ),
@@ -346,7 +443,8 @@ class _SuiviTransporteurState extends ConsumerState<SuiviTransporteur> {
                 decoration: BoxDecoration(
                   color: CouleursApp.succes.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(16),
-                  border: Border.all(color: CouleursApp.succes.withValues(alpha: 0.3)),
+                  border: Border.all(
+                      color: CouleursApp.succes.withValues(alpha: 0.3)),
                 ),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
@@ -356,7 +454,8 @@ class _SuiviTransporteurState extends ConsumerState<SuiviTransporteur> {
                     Expanded(
                       child: Text(
                         "Course terminée ! En attente du paiement client.",
-                        style: GoogleFonts.inter(color: CouleursApp.succes, fontSize: 13),
+                        style: GoogleFonts.inter(
+                            color: CouleursApp.succes, fontSize: 13),
                         textAlign: TextAlign.center,
                       ),
                     ),
@@ -369,7 +468,8 @@ class _SuiviTransporteurState extends ConsumerState<SuiviTransporteur> {
     );
   }
 
-  Widget _buildInfoLigne(IconData icone, String label, String valeur, Color couleur) {
+  Widget _buildInfoLigne(
+      IconData icone, String label, String valeur, Color couleur) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -379,8 +479,13 @@ class _SuiviTransporteurState extends ConsumerState<SuiviTransporteur> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(label, style: GoogleFonts.inter(color: Colors.white38, fontSize: 11, fontWeight: FontWeight.w600)),
-              Text(valeur.isNotEmpty ? valeur : "—", style: GoogleFonts.inter(color: Colors.white, fontSize: 13)),
+              Text(label,
+                  style: GoogleFonts.inter(
+                      color: Colors.white38,
+                      fontSize: 11,
+                      fontWeight: FontWeight.w600)),
+              Text(valeur.isNotEmpty ? valeur : "—",
+                  style: GoogleFonts.inter(color: Colors.white, fontSize: 13)),
             ],
           ),
         ),
@@ -390,16 +495,26 @@ class _SuiviTransporteurState extends ConsumerState<SuiviTransporteur> {
 
   String _libeleStatut(String statut) {
     switch (statut) {
-      case StatutCourse.propose: return "Proposé";
-      case StatutCourse.attribue: return "Attribué";
-      case StatutCourse.enRouteDepart: return "En route → Départ";
-      case StatutCourse.arriveDepart: return "Arrivé au départ";
-      case StatutCourse.charge: return "Chargé";
-      case StatutCourse.enTransit: return "En transit";
-      case StatutCourse.arriveDestination: return "Arrivé destination";
-      case StatutCourse.terminee: return "Terminée ✅";
-      case StatutCourse.annulee: return "Annulée ❌";
-      default: return statut;
+      case StatutCourse.propose:
+        return "Proposé";
+      case StatutCourse.attribue:
+        return "Attribué";
+      case StatutCourse.enRouteDepart:
+        return "En route → Départ";
+      case StatutCourse.arriveDepart:
+        return "Arrivé au départ";
+      case StatutCourse.charge:
+        return "Chargé";
+      case StatutCourse.enTransit:
+        return "En transit";
+      case StatutCourse.arriveDestination:
+        return "Arrivé destination";
+      case StatutCourse.terminee:
+        return "Terminée ✅";
+      case StatutCourse.annulee:
+        return "Annulée ❌";
+      default:
+        return statut;
     }
   }
 
@@ -409,7 +524,9 @@ class _SuiviTransporteurState extends ConsumerState<SuiviTransporteur> {
       builder: (ctx) => AlertDialog(
         backgroundColor: const Color(0xFF0F172A),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: Text("Confirmer la fin de course", style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.bold)),
+        title: Text("Confirmer la fin de course",
+            style: GoogleFonts.poppins(
+                color: Colors.white, fontWeight: FontWeight.bold)),
         content: Text(
           "Confirmez-vous que la livraison est terminée et la marchandise remise au client ?",
           style: GoogleFonts.inter(color: Colors.white70),
@@ -417,7 +534,8 @@ class _SuiviTransporteurState extends ConsumerState<SuiviTransporteur> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: Text("Non, annuler", style: GoogleFonts.inter(color: Colors.white54)),
+            child: Text("Non, annuler",
+                style: GoogleFonts.inter(color: Colors.white54)),
           ),
           ElevatedButton(
             onPressed: () async {
@@ -434,10 +552,13 @@ class _SuiviTransporteurState extends ConsumerState<SuiviTransporteur> {
               if (context.mounted) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
-                    content: Text("Course terminée ! En attente du paiement client.", style: GoogleFonts.inter(color: Colors.white)),
+                    content: Text(
+                        "Course terminée ! En attente du paiement client.",
+                        style: GoogleFonts.inter(color: Colors.white)),
                     backgroundColor: CouleursApp.succes,
                     behavior: SnackBarBehavior.floating,
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12)),
                   ),
                 );
               }
@@ -445,9 +566,11 @@ class _SuiviTransporteurState extends ConsumerState<SuiviTransporteur> {
             style: ElevatedButton.styleFrom(
               backgroundColor: CouleursApp.succes,
               foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12)),
             ),
-            child: Text("Oui, terminer", style: GoogleFonts.poppins(fontWeight: FontWeight.bold)),
+            child: Text("Oui, terminer",
+                style: GoogleFonts.poppins(fontWeight: FontWeight.bold)),
           ),
         ],
       ),

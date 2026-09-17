@@ -9,7 +9,6 @@ import 'package:update_camtrans/coeur/routes/routes.dart';
 import 'package:update_camtrans/coeur/widgets/effets_visuels.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
-
 class Onboarding extends StatefulWidget {
   const Onboarding({super.key});
 
@@ -225,7 +224,8 @@ class _OnboardingSlide extends StatelessWidget {
               )
                   .animate(key: ValueKey('image_$index'))
                   .fadeIn(duration: 500.ms)
-                  .scale(begin: const Offset(1.04, 1.04), end: const Offset(1, 1)),
+                  .scale(
+                      begin: const Offset(1.04, 1.04), end: const Offset(1, 1)),
               DecoratedBox(
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
@@ -252,7 +252,8 @@ class _OnboardingSlide extends StatelessWidget {
             padding: EdgeInsets.fromLTRB(24, isCompact ? 24 : 32, 24, 112),
             decoration: BoxDecoration(
               color: CouleursApp.fond.withValues(alpha: 0.96),
-              borderRadius: const BorderRadius.vertical(top: Radius.circular(34)),
+              borderRadius:
+                  const BorderRadius.vertical(top: Radius.circular(34)),
               border: Border.all(color: Colors.white.withValues(alpha: 0.82)),
               boxShadow: [
                 BoxShadow(
@@ -309,7 +310,10 @@ class _OnboardingSlide extends StatelessWidget {
                           ),
                         ),
                       ],
-                    ).animate(key: ValueKey('badge_$index')).fadeIn().slideX(begin: -0.12),
+                    )
+                        .animate(key: ValueKey('badge_$index'))
+                        .fadeIn()
+                        .slideX(begin: -0.12),
                     SizedBox(height: isCompact ? 18 : 24),
                     Text(
                       page.titre,

@@ -8,7 +8,8 @@ class EtatEstimation {
 
   EtatEstimation({this.enCours = false, this.resultat, this.erreur});
 
-  EtatEstimation copierAvec({bool? enCours, ResultatEstimation? resultat, String? erreur}) {
+  EtatEstimation copierAvec(
+      {bool? enCours, ResultatEstimation? resultat, String? erreur}) {
     return EtatEstimation(
       enCours: enCours ?? this.enCours,
       resultat: resultat ?? this.resultat,
@@ -33,7 +34,7 @@ class EstimationNotifier extends StateNotifier<EtatEstimation> {
     double distanceKm = 10.0, // Default for simulation if not provided
   }) async {
     state = EtatEstimation(enCours: true);
-    
+
     try {
       ResultatEstimation resultat;
       if (isRemorque) {
@@ -60,6 +61,7 @@ class EstimationNotifier extends StateNotifier<EtatEstimation> {
   }
 }
 
-final estimationProvider = StateNotifierProvider<EstimationNotifier, EtatEstimation>((ref) {
+final estimationProvider =
+    StateNotifierProvider<EstimationNotifier, EtatEstimation>((ref) {
   return EstimationNotifier(ref.read(serviceEstimationProvider));
 });

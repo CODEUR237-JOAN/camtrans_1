@@ -11,11 +11,11 @@ import 'package:update_camtrans/services/service_firestore.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:update_camtrans/coeur/widgets/loader_premium.dart';
 
-
 class PageModeration extends ConsumerWidget {
   const PageModeration({super.key});
 
-  static Future<void> modifierStatut(BuildContext context, WidgetRef ref, Transporteur transporteur, bool approuve) async {
+  static Future<void> modifierStatut(BuildContext context, WidgetRef ref,
+      Transporteur transporteur, bool approuve) async {
     try {
       final firestore = ref.read(serviceFirestoreProvider);
       await firestore.modifierDocument(
@@ -26,7 +26,9 @@ class PageModeration extends ConsumerWidget {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(approuve ? "Dossier de ${transporteur.prenom} approuvé" : "Dossier de ${transporteur.prenom} rejeté"),
+            content: Text(approuve
+                ? "Dossier de ${transporteur.prenom} approuvé"
+                : "Dossier de ${transporteur.prenom} rejeté"),
             backgroundColor: approuve ? CouleursApp.succes : CouleursApp.erreur,
             behavior: SnackBarBehavior.floating,
           ),
@@ -35,7 +37,10 @@ class PageModeration extends ConsumerWidget {
     } catch (e) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Erreur: $e"), backgroundColor: CouleursApp.erreur, behavior: SnackBarBehavior.floating),
+          SnackBar(
+              content: Text("Erreur: $e"),
+              backgroundColor: CouleursApp.erreur,
+              behavior: SnackBarBehavior.floating),
         );
       }
     }
@@ -60,19 +65,29 @@ class PageModeration extends ConsumerWidget {
                 color: CouleursApp.avertissement.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
-            ).animate(onPlay: (controller) => controller.repeat(reverse: true)).scale(duration: 5.seconds, begin: const Offset(1,1), end: const Offset(1.3,1.3)),
+            )
+                .animate(
+                    onPlay: (controller) => controller.repeat(reverse: true))
+                .scale(
+                    duration: 5.seconds,
+                    begin: const Offset(1, 1),
+                    end: const Offset(1.3, 1.3)),
           ),
-          
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               _buildHeader(),
               Expanded(
                 child: transporteursAsync.when(
-                  loading: () => const EtatChargement(message: "Chargement des dossiers..."),
-                  error: (err, _) => EtatErreur(erreur: err.toString(), onRetry: () => ref.refresh(adminTransporteursProvider)),
+                  loading: () => const EtatChargement(
+                      message: "Chargement des dossiers..."),
+                  error: (err, _) => EtatErreur(
+                      erreur: err.toString(),
+                      onRetry: () => ref.refresh(adminTransporteursProvider)),
                   data: (transporteurs) {
-                    final enAttente = transporteurs.where((t) => !t.documentsValides).toList();
+                    final enAttente = transporteurs
+                        .where((t) => !t.documentsValides)
+                        .toList();
 
                     if (enAttente.isEmpty) {
                       return Center(
@@ -81,38 +96,53 @@ class PageModeration extends ConsumerWidget {
                           children: [
                             Container(
                               padding: const EdgeInsets.all(24),
-                              decoration: BoxDecoration(color: CouleursApp.succes.withValues(alpha: 0.1), shape: BoxShape.circle),
-                              child: const Icon(Iconsax.verify_copy, size: 64, color: CouleursApp.succes),
+                              decoration: BoxDecoration(
+                                  color:
+                                      CouleursApp.succes.withValues(alpha: 0.1),
+                                  shape: BoxShape.circle),
+                              child: const Icon(Iconsax.verify_copy,
+                                  size: 64, color: CouleursApp.succes),
                             ),
                             const SizedBox(height: 24),
-                            Text("À jour !", style: GoogleFonts.inter(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white)),
+                            Text("À jour !",
+                                style: GoogleFonts.inter(
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white)),
                             const SizedBox(height: 8),
-                            Text("Aucun dossier en attente de modération.", style: GoogleFonts.inter(color: Colors.white54)),
+                            Text("Aucun dossier en attente de modération.",
+                                style:
+                                    GoogleFonts.inter(color: Colors.white54)),
                           ],
                         ),
                       );
                     }
 
-                    return LayoutBuilder(
-                      builder: (context, constraints) {
-                        int crossAxisCount = constraints.maxWidth > 1000 ? 3 : constraints.maxWidth > 600 ? 2 : 1;
-                        
-                        return GridView.builder(
-                          padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-                          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                            crossAxisCount: crossAxisCount,
-                            crossAxisSpacing: 24,
-                            mainAxisSpacing: 24,
-                            childAspectRatio: 0.75, // Ajusté pour le nouveau design
-                          ),
-                          itemCount: enAttente.length,
-                          itemBuilder: (context, index) {
-                            return _DossierCard(transporteur: enAttente[index])
-                                .animate().slideY(begin: 0.1);
-                          },
-                        );
-                      }
-                    );
+                    return LayoutBuilder(builder: (context, constraints) {
+                      int crossAxisCount = constraints.maxWidth > 1000
+                          ? 3
+                          : constraints.maxWidth > 600
+                              ? 2
+                              : 1;
+
+                      return GridView.builder(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 32, vertical: 16),
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: crossAxisCount,
+                          crossAxisSpacing: 24,
+                          mainAxisSpacing: 24,
+                          childAspectRatio:
+                              0.75, // Ajusté pour le nouveau design
+                        ),
+                        itemCount: enAttente.length,
+                        itemBuilder: (context, index) {
+                          return _DossierCard(transporteur: enAttente[index])
+                              .animate()
+                              .slideY(begin: 0.1);
+                        },
+                      );
+                    });
                   },
                 ),
               ),
@@ -131,7 +161,11 @@ class PageModeration extends ConsumerWidget {
         children: [
           Text(
             "Modération des Documents",
-            style: GoogleFonts.inter(fontSize: 32, fontWeight: FontWeight.bold, color: Colors.white, letterSpacing: -1),
+            style: GoogleFonts.inter(
+                fontSize: 32,
+                fontWeight: FontWeight.bold,
+                color: Colors.white,
+                letterSpacing: -1),
           ),
           const SizedBox(height: 8),
           Text(
@@ -146,7 +180,7 @@ class PageModeration extends ConsumerWidget {
 
 class _DossierCard extends ConsumerWidget {
   final Transporteur transporteur;
-  
+
   const _DossierCard({required this.transporteur});
 
   @override
@@ -164,21 +198,31 @@ class _DossierCard extends ConsumerWidget {
           Row(
             children: [
               Container(
-                width: 60, height: 60,
+                width: 60,
+                height: 60,
                 decoration: BoxDecoration(
                   color: Colors.orange.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(16),
                 ),
-                child: const Icon(Iconsax.personalcard_copy, color: Colors.orange, size: 28),
+                child: const Icon(Iconsax.personalcard_copy,
+                    color: Colors.orange, size: 28),
               ),
               const SizedBox(width: 16),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text("${transporteur.prenom} ${transporteur.nom}", style: GoogleFonts.inter(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.white), maxLines: 1, overflow: TextOverflow.ellipsis),
+                    Text("${transporteur.prenom} ${transporteur.nom}",
+                        style: GoogleFonts.inter(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18,
+                            color: Colors.white),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis),
                     const SizedBox(height: 4),
-                    Text(transporteur.telephone, style: GoogleFonts.inter(color: Colors.white54, fontSize: 13)),
+                    Text(transporteur.telephone,
+                        style: GoogleFonts.inter(
+                            color: Colors.white54, fontSize: 13)),
                   ],
                 ),
               )
@@ -187,13 +231,24 @@ class _DossierCard extends ConsumerWidget {
           const SizedBox(height: 24),
           Divider(color: Colors.white.withValues(alpha: 0.1), height: 1),
           const SizedBox(height: 24),
-          Text("Documents soumis :", style: GoogleFonts.inter(fontWeight: FontWeight.bold, color: Colors.white)),
+          Text("Documents soumis :",
+              style: GoogleFonts.inter(
+                  fontWeight: FontWeight.bold, color: Colors.white)),
           const SizedBox(height: 12),
-          
-          _buildDocLigne(context, Iconsax.image_copy, "Photo de profil", transporteur.photo.isNotEmpty, transporteur.photo),
-          _buildDocLigne(context, Iconsax.personalcard_copy, "Permis de conduire", transporteur.photoPermis.isNotEmpty, transporteur.photoPermis),
-          _buildDocLigne(context, Iconsax.document_copy, "Carte grise", transporteur.photoCarteGrise.isNotEmpty, transporteur.photoCarteGrise),
-          
+          _buildDocLigne(context, Iconsax.image_copy, "Photo de profil",
+              transporteur.photo.isNotEmpty, transporteur.photo),
+          _buildDocLigne(
+              context,
+              Iconsax.personalcard_copy,
+              "Permis de conduire",
+              transporteur.photoPermis.isNotEmpty,
+              transporteur.photoPermis),
+          _buildDocLigne(
+              context,
+              Iconsax.document_copy,
+              "Carte grise",
+              transporteur.photoCarteGrise.isNotEmpty,
+              transporteur.photoCarteGrise),
           const Spacer(),
           Row(
             children: [
@@ -202,7 +257,8 @@ class _DossierCard extends ConsumerWidget {
                   icon: Iconsax.close_circle_copy,
                   label: "Rejeter",
                   color: CouleursApp.erreur,
-                  onTap: () => PageModeration.modifierStatut(context, ref, transporteur, false),
+                  onTap: () => PageModeration.modifierStatut(
+                      context, ref, transporteur, false),
                 ),
               ),
               const SizedBox(width: 12),
@@ -211,7 +267,8 @@ class _DossierCard extends ConsumerWidget {
                   icon: Iconsax.tick_circle_copy,
                   label: "Approuver",
                   color: CouleursApp.succes,
-                  onTap: () => PageModeration.modifierStatut(context, ref, transporteur, true),
+                  onTap: () => PageModeration.modifierStatut(
+                      context, ref, transporteur, true),
                   isPrimary: true,
                 ),
               ),
@@ -222,7 +279,12 @@ class _DossierCard extends ConsumerWidget {
     );
   }
 
-  Widget _buildActionButton({required IconData icon, required String label, required Color color, required VoidCallback onTap, bool isPrimary = false}) {
+  Widget _buildActionButton(
+      {required IconData icon,
+      required String label,
+      required Color color,
+      required VoidCallback onTap,
+      bool isPrimary = false}) {
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(12),
@@ -252,9 +314,12 @@ class _DossierCard extends ConsumerWidget {
     );
   }
 
-  Widget _buildDocLigne(BuildContext context, IconData icone, String label, bool recu, String imageUrl) {
+  Widget _buildDocLigne(BuildContext context, IconData icone, String label,
+      bool recu, String imageUrl) {
     return InkWell(
-      onTap: recu && imageUrl.isNotEmpty ? () => _afficherImageEnGrand(context, label, imageUrl) : null,
+      onTap: recu && imageUrl.isNotEmpty
+          ? () => _afficherImageEnGrand(context, label, imageUrl)
+          : null,
       borderRadius: BorderRadius.circular(8),
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 4.0),
@@ -262,7 +327,16 @@ class _DossierCard extends ConsumerWidget {
           children: [
             Icon(icone, size: 20, color: Colors.white54),
             const SizedBox(width: 12),
-            Expanded(child: Text(label, style: GoogleFonts.inter(fontSize: 14, decoration: recu && imageUrl.isNotEmpty ? TextDecoration.underline : TextDecoration.none, color: recu && imageUrl.isNotEmpty ? Colors.white : Colors.white54))),
+            Expanded(
+                child: Text(label,
+                    style: GoogleFonts.inter(
+                        fontSize: 14,
+                        decoration: recu && imageUrl.isNotEmpty
+                            ? TextDecoration.underline
+                            : TextDecoration.none,
+                        color: recu && imageUrl.isNotEmpty
+                            ? Colors.white
+                            : Colors.white54))),
             Icon(
               recu ? Iconsax.tick_circle_copy : Iconsax.clock_copy,
               color: recu ? CouleursApp.succes : CouleursApp.avertissement,
@@ -274,7 +348,8 @@ class _DossierCard extends ConsumerWidget {
     );
   }
 
-  void _afficherImageEnGrand(BuildContext context, String titre, String imageUrl) {
+  void _afficherImageEnGrand(
+      BuildContext context, String titre, String imageUrl) {
     showDialog(
       context: context,
       builder: (context) => Dialog(
@@ -292,9 +367,14 @@ class _DossierCard extends ConsumerWidget {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(titre, style: GoogleFonts.inter(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
+                  Text(titre,
+                      style: GoogleFonts.inter(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white)),
                   IconButton(
-                    icon: const Icon(Iconsax.close_circle_copy, color: Colors.white54),
+                    icon: const Icon(Iconsax.close_circle_copy,
+                        color: Colors.white54),
                     onPressed: () => Navigator.pop(context),
                   ),
                 ],
@@ -315,7 +395,9 @@ class _DossierCard extends ConsumerWidget {
                 errorBuilder: (context, error, stackTrace) {
                   return SizedBox(
                     height: 200,
-                    child: Center(child: Text("Erreur de chargement de l'image", style: GoogleFonts.inter(color: Colors.white54))),
+                    child: Center(
+                        child: Text("Erreur de chargement de l'image",
+                            style: GoogleFonts.inter(color: Colors.white54))),
                   );
                 },
               ),

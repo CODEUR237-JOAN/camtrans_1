@@ -16,7 +16,7 @@ class PageNotifications extends ConsumerStatefulWidget {
 class _PageNotificationsState extends ConsumerState<PageNotifications> {
   final TextEditingController _titreController = TextEditingController();
   final TextEditingController _messageController = TextEditingController();
-  
+
   String _cible = "tous"; // tous, clients, transporteurs
   bool _enCours = false;
 
@@ -34,8 +34,9 @@ class _PageNotificationsState extends ConsumerState<PageNotifications> {
     setState(() => _enCours = true);
 
     try {
-      final refNotif = FirebaseFirestore.instance.collection('notifications_push').doc();
-      
+      final refNotif =
+          FirebaseFirestore.instance.collection('notifications_push').doc();
+
       await refNotif.set({
         'id': refNotif.id,
         'titre': titre,
@@ -75,7 +76,8 @@ class _PageNotificationsState extends ConsumerState<PageNotifications> {
         children: [
           Text(
             "Notifications Push Globales",
-            style: GoogleFonts.inter(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
+            style: GoogleFonts.inter(
+                fontSize: 24, fontWeight: FontWeight.bold, color: Colors.white),
           ),
           const SizedBox(height: 8),
           Text(
@@ -83,7 +85,6 @@ class _PageNotificationsState extends ConsumerState<PageNotifications> {
             style: GoogleFonts.inter(fontSize: 14, color: Colors.grey.shade400),
           ),
           const SizedBox(height: 30),
-
           Container(
             padding: const EdgeInsets.all(24),
             decoration: BoxDecoration(
@@ -110,17 +111,23 @@ class _PageNotificationsState extends ConsumerState<PageNotifications> {
                   decoration: InputDecoration(
                     filled: true,
                     fillColor: Colors.black.withValues(alpha: 0.2),
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide.none),
                   ),
                   items: const [
-                    DropdownMenuItem(value: "tous", child: Text("Tous les utilisateurs")),
-                    DropdownMenuItem(value: "clients", child: Text("Uniquement les clients")),
-                    DropdownMenuItem(value: "transporteurs", child: Text("Uniquement les transporteurs")),
+                    DropdownMenuItem(
+                        value: "tous", child: Text("Tous les utilisateurs")),
+                    DropdownMenuItem(
+                        value: "clients",
+                        child: Text("Uniquement les clients")),
+                    DropdownMenuItem(
+                        value: "transporteurs",
+                        child: Text("Uniquement les transporteurs")),
                   ],
                   onChanged: (val) => setState(() => _cible = val!),
                 ),
                 const SizedBox(height: 24),
-                
                 _buildLabel("Titre de la notification"),
                 const SizedBox(height: 10),
                 TextField(
@@ -131,11 +138,12 @@ class _PageNotificationsState extends ConsumerState<PageNotifications> {
                     hintStyle: TextStyle(color: Colors.grey.shade600),
                     filled: true,
                     fillColor: Colors.black.withValues(alpha: 0.2),
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide.none),
                   ),
                 ),
                 const SizedBox(height: 24),
-
                 _buildLabel("Message"),
                 const SizedBox(height: 10),
                 TextField(
@@ -147,26 +155,34 @@ class _PageNotificationsState extends ConsumerState<PageNotifications> {
                     hintStyle: TextStyle(color: Colors.grey.shade600),
                     filled: true,
                     fillColor: Colors.black.withValues(alpha: 0.2),
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                    border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide.none),
                   ),
                 ),
                 const SizedBox(height: 30),
-
                 SizedBox(
                   width: double.infinity,
                   height: 55,
                   child: ElevatedButton.icon(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: CouleursApp.primaire,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12)),
                     ),
                     onPressed: _enCours ? null : _envoyerNotification,
-                    icon: _enCours 
-                      ? const SizedBox(width: 20, height: 20, child: LoaderPremium(size: 24))
-                      : const Icon(Icons.send, color: Colors.white),
+                    icon: _enCours
+                        ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: LoaderPremium(size: 24))
+                        : const Icon(Icons.send, color: Colors.white),
                     label: Text(
                       _enCours ? "Envoi en cours..." : "Envoyer le Push",
-                      style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+                      style: GoogleFonts.inter(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white),
                     ),
                   ),
                 )
@@ -181,7 +197,10 @@ class _PageNotificationsState extends ConsumerState<PageNotifications> {
   Widget _buildLabel(String texte) {
     return Text(
       texte,
-      style: GoogleFonts.inter(fontSize: 14, fontWeight: FontWeight.w600, color: Colors.grey.shade300),
+      style: GoogleFonts.inter(
+          fontSize: 14,
+          fontWeight: FontWeight.w600,
+          color: Colors.grey.shade300),
     );
   }
 }

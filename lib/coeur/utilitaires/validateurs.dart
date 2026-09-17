@@ -6,9 +6,9 @@ class Validateurs {
   // ===============================
 
   static String? obligatoire(
-      String? valeur, {
-        String nomChamp = "Ce champ",
-      }) {
+    String? valeur, {
+    String nomChamp = "Ce champ",
+  }) {
     if (valeur == null || valeur.trim().isEmpty) {
       return "$nomChamp est obligatoire.";
     }
@@ -95,9 +95,9 @@ class Validateurs {
   // ===============================
 
   static String? confirmerMotDePasse(
-      String? confirmation,
-      String motDePasse,
-      ) {
+    String? confirmation,
+    String motDePasse,
+  ) {
     if (confirmation == null || confirmation.isEmpty) {
       return "Veuillez confirmer votre mot de passe.";
     }

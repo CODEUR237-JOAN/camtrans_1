@@ -5,7 +5,9 @@ import '../../services/service_firestore.dart';
 // Provider pour récupérer les textes globaux de l'application depuis Firestore
 final textesAppProvider = StreamProvider<TextesApp>((ref) {
   final firestore = ref.watch(serviceFirestoreProvider);
-  return firestore.fluxDocument(collection: 'parametres', id: 'textes_app').map((doc) {
+  return firestore
+      .fluxDocument(collection: 'parametres', id: 'textes_app')
+      .map((doc) {
     if (doc.exists && doc.data() != null) {
       return TextesApp.fromMap(doc.data()!);
     }

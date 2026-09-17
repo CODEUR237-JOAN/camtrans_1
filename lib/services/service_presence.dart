@@ -70,7 +70,7 @@ class ServicePresence with WidgetsBindingObserver {
       debugPrint("⚠️ Heartbeat ignoré : user=$user, collection=$collection");
       return;
     }
-    
+
     debugPrint("💓 Envoi du heartbeat pour ${user.uid} dans $collection...");
     _firestore.collection(collection).doc(user.uid).update({
       'derniereConnexion': FieldValue.serverTimestamp(),
@@ -94,7 +94,11 @@ class ServicePresence with WidgetsBindingObserver {
       'derniereConnexion': FieldValue.serverTimestamp(),
     };
 
-    await _firestore.collection(collection).doc(user.uid).update(donnees).then((_) {
+    await _firestore
+        .collection(collection)
+        .doc(user.uid)
+        .update(donnees)
+        .then((_) {
       debugPrint("✅ _setEnLigne($enLigne) réussi !");
     }).catchError((e) {
       debugPrint("❌ Erreur _setEnLigne($enLigne) : $e");

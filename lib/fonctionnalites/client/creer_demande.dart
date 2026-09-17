@@ -15,37 +15,104 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'dart:math' as math;
 import 'package:update_camtrans/coeur/widgets/loader_premium.dart';
 
-
 /// =================================================================
 /// NEO PREMIUM GLASS DARK - TUNNEL DE COMMANDE SPRINT 10
 /// =================================================================
 
 // ~30 marques de véhicules populaires au Cameroun (Douala, Yaoundé)
 const List<String> _marquesVehicules = [
-  'Toyota', 'Mercedes', 'Hyundai', 'Kia', 'Nissan', 'Peugeot',
-  'Renault', 'Ford', 'Volkswagen', 'Honda', 'Mitsubishi', 'Suzuki',
-  'Isuzu', 'Hino', 'Man', 'Iveco', 'Fuso', 'JAC', 'Foton',
-  'Tata', 'Land Rover', 'BMW', 'Audi', 'Citroën', 'Opel',
-  'Mazda', 'Volvo', 'Scania', 'DAF', 'Autre',
+  'Toyota',
+  'Mercedes',
+  'Hyundai',
+  'Kia',
+  'Nissan',
+  'Peugeot',
+  'Renault',
+  'Ford',
+  'Volkswagen',
+  'Honda',
+  'Mitsubishi',
+  'Suzuki',
+  'Isuzu',
+  'Hino',
+  'Man',
+  'Iveco',
+  'Fuso',
+  'JAC',
+  'Foton',
+  'Tata',
+  'Land Rover',
+  'BMW',
+  'Audi',
+  'Citroën',
+  'Opel',
+  'Mazda',
+  'Volvo',
+  'Scania',
+  'DAF',
+  'Autre',
 ];
 
 // Liste exhaustive de quartiers de Yaoundé pour l'autocomplétion
 const List<String> _quartiersCameroun = [
-  'Bastos, Yaoundé', 'Centre-ville, Yaoundé', 'Melen, Yaoundé', 'Nlongkak, Yaoundé', 
-  'Tsinga, Yaoundé', 'Elig-Essono, Yaoundé', 'Mballa 2, Yaoundé', 'Hippodrome, Yaoundé', 
-  'Quartier du Lac, Yaoundé', 'Messa, Yaoundé', 'Omnisport, Yaoundé', 'Mfandena, Yaoundé', 
-  'Essos, Yaoundé', 'Mimboman, Yaoundé', 'Kondengui, Yaoundé', 'Ekounou, Yaoundé', 
-  'Awae, Yaoundé', 'Mvog-Mbi, Yaoundé', 'Mvog-Ada, Yaoundé', 'Nkoldongo, Yaoundé', 
-  'Anguissa, Yaoundé', 'Nkomo, Yaoundé', 'Odza, Yaoundé', 'Mvan, Yaoundé', 
-  'Ahala, Yaoundé', 'Meyo, Yaoundé', 'Nsimalen, Yaoundé', 'Tropicana, Yaoundé', 
-  'Biyem-Assi, Yaoundé', 'Obili, Yaoundé', 'Ngoa-Ekélé, Yaoundé', 'Etoug-Ebe, Yaoundé', 
-  'Mendong, Yaoundé', 'Simbock, Yaoundé', 'Jouvence, Yaoundé', 'Mokolo, Yaoundé', 
-  'Madagascar, Yaoundé', 'Cité Verte, Yaoundé', 'Nkolbisson, Yaoundé', 'Oyom-Abang, Yaoundé', 
-  'Carrière, Yaoundé', 'Etoudi, Yaoundé', 'Emana, Yaoundé', 'Messassi, Yaoundé', 
-  'Olembe, Yaoundé', 'Nkolmesseng, Yaoundé', 'Ngousso, Yaoundé', 'Biteng, Yaoundé', 
-  'Ndamvout, Yaoundé', 'Ekoumdoum, Yaoundé', 'Damase, Yaoundé', 'Briqueterie, Yaoundé',
-  'Mbankolo, Yaoundé', 'Febe, Yaoundé', 'Tonga, Yaoundé', 'Nsimeyong, Yaoundé'
+  'Bastos, Yaoundé',
+  'Centre-ville, Yaoundé',
+  'Melen, Yaoundé',
+  'Nlongkak, Yaoundé',
+  'Tsinga, Yaoundé',
+  'Elig-Essono, Yaoundé',
+  'Mballa 2, Yaoundé',
+  'Hippodrome, Yaoundé',
+  'Quartier du Lac, Yaoundé',
+  'Messa, Yaoundé',
+  'Omnisport, Yaoundé',
+  'Mfandena, Yaoundé',
+  'Essos, Yaoundé',
+  'Mimboman, Yaoundé',
+  'Kondengui, Yaoundé',
+  'Ekounou, Yaoundé',
+  'Awae, Yaoundé',
+  'Mvog-Mbi, Yaoundé',
+  'Mvog-Ada, Yaoundé',
+  'Nkoldongo, Yaoundé',
+  'Anguissa, Yaoundé',
+  'Nkomo, Yaoundé',
+  'Odza, Yaoundé',
+  'Mvan, Yaoundé',
+  'Ahala, Yaoundé',
+  'Meyo, Yaoundé',
+  'Nsimalen, Yaoundé',
+  'Tropicana, Yaoundé',
+  'Biyem-Assi, Yaoundé',
+  'Obili, Yaoundé',
+  'Ngoa-Ekélé, Yaoundé',
+  'Etoug-Ebe, Yaoundé',
+  'Mendong, Yaoundé',
+  'Simbock, Yaoundé',
+  'Jouvence, Yaoundé',
+  'Mokolo, Yaoundé',
+  'Madagascar, Yaoundé',
+  'Cité Verte, Yaoundé',
+  'Nkolbisson, Yaoundé',
+  'Oyom-Abang, Yaoundé',
+  'Carrière, Yaoundé',
+  'Etoudi, Yaoundé',
+  'Emana, Yaoundé',
+  'Messassi, Yaoundé',
+  'Olembe, Yaoundé',
+  'Nkolmesseng, Yaoundé',
+  'Ngousso, Yaoundé',
+  'Biteng, Yaoundé',
+  'Ndamvout, Yaoundé',
+  'Ekoumdoum, Yaoundé',
+  'Damase, Yaoundé',
+  'Briqueterie, Yaoundé',
+  'Mbankolo, Yaoundé',
+  'Febe, Yaoundé',
+  'Tonga, Yaoundé',
+  'Nsimeyong, Yaoundé'
 ];
+
 class CreerDemande extends ConsumerStatefulWidget {
   const CreerDemande({super.key});
 
@@ -68,9 +135,12 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
     super.initState();
     final etatInitial = ref.read(demandeExpeditionProvider);
     _departController = TextEditingController(text: etatInitial.depart);
-    _destinationController = TextEditingController(text: etatInitial.destination);
-    _detailsController = TextEditingController(text: etatInitial.detailsSpecifiques);
-    _modeleController = TextEditingController(text: etatInitial.modeleVehiculeRemorque);
+    _destinationController =
+        TextEditingController(text: etatInitial.destination);
+    _detailsController =
+        TextEditingController(text: etatInitial.detailsSpecifiques);
+    _modeleController =
+        TextEditingController(text: etatInitial.modeleVehiculeRemorque);
   }
 
   @override
@@ -83,7 +153,8 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
     super.dispose();
   }
 
-  void _etapeSuivante(EtatDemandeExpedition etat, DemandeExpeditionNotifier notifier) {
+  void _etapeSuivante(
+      EtatDemandeExpedition etat, DemandeExpeditionNotifier notifier) {
     if (!etat.estEtapeValide(_etapeCourante)) {
       String message = "Veuillez remplir les informations requises.";
       if (_etapeCourante == 1) {
@@ -97,9 +168,10 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
           message = "Veuillez remplir les détails obligatoires.";
         }
       }
-      if (_etapeCourante == 2) message = "Veuillez choisir une gamme de service.";
+      if (_etapeCourante == 2)
+        message = "Veuillez choisir une gamme de service.";
       if (_etapeCourante == 3) message = "L'itinéraire est incomplet.";
-      
+
       _montrerErreur(message);
       return;
     }
@@ -108,7 +180,7 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
       // Auto-assignation de la date et de l'heure (Commande immédiate)
       notifier.setDateTransport(DateTime.now());
       notifier.setHeureTransport(TimeOfDay.now());
-      
+
       // On déclenche le matching/estimation en passant à l'étape 5
       notifier.estimerAvecIA();
     }
@@ -129,19 +201,22 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
     setState(() => _isLoadingGps = true);
     final gps = ref.read(serviceGpsProvider);
     final position = await gps.obtenirPositionActuelle();
-    
+
     if (position != null) {
-      final adresse = await gps.obtenirAdresse(latitude: position.latitude, longitude: position.longitude);
+      final adresse = await gps.obtenirAdresse(
+          latitude: position.latitude, longitude: position.longitude);
       if (adresse.isNotEmpty) {
         notifier.setDepart(adresse);
         _departController.text = adresse;
         notifier.setLatitudeDepart(position.latitude);
         notifier.setLongitudeDepart(position.longitude);
       } else {
-        _montrerErreur("Impossible de trouver l'adresse exacte. Entrez-la manuellement.");
+        _montrerErreur(
+            "Impossible de trouver l'adresse exacte. Entrez-la manuellement.");
       }
     } else {
-      _montrerErreur("Localisation non disponible. Veuillez vérifier vos permissions GPS.");
+      _montrerErreur(
+          "Localisation non disponible. Veuillez vérifier vos permissions GPS.");
     }
     if (mounted) setState(() => _isLoadingGps = false);
   }
@@ -154,7 +229,10 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
 
   void _montrerErreur(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message), backgroundColor: CouleursApp.erreur, behavior: SnackBarBehavior.floating),
+      SnackBar(
+          content: Text(message),
+          backgroundColor: CouleursApp.erreur,
+          behavior: SnackBarBehavior.floating),
     );
   }
 
@@ -196,7 +274,7 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
               ),
             ),
           ),
-          
+
           // Orbe lumineux vert émeraude (à la Pinterest glassmorphism)
           Positioned(
             top: -80,
@@ -236,7 +314,9 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
             duration: const Duration(milliseconds: 600),
             curve: Curves.easeOutCubic,
             top: _etapeCourante * 80.0,
-            right: _etapeCourante.isEven ? -40.0 : MediaQuery.of(context).size.width * 0.3,
+            right: _etapeCourante.isEven
+                ? -40.0
+                : MediaQuery.of(context).size.width * 0.3,
             child: AnimatedContainer(
               duration: const Duration(milliseconds: 600),
               width: 180,
@@ -259,29 +339,34 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
             child: PageResponsive(
               child: SingleChildScrollView(
                 physics: const BouncingScrollPhysics(),
-                padding: const EdgeInsets.only(left: 24, right: 24, top: 10, bottom: 180),
+                padding: const EdgeInsets.only(
+                    left: 24, right: 24, top: 10, bottom: 180),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _buildProgressBar(_etapeCourante),
                     const SizedBox(height: 32),
-                    
-                    if (_etapeCourante == 1) _buildEtape2Formulaire(etat, notifier),
+                    if (_etapeCourante == 1)
+                      _buildEtape2Formulaire(etat, notifier),
                     if (_etapeCourante == 2) _buildEtape3Gamme(etat, notifier),
-                    if (_etapeCourante == 3) _buildEtape4Itineraire(context, etat, notifier),
-                    if (_etapeCourante == 4) _buildEtape5Matching(context, etat),
+                    if (_etapeCourante == 3)
+                      _buildEtape4Itineraire(context, etat, notifier),
+                    if (_etapeCourante == 4)
+                      _buildEtape5Matching(context, etat),
                   ],
                 ),
               ),
             ),
           ),
-          
+
           // Sticky Bottom CTA
           Positioned(
             bottom: 0,
             left: 0,
             right: 0,
-            child: _etapeCourante == 4 ? const SizedBox.shrink() : _buildBottomCTA(etat, notifier),
+            child: _etapeCourante == 4
+                ? const SizedBox.shrink()
+                : _buildBottomCTA(etat, notifier),
           ),
         ],
       ),
@@ -290,87 +375,89 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
 
   Widget _buildProgressBar(int currentStep) {
     final steps = ["Détails", "Gamme", "Trajet", "Offre"];
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        return Row(
-          children: List.generate(steps.length, (index) {
-            final stepNum = index + 1;
-            final isActive = stepNum == currentStep;
-            final isCompleted = stepNum < currentStep;
+    return LayoutBuilder(builder: (context, constraints) {
+      return Row(
+        children: List.generate(steps.length, (index) {
+          final stepNum = index + 1;
+          final isActive = stepNum == currentStep;
+          final isCompleted = stepNum < currentStep;
 
-            Color circleColor = const Color(0xFF10192A);
-            Color textColor = const Color(0xFF475569);
-            
-            if (isCompleted) {
-              circleColor = CouleursApp.succes;
-              textColor = CouleursApp.succes;
-            } else if (isActive) {
-              circleColor = CouleursApp.primaire;
-              textColor = Colors.white;
-            }
+          Color circleColor = const Color(0xFF10192A);
+          Color textColor = const Color(0xFF475569);
 
-            return Expanded(
+          if (isCompleted) {
+            circleColor = CouleursApp.succes;
+            textColor = CouleursApp.succes;
+          } else if (isActive) {
+            circleColor = CouleursApp.primaire;
+            textColor = Colors.white;
+          }
+
+          return Expanded(
               child: Row(
+            children: [
+              Column(
                 children: [
-                  Column(
-                    children: [
-                      AnimatedContainer(
-                        duration: const Duration(milliseconds: 300),
-                        width: 24, // Réduit de 28 à 24
-                        height: 24, // Réduit de 28 à 24
-                        decoration: BoxDecoration(
-                          color: circleColor.withValues(alpha: isActive || isCompleted ? 0.2 : 1),
-                          shape: BoxShape.circle,
-                          border: Border.all(color: circleColor, width: 2),
-                        ),
-                        child: Center(
-                          child: isCompleted
-                              ? const Icon(Icons.check, size: 12, color: CouleursApp.succes)
-                              : Text(
-                                  "$stepNum",
-                                  style: GoogleFonts.poppins(
-                                    fontSize: 10,
-                                    fontWeight: FontWeight.bold,
-                                    color: isActive ? Colors.white : const Color(0xFF94A3B8),
-                                  ),
-                                ),
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        steps[index],
-                        style: GoogleFonts.poppins(
-                          fontSize: 9, // Réduit de 10 à 9
-                          fontWeight: isActive ? FontWeight.w600 : FontWeight.w500,
-                          color: textColor,
-                        ),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ],
-                  ),
-                  if (index < steps.length - 1)
-                    Expanded(
-                      child: Container(
-                        height: 2,
-                        margin: const EdgeInsets.only(bottom: 18, left: 2, right: 2),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(1),
-                          gradient: isCompleted
-                              ? const LinearGradient(
-                                  colors: [Color(0xFF12B76A), Color(0xFF3B82F6)],
-                                )
-                              : null,
-                          color: isCompleted ? null : const Color(0xFF10192A),
-                        ),
-                      ),
+                  AnimatedContainer(
+                    duration: const Duration(milliseconds: 300),
+                    width: 24, // Réduit de 28 à 24
+                    height: 24, // Réduit de 28 à 24
+                    decoration: BoxDecoration(
+                      color: circleColor.withValues(
+                          alpha: isActive || isCompleted ? 0.2 : 1),
+                      shape: BoxShape.circle,
+                      border: Border.all(color: circleColor, width: 2),
                     ),
+                    child: Center(
+                      child: isCompleted
+                          ? const Icon(Icons.check,
+                              size: 12, color: CouleursApp.succes)
+                          : Text(
+                              "$stepNum",
+                              style: GoogleFonts.poppins(
+                                fontSize: 10,
+                                fontWeight: FontWeight.bold,
+                                color: isActive
+                                    ? Colors.white
+                                    : const Color(0xFF94A3B8),
+                              ),
+                            ),
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    steps[index],
+                    style: GoogleFonts.poppins(
+                      fontSize: 9, // Réduit de 10 à 9
+                      fontWeight: isActive ? FontWeight.w600 : FontWeight.w500,
+                      color: textColor,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ],
-              ).animate().fadeIn(delay: (index * 100).ms)
-            );
-          }),
-        );
-      }
-    );
+              ),
+              if (index < steps.length - 1)
+                Expanded(
+                  child: Container(
+                    height: 2,
+                    margin:
+                        const EdgeInsets.only(bottom: 18, left: 2, right: 2),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(1),
+                      gradient: isCompleted
+                          ? const LinearGradient(
+                              colors: [Color(0xFF12B76A), Color(0xFF3B82F6)],
+                            )
+                          : null,
+                      color: isCompleted ? null : const Color(0xFF10192A),
+                    ),
+                  ),
+                ),
+            ],
+          ).animate().fadeIn(delay: (index * 100).ms));
+        }),
+      );
+    });
   }
 
   Widget _buildSectionTitle(String title, String subtitle) {
@@ -379,7 +466,11 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
       children: [
         Text(
           title,
-          style: GoogleFonts.poppins(fontSize: 24, fontWeight: FontWeight.w700, color: Colors.white, letterSpacing: -0.5),
+          style: GoogleFonts.poppins(
+              fontSize: 24,
+              fontWeight: FontWeight.w700,
+              color: Colors.white,
+              letterSpacing: -0.5),
         ),
         const SizedBox(height: 8),
         Text(
@@ -394,11 +485,13 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
   // ==========================================
   // ETAPE 2 : FORMULAIRE DYNAMIQUE
   // ==========================================
-  Widget _buildEtape2Formulaire(EtatDemandeExpedition etat, DemandeExpeditionNotifier notifier) {
+  Widget _buildEtape2Formulaire(
+      EtatDemandeExpedition etat, DemandeExpeditionNotifier notifier) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildSectionTitle("Détails de la demande", "Aidez-nous à mieux comprendre votre besoin pour le service : ${etat.categorieService}."),
+        _buildSectionTitle("Détails de la commande",
+            "Aidez-nous à mieux comprendre votre besoin pour le service : ${etat.categorieService}."),
         _GlassCard(
           child: Column(
             children: [
@@ -414,7 +507,8 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
                 // ── Label section ────────────────────────────────
                 Row(
                   children: [
-                    const Icon(Icons.directions_car_outlined, color: Color(0xFF12B76A), size: 18),
+                    const Icon(Icons.directions_car_outlined,
+                        color: Color(0xFF12B76A), size: 18),
                     const SizedBox(width: 8),
                     Text(
                       "Marque du véhicule",
@@ -464,7 +558,8 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
                           alignment: Alignment.center,
                           decoration: BoxDecoration(
                             color: isSelected
-                                ? const Color(0xFF12B76A).withValues(alpha: 0.18)
+                                ? const Color(0xFF12B76A)
+                                    .withValues(alpha: 0.18)
                                 : const Color(0xFF10192A),
                             borderRadius: BorderRadius.circular(24),
                             border: Border.all(
@@ -476,7 +571,8 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
                             boxShadow: isSelected
                                 ? [
                                     BoxShadow(
-                                      color: const Color(0xFF12B76A).withValues(alpha: 0.35),
+                                      color: const Color(0xFF12B76A)
+                                          .withValues(alpha: 0.35),
                                       blurRadius: 12,
                                       spreadRadius: 0,
                                     )
@@ -492,17 +588,21 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
                           child: Text(
                             marque,
                             style: GoogleFonts.inter(
-                              color: isSelected ? const Color(0xFF12B76A) : Colors.white60,
-                              fontWeight: isSelected ? FontWeight.w700 : FontWeight.w400,
+                              color: isSelected
+                                  ? const Color(0xFF12B76A)
+                                  : Colors.white60,
+                              fontWeight: isSelected
+                                  ? FontWeight.w700
+                                  : FontWeight.w400,
                               fontSize: 13,
                             ),
                           ),
                         ).animate(target: isSelected ? 1 : 0).scale(
-                          begin: const Offset(1.0, 1.0),
-                          end: const Offset(1.06, 1.06),
-                          duration: 200.ms,
-                          curve: Curves.easeOutBack,
-                        ),
+                              begin: const Offset(1.0, 1.0),
+                              end: const Offset(1.06, 1.06),
+                              duration: 200.ms,
+                              curve: Curves.easeOutBack,
+                            ),
                       );
                     },
                   ),
@@ -511,7 +611,8 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
                 // ── Champ Modèle ─────────────────────────────────
                 Row(
                   children: [
-                    const Icon(Icons.edit_outlined, color: Color(0xFF94A3B8), size: 16),
+                    const Icon(Icons.edit_outlined,
+                        color: Color(0xFF94A3B8), size: 16),
                     const SizedBox(width: 6),
                     Text(
                       "Modèle",
@@ -535,7 +636,8 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
                     // Debounce 1.5s avant d'appeler l'IA
                     if (_debounce?.isActive ?? false) _debounce!.cancel();
                     _debounce = Timer(const Duration(milliseconds: 1500), () {
-                      if (val.length >= 2 && etat.marqueVehiculeRemorque.isNotEmpty) {
+                      if (val.length >= 2 &&
+                          etat.marqueVehiculeRemorque.isNotEmpty) {
                         notifier.estimerMasseIA();
                       }
                     });
@@ -552,9 +654,11 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             // Icône dépanneuse pulsante — jamais un spinner générique
-                            const Icon(Icons.car_repair, color: Color(0xFF12B76A), size: 28)
+                            const Icon(Icons.car_repair,
+                                    color: Color(0xFF12B76A), size: 28)
                                 .animate(onPlay: (c) => c.repeat())
-                                .shimmer(duration: 900.ms, color: Colors.white70)
+                                .shimmer(
+                                    duration: 900.ms, color: Colors.white70)
                                 .then()
                                 .scale(
                                   begin: const Offset(0.9, 0.9),
@@ -572,7 +676,8 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
                             const SizedBox(width: 12),
                             Text(
                               "Analyse du véhicule en cours…",
-                              style: GoogleFonts.inter(color: Colors.white54, fontSize: 13),
+                              style: GoogleFonts.inter(
+                                  color: Colors.white54, fontSize: 13),
                             ),
                           ],
                         ),
@@ -583,7 +688,8 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
                 else if (etat.masseEstimeeKg > 0) ...[
                   // ── Badge masse avec count-up ──────────────────
                   Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 18, vertical: 14),
                     decoration: BoxDecoration(
                       color: const Color(0xFFF5A623).withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(16),
@@ -594,15 +700,18 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        const Icon(Icons.scale_outlined, color: Color(0xFFF5A623), size: 20),
+                        const Icon(Icons.scale_outlined,
+                            color: Color(0xFFF5A623), size: 20),
                         const SizedBox(width: 10),
                         Text(
                           "Masse estimée : ~",
-                          style: GoogleFonts.inter(color: Colors.white70, fontSize: 14),
+                          style: GoogleFonts.inter(
+                              color: Colors.white70, fontSize: 14),
                         ),
                         TweenAnimationBuilder<double>(
                           key: ValueKey(etat.masseEstimeeKg),
-                          tween: Tween<double>(begin: 0, end: etat.masseEstimeeKg),
+                          tween:
+                              Tween<double>(begin: 0, end: etat.masseEstimeeKg),
                           duration: const Duration(milliseconds: 1200),
                           curve: Curves.easeOutCubic,
                           builder: (context, value, _) {
@@ -631,7 +740,8 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
               ] else ...[
                 _buildFloatingTextField(
                   controller: _detailsController,
-                  hint: "Décrivez précisément ce que vous souhaitez transporter...",
+                  hint:
+                      "Décrivez précisément ce que vous souhaitez transporter...",
                   icon: Iconsax.textalign_left_copy,
                   onChanged: (val) => notifier.setDetailsSpecifiques(val),
                   maxLines: 4,
@@ -645,8 +755,10 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
                 style: OutlinedButton.styleFrom(
                   foregroundColor: Colors.white,
                   side: BorderSide(color: Colors.white.withValues(alpha: 0.2)),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12)),
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
                 ),
               ),
               if (etat.photos.isNotEmpty)
@@ -666,18 +778,31 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
                                 borderRadius: BorderRadius.circular(12),
                                 child: Image.network(
                                   etat.photos[index].path,
-                                  width: 80, height: 80, fit: BoxFit.cover,
-                                  errorBuilder: (context, error, stackTrace) => Container(width: 80, height: 80, color: Colors.white.withValues(alpha: 0.3), child: const Icon(Icons.image, color: Colors.white54)),
+                                  width: 80,
+                                  height: 80,
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stackTrace) =>
+                                      Container(
+                                          width: 80,
+                                          height: 80,
+                                          color: Colors.white
+                                              .withValues(alpha: 0.3),
+                                          child: const Icon(Icons.image,
+                                              color: Colors.white54)),
                                 ),
                               ),
                               Positioned(
-                                right: 4, top: 4,
+                                right: 4,
+                                top: 4,
                                 child: GestureDetector(
                                   onTap: () => notifier.supprimerPhoto(index),
                                   child: Container(
                                     padding: const EdgeInsets.all(4),
-                                    decoration: const BoxDecoration(color: Colors.white54, shape: BoxShape.circle),
-                                    child: const Icon(Icons.close, size: 14, color: Colors.white),
+                                    decoration: const BoxDecoration(
+                                        color: Colors.white54,
+                                        shape: BoxShape.circle),
+                                    child: const Icon(Icons.close,
+                                        size: 14, color: Colors.white),
                                   ),
                                 ),
                               )
@@ -698,15 +823,17 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
   // ==========================================
   // ETAPE 3 : GAMME ECO / CONFORT
   // ==========================================
-  Widget _buildEtape3Gamme(EtatDemandeExpedition etat, DemandeExpeditionNotifier notifier) {
+  Widget _buildEtape3Gamme(
+      EtatDemandeExpedition etat, DemandeExpeditionNotifier notifier) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildSectionTitle("Options de Service", "Choisissez la gamme qui correspond à votre budget et à vos exigences."),
-        
+        _buildSectionTitle("Options de Service",
+            "Choisissez la gamme qui correspond à votre budget et à vos exigences."),
         _buildGammeCard(
           titre: "Éco",
-          desc: "L'option la plus abordable. Idéal pour les transports simples.",
+          desc:
+              "L'option la plus abordable. Idéal pour les transports simples.",
           icon: Iconsax.wallet_copy,
           prixPromo: "-15% approx.",
           color: CouleursApp.succes,
@@ -716,7 +843,8 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
         const SizedBox(height: 16),
         _buildGammeCard(
           titre: "Confort",
-          desc: "Service Premium. Chauffeurs les mieux notés, aide au chargement incluse.",
+          desc:
+              "Service Premium. Chauffeurs les mieux notés, aide au chargement incluse.",
           icon: Iconsax.star_1_copy,
           prixPromo: "Premium",
           color: CouleursApp.avertissement,
@@ -727,7 +855,14 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
     );
   }
 
-  Widget _buildGammeCard({required String titre, required String desc, required IconData icon, required String prixPromo, required Color color, required bool isSelected, required VoidCallback onTap}) {
+  Widget _buildGammeCard(
+      {required String titre,
+      required String desc,
+      required IconData icon,
+      required String prixPromo,
+      required Color color,
+      required bool isSelected,
+      required VoidCallback onTap}) {
     return GestureDetector(
       onTap: () {
         HapticFeedback.lightImpact();
@@ -737,7 +872,9 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
         duration: const Duration(milliseconds: 300),
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: isSelected ? color.withValues(alpha: 0.1) : const Color(0xFF10192A).withValues(alpha: 0.5),
+          color: isSelected
+              ? color.withValues(alpha: 0.1)
+              : const Color(0xFF10192A).withValues(alpha: 0.5),
           borderRadius: BorderRadius.circular(24),
           border: Border.all(
             color: isSelected ? color : Colors.white.withValues(alpha: 0.05),
@@ -748,7 +885,8 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
           children: [
             Container(
               padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(color: color.withValues(alpha: 0.2), shape: BoxShape.circle),
+              decoration: BoxDecoration(
+                  color: color.withValues(alpha: 0.2), shape: BoxShape.circle),
               child: Icon(icon, color: color, size: 28),
             ),
             const SizedBox(width: 16),
@@ -756,17 +894,27 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(titre, style: GoogleFonts.poppins(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white)),
+                  Text(titre,
+                      style: GoogleFonts.poppins(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white)),
                   const SizedBox(height: 4),
-                  Text(desc, style: GoogleFonts.poppins(fontSize: 12, color: Colors.white54)),
+                  Text(desc,
+                      style: GoogleFonts.poppins(
+                          fontSize: 12, color: Colors.white54)),
                 ],
               ),
             ),
             const SizedBox(width: 8),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-              decoration: BoxDecoration(color: color.withValues(alpha: 0.1), borderRadius: BorderRadius.circular(8)),
-              child: Text(prixPromo, style: GoogleFonts.poppins(fontSize: 10, fontWeight: FontWeight.bold, color: color)),
+              decoration: BoxDecoration(
+                  color: color.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(8)),
+              child: Text(prixPromo,
+                  style: GoogleFonts.poppins(
+                      fontSize: 10, fontWeight: FontWeight.bold, color: color)),
             )
           ],
         ),
@@ -777,11 +925,13 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
   // ==========================================
   // ETAPE 4 : ITINERAIRE
   // ==========================================
-  Widget _buildEtape4Itineraire(BuildContext context, EtatDemandeExpedition etat, DemandeExpeditionNotifier notifier) {
+  Widget _buildEtape4Itineraire(BuildContext context,
+      EtatDemandeExpedition etat, DemandeExpeditionNotifier notifier) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildSectionTitle("Où voulez-vous aller ?", "Votre position de départ sera automatiquement transmise au dépanneur."),
+        _buildSectionTitle("Où voulez-vous aller ?",
+            "Votre position de départ sera automatiquement transmise au dépanneur."),
         _GlassCard(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -789,24 +939,35 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
               // Départ avec Autocomplete
               Row(
                 children: [
-                  const Icon(Icons.my_location, color: CouleursApp.primaire, size: 16),
+                  const Icon(Icons.my_location,
+                      color: CouleursApp.primaire, size: 16),
                   const SizedBox(width: 6),
-                  Text("Quartier de Départ", style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 14)),
+                  Text("Quartier de Départ",
+                      style: GoogleFonts.poppins(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 14)),
                 ],
               ),
               const SizedBox(height: 8),
-              
+
               Autocomplete<String>(
                 optionsBuilder: (TextEditingValue textEditingValue) {
-                  if (textEditingValue.text.isEmpty) return const Iterable<String>.empty();
-                  return _quartiersCameroun.where((String option) => option.toLowerCase().contains(textEditingValue.text.toLowerCase()));
+                  if (textEditingValue.text.isEmpty)
+                    return const Iterable<String>.empty();
+                  return _quartiersCameroun.where((String option) => option
+                      .toLowerCase()
+                      .contains(textEditingValue.text.toLowerCase()));
                 },
                 onSelected: (String selection) {
                   notifier.setDepart(selection);
                   _departController.text = selection;
                 },
-                fieldViewBuilder: (context, controller, focusNode, onFieldSubmitted) {
-                  if (controller.text.isEmpty && _departController.text.isNotEmpty) controller.text = _departController.text;
+                fieldViewBuilder:
+                    (context, controller, focusNode, onFieldSubmitted) {
+                  if (controller.text.isEmpty &&
+                      _departController.text.isNotEmpty)
+                    controller.text = _departController.text;
                   controller.addListener(() {
                     if (controller.text != _departController.text) {
                       _departController.text = controller.text;
@@ -818,16 +979,36 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
                     focusNode: focusNode,
                     style: const TextStyle(color: Colors.white),
                     decoration: InputDecoration(
-                      hintText: _isLoadingGps ? "Recherche GPS en cours..." : "Entrez votre quartier exact",
-                      hintStyle: TextStyle(color: _isLoadingGps ? CouleursApp.primaire : Colors.white54),
-                      prefixIcon: _isLoadingGps 
-                          ? const Padding(padding: EdgeInsets.all(12), child: SizedBox(width: 16, height: 16, child: LoaderPremium(size: 20)))
+                      hintText: _isLoadingGps
+                          ? "Recherche GPS en cours..."
+                          : "Entrez votre quartier exact",
+                      hintStyle: TextStyle(
+                          color: _isLoadingGps
+                              ? CouleursApp.primaire
+                              : Colors.white54),
+                      prefixIcon: _isLoadingGps
+                          ? const Padding(
+                              padding: EdgeInsets.all(12),
+                              child: SizedBox(
+                                  width: 16,
+                                  height: 16,
+                                  child: LoaderPremium(size: 20)))
                           : const Icon(Iconsax.location, color: Colors.white70),
                       filled: true,
                       fillColor: const Color(0xFF10192A),
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.1))),
-                      enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.07))),
-                      focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide(color: CouleursApp.primaire.withValues(alpha: 0.5))),
+                      border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(16),
+                          borderSide: BorderSide(
+                              color: Colors.white.withValues(alpha: 0.1))),
+                      enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(16),
+                          borderSide: BorderSide(
+                              color: Colors.white.withValues(alpha: 0.07))),
+                      focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(16),
+                          borderSide: BorderSide(
+                              color:
+                                  CouleursApp.primaire.withValues(alpha: 0.5))),
                     ),
                   );
                 },
@@ -848,8 +1029,10 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
                           itemBuilder: (BuildContext context, int index) {
                             final String option = options.elementAt(index);
                             return ListTile(
-                              leading: const Icon(Icons.location_on, color: Colors.white54),
-                              title: Text(option, style: const TextStyle(color: Colors.white)),
+                              leading: const Icon(Icons.location_on,
+                                  color: Colors.white54),
+                              title: Text(option,
+                                  style: const TextStyle(color: Colors.white)),
                               onTap: () => onSelected(option),
                             );
                           },
@@ -860,33 +1043,42 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
                 },
               ),
               const SizedBox(height: 16),
-              
+
               // Destination avec Autocomplete
               Row(
                 children: [
-                  const Icon(Icons.location_on, color: CouleursApp.erreur, size: 16),
+                  const Icon(Icons.location_on,
+                      color: CouleursApp.erreur, size: 16),
                   const SizedBox(width: 6),
-                  Text("Destination", style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.w600, fontSize: 14)),
+                  Text("Destination",
+                      style: GoogleFonts.poppins(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 14)),
                 ],
               ),
               const SizedBox(height: 8),
-              
+
               Autocomplete<String>(
                 optionsBuilder: (TextEditingValue textEditingValue) {
                   if (textEditingValue.text.isEmpty) {
                     return const Iterable<String>.empty();
                   }
                   return _quartiersCameroun.where((String option) {
-                    return option.toLowerCase().contains(textEditingValue.text.toLowerCase());
+                    return option
+                        .toLowerCase()
+                        .contains(textEditingValue.text.toLowerCase());
                   });
                 },
                 onSelected: (String selection) {
                   notifier.setDestination(selection);
                   _destinationController.text = selection;
                 },
-                fieldViewBuilder: (context, controller, focusNode, onFieldSubmitted) {
+                fieldViewBuilder:
+                    (context, controller, focusNode, onFieldSubmitted) {
                   // Synchroniser le controller de l'autocomplete avec le state
-                  if (controller.text.isEmpty && _destinationController.text.isNotEmpty) {
+                  if (controller.text.isEmpty &&
+                      _destinationController.text.isNotEmpty) {
                     controller.text = _destinationController.text;
                   }
                   controller.addListener(() {
@@ -902,20 +1094,24 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
                     decoration: InputDecoration(
                       hintText: "Entrez un nom de quartier",
                       hintStyle: const TextStyle(color: Colors.white54),
-                      prefixIcon: const Icon(Iconsax.location_add_copy, color: Colors.white70),
+                      prefixIcon: const Icon(Iconsax.location_add_copy,
+                          color: Colors.white70),
                       filled: true,
                       fillColor: const Color(0xFF10192A),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(16),
-                        borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.1)),
+                        borderSide: BorderSide(
+                            color: Colors.white.withValues(alpha: 0.1)),
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(16),
-                        borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.07)),
+                        borderSide: BorderSide(
+                            color: Colors.white.withValues(alpha: 0.07)),
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(16),
-                        borderSide: BorderSide(color: CouleursApp.primaire.withValues(alpha: 0.5)),
+                        borderSide: BorderSide(
+                            color: CouleursApp.primaire.withValues(alpha: 0.5)),
                       ),
                     ),
                   );
@@ -928,7 +1124,8 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
                       borderRadius: BorderRadius.circular(16),
                       color: const Color(0xFF10192A),
                       child: Container(
-                        width: MediaQuery.of(context).size.width - 64, // Ajustement largeur
+                        width: MediaQuery.of(context).size.width -
+                            64, // Ajustement largeur
                         constraints: const BoxConstraints(maxHeight: 200),
                         child: ListView.builder(
                           padding: EdgeInsets.zero,
@@ -937,8 +1134,10 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
                           itemBuilder: (BuildContext context, int index) {
                             final option = options.elementAt(index);
                             return ListTile(
-                              leading: const Icon(Icons.location_city, color: Colors.white54, size: 20),
-                              title: Text(option, style: const TextStyle(color: Colors.white)),
+                              leading: const Icon(Icons.location_city,
+                                  color: Colors.white54, size: 20),
+                              title: Text(option,
+                                  style: const TextStyle(color: Colors.white)),
                               onTap: () => onSelected(option),
                             );
                           },
@@ -958,7 +1157,7 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
   // ==========================================
   // ETAPE 5 : MATCHING & PROPOSITION
   // ==========================================
-    Widget _buildEtape5Matching(
+  Widget _buildEtape5Matching(
     BuildContext context,
     EtatDemandeExpedition etat,
   ) {
@@ -979,46 +1178,17 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
     );
   }
 
-  Widget _buildEstimationRow(String label, String value, IconData icon, {bool isHighlight = false}) {
-    return Row(
-      children: [
-        Icon(icon, size: 16, color: isHighlight ? CouleursApp.succes : Colors.white54),
-        const SizedBox(width: 8),
-        Expanded(
-          flex: 2,
-          child: Text(
-            label,
-            style: GoogleFonts.poppins(color: Colors.white54, fontSize: 13),
-            overflow: TextOverflow.ellipsis,
-          ),
-        ),
-        const SizedBox(width: 8),
-        Expanded(
-          flex: 3,
-          child: Text(
-            value,
-            textAlign: TextAlign.right,
-            style: GoogleFonts.poppins(
-              color: isHighlight ? CouleursApp.succes : Colors.white,
-              fontWeight: FontWeight.bold,
-              fontSize: isHighlight ? 16 : 13,
-            ),
-            overflow: TextOverflow.ellipsis,
-          ),
-        ),
-      ],
-    );
-  }
-
   // ==========================================
   // WIDGETS UTILES
   // ==========================================
-  Widget _buildBottomCTA(EtatDemandeExpedition etat, DemandeExpeditionNotifier notifier) {
+  Widget _buildBottomCTA(
+      EtatDemandeExpedition etat, DemandeExpeditionNotifier notifier) {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         color: const Color(0xFF08111F).withValues(alpha: 0.9),
-        border: Border(top: BorderSide(color: Colors.white.withValues(alpha: 0.06))),
+        border: Border(
+            top: BorderSide(color: Colors.white.withValues(alpha: 0.06))),
       ),
       child: SafeArea(
         top: false,
@@ -1058,7 +1228,9 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
                           isScrollControlled: true,
                           backgroundColor: Colors.transparent,
                           builder: (context) => Padding(
-                            padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+                            padding: EdgeInsets.only(
+                                bottom:
+                                    MediaQuery.of(context).viewInsets.bottom),
                             child: const ResumeExpeditionBottomSheet(),
                           ),
                         );
@@ -1068,7 +1240,8 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
                 backgroundColor: Colors.transparent,
                 shadowColor: Colors.transparent,
                 foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16)),
                 elevation: 0,
               ),
               child: Row(
@@ -1080,7 +1253,8 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
                         : _etapeCourante == 4
                             ? "Rechercher un chauffeur"
                             : "Valider la Commande",
-                    style: GoogleFonts.poppins(fontSize: 16, fontWeight: FontWeight.w600),
+                    style: GoogleFonts.poppins(
+                        fontSize: 16, fontWeight: FontWeight.w600),
                   ),
                   if (_etapeCourante < 5) ...[
                     const SizedBox(width: 8),
@@ -1108,12 +1282,15 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
       controller: controller,
       onChanged: onChanged,
       maxLines: maxLines,
-      style: GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.w500),
+      style:
+          GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.w500),
       decoration: InputDecoration(
         hintText: hint,
-        hintStyle: GoogleFonts.poppins(color: const Color(0xFF64748B), fontWeight: FontWeight.w400),
+        hintStyle: GoogleFonts.poppins(
+            color: const Color(0xFF64748B), fontWeight: FontWeight.w400),
         prefixIcon: Padding(
-          padding: EdgeInsets.only(bottom: maxLines > 1 ? (maxLines - 1) * 20.0 : 0),
+          padding:
+              EdgeInsets.only(bottom: maxLines > 1 ? (maxLines - 1) * 20.0 : 0),
           child: Icon(icon, color: const Color(0xFF94A3B8), size: 20),
         ),
         suffixIcon: onSuffixTap != null
@@ -1122,17 +1299,28 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
                 child: Padding(
                   padding: const EdgeInsets.all(12.0),
                   child: isLoadingSuffix
-                      ? const SizedBox(width: 20, height: 20, child: LoaderPremium(size: 20))
-                      : const Icon(Icons.my_location, color: Color(0xFF3B82F6), size: 22),
+                      ? const SizedBox(
+                          width: 20, height: 20, child: LoaderPremium(size: 20))
+                      : const Icon(Icons.my_location,
+                          color: Color(0xFF3B82F6), size: 22),
                 ),
               )
             : null,
         filled: true,
         fillColor: const Color(0xFF08111F).withValues(alpha: 0.7),
-        contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.07))),
-        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.07))),
-        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(16), borderSide: const BorderSide(color: Color(0xFF3B82F6), width: 1.5)),
+        contentPadding:
+            const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+        border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(16),
+            borderSide:
+                BorderSide(color: Colors.white.withValues(alpha: 0.07))),
+        enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(16),
+            borderSide:
+                BorderSide(color: Colors.white.withValues(alpha: 0.07))),
+        focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(16),
+            borderSide: const BorderSide(color: Color(0xFF3B82F6), width: 1.5)),
       ),
     );
   }
@@ -1140,10 +1328,7 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
 
 class _GlassCard extends StatelessWidget {
   final Widget child;
-  // Le padding contrôle l'espacement interne de la carte.
-  // Une valeur par défaut est fournie pour éviter d'avoir à la spécifier à chaque usage.
-  final EdgeInsets padding;
-  const _GlassCard({required this.child, this.padding = const EdgeInsets.all(20)});
+  const _GlassCard({required this.child});
 
   @override
   Widget build(BuildContext context) {
@@ -1152,7 +1337,7 @@ class _GlassCard extends StatelessWidget {
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
         child: Container(
-          padding: padding,
+          padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             color: const Color(0xFF10192A).withValues(alpha: 0.45),
             borderRadius: BorderRadius.circular(24),
@@ -1196,6 +1381,7 @@ class _GlassButton extends StatelessWidget {
     );
   }
 }
+
 class AnimatedRadarSearch extends StatefulWidget {
   final VoidCallback onSearchComplete;
 
@@ -1248,7 +1434,7 @@ class _AnimatedRadarSearchState extends State<AnimatedRadarSearch> {
   @override
   Widget build(BuildContext context) {
     final isFinished = _step == _messages.length - 1;
-    
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       mainAxisAlignment: MainAxisAlignment.center,
@@ -1315,18 +1501,16 @@ class _AnimatedRadarSearchState extends State<AnimatedRadarSearch> {
                 shape: BoxShape.circle,
                 boxShadow: [
                   BoxShadow(
-                    color: (isFinished ? CouleursApp.succes : CouleursApp.primaire)
-                        .withValues(alpha: 0.5),
+                    color:
+                        (isFinished ? CouleursApp.succes : CouleursApp.primaire)
+                            .withValues(alpha: 0.5),
                     blurRadius: 20,
                     spreadRadius: 5,
                   )
                 ],
               ),
-              child: Icon(
-                isFinished ? Icons.check : Icons.search, 
-                color: Colors.white, 
-                size: 30
-              ),
+              child: Icon(isFinished ? Icons.check : Icons.search,
+                  color: Colors.white, size: 30),
             )
                 .animate(
                   target: isFinished ? 0 : 1,
@@ -1340,7 +1524,6 @@ class _AnimatedRadarSearchState extends State<AnimatedRadarSearch> {
           ],
         ),
         const SizedBox(height: 60),
-
         AnimatedSwitcher(
           duration: const Duration(milliseconds: 500),
           child: Text(
@@ -1355,7 +1538,6 @@ class _AnimatedRadarSearchState extends State<AnimatedRadarSearch> {
           ),
         ),
         const SizedBox(height: 12),
-
         if (!isFinished)
           Text(
             "Un instant, nous trouvons le meilleur chauffeur pour votre trajet.",

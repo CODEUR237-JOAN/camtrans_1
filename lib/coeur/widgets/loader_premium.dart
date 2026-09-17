@@ -32,9 +32,12 @@ class LoaderPremium extends StatelessWidget {
             ),
           )
               .animate(onPlay: (controller) => controller.repeat())
-              .scale(duration: 1.5.seconds, begin: const Offset(0.5, 0.5), end: const Offset(1.2, 1.2))
+              .scale(
+                  duration: 1.5.seconds,
+                  begin: const Offset(0.5, 0.5),
+                  end: const Offset(1.2, 1.2))
               .fade(duration: 1.5.seconds, begin: 0.8, end: 0.0),
-              
+
           // Anneau intérieur qui tourne
           SizedBox(
             width: size * 0.6,
@@ -44,9 +47,10 @@ class LoaderPremium extends StatelessWidget {
               valueColor: AlwaysStoppedAnimation<Color>(loaderColor),
               backgroundColor: Colors.transparent,
             ),
-          ).animate(onPlay: (controller) => controller.repeat())
-           .shimmer(duration: 2.seconds, color: Colors.white70),
-           
+          )
+              .animate(onPlay: (controller) => controller.repeat())
+              .shimmer(duration: 2.seconds, color: Colors.white70),
+
           // Cœur lumineux
           Container(
             width: size * 0.2,
@@ -64,7 +68,10 @@ class LoaderPremium extends StatelessWidget {
             ),
           )
               .animate(onPlay: (controller) => controller.repeat(reverse: true))
-              .scale(duration: 800.ms, begin: const Offset(0.8, 0.8), end: const Offset(1.2, 1.2)),
+              .scale(
+                  duration: 800.ms,
+                  begin: const Offset(0.8, 0.8),
+                  end: const Offset(1.2, 1.2)),
         ],
       ),
     );

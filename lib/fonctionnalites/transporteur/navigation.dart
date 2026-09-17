@@ -9,10 +9,12 @@ class NavigationTransporteur extends ConsumerStatefulWidget {
   const NavigationTransporteur({super.key});
 
   @override
-  ConsumerState<NavigationTransporteur> createState() => _NavigationTransporteurState();
+  ConsumerState<NavigationTransporteur> createState() =>
+      _NavigationTransporteurState();
 }
 
-class _NavigationTransporteurState extends ConsumerState<NavigationTransporteur> {
+class _NavigationTransporteurState
+    extends ConsumerState<NavigationTransporteur> {
   @override
   void initState() {
     super.initState();
@@ -43,9 +45,15 @@ class _NavigationTransporteurState extends ConsumerState<NavigationTransporteur>
             children: [
               const Icon(Icons.map_outlined, size: 80, color: Colors.white54),
               const SizedBox(height: 20),
-              const Text("Aucune course active", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Colors.white)),
+              const Text("Aucune course active",
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                      color: Colors.white)),
               const SizedBox(height: 10),
-              const Text("Acceptez une course sur le marché pour commencer.", textAlign: TextAlign.center, style: TextStyle(color: Colors.white54)),
+              const Text("Acceptez une course sur le marché pour commencer.",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(color: Colors.white54)),
             ],
           ),
         ),

@@ -92,11 +92,15 @@ class _PageParametresState extends ConsumerState<PageParametres> {
 
       await updateParams(nouveauxParams);
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Parfait ! Les paramètres ont été mis à jour avec succès. ✨"), backgroundColor: CouleursApp.succes));
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+            content: Text(
+                "Parfait ! Les paramètres ont été mis à jour avec succès. ✨"),
+            backgroundColor: CouleursApp.succes));
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Oups ! Échec de la sauvegarde : $e 🔧")));
+        ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text("Oups ! Échec de la sauvegarde : $e 🔧")));
       }
     } finally {
       if (mounted) {
@@ -113,7 +117,9 @@ class _PageParametresState extends ConsumerState<PageParametres> {
       backgroundColor: Colors.transparent,
       body: parametresAsync.when(
         loading: () => Center(child: LoaderPremium()),
-        error: (err, stack) => Center(child: Text("Impossible de charger les paramètres : $err 🔧", style: const TextStyle(color: Colors.redAccent))),
+        error: (err, stack) => Center(
+            child: Text("Impossible de charger les paramètres : $err 🔧",
+                style: const TextStyle(color: Colors.redAccent))),
         data: (parametres) {
           // On initialise une seule fois (pour ne pas écraser la saisie en cours de route si un update arrive)
           WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -131,13 +137,19 @@ class _PageParametresState extends ConsumerState<PageParametres> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text("Paramètres Généraux", style: GoogleFonts.inter(fontSize: 28, fontWeight: FontWeight.bold, color: Colors.white)),
+                  Text("Paramètres Généraux",
+                      style: GoogleFonts.inter(
+                          fontSize: 28,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white)),
                   const SizedBox(height: 8),
-                  Text("Gérez les règles financières et métiers de CamTrans", style: GoogleFonts.inter(color: Colors.white54)),
+                  Text("Gérez les règles financières et métiers de CamTrans",
+                      style: GoogleFonts.inter(color: Colors.white54)),
                   const SizedBox(height: 40),
 
                   // Section Financière
-                  _buildSectionTitre("Paramètres Financiers", Iconsax.wallet_3_copy),
+                  _buildSectionTitre(
+                      "Paramètres Financiers", Iconsax.wallet_3_copy),
                   const SizedBox(height: 16),
                   _buildCarte(
                     child: Column(
@@ -179,23 +191,28 @@ class _PageParametresState extends ConsumerState<PageParametres> {
                   const SizedBox(height: 40),
 
                   // Section Modération & Paiement
-                  _buildSectionTitre("Modération et Paiement", Iconsax.security_safe_copy),
+                  _buildSectionTitre(
+                      "Modération et Paiement", Iconsax.security_safe_copy),
                   const SizedBox(height: 16),
                   _buildCarte(
                     child: Column(
                       children: [
                         _buildSwitchRow(
                           titre: "Approbation automatique des transporteurs",
-                          description: "Si activé, les transporteurs peuvent recevoir des courses immédiatement après leur inscription.",
+                          description:
+                              "Si activé, les transporteurs peuvent recevoir des courses immédiatement après leur inscription.",
                           valeur: _approbationAuto,
-                          onChanged: (val) => setState(() => _approbationAuto = val),
+                          onChanged: (val) =>
+                              setState(() => _approbationAuto = val),
                         ),
                         const Divider(color: Colors.white10, height: 32),
                         _buildSwitchRow(
                           titre: "Activer les paiements en espèces",
-                          description: "Permet aux clients de payer leur course directement au chauffeur en espèces.",
+                          description:
+                              "Permet aux clients de payer leur course directement au chauffeur en espèces.",
                           valeur: _paiementEspece,
-                          onChanged: (val) => setState(() => _paiementEspece = val),
+                          onChanged: (val) =>
+                              setState(() => _paiementEspece = val),
                         ),
                       ],
                     ),
@@ -204,7 +221,8 @@ class _PageParametresState extends ConsumerState<PageParametres> {
                   const SizedBox(height: 40),
 
                   // Section Abonnements
-                  _buildSectionTitre("Abonnements Transporteurs", Iconsax.card_copy),
+                  _buildSectionTitre(
+                      "Abonnements Transporteurs", Iconsax.card_copy),
                   const SizedBox(height: 16),
                   _buildCarte(
                     child: Column(
@@ -246,11 +264,19 @@ class _PageParametresState extends ConsumerState<PageParametres> {
                       onPressed: _isSaving ? null : _sauvegarder,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: CouleursApp.primaire,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16)),
                       ),
                       child: _isSaving
-                          ? const SizedBox(width: 24, height: 24, child: LoaderPremium(size: 24))
-                          : Text("Enregistrer les modifications", style: GoogleFonts.inter(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white)),
+                          ? const SizedBox(
+                              width: 24,
+                              height: 24,
+                              child: LoaderPremium(size: 24))
+                          : Text("Enregistrer les modifications",
+                              style: GoogleFonts.inter(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white)),
                     ),
                   ),
                   const SizedBox(height: 40),
@@ -268,11 +294,17 @@ class _PageParametresState extends ConsumerState<PageParametres> {
       children: [
         Container(
           padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(color: CouleursApp.primaire.withValues(alpha: 0.15), borderRadius: BorderRadius.circular(10)),
+          decoration: BoxDecoration(
+              color: CouleursApp.primaire.withValues(alpha: 0.15),
+              borderRadius: BorderRadius.circular(10)),
           child: Icon(icon, color: CouleursApp.primaire, size: 20),
         ),
         const SizedBox(width: 12),
-        Text(titre, style: GoogleFonts.inter(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white)),
+        Text(titre,
+            style: GoogleFonts.inter(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.white)),
       ],
     );
   }
@@ -299,7 +331,8 @@ class _PageParametresState extends ConsumerState<PageParametres> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(label, style: GoogleFonts.inter(color: Colors.white70, fontSize: 14)),
+        Text(label,
+            style: GoogleFonts.inter(color: Colors.white70, fontSize: 14)),
         const SizedBox(height: 8),
         TextFormField(
           controller: controller,
@@ -307,7 +340,8 @@ class _PageParametresState extends ConsumerState<PageParametres> {
           style: const TextStyle(color: Colors.white),
           validator: (val) {
             if (val == null || val.isEmpty) return "Ce champ est requis";
-            if (double.tryParse(val) == null) return "Valeur numérique invalide";
+            if (double.tryParse(val) == null)
+              return "Valeur numérique invalide";
             return null;
           },
           decoration: InputDecoration(
@@ -320,7 +354,8 @@ class _PageParametresState extends ConsumerState<PageParametres> {
             fillColor: Colors.white.withValues(alpha: 0.03),
             enabledBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
-              borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.1)),
+              borderSide:
+                  BorderSide(color: Colors.white.withValues(alpha: 0.1)),
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(12),
@@ -349,9 +384,15 @@ class _PageParametresState extends ConsumerState<PageParametres> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(titre, style: GoogleFonts.inter(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w600)),
+              Text(titre,
+                  style: GoogleFonts.inter(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600)),
               const SizedBox(height: 4),
-              Text(description, style: GoogleFonts.inter(color: Colors.white54, fontSize: 13)),
+              Text(description,
+                  style:
+                      GoogleFonts.inter(color: Colors.white54, fontSize: 13)),
             ],
           ),
         ),

@@ -38,7 +38,8 @@ class CarteEstimationRemorque extends StatelessWidget {
       decoration: BoxDecoration(
         color: const Color(0xFF0F172A).withValues(alpha: 0.92),
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: const Color(0xFF12B76A).withValues(alpha: 0.25)),
+        border:
+            Border.all(color: const Color(0xFF12B76A).withValues(alpha: 0.25)),
         boxShadow: [
           BoxShadow(
             color: const Color(0xFF12B76A).withValues(alpha: 0.12),
@@ -56,10 +57,12 @@ class CarteEstimationRemorque extends StatelessWidget {
             children: [
               // ── En-tête Véhicule ──────────────────────────────
               Container(
-                padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
                 decoration: BoxDecoration(
                   border: Border(
-                    bottom: BorderSide(color: Colors.white.withValues(alpha: 0.07)),
+                    bottom:
+                        BorderSide(color: Colors.white.withValues(alpha: 0.07)),
                   ),
                 ),
                 child: Row(
@@ -70,7 +73,8 @@ class CarteEstimationRemorque extends StatelessWidget {
                         color: const Color(0xFF12B76A).withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      child: const Icon(Icons.car_repair, color: Color(0xFF12B76A), size: 22),
+                      child: const Icon(Icons.car_repair,
+                          color: Color(0xFF12B76A), size: 22),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
@@ -98,7 +102,8 @@ class CarteEstimationRemorque extends StatelessWidget {
                     ),
                     // Badge de distance — info neutre, ne révèle pas la formule
                     Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 5),
                       decoration: BoxDecoration(
                         color: const Color(0xFF1E293B),
                         borderRadius: BorderRadius.circular(10),
@@ -149,10 +154,10 @@ class CarteEstimationRemorque extends StatelessWidget {
                         );
                       },
                     ).animate().scale(
-                      delay: 400.ms,
-                      duration: 600.ms,
-                      curve: Curves.easeOutBack,
-                    ),
+                          delay: 400.ms,
+                          duration: 600.ms,
+                          curve: Curves.easeOutBack,
+                        ),
                     const SizedBox(height: 8),
                     // Sous-texte rassurant — jamais de mention des détails
                     Text(
@@ -171,7 +176,8 @@ class CarteEstimationRemorque extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.fromLTRB(20, 0, 20, 20),
                 child: Container(
-                  padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
                   decoration: BoxDecoration(
                     color: const Color(0xFF1E293B).withValues(alpha: 0.6),
                     borderRadius: BorderRadius.circular(14),
@@ -179,7 +185,8 @@ class CarteEstimationRemorque extends StatelessWidget {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Icon(Icons.schedule_rounded, size: 16, color: Color(0xFFF5A623)),
+                      const Icon(Icons.schedule_rounded,
+                          size: 16, color: Color(0xFFF5A623)),
                       const SizedBox(width: 8),
                       Flexible(
                         child: Text(

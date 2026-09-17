@@ -28,7 +28,8 @@ class IANotifier extends StateNotifier<IAState> {
       estUtilisateur: true,
       piecesJointes: fichiersImages ?? [],
     );
-    state = state.copierAvec(messages: [...state.messages, msgU], enReponse: true);
+    state =
+        state.copierAvec(messages: [...state.messages, msgU], enReponse: true);
 
     _demanderReponseIA(texte, fichiersImages);
   }
@@ -40,19 +41,20 @@ class IANotifier extends StateNotifier<IAState> {
       estUtilisateur: false,
       estEnChargement: true,
     );
-    
+
     // L'ajouter à la liste
     state = state.copierAvec(messages: [...state.messages, msgIA]);
-    
+
     final msgId = msgIA.id;
     String texteAccumule = "";
 
     try {
-      final stream = _serviceIA.envoyerMessageStream(prompt, fichiersImages: fichiersImages);
+      final stream = _serviceIA.envoyerMessageStream(prompt,
+          fichiersImages: fichiersImages);
 
       await for (final chunk in stream) {
         texteAccumule += chunk;
-        
+
         // Mettre à jour le message spécifique dans la liste
         final index = state.messages.indexWhere((m) => m.id == msgId);
         if (index != -1) {

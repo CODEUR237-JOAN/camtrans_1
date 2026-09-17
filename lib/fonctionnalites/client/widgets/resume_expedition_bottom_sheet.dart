@@ -28,21 +28,24 @@ class ResumeExpeditionBottomSheet extends ConsumerStatefulWidget {
   const ResumeExpeditionBottomSheet({super.key});
 
   @override
-  ConsumerState<ResumeExpeditionBottomSheet> createState() => _ResumeExpeditionBottomSheetState();
+  ConsumerState<ResumeExpeditionBottomSheet> createState() =>
+      _ResumeExpeditionBottomSheetState();
 }
 
-class _ResumeExpeditionBottomSheetState extends ConsumerState<ResumeExpeditionBottomSheet> {
+class _ResumeExpeditionBottomSheetState
+    extends ConsumerState<ResumeExpeditionBottomSheet> {
   @override
   void initState() {
     super.initState();
     // Lancer l'estimation dès l'ouverture de la BottomSheet
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       final etatDemande = ref.read(demandeExpeditionProvider);
-      
+
       double distanceKm = 10.0;
       final serviceGps = ref.read(serviceGpsProvider);
       final locDepart = await serviceGps.obtenirCoordonnees(etatDemande.depart);
-      final locArrivee = await serviceGps.obtenirCoordonnees(etatDemande.destination);
+      final locArrivee =
+          await serviceGps.obtenirCoordonnees(etatDemande.destination);
       if (locDepart != null && locArrivee != null) {
         distanceKm = serviceGps.calculerDistance(
           latitudeDepart: locDepart.latitude,
@@ -53,15 +56,15 @@ class _ResumeExpeditionBottomSheetState extends ConsumerState<ResumeExpeditionBo
       }
 
       ref.read(estimationProvider.notifier).lancerEstimation(
-        depart: etatDemande.depart,
-        arrivee: etatDemande.destination,
-        typeMarchandise: etatDemande.typeMarchandise,
-        description: etatDemande.description,
-        categorieVehicule: etatDemande.categorieVehicule,
-        isRemorque: etatDemande.categorieService == "Remorque",
-        masseRemorqueKg: etatDemande.masseEstimeeKg,
-        distanceKm: distanceKm,
-      );
+            depart: etatDemande.depart,
+            arrivee: etatDemande.destination,
+            typeMarchandise: etatDemande.typeMarchandise,
+            description: etatDemande.description,
+            categorieVehicule: etatDemande.categorieVehicule,
+            isRemorque: etatDemande.categorieService == "Remorque",
+            masseRemorqueKg: etatDemande.masseEstimeeKg,
+            distanceKm: distanceKm,
+          );
     });
   }
 
@@ -72,12 +75,21 @@ class _ResumeExpeditionBottomSheetState extends ConsumerState<ResumeExpeditionBo
 
     Widget content = Container(
       padding: const EdgeInsets.fromLTRB(24, 12, 24, 24),
-      margin: etat.categorieService == "Remorque" ? const EdgeInsets.all(16) : EdgeInsets.zero,
+      margin: etat.categorieService == "Remorque"
+          ? const EdgeInsets.all(16)
+          : EdgeInsets.zero,
       decoration: BoxDecoration(
         color: const Color(0xFF08111F).withValues(alpha: 0.95),
-        borderRadius: etat.categorieService == "Remorque" ? BorderRadius.circular(24.0) : const BorderRadius.vertical(top: Radius.circular(24.0)),
+        borderRadius: etat.categorieService == "Remorque"
+            ? BorderRadius.circular(24.0)
+            : const BorderRadius.vertical(top: Radius.circular(24.0)),
         border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
-        boxShadow: [BoxShadow(color: Colors.black.withValues(alpha: 0.3), blurRadius: 20, spreadRadius: -5)],
+        boxShadow: [
+          BoxShadow(
+              color: Colors.black.withValues(alpha: 0.3),
+              blurRadius: 20,
+              spreadRadius: -5)
+        ],
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -105,11 +117,12 @@ class _ResumeExpeditionBottomSheetState extends ConsumerState<ResumeExpeditionBo
                     children: [
                       Expanded(
                         child: Text(
-                          "Résumé de l'expédition",
-                          style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
+                          "Résumé de la course",
+                          style:
+                              Theme.of(context).textTheme.titleLarge?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.white,
+                                  ),
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
@@ -120,9 +133,11 @@ class _ResumeExpeditionBottomSheetState extends ConsumerState<ResumeExpeditionBo
                     ],
                   ),
                   const Divider(height: 30),
-                  _buildInfoRow(context, Iconsax.location_copy, "Trajet", "${etat.depart}  ${etat.destination}"),
+                  _buildInfoRow(context, Iconsax.location_copy, "Trajet",
+                      "${etat.depart}  ${etat.destination}"),
                   const SizedBox(height: 16),
-                  _buildInfoRow(context, Iconsax.category_copy, "Service", "${etat.categorieService} (Gamme ${etat.optionGamme})"),
+                  _buildInfoRow(context, Iconsax.category_copy, "Service",
+                      "${etat.categorieService} (Gamme ${etat.optionGamme})"),
                   const SizedBox(height: 16),
                   // Pour Remorque : afficher le type du chauffeur assigné, pas l'estimation IA
                   _buildInfoRow(
@@ -130,7 +145,8 @@ class _ResumeExpeditionBottomSheetState extends ConsumerState<ResumeExpeditionBo
                     Iconsax.truck_fast_copy,
                     "Véhicule",
                     etat.categorieService == "Remorque"
-                        ? (etat.chauffeurPropose?.typeVehicule.isNotEmpty == true
+                        ? (etat.chauffeurPropose?.typeVehicule.isNotEmpty ==
+                                true
                             ? etat.chauffeurPropose!.typeVehicule
                             : "Dépanneuse")
                         : etat.categorieVehicule.isNotEmpty
@@ -154,15 +170,25 @@ class _ResumeExpeditionBottomSheetState extends ConsumerState<ResumeExpeditionBo
                       "Date de la demande",
                       "${DateFormat('dd/MM/yyyy').format(etat.dateTransport!)} à ${etat.heureTransport!.format(context)} (Immédiat)",
                     ),
-                  if (etat.detailsSpecifiques.isNotEmpty || etat.description.isNotEmpty) ...[
+                  if (etat.detailsSpecifiques.isNotEmpty ||
+                      etat.description.isNotEmpty) ...[
                     const SizedBox(height: 16),
-                    _buildInfoRow(context, Iconsax.textalign_left_copy, "Détails", etat.detailsSpecifiques.isNotEmpty ? etat.detailsSpecifiques : etat.description),
+                    _buildInfoRow(
+                        context,
+                        Iconsax.textalign_left_copy,
+                        "Détails",
+                        etat.detailsSpecifiques.isNotEmpty
+                            ? etat.detailsSpecifiques
+                            : etat.description),
                   ],
                   if (etat.photos.isNotEmpty) ...[
                     const SizedBox(height: 16),
                     Text(
                       "Photos (${etat.photos.length})",
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(color: Colors.grey),
+                      style: Theme.of(context)
+                          .textTheme
+                          .bodySmall
+                          ?.copyWith(color: Colors.grey),
                     ),
                     const SizedBox(height: 8),
                     SizedBox(
@@ -175,19 +201,19 @@ class _ResumeExpeditionBottomSheetState extends ConsumerState<ResumeExpeditionBo
                             padding: const EdgeInsets.only(right: 8.0),
                             child: ClipRRect(
                               borderRadius: BorderRadius.circular(8),
-                              child: kIsWeb 
-                              ? Image.network(
-                                  etat.photos[index].path,
-                                  width: 60,
-                                  height: 60,
-                                  fit: BoxFit.cover,
-                                )
-                              : Image.file(
-                                  io.File(etat.photos[index].path),
-                                  width: 60,
-                                  height: 60,
-                                  fit: BoxFit.cover,
-                                ),
+                              child: kIsWeb
+                                  ? Image.network(
+                                      etat.photos[index].path,
+                                      width: 60,
+                                      height: 60,
+                                      fit: BoxFit.cover,
+                                    )
+                                  : Image.file(
+                                      io.File(etat.photos[index].path),
+                                      width: 60,
+                                      height: 60,
+                                      fit: BoxFit.cover,
+                                    ),
                             ),
                           );
                         },
@@ -197,41 +223,49 @@ class _ResumeExpeditionBottomSheetState extends ConsumerState<ResumeExpeditionBo
                   const SizedBox(height: 16),
                   // Affichage du module d'estimation
                   if (etatEstimation.enCours)
-                    const Center(child: Padding(
+                    const Center(
+                        child: Padding(
                       padding: EdgeInsets.all(20.0),
                       child: LoaderPremium(size: 24),
                     ))
                   else if (etatEstimation.erreur != null)
-                    Text("Oups ! Un petit imprévu : ${etatEstimation.erreur} 🔧", style: const TextStyle(color: Colors.red))
+                    Text(
+                        "Oups ! Un petit imprévu : ${etatEstimation.erreur} 🔧",
+                        style: const TextStyle(color: Colors.red))
                   else if (etatEstimation.resultat != null)
                     Column(
                       children: [
                         etat.categorieService == "Remorque"
-                          ? CarteEstimationRemorque(
-                              resultat: etatEstimation.resultat!,
-                              marque: etat.marqueVehiculeRemorque,
-                              modele: etat.modeleVehiculeRemorque,
-                              masseKg: etat.masseEstimeeKg,
-                              latitudeDepart: etat.latitudeDepart,
-                              longitudeDepart: etat.longitudeDepart,
-                              latitudeArrivee: etat.latitudeArrivee,
-                              longitudeArrivee: etat.longitudeArrivee,
-                            )
-                          : CarteEstimationIntelligente(resultat: etatEstimation.resultat!),
-                          
+                            ? CarteEstimationRemorque(
+                                resultat: etatEstimation.resultat!,
+                                marque: etat.marqueVehiculeRemorque,
+                                modele: etat.modeleVehiculeRemorque,
+                                masseKg: etat.masseEstimeeKg,
+                                latitudeDepart: etat.latitudeDepart,
+                                longitudeDepart: etat.longitudeDepart,
+                                latitudeArrivee: etat.latitudeArrivee,
+                                longitudeArrivee: etat.longitudeArrivee,
+                              )
+                            : CarteEstimationIntelligente(
+                                resultat: etatEstimation.resultat!),
+
                         const SizedBox(height: 16),
-                        
+
                         // Badge de Tarification Standardisée
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 12),
                           decoration: BoxDecoration(
                             color: CouleursApp.succes.withValues(alpha: 0.1),
                             borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: CouleursApp.succes.withValues(alpha: 0.3)),
+                            border: Border.all(
+                                color:
+                                    CouleursApp.succes.withValues(alpha: 0.3)),
                           ),
                           child: Row(
                             children: [
-                              const Icon(Icons.verified, color: CouleursApp.succes, size: 20),
+                              const Icon(Icons.verified,
+                                  color: CouleursApp.succes, size: 20),
                               const SizedBox(width: 12),
                               Expanded(
                                 child: Column(
@@ -239,12 +273,16 @@ class _ResumeExpeditionBottomSheetState extends ConsumerState<ResumeExpeditionBo
                                   children: [
                                     const Text(
                                       "Tarif Standardisé CamTrans",
-                                      style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: CouleursApp.succes),
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 13,
+                                          color: CouleursApp.succes),
                                     ),
                                     const SizedBox(height: 2),
                                     Text(
                                       "Calculé équitablement selon la distance et le volume. Sans négociation.",
-                                      style: TextStyle(color: Colors.white70, fontSize: 11),
+                                      style: TextStyle(
+                                          color: Colors.white70, fontSize: 11),
                                     ),
                                   ],
                                 ),
@@ -285,10 +323,13 @@ class _ResumeExpeditionBottomSheetState extends ConsumerState<ResumeExpeditionBo
               child: ElevatedButton(
                 onPressed: () async {
                   HapticFeedback.mediumImpact();
-                  final user = ref.read(serviceAuthentificationProvider).utilisateur;
+                  final user =
+                      ref.read(serviceAuthentificationProvider).utilisateur;
                   if (user == null) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text("Hmm, il semblerait que vous ne soyez pas connecté. 🤔")),
+                      const SnackBar(
+                          content: Text(
+                              "Hmm, il semblerait que vous ne soyez pas connecté. 🤔")),
                     );
                     return;
                   }
@@ -297,13 +338,13 @@ class _ResumeExpeditionBottomSheetState extends ConsumerState<ResumeExpeditionBo
                   if (courseActive != null) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       SnackBar(
-                        content: const Text("Vous avez déjà une expédition en cours."),
+                        content: const Text(
+                            "Vous avez déjà une course en cours."),
                         backgroundColor: CouleursApp.erreur,
                       ),
                     );
                     return;
                   }
-
 
                   // Afficher le Radar pendant l'affectation
                   showGeneralDialog(
@@ -318,8 +359,10 @@ class _ResumeExpeditionBottomSheetState extends ConsumerState<ResumeExpeditionBo
                     final List<String> photosUrl = [];
 
                     final serviceGps = ref.read(serviceGpsProvider);
-                    final locDepart = await serviceGps.obtenirCoordonnees(etat.depart);
-                    final locArrivee = await serviceGps.obtenirCoordonnees(etat.destination);
+                    final locDepart =
+                        await serviceGps.obtenirCoordonnees(etat.depart);
+                    final locArrivee =
+                        await serviceGps.obtenirCoordonnees(etat.destination);
 
                     final double latDepart = locDepart?.latitude ?? 0.0;
                     final double lngDepart = locDepart?.longitude ?? 0.0;
@@ -337,39 +380,54 @@ class _ResumeExpeditionBottomSheetState extends ConsumerState<ResumeExpeditionBo
                     }
 
                     // ✅ PHASE 4: ALGORTIHME DE DISPATCH - Recherche des transporteurs à proximité
-                    final typeVehiculeRequis = etatEstimation.resultat?.vehiculeRecommande ?? etat.categorieVehicule;
-                    
+                    final typeVehiculeRequis =
+                        etatEstimation.resultat?.vehiculeRecommande ??
+                            etat.categorieVehicule;
+
                     // 1. Récupérer tous les transporteurs en ligne et valides
                     final transporteursSnap = await FirebaseFirestore.instance
                         .collection('transporteurs')
                         .where('disponible', isEqualTo: true)
                         .where('documentsValides', isEqualTo: true)
                         .get();
-                        
+
                     // 2. Filtrer par type de véhicule et calculer la distance au départ
                     final List<Map<String, dynamic>> candidatsDispo = [];
                     for (var doc in transporteursSnap.docs) {
                       final t = doc.data();
                       // Filtrer type
-                      if (typeVehiculeRequis.isNotEmpty && t['typeVehicule'] != typeVehiculeRequis) continue;
-                      
+                      if (typeVehiculeRequis.isNotEmpty &&
+                          t['typeVehicule'] != typeVehiculeRequis) continue;
+
                       final double tLat = t['latitude'] ?? 0.0;
                       final double tLng = t['longitude'] ?? 0.0;
-                      
+
                       if (tLat != 0.0) {
                         final dist = serviceGps.calculerDistance(
-                          latitudeDepart: latDepart, longitudeDepart: lngDepart,
-                          latitudeArrivee: tLat, longitudeArrivee: tLng,
+                          latitudeDepart: latDepart,
+                          longitudeDepart: lngDepart,
+                          latitudeArrivee: tLat,
+                          longitudeArrivee: tLng,
                         );
                         final int nbCourses = t['nombreCourses'] ?? 0;
-                        candidatsDispo.add({'id': doc.id, 'distance': dist, 'nom': t['prenom'], 'nombreCourses': nbCourses});
+                        candidatsDispo.add({
+                          'id': doc.id,
+                          'distance': dist,
+                          'nom': t['prenom'],
+                          'nombreCourses': nbCourses
+                        });
                       } else {
                         // S'il n'a pas de GPS, on le met loin par défaut
                         final int nbCourses = t['nombreCourses'] ?? 0;
-                        candidatsDispo.add({'id': doc.id, 'distance': 9999.0, 'nom': t['prenom'], 'nombreCourses': nbCourses});
+                        candidatsDispo.add({
+                          'id': doc.id,
+                          'distance': 9999.0,
+                          'nom': t['prenom'],
+                          'nombreCourses': nbCourses
+                        });
                       }
                     }
-                    
+
                     // 3. Trier avec équité : Distance d'abord, mais si la différence est faible (< 3 km), prioriser celui avec le moins de courses.
                     candidatsDispo.sort((a, b) {
                       final distA = a['distance'] as double;
@@ -388,38 +446,44 @@ class _ResumeExpeditionBottomSheetState extends ConsumerState<ResumeExpeditionBo
                       // Sinon, tri standard par distance
                       return distA.compareTo(distB);
                     });
-                    
+
                     // 4. Extraire uniquement les IDs
-                    final List<String> candidatsFinaux = candidatsDispo.map((e) => e['id'] as String).toList();
-                    
+                    final List<String> candidatsFinaux =
+                        candidatsDispo.map((e) => e['id'] as String).toList();
+
                     // Si un chauffeur avait été spécifiquement proposé par le client, on le met en premier (priorité)
                     if (etat.chauffeurPropose != null) {
                       candidatsFinaux.remove(etat.chauffeurPropose!.id);
                       candidatsFinaux.insert(0, etat.chauffeurPropose!.id);
                     }
-                    
+
                     // 5. Déterminer le statut initial de la course
                     String statutInitial = StatutCourse.recherche;
                     String premierTransporteurId = '';
                     DateTime? expiration;
-                    
+
                     if (candidatsFinaux.isNotEmpty) {
                       statutInitial = StatutCourse.propose;
                       premierTransporteurId = candidatsFinaux.first;
-                      expiration = DateTime.now().add(const Duration(seconds: 30));
+                      expiration =
+                          DateTime.now().add(const Duration(seconds: 30));
                       // (Le nom/tel du transporteur reste vide jusqu'à ce qu'il accepte vraiment)
                     }
 
                     // Générer un code PIN à 4 chiffres
-                    final String pin = (1000 + (DateTime.now().millisecondsSinceEpoch % 9000)).toString();
-                    
+                    final String pin =
+                        (1000 + (DateTime.now().millisecondsSinceEpoch % 9000))
+                            .toString();
+
                     // Prix final imposé par le système (IA)
-                    final double prixImpose = etatEstimation.resultat?.coutTotal ?? 0.0;
+                    final double prixImpose =
+                        etatEstimation.resultat?.coutTotal ?? 0.0;
 
                     final course = Course(
                       id: courseId,
                       clientId: user.uid,
-                      transporteurId: premierTransporteurId, // Attribué provisoirement
+                      transporteurId:
+                          premierTransporteurId, // Attribué provisoirement
                       nomClient: user.displayName ?? "Client Anonyme",
                       nomTransporteur: '',
                       telephoneClient: '',
@@ -434,7 +498,9 @@ class _ResumeExpeditionBottomSheetState extends ConsumerState<ResumeExpeditionBo
                       volumeM3: etatEstimation.resultat?.volumeM3 ?? 0.0,
                       poidsKg: 0.0,
                       typeVehicule: typeVehiculeRequis,
-                      typeMarchandise: etat.typeMarchandise.isNotEmpty ? etat.typeMarchandise : etat.categorieService,
+                      typeMarchandise: etat.typeMarchandise.isNotEmpty
+                          ? etat.typeMarchandise
+                          : etat.categorieService,
                       prixEstime: prixImpose,
                       prixFinal: 0.0,
                       modePaiement: '',
@@ -447,13 +513,15 @@ class _ResumeExpeditionBottomSheetState extends ConsumerState<ResumeExpeditionBo
                       fragile: false,
                       aideChargement: etat.optionGamme == "Confort",
                       aideDechargement: false,
-                      codeSuivi: 'CMR-${DateTime.now().millisecondsSinceEpoch.toString().substring(5)}',
+                      codeSuivi:
+                          'CMR-${DateTime.now().millisecondsSinceEpoch.toString().substring(5)}',
                       noteClient: 0.0,
                       noteTransporteur: 0.0,
                       commentaireClient: '',
                       commentaireTransporteur: '',
                       scoreIA: 0.0,
-                      vehiculeRecommandeIA: etatEstimation.resultat?.vehiculeRecommande ?? '',
+                      vehiculeRecommandeIA:
+                          etatEstimation.resultat?.vehiculeRecommande ?? '',
                       volumeEstimeIA: etatEstimation.resultat?.volumeM3 ?? 0.0,
                       conseilIA: '',
                       categorieService: etat.categorieService,
@@ -469,26 +537,28 @@ class _ResumeExpeditionBottomSheetState extends ConsumerState<ResumeExpeditionBo
                     );
 
                     await ref.read(serviceFirestoreProvider).ajouterDocument(
-                      collection: 'courses',
-                      id: course.id,
-                      donnees: course.toMap(),
-                    );
-                    
+                          collection: 'courses',
+                          id: course.id,
+                          donnees: course.toMap(),
+                        );
+
                     // ✅ PHASE 4: DISPATCH - Déclencher la notification Push
                     if (premierTransporteurId.isNotEmpty) {
                       try {
-                        await ref.read(serviceFirestoreProvider).ajouterDocument(
-                          collection: 'notifications_push',
-                          id: 'notif_${const Uuid().v4()}',
-                          donnees: {
-                            'titre': '🚨 NOUVELLE COURSE !',
-                            'message': 'Course à ${distanceKm.toStringAsFixed(1)} km. Acceptez vite !',
-                            'cible': 'transporteur',
-                            'cibleId': premierTransporteurId,
-                            'status': 'pending',
-                            'createdAt': FieldValue.serverTimestamp(),
-                          }
-                        );
+                        await ref
+                            .read(serviceFirestoreProvider)
+                            .ajouterDocument(
+                                collection: 'notifications_push',
+                                id: 'notif_${const Uuid().v4()}',
+                                donnees: {
+                              'titre': '🚨 NOUVELLE COURSE !',
+                              'message':
+                                  'Course à ${distanceKm.toStringAsFixed(1)} km. Acceptez vite !',
+                              'cible': 'transporteur',
+                              'cibleId': premierTransporteurId,
+                              'status': 'pending',
+                              'createdAt': FieldValue.serverTimestamp(),
+                            });
                       } catch (e) {
                         debugPrint("Erreur notification push ignorée : $e");
                       }
@@ -498,14 +568,19 @@ class _ResumeExpeditionBottomSheetState extends ConsumerState<ResumeExpeditionBo
                       Navigator.pop(context); // Fermer le radar
                       Navigator.pop(context); // Fermer le bottom sheet
                       final codeSuivi = course.codeSuivi;
-                      ref.read(demandeExpeditionProvider.notifier).reinitialiser();
+                      ref
+                          .read(demandeExpeditionProvider.notifier)
+                          .reinitialiser();
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Row(
                             children: [
-                              const Icon(Icons.check_circle, color: Colors.white),
+                              const Icon(Icons.check_circle,
+                                  color: Colors.white),
                               const SizedBox(width: 12),
-                              Expanded(child: Text("Commande créée ! Code: $codeSuivi")),
+                              Expanded(
+                                  child: Text(
+                                      "Commande créée ! Code: $codeSuivi")),
                             ],
                           ),
                           backgroundColor: CouleursApp.succes,
@@ -519,7 +594,8 @@ class _ResumeExpeditionBottomSheetState extends ConsumerState<ResumeExpeditionBo
                       Navigator.pop(context); // Fermer le radar
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                          content: Text("Hmm, quelque chose s'est mal passé : ${e.toString()} 🔧"),
+                          content: Text(
+                              "Hmm, quelque chose s'est mal passé : ${e.toString()} 🔧"),
                           backgroundColor: CouleursApp.erreur,
                         ),
                       );
@@ -530,7 +606,8 @@ class _ResumeExpeditionBottomSheetState extends ConsumerState<ResumeExpeditionBo
                   backgroundColor: Colors.transparent,
                   shadowColor: Colors.transparent,
                   foregroundColor: Colors.white,
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16)),
                   elevation: 0,
                 ),
                 child: const Text(
@@ -557,7 +634,8 @@ class _ResumeExpeditionBottomSheetState extends ConsumerState<ResumeExpeditionBo
     return content;
   }
 
-  Widget _buildInfoRow(BuildContext context, IconData icon, String label, String value) {
+  Widget _buildInfoRow(
+      BuildContext context, IconData icon, String label, String value) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -567,11 +645,15 @@ class _ResumeExpeditionBottomSheetState extends ConsumerState<ResumeExpeditionBo
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(label, style: const TextStyle(color: Colors.white54, fontSize: 12)),
+              Text(label,
+                  style: const TextStyle(color: Colors.white54, fontSize: 12)),
               const SizedBox(height: 2),
               Text(
                 value,
-                style: const TextStyle(fontWeight: FontWeight.w600, fontSize: 14, color: Colors.white),
+                style: const TextStyle(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 14,
+                    color: Colors.white),
               ),
             ],
           ),

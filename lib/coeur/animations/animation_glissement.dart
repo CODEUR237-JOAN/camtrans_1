@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-
 class AnimationGlissement extends StatefulWidget {
   final Widget enfant;
   final Offset debut;
@@ -18,12 +17,10 @@ class AnimationGlissement extends StatefulWidget {
   });
 
   @override
-  State<AnimationGlissement> createState() =>
-      _AnimationGlissementState();
+  State<AnimationGlissement> createState() => _AnimationGlissementState();
 }
 
-class _AnimationGlissementState
-    extends State<AnimationGlissement>
+class _AnimationGlissementState extends State<AnimationGlissement>
     with SingleTickerProviderStateMixin {
   late AnimationController _controleur;
 

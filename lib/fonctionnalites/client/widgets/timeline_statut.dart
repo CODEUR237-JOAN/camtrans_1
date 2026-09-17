@@ -3,7 +3,6 @@ import 'package:update_camtrans/coeur/constantes/couleurs.dart';
 import 'package:update_camtrans/coeur/constantes/statuts.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
-
 class TimelineStatut extends StatelessWidget {
   final String statutActuel;
 
@@ -44,7 +43,9 @@ class TimelineStatut extends StatelessWidget {
                   width: 20,
                   height: 20,
                   decoration: BoxDecoration(
-                    color: estPasse || estActuel ? CouleursApp.primaire : Colors.grey.shade300,
+                    color: estPasse || estActuel
+                        ? CouleursApp.primaire
+                        : Colors.grey.shade300,
                     shape: BoxShape.circle,
                     border: Border.all(
                       color: estActuel ? Colors.black : Colors.transparent,
@@ -56,16 +57,20 @@ class TimelineStatut extends StatelessWidget {
                       : (estActuel
                           ? Container(
                               margin: const EdgeInsets.all(4),
-                              decoration: const BoxDecoration(color: Colors.white, shape: BoxShape.circle),
+                              decoration: const BoxDecoration(
+                                  color: Colors.white, shape: BoxShape.circle),
                             )
                           : null),
-                ).animate(target: (estPasse || estActuel) ? 1 : 0).scale(duration: 300.ms),
+                )
+                    .animate(target: (estPasse || estActuel) ? 1 : 0)
+                    .scale(duration: 300.ms),
                 // Ligne connectrice
                 if (!estDernier)
                   Container(
                     width: 2,
                     height: 30,
-                    color: estPasse ? CouleursApp.primaire : Colors.grey.shade300,
+                    color:
+                        estPasse ? CouleursApp.primaire : Colors.grey.shade300,
                   ),
               ],
             ),
@@ -79,7 +84,8 @@ class TimelineStatut extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 15,
                     fontWeight: estActuel ? FontWeight.bold : FontWeight.normal,
-                    color: estPasse || estActuel ? Colors.black87 : Colors.black38,
+                    color:
+                        estPasse || estActuel ? Colors.black87 : Colors.black38,
                   ),
                 ),
               ),

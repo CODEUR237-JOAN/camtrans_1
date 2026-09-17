@@ -52,7 +52,8 @@ class _BottomSheetPaiementState extends ConsumerState<BottomSheetPaiement> {
         _phoneCtrl.text.isEmpty &&
         _nomCtrl.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Veuillez remplir les informations requises.')),
+        const SnackBar(
+            content: Text('Veuillez remplir les informations requises.')),
       );
       return;
     }
@@ -127,7 +128,8 @@ class _BottomSheetPaiementState extends ConsumerState<BottomSheetPaiement> {
             content: Text('Paiement échoué : ${e.toString()}'),
             backgroundColor: CouleursApp.erreur,
             behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           ),
         );
       }
@@ -175,8 +177,10 @@ class _BottomSheetPaiementState extends ConsumerState<BottomSheetPaiement> {
                 shape: BoxShape.circle,
                 color: CouleursApp.succes.withValues(alpha: 0.08),
               ),
-            ).animate(onPlay: (c) => c.repeat(reverse: true))
-              .scale(begin: const Offset(0.9, 0.9), end: const Offset(1.1, 1.1), duration: 1.seconds),
+            ).animate(onPlay: (c) => c.repeat(reverse: true)).scale(
+                begin: const Offset(0.9, 0.9),
+                end: const Offset(1.1, 1.1),
+                duration: 1.seconds),
             // Cercle intermédiaire
             Container(
               width: 90,
@@ -194,10 +198,16 @@ class _BottomSheetPaiementState extends ConsumerState<BottomSheetPaiement> {
                 shape: BoxShape.circle,
                 color: CouleursApp.succes,
               ),
-              child: const Icon(Icons.check_rounded, color: Colors.white, size: 40),
-            ).animate()
-              .scale(begin: const Offset(0, 0), end: const Offset(1, 1), duration: 600.ms, curve: Curves.elasticOut)
-              .fadeIn(duration: 300.ms),
+              child: const Icon(Icons.check_rounded,
+                  color: Colors.white, size: 40),
+            )
+                .animate()
+                .scale(
+                    begin: const Offset(0, 0),
+                    end: const Offset(1, 1),
+                    duration: 600.ms,
+                    curve: Curves.elasticOut)
+                .fadeIn(duration: 300.ms),
           ],
         ),
         const SizedBox(height: 28),
@@ -217,7 +227,10 @@ class _BottomSheetPaiementState extends ConsumerState<BottomSheetPaiement> {
             fontWeight: FontWeight.w800,
             fontSize: 36,
           ),
-        ).animate().fadeIn(delay: 500.ms).scale(begin: const Offset(0.8, 0.8), end: const Offset(1, 1)),
+        )
+            .animate()
+            .fadeIn(delay: 500.ms)
+            .scale(begin: const Offset(0.8, 0.8), end: const Offset(1, 1)),
         const SizedBox(height: 8),
         Text(
           'Merci pour votre confiance ✨',
@@ -229,7 +242,8 @@ class _BottomSheetPaiementState extends ConsumerState<BottomSheetPaiement> {
           decoration: BoxDecoration(
             color: CouleursApp.succes.withValues(alpha: 0.08),
             borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: CouleursApp.succes.withValues(alpha: 0.2)),
+            border:
+                Border.all(color: CouleursApp.succes.withValues(alpha: 0.2)),
           ),
           child: Text(
             'Votre chauffeur a été notifié',
@@ -243,7 +257,8 @@ class _BottomSheetPaiementState extends ConsumerState<BottomSheetPaiement> {
 
   /// ✅ HUMANISATION 3.1: Écran de chargement avec étapes progressives
   Widget _buildChargementAvecProgression() {
-    final operateur = _modeSelectionne == 'orange' ? 'Orange Money' : 'MTN Mobile Money';
+    final operateur =
+        _modeSelectionne == 'orange' ? 'Orange Money' : 'MTN Mobile Money';
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 32),
       child: ProgressionPaiement(
@@ -268,8 +283,7 @@ class _BottomSheetPaiementState extends ConsumerState<BottomSheetPaiement> {
             height: 5,
             margin: const EdgeInsets.only(bottom: 20),
             decoration: BoxDecoration(
-                color: Colors.white24,
-                borderRadius: BorderRadius.circular(10)),
+                color: Colors.white24, borderRadius: BorderRadius.circular(10)),
           ),
         ),
 
@@ -295,8 +309,8 @@ class _BottomSheetPaiementState extends ConsumerState<BottomSheetPaiement> {
                         fontWeight: FontWeight.bold,
                         fontSize: 18)),
                 Text('Choisissez votre mode de paiement',
-                    style: GoogleFonts.inter(
-                        color: Colors.white54, fontSize: 12)),
+                    style:
+                        GoogleFonts.inter(color: Colors.white54, fontSize: 12)),
               ],
             ),
           ],
@@ -316,13 +330,14 @@ class _BottomSheetPaiementState extends ConsumerState<BottomSheetPaiement> {
               ],
             ),
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: CouleursApp.primaire.withValues(alpha: 0.3)),
+            border:
+                Border.all(color: CouleursApp.primaire.withValues(alpha: 0.3)),
           ),
           child: Column(
             children: [
               Text('Montant total',
-                  style: GoogleFonts.inter(
-                      color: Colors.white54, fontSize: 13)),
+                  style:
+                      GoogleFonts.inter(color: Colors.white54, fontSize: 13)),
               const SizedBox(height: 4),
               Text(
                 '${widget.montant.toStringAsFixed(0)} FCFA',
@@ -332,8 +347,8 @@ class _BottomSheetPaiementState extends ConsumerState<BottomSheetPaiement> {
                     fontSize: 36),
               ),
               Text('Frais de service inclus',
-                  style: GoogleFonts.inter(
-                      color: Colors.white38, fontSize: 11)),
+                  style:
+                      GoogleFonts.inter(color: Colors.white38, fontSize: 11)),
             ],
           ),
         ),
@@ -365,7 +380,8 @@ class _BottomSheetPaiementState extends ConsumerState<BottomSheetPaiement> {
           width: double.infinity,
           height: 58,
           child: ElevatedButton(
-            onPressed: _modeSelectionne == null || _enChargement ? null : _payer,
+            onPressed:
+                _modeSelectionne == null || _enChargement ? null : _payer,
             style: ElevatedButton.styleFrom(
               backgroundColor: CouleursApp.primaire,
               disabledBackgroundColor: Colors.white12,
@@ -455,14 +471,16 @@ class _BottomSheetPaiementState extends ConsumerState<BottomSheetPaiement> {
               ),
               child: Row(
                 children: [
-                  Icon(mode['icon'] as IconData, color: selected ? couleur : Colors.white70, size: 20),
+                  Icon(mode['icon'] as IconData,
+                      color: selected ? couleur : Colors.white70, size: 20),
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
                       mode['label'] as String,
                       style: GoogleFonts.inter(
                         color: selected ? Colors.white : Colors.white60,
-                        fontWeight: selected ? FontWeight.bold : FontWeight.normal,
+                        fontWeight:
+                            selected ? FontWeight.bold : FontWeight.normal,
                         fontSize: 12,
                       ),
                     ),
@@ -482,9 +500,7 @@ class _BottomSheetPaiementState extends ConsumerState<BottomSheetPaiement> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          isOrange
-              ? 'Numéro Orange Money'
-              : 'Numéro MTN Mobile Money',
+          isOrange ? 'Numéro Orange Money' : 'Numéro MTN Mobile Money',
           style: GoogleFonts.inter(color: Colors.white70, fontSize: 13),
         ),
         const SizedBox(height: 8),
@@ -538,8 +554,8 @@ class _BottomSheetPaiementState extends ConsumerState<BottomSheetPaiement> {
             decoration: const InputDecoration(
               hintText: 'Ex: Jean DUPONT',
               hintStyle: TextStyle(color: Colors.white38),
-              prefixIcon: Icon(Icons.credit_card,
-                  color: Color(0xFF6366F1), size: 20),
+              prefixIcon:
+                  Icon(Icons.credit_card, color: Color(0xFF6366F1), size: 20),
               border: InputBorder.none,
               contentPadding:
                   EdgeInsets.symmetric(horizontal: 16, vertical: 16),
@@ -567,8 +583,7 @@ class _BottomSheetPaiementState extends ConsumerState<BottomSheetPaiement> {
           Expanded(
             child: Text(
               'Remettez exactement ${widget.montant.toStringAsFixed(0)} FCFA en espèces à votre chauffeur.',
-              style:
-                  GoogleFonts.inter(color: Colors.white70, fontSize: 12),
+              style: GoogleFonts.inter(color: Colors.white70, fontSize: 12),
             ),
           ),
         ],

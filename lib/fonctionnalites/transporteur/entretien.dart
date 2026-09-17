@@ -78,8 +78,7 @@ class _EntretienState extends State<Entretien> {
                 borderRadius: BorderRadius.circular(20),
               ),
               child: const Column(
-                crossAxisAlignment:
-                CrossAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     "Carnet d'entretien",
@@ -99,9 +98,7 @@ class _EntretienState extends State<Entretien> {
                 ],
               ),
             ),
-
             const SizedBox(height: 30),
-
             Row(
               children: [
                 Expanded(
@@ -121,9 +118,7 @@ class _EntretienState extends State<Entretien> {
                 ),
               ],
             ),
-
             const SizedBox(height: 30),
-
             const Text(
               "Historique",
               style: TextStyle(
@@ -131,27 +126,21 @@ class _EntretienState extends State<Entretien> {
                 fontWeight: FontWeight.bold,
               ),
             ),
-
             const SizedBox(height: 15),
-
             ...entretiens.map<Widget>(
-                  (entretien) => Card(
+              (entretien) => Card(
                 color: const Color(0xFF10192A),
-                margin:
-                const EdgeInsets.only(bottom: 15),
+                margin: const EdgeInsets.only(bottom: 15),
                 elevation: 3,
                 shape: RoundedRectangleBorder(
-                  borderRadius:
-                  BorderRadius.circular(18),
+                  borderRadius: BorderRadius.circular(18),
                 ),
                 child: ListTile(
-                  contentPadding:
-                  const EdgeInsets.all(15),
+                  contentPadding: const EdgeInsets.all(15),
                   leading: CircleAvatar(
                     radius: 28,
                     backgroundColor:
-                    (entretien["couleur"] as Color)
-                        .withValues(alpha: .15),
+                        (entretien["couleur"] as Color).withValues(alpha: .15),
                     child: Icon(
                       entretien["icone"],
                       color: entretien["couleur"],
@@ -160,13 +149,11 @@ class _EntretienState extends State<Entretien> {
                   title: Text(
                     entretien["titre"],
                     style: const TextStyle(
-                      fontWeight:
-                      FontWeight.bold,
+                      fontWeight: FontWeight.bold,
                     ),
                   ),
                   subtitle: Column(
-                    crossAxisAlignment:
-                    CrossAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const SizedBox(height: 8),
                       Text(
@@ -181,20 +168,19 @@ class _EntretienState extends State<Entretien> {
                     icon: const Icon(Icons.edit),
                     color: CouleursApp.primaire,
                     onPressed: () {
-                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text("Édition de l'entretien à venir avec le backend.")));
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                          content: Text(
+                              "Édition de l'entretien à venir avec le backend.")));
                     },
                   ),
                 ),
               ),
             ),
-
             const SizedBox(height: 25),
-
             Card(
               color: Colors.orange.withValues(alpha: 0.1),
               shape: RoundedRectangleBorder(
-                borderRadius:
-                BorderRadius.circular(18),
+                borderRadius: BorderRadius.circular(18),
               ),
               child: const ListTile(
                 leading: Icon(
@@ -209,14 +195,11 @@ class _EntretienState extends State<Entretien> {
                 ),
               ),
             ),
-
             const SizedBox(height: 25),
-
             Card(
               color: Colors.green.withValues(alpha: 0.1),
               shape: RoundedRectangleBorder(
-                borderRadius:
-                BorderRadius.circular(18),
+                borderRadius: BorderRadius.circular(18),
               ),
               child: const ListTile(
                 leading: Icon(
@@ -231,7 +214,6 @@ class _EntretienState extends State<Entretien> {
                 ),
               ),
             ),
-
             const SizedBox(height: 90),
           ],
         ),
@@ -240,14 +222,13 @@ class _EntretienState extends State<Entretien> {
   }
 
   Widget _statistique(
-      String titre,
-      String valeur,
-      IconData icone,
-      ) {
+    String titre,
+    String valeur,
+    IconData icone,
+  ) {
     return Card(
       shape: RoundedRectangleBorder(
-        borderRadius:
-        BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(18),
       ),
       child: Padding(
         padding: const EdgeInsets.all(18),

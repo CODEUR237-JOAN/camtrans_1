@@ -21,14 +21,12 @@ class DetailsCourse extends StatelessWidget {
           TaillesApp.margePage,
         ),
         child: Column(
-          crossAxisAlignment:
-          CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Container(
               height: 220,
               decoration: BoxDecoration(
-                borderRadius:
-                BorderRadius.circular(20),
+                borderRadius: BorderRadius.circular(20),
               ),
               clipBehavior: Clip.antiAlias,
               child: FlutterMap(
@@ -38,9 +36,10 @@ class DetailsCourse extends StatelessWidget {
                 ),
                 children: [
                   TileLayer(
-            urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-            userAgentPackageName: 'com.joan.update_camtrans',
-          ),
+                    urlTemplate:
+                        'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                    userAgentPackageName: 'com.joan.update_camtrans',
+                  ),
                   const MarkerLayer(
                     markers: [
                       Marker(
@@ -56,26 +55,20 @@ class DetailsCourse extends StatelessWidget {
                 ],
               ),
             ),
-
             const SizedBox(height: 25),
-
             const Text(
               "Informations du client",
               style: TextStyle(
                 fontSize: 20,
-                fontWeight:
-                FontWeight.bold,
+                fontWeight: FontWeight.bold,
               ),
             ),
-
             const SizedBox(height: 15),
-
             Card(
               child: ListTile(
                 leading: const CircleAvatar(
                   radius: 28,
-                  backgroundImage:
-                  AssetImage(
+                  backgroundImage: AssetImage(
                     "assets/images/client.jpg",
                   ),
                 ),
@@ -94,20 +87,15 @@ class DetailsCourse extends StatelessWidget {
                 ),
               ),
             ),
-
             const SizedBox(height: 25),
-
             const Text(
               "Trajet",
               style: TextStyle(
                 fontSize: 20,
-                fontWeight:
-                FontWeight.bold,
+                fontWeight: FontWeight.bold,
               ),
             ),
-
             const SizedBox(height: 15),
-
             Card(
               child: Column(
                 children: [
@@ -139,104 +127,73 @@ class DetailsCourse extends StatelessWidget {
                 ],
               ),
             ),
-
             const SizedBox(height: 25),
-
             const Text(
               "Marchandise",
               style: TextStyle(
                 fontSize: 20,
-                fontWeight:
-                FontWeight.bold,
+                fontWeight: FontWeight.bold,
               ),
             ),
-
             const SizedBox(height: 15),
-
             Card(
               child: Column(
                 children: [
                   ListTile(
-                    leading:
-                    Icon(Icons.inventory),
-                    title:
-                    Text("Type"),
-                    subtitle:
-                    Text("Mobilier"),
+                    leading: Icon(Icons.inventory),
+                    title: Text("Type"),
+                    subtitle: Text("Mobilier"),
                   ),
                   Divider(color: Colors.white.withValues(alpha: 0.08)),
                   ListTile(
-                    leading:
-                    Icon(Icons.scale),
-                    title:
-                    Text("Poids"),
-                    subtitle:
-                    Text("850 Kg"),
+                    leading: Icon(Icons.scale),
+                    title: Text("Poids"),
+                    subtitle: Text("850 Kg"),
                   ),
                   Divider(color: Colors.white.withValues(alpha: 0.08)),
                   ListTile(
-                    leading:
-                    Icon(Icons.all_inbox),
-                    title:
-                    Text("Volume"),
-                    subtitle:
-                    Text("4.5 m³"),
+                    leading: Icon(Icons.all_inbox),
+                    title: Text("Volume"),
+                    subtitle: Text("4.5 m³"),
                   ),
                   Divider(color: Colors.white.withValues(alpha: 0.08)),
                   ListTile(
-                    leading:
-                    Icon(Icons.route),
-                    title:
-                    Text("Distance"),
-                    subtitle:
-                    Text("245 Km"),
+                    leading: Icon(Icons.route),
+                    title: Text("Distance"),
+                    subtitle: Text("245 Km"),
                   ),
                   Divider(color: Colors.white.withValues(alpha: 0.08)),
                   ListTile(
-                    leading:
-                    Icon(Icons.timer),
-                    title:
-                    Text("Durée estimée"),
-                    subtitle:
-                    Text("4 h 30"),
+                    leading: Icon(Icons.timer),
+                    title: Text("Durée estimée"),
+                    subtitle: Text("4 h 30"),
                   ),
                 ],
               ),
             ),
-
             const SizedBox(height: 25),
-
             const Text(
               "Photos de la marchandise",
               style: TextStyle(
                 fontSize: 20,
-                fontWeight:
-                FontWeight.bold,
+                fontWeight: FontWeight.bold,
               ),
             ),
-
             const SizedBox(height: 15),
-
             SizedBox(
               height: 110,
               child: ListView(
-                scrollDirection:
-                Axis.horizontal,
+                scrollDirection: Axis.horizontal,
                 children: List.generate(
                   3,
-                      (index) => Container(
+                  (index) => Container(
                     width: 120,
-                    margin:
-                    const EdgeInsets.only(
+                    margin: const EdgeInsets.only(
                       right: 15,
                     ),
-                    decoration:
-                    BoxDecoration(
-                      color:
-                      const Color(0xFF1A2640),
-                      borderRadius:
-                      BorderRadius.circular(
-                          15),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF1A2640),
+                      borderRadius: BorderRadius.circular(15),
                     ),
                     child: const Icon(
                       Icons.image,
@@ -247,12 +204,9 @@ class DetailsCourse extends StatelessWidget {
                 ),
               ),
             ),
-
             const SizedBox(height: 25),
-
             Card(
-              color:
-              const Color(0xFF0D2A1A),
+              color: const Color(0xFF0D2A1A),
               child: const ListTile(
                 leading: Icon(
                   Icons.payments,
@@ -261,29 +215,22 @@ class DetailsCourse extends StatelessWidget {
                 title: Text(
                   "Montant proposé",
                 ),
-                subtitle:
-                Text("30 000 FCFA"),
+                subtitle: Text("30 000 FCFA"),
               ),
             ),
-
             const SizedBox(height: 30),
-
             Row(
               children: [
                 Expanded(
-                  child:
-                  OutlinedButton.icon(
-                    style:
-                    OutlinedButton.styleFrom(
-                      minimumSize:
-                      const Size(
+                  child: OutlinedButton.icon(
+                    style: OutlinedButton.styleFrom(
+                      minimumSize: const Size(
                         double.infinity,
                         55,
                       ),
                     ),
                     onPressed: () {
-                      Navigator.pop(
-                          context);
+                      Navigator.pop(context);
                     },
                     icon: const Icon(
                       Icons.close,
@@ -297,21 +244,13 @@ class DetailsCourse extends StatelessWidget {
                     ),
                   ),
                 ),
-
                 const SizedBox(width: 15),
-
                 Expanded(
-                  child:
-                  ElevatedButton.icon(
-                    style:
-                    ElevatedButton.styleFrom(
-                      backgroundColor:
-                      CouleursApp
-                          .primaire,
-                      foregroundColor:
-                      Colors.white,
-                      minimumSize:
-                      const Size(
+                  child: ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: CouleursApp.primaire,
+                      foregroundColor: Colors.white,
+                      minimumSize: const Size(
                         double.infinity,
                         55,
                       ),
@@ -332,7 +271,6 @@ class DetailsCourse extends StatelessWidget {
                 ),
               ],
             ),
-
             const SizedBox(height: 30),
           ],
         ),

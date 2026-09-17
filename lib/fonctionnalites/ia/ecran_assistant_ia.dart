@@ -9,7 +9,6 @@ import 'package:update_camtrans/coeur/widgets/page_responsive.dart';
 import 'package:update_camtrans/services/service_ia.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
-
 class EcranAssistantIA extends ConsumerStatefulWidget {
   const EcranAssistantIA({super.key});
 
@@ -23,7 +22,8 @@ class _EcranAssistantIAState extends ConsumerState<EcranAssistantIA> {
   final List<Map<String, dynamic>> _messages = [
     {
       "isUser": false,
-      "text": "Bonjour ! Je suis l'Assistant CamTrans. Décrivez-moi votre marchandise ou prenez-la en photo pour une estimation du volume et du prix !",
+      "text":
+          "Bonjour ! Je suis l'Assistant CamTrans. Décrivez-moi votre marchandise ou prenez-la en photo pour une estimation du volume et du prix !",
       "type": "welcome"
     }
   ];
@@ -31,24 +31,27 @@ class _EcranAssistantIAState extends ConsumerState<EcranAssistantIA> {
   void _envoyerMessage() async {
     final prompt = _messageController.text.trim();
     if (prompt.isEmpty) return;
-    
+
     setState(() {
       _messages.add({"isUser": true, "text": prompt, "type": "text"});
       // On ajoute une bulle vide pour la réponse de l'IA
       _messages.add({"isUser": false, "text": "", "type": "text"});
     });
-    
+
     final iaIndex = _messages.length - 1;
     _messageController.clear();
     _scrollToBottom();
-    
+
     try {
-      final stream = ref.read(serviceIAProvider).envoyerMessageStream(prompt, fichiersImages: null);
-      
+      final stream = ref
+          .read(serviceIAProvider)
+          .envoyerMessageStream(prompt, fichiersImages: null);
+
       await for (final chunk in stream) {
         if (mounted) {
           setState(() {
-            _messages[iaIndex]["text"] = (_messages[iaIndex]["text"] as String) + chunk;
+            _messages[iaIndex]["text"] =
+                (_messages[iaIndex]["text"] as String) + chunk;
           });
           _scrollToBottom();
         }
@@ -99,13 +102,15 @@ class _EcranAssistantIAState extends ConsumerState<EcranAssistantIA> {
         ),
         title: Text(
           "Assistant Intelligent",
-          style: GoogleFonts.poppins(fontWeight: FontWeight.w600, fontSize: 18, color: Colors.white),
+          style: GoogleFonts.poppins(
+              fontWeight: FontWeight.w600, fontSize: 18, color: Colors.white),
         ),
         centerTitle: true,
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 16.0),
-            child: Icon(Iconsax.info_circle_copy, color: const Color(0xFF94A3B8).withValues(alpha: 0.8)),
+            child: Icon(Iconsax.info_circle_copy,
+                color: const Color(0xFF94A3B8).withValues(alpha: 0.8)),
           ),
         ],
       ),
@@ -121,7 +126,7 @@ class _EcranAssistantIAState extends ConsumerState<EcranAssistantIA> {
               ),
             ),
           ),
-          
+
           // Blob lumineux IA
           Positioned(
             top: 50,
@@ -131,15 +136,18 @@ class _EcranAssistantIAState extends ConsumerState<EcranAssistantIA> {
               height: 250,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: const Color(0xFF10B981).withValues(alpha: 0.15), // Emerald Green
+                color: const Color(0xFF10B981)
+                    .withValues(alpha: 0.15), // Emerald Green
               ),
               child: BackdropFilter(
                 filter: ImageFilter.blur(sigmaX: 80, sigmaY: 80),
                 child: const SizedBox(),
               ),
-            ).animate(onPlay: (c) => c.repeat(reverse: true)).scaleXY(end: 1.1, duration: 4.seconds),
+            )
+                .animate(onPlay: (c) => c.repeat(reverse: true))
+                .scaleXY(end: 1.1, duration: 4.seconds),
           ),
-          
+
           Positioned(
             bottom: -50,
             left: -50,
@@ -148,13 +156,16 @@ class _EcranAssistantIAState extends ConsumerState<EcranAssistantIA> {
               height: 300,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: const Color(0xFF3B82F6).withValues(alpha: 0.1), // Neon Blue
+                color:
+                    const Color(0xFF3B82F6).withValues(alpha: 0.1), // Neon Blue
               ),
               child: BackdropFilter(
                 filter: ImageFilter.blur(sigmaX: 80, sigmaY: 80),
                 child: const SizedBox(),
               ),
-            ).animate(onPlay: (c) => c.repeat(reverse: true)).scaleXY(end: 1.2, duration: 5.seconds),
+            )
+                .animate(onPlay: (c) => c.repeat(reverse: true))
+                .scaleXY(end: 1.2, duration: 5.seconds),
           ),
 
           SafeArea(
@@ -164,12 +175,12 @@ class _EcranAssistantIAState extends ConsumerState<EcranAssistantIA> {
                   child: PageResponsive(
                     child: ListView.builder(
                       controller: _scrollController,
-                      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 24, vertical: 20),
                       itemCount: _messages.length,
                       itemBuilder: (context, index) {
                         final msg = _messages[index];
-                        return _MessageBubble(message: msg)
-                            ;
+                        return _MessageBubble(message: msg);
                       },
                     ),
                   ),
@@ -188,8 +199,10 @@ class _EcranAssistantIAState extends ConsumerState<EcranAssistantIA> {
       padding: const EdgeInsets.only(left: 20, right: 20, top: 16, bottom: 32),
       decoration: BoxDecoration(
         color: const Color(0xFF0F172A).withValues(alpha: 0.8),
-        borderRadius: const BorderRadius.only(topLeft: Radius.circular(36), topRight: Radius.circular(36)),
-        border: Border(top: BorderSide(color: Colors.white.withValues(alpha: 0.05))),
+        borderRadius: const BorderRadius.only(
+            topLeft: Radius.circular(36), topRight: Radius.circular(36)),
+        border: Border(
+            top: BorderSide(color: Colors.white.withValues(alpha: 0.05))),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.3),
@@ -214,9 +227,11 @@ class _EcranAssistantIAState extends ConsumerState<EcranAssistantIA> {
                   decoration: BoxDecoration(
                     color: const Color(0xFF1E293B).withValues(alpha: 0.5),
                     shape: BoxShape.circle,
-                    border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+                    border:
+                        Border.all(color: Colors.white.withValues(alpha: 0.1)),
                   ),
-                  child: const Icon(Iconsax.camera_copy, color: Color(0xFF94A3B8), size: 22),
+                  child: const Icon(Iconsax.camera_copy,
+                      color: Color(0xFF94A3B8), size: 22),
                 ),
               ),
               const SizedBox(width: 12),
@@ -225,16 +240,20 @@ class _EcranAssistantIAState extends ConsumerState<EcranAssistantIA> {
                   decoration: BoxDecoration(
                     color: const Color(0xFF1E293B).withValues(alpha: 0.4),
                     borderRadius: BorderRadius.circular(24),
-                    border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
+                    border:
+                        Border.all(color: Colors.white.withValues(alpha: 0.05)),
                   ),
                   child: TextField(
                     controller: _messageController,
-                    style: GoogleFonts.poppins(color: Colors.white, fontSize: 14),
+                    style:
+                        GoogleFonts.poppins(color: Colors.white, fontSize: 14),
                     decoration: InputDecoration(
                       hintText: "Décrivez vos objets...",
-                      hintStyle: GoogleFonts.poppins(color: const Color(0xFF64748B), fontSize: 14),
+                      hintStyle: GoogleFonts.poppins(
+                          color: const Color(0xFF64748B), fontSize: 14),
                       border: InputBorder.none,
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 20, vertical: 14),
                     ),
                     onSubmitted: (_) => _envoyerMessage(),
                   ),
@@ -249,13 +268,18 @@ class _EcranAssistantIAState extends ConsumerState<EcranAssistantIA> {
                 child: Container(
                   padding: const EdgeInsets.all(14),
                   decoration: BoxDecoration(
-                    gradient: const LinearGradient(colors: [Color(0xFF10B981), Color(0xFF059669)]),
+                    gradient: const LinearGradient(
+                        colors: [Color(0xFF10B981), Color(0xFF059669)]),
                     shape: BoxShape.circle,
                     boxShadow: [
-                      BoxShadow(color: const Color(0xFF10B981).withValues(alpha: 0.4), blurRadius: 12, offset: const Offset(0, 4))
+                      BoxShadow(
+                          color: const Color(0xFF10B981).withValues(alpha: 0.4),
+                          blurRadius: 12,
+                          offset: const Offset(0, 4))
                     ],
                   ),
-                  child: const Icon(Iconsax.send_2_copy, color: Colors.white, size: 20),
+                  child: const Icon(Iconsax.send_2_copy,
+                      color: Colors.white, size: 20),
                 ),
               ),
             ],
@@ -279,7 +303,8 @@ class _MessageBubble extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.only(bottom: 20),
       child: Row(
-        mainAxisAlignment: isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
+        mainAxisAlignment:
+            isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           if (!isUser) ...[
@@ -289,23 +314,33 @@ class _MessageBubble extends StatelessWidget {
               decoration: BoxDecoration(
                 color: const Color(0xFF3B82F6).withValues(alpha: 0.15),
                 shape: BoxShape.circle,
-                border: Border.all(color: const Color(0xFF3B82F6).withValues(alpha: 0.3)),
+                border: Border.all(
+                    color: const Color(0xFF3B82F6).withValues(alpha: 0.3)),
               ),
-              child: const Icon(Iconsax.magic_star_copy, color: Color(0xFF60A5FA), size: 16),
+              child: const Icon(Iconsax.magic_star_copy,
+                  color: Color(0xFF60A5FA), size: 16),
             ),
           ],
           Flexible(
             child: Container(
               padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
               decoration: BoxDecoration(
-                color: isUser ? const Color(0xFF3B82F6) : const Color(0xFF1E293B).withValues(alpha: 0.6),
+                color: isUser
+                    ? const Color(0xFF3B82F6)
+                    : const Color(0xFF1E293B).withValues(alpha: 0.6),
                 borderRadius: BorderRadius.only(
                   topLeft: const Radius.circular(24),
                   topRight: const Radius.circular(24),
-                  bottomLeft: isUser ? const Radius.circular(24) : const Radius.circular(4),
-                  bottomRight: isUser ? const Radius.circular(4) : const Radius.circular(24),
+                  bottomLeft: isUser
+                      ? const Radius.circular(24)
+                      : const Radius.circular(4),
+                  bottomRight: isUser
+                      ? const Radius.circular(4)
+                      : const Radius.circular(24),
                 ),
-                border: isUser ? null : Border.all(color: Colors.white.withValues(alpha: 0.05)),
+                border: isUser
+                    ? null
+                    : Border.all(color: Colors.white.withValues(alpha: 0.05)),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -313,15 +348,21 @@ class _MessageBubble extends StatelessWidget {
                   if (type == "estimation")
                     Container(
                       margin: const EdgeInsets.only(bottom: 8),
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 4),
                       decoration: BoxDecoration(
                         color: const Color(0xFF10B981).withValues(alpha: 0.2),
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: Text(
                         "Devis Automatique",
-                        style: GoogleFonts.poppins(color: const Color(0xFF34D399), fontSize: 10, fontWeight: FontWeight.bold),
-                      ).animate(onPlay: (c) => c.repeat(reverse: true)).shimmer(duration: 2.seconds),
+                        style: GoogleFonts.poppins(
+                            color: const Color(0xFF34D399),
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold),
+                      )
+                          .animate(onPlay: (c) => c.repeat(reverse: true))
+                          .shimmer(duration: 2.seconds),
                     ),
                   Text(
                     message["text"],

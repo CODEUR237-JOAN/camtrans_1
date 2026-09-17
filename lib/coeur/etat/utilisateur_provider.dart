@@ -16,30 +16,35 @@ final userRoleProvider = FutureProvider.autoDispose<String?>((ref) async {
   }
 
   final firestore = ref.read(serviceFirestoreProvider);
-  
+
   // 1. Check Admin — uniquement via la collection Firestore (pas d'email codé en dur)
-  final adminDoc = await firestore.lireDocument(collection: 'admin', id: userId);
+  final adminDoc =
+      await firestore.lireDocument(collection: 'admin', id: userId);
   if (adminDoc.exists) {
     // Si l\'admin est aussi transporteur ou client, on lance sa presence
-    final testTransp = await firestore.lireDocument(collection: 'transporteurs', id: userId);
+    final testTransp =
+        await firestore.lireDocument(collection: 'transporteurs', id: userId);
     if (testTransp.exists) {
       ServicePresence().demarrer(role: 'transporteur');
     } else {
-      final testClient = await firestore.lireDocument(collection: 'clients', id: userId);
+      final testClient =
+          await firestore.lireDocument(collection: 'clients', id: userId);
       if (testClient.exists) ServicePresence().demarrer(role: 'client');
     }
     return 'admin';
   }
 
   // 2. Check Transporteur (Priorité au transporteur comme dans connexion.dart)
-  final transpDoc = await firestore.lireDocument(collection: 'transporteurs', id: userId);
+  final transpDoc =
+      await firestore.lireDocument(collection: 'transporteurs', id: userId);
   if (transpDoc.exists) {
     ServicePresence().demarrer(role: 'transporteur');
     return 'transporteur';
   }
 
   // 3. Check Client
-  final clientDoc = await firestore.lireDocument(collection: 'clients', id: userId);
+  final clientDoc =
+      await firestore.lireDocument(collection: 'clients', id: userId);
   if (clientDoc.exists) {
     ServicePresence().demarrer(role: 'client');
     return 'client';
@@ -55,10 +60,8 @@ final currentClientProvider = StreamProvider.autoDispose<Client?>((ref) {
   if (userId == null) return Stream.value(null);
 
   final firestore = ref.watch(serviceFirestoreProvider);
-  
-  return firestore
-      .fluxDocument(collection: 'clients', id: userId)
-      .map((doc) {
+
+  return firestore.fluxDocument(collection: 'clients', id: userId).map((doc) {
     if (!doc.exists || doc.data() == null) return null;
     return Client.fromMap(doc.data()!);
   });

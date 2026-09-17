@@ -67,7 +67,8 @@ class QrSuivi extends StatelessWidget {
                   color: CouleursApp.primaire.withValues(alpha: 0.15),
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(Icons.qr_code_rounded, color: CouleursApp.primaire, size: 22),
+                child: const Icon(Icons.qr_code_rounded,
+                    color: CouleursApp.primaire, size: 22),
               ),
               const SizedBox(width: 12),
               Column(
@@ -83,7 +84,8 @@ class QrSuivi extends StatelessWidget {
                   ),
                   Text(
                     "Scannez pour suivre cette livraison",
-                    style: GoogleFonts.inter(color: Colors.white54, fontSize: 12),
+                    style:
+                        GoogleFonts.inter(color: Colors.white54, fontSize: 12),
                   ),
                 ],
               ),
@@ -120,9 +122,14 @@ class QrSuivi extends StatelessWidget {
                 color: Color(0xFF0F172A),
               ),
             ),
-          ).animate()
-            .scale(begin: const Offset(0.8, 0.8), end: const Offset(1, 1), duration: 400.ms, curve: Curves.elasticOut)
-            .fadeIn(duration: 300.ms),
+          )
+              .animate()
+              .scale(
+                  begin: const Offset(0.8, 0.8),
+                  end: const Offset(1, 1),
+                  duration: 400.ms,
+                  curve: Curves.elasticOut)
+              .fadeIn(duration: 300.ms),
 
           const SizedBox(height: 20),
 
@@ -157,18 +164,21 @@ class QrSuivi extends StatelessWidget {
                       SnackBar(
                         content: Row(
                           children: [
-                            const Icon(Icons.check, color: Colors.white, size: 16),
+                            const Icon(Icons.check,
+                                color: Colors.white, size: 16),
                             const SizedBox(width: 8),
                             Text(
                               "Lien copié !",
-                              style: GoogleFonts.inter(fontWeight: FontWeight.bold),
+                              style: GoogleFonts.inter(
+                                  fontWeight: FontWeight.bold),
                             ),
                           ],
                         ),
                         backgroundColor: CouleursApp.succes,
                         behavior: SnackBarBehavior.floating,
                         duration: const Duration(seconds: 2),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12)),
                       ),
                     );
                   },
@@ -178,7 +188,8 @@ class QrSuivi extends StatelessWidget {
                       color: CouleursApp.primaire.withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(8),
                     ),
-                    child: const Icon(Icons.copy_rounded, color: CouleursApp.primaire, size: 16),
+                    child: const Icon(Icons.copy_rounded,
+                        color: CouleursApp.primaire, size: 16),
                   ),
                 ),
               ],
@@ -193,16 +204,19 @@ class QrSuivi extends StatelessWidget {
             decoration: BoxDecoration(
               color: CouleursApp.information.withValues(alpha: 0.06),
               borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: CouleursApp.information.withValues(alpha: 0.15)),
+              border: Border.all(
+                  color: CouleursApp.information.withValues(alpha: 0.15)),
             ),
             child: Row(
               children: [
-                const Icon(Icons.info_outline_rounded, color: CouleursApp.information, size: 18),
+                const Icon(Icons.info_outline_rounded,
+                    color: CouleursApp.information, size: 18),
                 const SizedBox(width: 10),
                 Expanded(
                   child: Text(
                     "Le destinataire peut scanner ce QR Code pour suivre votre livraison en temps réel, sans télécharger l'app.",
-                    style: GoogleFonts.inter(color: Colors.white54, fontSize: 12, height: 1.5),
+                    style: GoogleFonts.inter(
+                        color: Colors.white54, fontSize: 12, height: 1.5),
                   ),
                 ),
               ],

@@ -19,7 +19,8 @@ final gestionTokenFCMProvider = Provider.autoDispose<void>((ref) {
           collection: 'utilisateurs',
           id: userId,
           donnees: {'fcmToken': token},
-        ).catchError((_) {}); // Ignore si le doc utilisateur n'existe pas encore
+        ).catchError(
+            (_) {}); // Ignore si le doc utilisateur n'existe pas encore
       }
     }).catchError((_) {});
 
@@ -44,18 +45,21 @@ final gestionTokenFCMProvider = Provider.autoDispose<void>((ref) {
 });
 
 /// Stream des notifications de l'utilisateur connecté depuis Firestore
-final fluxNotificationsProvider = StreamProvider.autoDispose<List<NotificationApp>>((ref) {
+final fluxNotificationsProvider =
+    StreamProvider.autoDispose<List<NotificationApp>>((ref) {
   final authState = ref.watch(authStateProvider);
   final firestore = ref.watch(serviceFirestoreProvider);
   final userId = authState.value?.uid;
 
   if (userId == null) return Stream.value([]);
 
-  return firestore.fluxCollectionCondition(
+  return firestore
+      .fluxCollectionCondition(
     collection: 'notifications',
     champ: 'utilisateurId',
     valeur: userId,
-  ).map((snapshot) {
+  )
+      .map((snapshot) {
     var notifications = snapshot.docs.map((doc) {
       final data = doc.data();
       data['id'] = doc.id;
@@ -106,14 +110,17 @@ class NotificationActions {
 }
 
 /// Stream des notifications Admin (id spécial 'ADMIN')
-final fluxNotificationsAdminProvider = StreamProvider.autoDispose<List<NotificationApp>>((ref) {
+final fluxNotificationsAdminProvider =
+    StreamProvider.autoDispose<List<NotificationApp>>((ref) {
   final firestore = ref.watch(serviceFirestoreProvider);
 
-  return firestore.fluxCollectionCondition(
+  return firestore
+      .fluxCollectionCondition(
     collection: 'notifications',
     champ: 'utilisateurId',
     valeur: 'ADMIN',
-  ).map((snapshot) {
+  )
+      .map((snapshot) {
     var notifications = snapshot.docs.map((doc) {
       final data = doc.data();
       data['id'] = doc.id;

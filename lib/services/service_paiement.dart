@@ -15,17 +15,18 @@ final servicePaiementProvider = Provider<ServicePaiement>((ref) {
 
 class ServicePaiement {
   final ServiceFirestore _firestore;
-  
+
   ServicePaiement(this._firestore);
-  
-  String get _baseUrl => ApiKeys.isCampayProduction 
-      ? 'https://www.campay.net/api' 
+
+  String get _baseUrl => ApiKeys.isCampayProduction
+      ? 'https://www.campay.net/api'
       : 'https://demo.campay.net/api';
 
   /// 1. Authentification : Obtenir le Token Campay
   Future<String> _obtenirToken() async {
     if (ApiKeys.campayUsername.isEmpty || ApiKeys.campayPassword.isEmpty) {
-      throw Exception("Clés d'API Campay non configurées. Veuillez vérifier le fichier .env");
+      throw Exception(
+          "Clés d'API Campay non configurées. Veuillez vérifier le fichier .env");
     }
 
     final response = await http.post(
@@ -57,13 +58,15 @@ class ServicePaiement {
   }) async {
     // 1. Obtenir le token
     final token = await _obtenirToken();
-    
+
     // 2. Lancer la demande de paiement (Push USSD sur le téléphone du client)
     // 237 est requis par l'API Campay pour le Cameroun, on s'assure du format
     String phone = telephonePayeur.replaceAll(RegExp(r'[^0-9]'), '');
-    if (phone.length == 9) phone = "237$phone"; // Ajouter l'indicatif si manquant
+    if (phone.length == 9)
+      phone = "237$phone"; // Ajouter l'indicatif si manquant
 
-    final refExterne = "CAMTRANS-${courseId.substring(0, 5).toUpperCase()}-${DateTime.now().millisecondsSinceEpoch}";
+    final refExterne =
+        "CAMTRANS-${courseId.substring(0, 5).toUpperCase()}-${DateTime.now().millisecondsSinceEpoch}";
 
     final collectResponse = await http.post(
       Uri.parse('$_baseUrl/collect/'),
@@ -72,7 +75,8 @@ class ServicePaiement {
         'Authorization': 'Token $token',
       },
       body: jsonEncode({
-        "amount": montant.toInt().toString(), // Campay demande souvent un entier
+        "amount":
+            montant.toInt().toString(), // Campay demande souvent un entier
         "currency": "XAF",
         "from": phone,
         "description": "Paiement Course CamTrans",
@@ -82,7 +86,8 @@ class ServicePaiement {
 
     if (collectResponse.statusCode != 200) {
       debugPrint("Erreur de collecte Campay: ${collectResponse.body}");
-      throw Exception("Erreur d'initialisation du paiement: ${jsonDecode(collectResponse.body)['message'] ?? 'Erreur inconnue'}");
+      throw Exception(
+          "Erreur d'initialisation du paiement: ${jsonDecode(collectResponse.body)['message'] ?? 'Erreur inconnue'}");
     }
 
     final collectData = jsonDecode(collectResponse.body);
@@ -92,8 +97,9 @@ class ServicePaiement {
     // On boucle jusqu'à ce que le statut soit SUCCESSFUL ou FAILED, ou qu'on dépasse 2 minutes.
     String status = "PENDING";
     int tentatives = 0;
-    
-    while (status == "PENDING" && tentatives < 40) { // 40 * 3s = 120 secondes max
+
+    while (status == "PENDING" && tentatives < 40) {
+      // 40 * 3s = 120 secondes max
       await Future.delayed(const Duration(seconds: 3));
       tentatives++;
 
@@ -108,7 +114,7 @@ class ServicePaiement {
       if (statusResponse.statusCode == 200) {
         final statusData = jsonDecode(statusResponse.body);
         status = statusData['status'];
-        
+
         if (status == "SUCCESSFUL") {
           return _creerPaiementReussi(
             courseId: courseId,
@@ -120,7 +126,8 @@ class ServicePaiement {
             telephone: phone,
           );
         } else if (status == "FAILED") {
-          throw Exception("Le paiement a échoué ou a été refusé par l'utilisateur.");
+          throw Exception(
+              "Le paiement a échoué ou a été refusé par l'utilisateur.");
         }
       }
     }
@@ -195,13 +202,16 @@ class ServicePaiement {
         collection: 'transporteurs',
         id: transporteurId,
         donnees: {
-          'dateFinAbonnement': nouvelleDateFin.toIso8601String(),
+          'dateFinAbonnement': nouvelleDateFin.millisecondsSinceEpoch,
         },
       );
 
       // 3. Enregistrer le paiement d'abonnement dans une collection dédiée
       final abonnementId = "ABN-${DateTime.now().millisecondsSinceEpoch}";
-      await FirebaseFirestore.instance.collection('abonnements').doc(abonnementId).set({
+      await FirebaseFirestore.instance
+          .collection('abonnements')
+          .doc(abonnementId)
+          .set({
         'id': abonnementId,
         'transporteurId': transporteurId,
         'nomTransporteur': nomTransporteur,
@@ -215,7 +225,8 @@ class ServicePaiement {
       });
 
       // 4. Notification in-app pour le transporteur
-      final notifTransporteurId = "NOTIF-ABN-TRANS-${DateTime.now().millisecondsSinceEpoch}";
+      final notifTransporteurId =
+          "NOTIF-ABN-TRANS-${DateTime.now().millisecondsSinceEpoch}";
       await _firestore.ajouterDocument(
         collection: 'notifications',
         id: notifTransporteurId,
@@ -223,7 +234,8 @@ class ServicePaiement {
           'id': notifTransporteurId,
           'utilisateurId': transporteurId,
           'titre': '🎉 Abonnement activé !',
-          'message': 'Votre abonnement de $dureeJours jour(s) est actif. Bonne route !',
+          'message':
+              'Votre abonnement de $dureeJours jour(s) est actif. Bonne route !',
           'type': 'succes',
           'categorie': 'abonnement',
           'lue': false,
@@ -243,7 +255,8 @@ class ServicePaiement {
       );
 
       // 5. Notification in-app pour l'Admin
-      final notifAdminId = "NOTIF-ABN-ADMIN-${DateTime.now().millisecondsSinceEpoch}";
+      final notifAdminId =
+          "NOTIF-ABN-ADMIN-${DateTime.now().millisecondsSinceEpoch}";
       await _firestore.ajouterDocument(
         collection: 'notifications',
         id: notifAdminId,
@@ -251,7 +264,8 @@ class ServicePaiement {
           'id': notifAdminId,
           'utilisateurId': 'ADMIN',
           'titre': '💳 Nouveau paiement abonnement',
-          'message': '$nomTransporteur a souscrit un abonnement de ${montant.toInt()} FCFA ($dureeJours jours).',
+          'message':
+              '$nomTransporteur a souscrit un abonnement de ${montant.toInt()} FCFA ($dureeJours jours).',
           'type': 'paiement',
           'categorie': 'abonnement',
           'lue': false,
@@ -305,7 +319,7 @@ class ServicePaiement {
     required String transporteurId,
     required double montant,
   }) async {
-    await Future.delayed(const Duration(seconds: 1)); 
+    await Future.delayed(const Duration(seconds: 1));
     return _creerPaiementReussi(
       courseId: courseId,
       clientId: clientId,
@@ -313,7 +327,7 @@ class ServicePaiement {
       montant: montant,
       methode: "Espèces",
       operateur: "Direct",
-      telephone: "N/A", 
+      telephone: "N/A",
     );
   }
 
@@ -345,11 +359,11 @@ class ServicePaiement {
       operateur: operateur,
       telephonePayeur: telephone,
       commentaire: "Paiement validé via $operateur",
-      fraisTransaction: montant * 0.02, 
+      fraisTransaction: montant * 0.02,
       montantNet: montant * 0.98,
       remboursementEffectue: false,
       motifRemboursement: "",
-      facturePdf: "", 
+      facturePdf: "",
     );
 
     // Enregistrer le paiement

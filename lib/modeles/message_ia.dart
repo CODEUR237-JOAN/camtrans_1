@@ -6,7 +6,8 @@ class MessageIA {
   final String texte;
   final bool estUtilisateur;
   final DateTime dateCreation;
-  final List<XFile> piecesJointes; // Fichiers/images (XFile pour compatibilité Web/Mobile)
+  final List<XFile>
+      piecesJointes; // Fichiers/images (XFile pour compatibilité Web/Mobile)
   final bool estEnChargement;
 
   MessageIA({

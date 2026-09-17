@@ -19,8 +19,7 @@ class ServiceGps {
       return false;
     }
 
-    LocationPermission permission =
-    await Geolocator.checkPermission();
+    LocationPermission permission = await Geolocator.checkPermission();
 
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
@@ -85,11 +84,13 @@ class ServiceGps {
       }
 
       final p = places.first;
-      
+
       // Construction d'une adresse descriptive : Quartier, Ville, Pays
       // subLocality correspond souvent au quartier
-      final quartier = p.subLocality?.isNotEmpty == true ? p.subLocality : p.thoroughfare;
-      final ville = p.locality?.isNotEmpty == true ? p.locality : p.subAdministrativeArea;
+      final quartier =
+          p.subLocality?.isNotEmpty == true ? p.subLocality : p.thoroughfare;
+      final ville =
+          p.locality?.isNotEmpty == true ? p.locality : p.subAdministrativeArea;
       final pays = p.country;
 
       List<String> composants = [];
@@ -108,14 +109,15 @@ class ServiceGps {
   // ===========================
 
   Future<Location?> obtenirCoordonnees(
-      String adresse,
-      ) async {
+    String adresse,
+  ) async {
     try {
       if (adresse.isEmpty) return null;
-      
+
       // Forcer la recherche au Cameroun pour éviter les homonymes dans d'autres pays
       String requete = adresse;
-      if (!requete.toLowerCase().contains("cameroun") && !requete.toLowerCase().contains("cameroon")) {
+      if (!requete.toLowerCase().contains("cameroun") &&
+          !requete.toLowerCase().contains("cameroon")) {
         requete = "$requete, Cameroun";
       }
 
@@ -145,11 +147,11 @@ class ServiceGps {
     required double longitudeArrivee,
   }) {
     return Geolocator.distanceBetween(
-      latitudeDepart,
-      longitudeDepart,
-      latitudeArrivee,
-      longitudeArrivee,
-    ) /
+          latitudeDepart,
+          longitudeDepart,
+          latitudeArrivee,
+          longitudeArrivee,
+        ) /
         1000;
   }
 

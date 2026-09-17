@@ -1,8 +1,11 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 import 'service_presence.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-final serviceAuthentificationProvider = Provider<ServiceAuthentification>((ref) {
+final serviceAuthentificationProvider =
+    Provider<ServiceAuthentification>((ref) {
   return ServiceAuthentification();
 });
 
@@ -12,13 +15,15 @@ final authStateProvider = StreamProvider<User?>((ref) {
 
 class ServiceAuthentification {
   final FirebaseAuth _auth = FirebaseAuth.instance;
+  final GoogleSignIn _googleSignIn = GoogleSignIn(
+    scopes: ['email', 'profile'],
+  );
 
   /// Utilisateur connecté
   User? get utilisateur => _auth.currentUser;
 
   /// Flux de connexion
-  Stream<User?> get changementsAuthentification =>
-      _auth.authStateChanges();
+  Stream<User?> get changementsAuthentification => _auth.authStateChanges();
 
   /// Inscription
   Future<UserCredential> inscription({
@@ -57,8 +62,8 @@ class ServiceAuthentification {
 
   /// Réinitialisation du mot de passe
   Future<void> reinitialiserMotDePasse(
-      String email,
-      ) async {
+    String email,
+  ) async {
     await _auth.sendPasswordResetEmail(
       email: email.trim(),
     );
@@ -66,8 +71,7 @@ class ServiceAuthentification {
 
   /// Vérification de l'email
   Future<void> envoyerVerificationEmail() async {
-    if (_auth.currentUser != null &&
-        !_auth.currentUser!.emailVerified) {
+    if (_auth.currentUser != null && !_auth.currentUser!.emailVerified) {
       await _auth.currentUser!.sendEmailVerification();
     }
   }
@@ -87,20 +91,17 @@ class ServiceAuthentification {
   }
 
   /// Email vérifié ?
-  bool get emailVerifie =>
-      _auth.currentUser?.emailVerified ?? false;
+  bool get emailVerifie => _auth.currentUser?.emailVerified ?? false;
 
   /// Modifier le mot de passe
-  Future<void> modifierMotDePasse(
-      String nouveauMotDePasse) async {
+  Future<void> modifierMotDePasse(String nouveauMotDePasse) async {
     await _auth.currentUser?.updatePassword(
       nouveauMotDePasse,
     );
   }
 
   /// Modifier l'email
-  Future<void> modifierEmail(
-      String nouvelEmail) async {
+  Future<void> modifierEmail(String nouvelEmail) async {
     await _auth.currentUser?.verifyBeforeUpdateEmail(
       nouvelEmail.trim(),
     );
@@ -121,5 +122,30 @@ class ServiceAuthentification {
       );
       await user.reauthenticateWithCredential(credential);
     }
+  }
+
+  /// Connexion avec Google (OAuth2)
+  Future<UserCredential?> connexionGoogle() async {
+    try {
+      final googleUser = await _googleSignIn.signIn();
+      if (googleUser == null) return null; // L'utilisateur a annulé
+
+      final googleAuth = await googleUser.authentication;
+      final credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+      return await _auth.signInWithCredential(credential);
+    } catch (e) {
+      debugPrint('[Auth] Erreur connexion Google : $e');
+      rethrow;
+    }
+  }
+
+  /// Déconnexion Google (nettoie aussi la session Google)
+  Future<void> deconnexionGoogle() async {
+    try {
+      await _googleSignIn.signOut();
+    } catch (_) {}
   }
 }

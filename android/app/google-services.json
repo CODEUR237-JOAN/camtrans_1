@@ -12,7 +12,20 @@
           "package_name": "com.joan.update_camtrans"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "60771248934-m7t8tr5ecfp3dcscl7hcnpc1rs88182u.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.joan.update_camtrans",
+            "certificate_hash": "37f4b67adbe5129840991fcf9d3f688175ee71f1"
+          }
+        },
+        {
+          "client_id": "60771248934-o1oi2uvfbpdg4ps2q9pvnbcchqshod7n.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyBgUDgopszTDY1KONS-I6ZG3gSSgOJIk8M"
@@ -20,7 +33,19 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "60771248934-o1oi2uvfbpdg4ps2q9pvnbcchqshod7n.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "60771248934-s9hq126h6icb5fv2e07m3i75crlp71pn.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.joan.updateCamtrans"
+              }
+            }
+          ]
         }
       }
     }

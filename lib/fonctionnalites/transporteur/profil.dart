@@ -11,6 +11,7 @@ import 'package:intl/intl.dart';
 import 'package:update_camtrans/coeur/widgets/loader_premium.dart';
 import 'package:update_camtrans/coeur/widgets/carte_information.dart';
 import 'package:update_camtrans/coeur/constantes/statuts.dart';
+
 class ProfilTransporteur extends ConsumerWidget {
   const ProfilTransporteur({super.key});
 
@@ -22,7 +23,8 @@ class ProfilTransporteur extends ConsumerWidget {
     return Scaffold(
       backgroundColor: const Color(0xFF08111F),
       appBar: AppBar(
-        title: const Text("Mon profil", style: TextStyle(fontWeight: FontWeight.bold)),
+        title: const Text("Mon profil",
+            style: TextStyle(fontWeight: FontWeight.bold)),
         backgroundColor: const Color(0xFF08111F),
         elevation: 0,
         automaticallyImplyLeading: false,
@@ -42,31 +44,39 @@ class ProfilTransporteur extends ConsumerWidget {
                 CircleAvatar(
                   radius: 60,
                   backgroundColor: CouleursApp.primaire.withValues(alpha: 0.1),
-                  backgroundImage: transporteur.photo.isNotEmpty ? NetworkImage(transporteur.photo) : null,
-                  child: transporteur.photo.isEmpty 
-                    ? const Icon(Icons.person, size: 60, color: CouleursApp.primaire)
-                    : null,
+                  backgroundImage: transporteur.photo.isNotEmpty
+                      ? NetworkImage(transporteur.photo)
+                      : null,
+                  child: transporteur.photo.isEmpty
+                      ? const Icon(Icons.person,
+                          size: 60, color: CouleursApp.primaire)
+                      : null,
                 ),
 
                 const SizedBox(height: 15),
 
                 Text(
                   "${transporteur.prenom} ${transporteur.nom}",
-                  style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                  style: const TextStyle(
+                      fontSize: 24, fontWeight: FontWeight.bold),
                 ),
 
                 const SizedBox(height: 5),
 
                 Text(
-                  transporteur.documentsValides ? "Transporteur Vérifié" : "En attente de vérification",
+                  transporteur.documentsValides
+                      ? "Transporteur Vérifié"
+                      : "En attente de vérification",
                   style: TextStyle(
-                    color: transporteur.documentsValides ? Colors.green : Colors.orange,
+                    color: transporteur.documentsValides
+                        ? Colors.green
+                        : Colors.orange,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
 
                 const SizedBox(height: 25),
-                
+
                 // === SECTION ABONNEMENT ===
                 _buildAbonnementCard(context, transporteur),
 
@@ -76,24 +86,28 @@ class ProfilTransporteur extends ConsumerWidget {
                   elevation: 0,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(20),
-                    side: BorderSide(color: Colors.white.withValues(alpha: 0.08)),
+                    side:
+                        BorderSide(color: Colors.white.withValues(alpha: 0.08)),
                   ),
                   child: Column(
                     children: [
                       ListTile(
-                        leading: const Icon(Icons.phone, color: CouleursApp.primaire),
+                        leading: const Icon(Icons.phone,
+                            color: CouleursApp.primaire),
                         title: const Text("Téléphone"),
                         subtitle: Text(transporteur.telephone),
                       ),
                       const Divider(height: 1),
                       ListTile(
-                        leading: const Icon(Icons.email, color: CouleursApp.primaire),
+                        leading: const Icon(Icons.email,
+                            color: CouleursApp.primaire),
                         title: const Text("E-mail"),
                         subtitle: Text(transporteur.email),
                       ),
                       const Divider(height: 1),
                       ListTile(
-                        leading: const Icon(Icons.location_city, color: CouleursApp.primaire),
+                        leading: const Icon(Icons.location_city,
+                            color: CouleursApp.primaire),
                         title: const Text("Ville"),
                         subtitle: Text(transporteur.ville),
                       ),
@@ -117,24 +131,29 @@ class ProfilTransporteur extends ConsumerWidget {
                   elevation: 0,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(20),
-                    side: BorderSide(color: Colors.white.withValues(alpha: 0.08)),
+                    side:
+                        BorderSide(color: Colors.white.withValues(alpha: 0.08)),
                   ),
                   child: Column(
                     children: [
                       ListTile(
-                        leading: const Icon(Icons.local_shipping, color: CouleursApp.primaire),
+                        leading: const Icon(Icons.local_shipping,
+                            color: CouleursApp.primaire),
                         title: const Text("Modèle"),
-                        subtitle: Text("${transporteur.marqueVehicule} ${transporteur.modeleVehicule}"),
+                        subtitle: Text(
+                            "${transporteur.marqueVehicule} ${transporteur.modeleVehicule}"),
                       ),
                       const Divider(height: 1),
                       ListTile(
-                        leading: const Icon(Icons.confirmation_number, color: CouleursApp.primaire),
+                        leading: const Icon(Icons.confirmation_number,
+                            color: CouleursApp.primaire),
                         title: const Text("Immatriculation"),
                         subtitle: Text(transporteur.immatriculation),
                       ),
                       const Divider(height: 1),
                       ListTile(
-                        leading: const Icon(Icons.scale, color: CouleursApp.primaire),
+                        leading: const Icon(Icons.scale,
+                            color: CouleursApp.primaire),
                         title: const Text("Capacité Max"),
                         subtitle: Text("${transporteur.chargeMaxKg} kg"),
                       ),
@@ -146,57 +165,88 @@ class ProfilTransporteur extends ConsumerWidget {
 
                 // === SECTION STATISTIQUES (Déplacée depuis le tableau de bord) ===
                 ref.watch(fluxMesCoursesProvider).when(
-                  loading: () => const SizedBox(height: 100, child: Center(child: CircularProgressIndicator())),
-                  error: (err, _) => const SizedBox.shrink(),
-                  data: (toutesLesCourses) {
-                    final courses = toutesLesCourses.where((c) => c.archivePourTransporteur != true).toList();
-                    int livrees = courses.where((c) => c.statut == StatutCourse.arriveDestination || c.statut == StatutCourse.terminee).length;
-                    int enAttente = courses.where((c) => StatutCourse.estActive(c.statut)).length;
-                    
-                    return Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                            "Mes Statistiques",
-                            style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    loading: () => const SizedBox(
+                        height: 100,
+                        child: Center(child: CircularProgressIndicator())),
+                    error: (err, _) => const SizedBox.shrink(),
+                    data: (toutesLesCourses) {
+                      final courses = toutesLesCourses
+                          .where((c) => c.archivePourTransporteur != true)
+                          .toList();
+                      int livrees = courses
+                          .where((c) =>
+                              c.statut == StatutCourse.arriveDestination ||
+                              c.statut == StatutCourse.terminee)
+                          .length;
+                      int enAttente = courses
+                          .where((c) => StatutCourse.estActive(c.statut))
+                          .length;
+
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Align(
+                            alignment: Alignment.centerLeft,
+                            child: Text(
+                              "Mes Statistiques",
+                              style: TextStyle(
+                                  fontSize: 20, fontWeight: FontWeight.bold),
+                            ),
                           ),
-                        ),
-                        const SizedBox(height: 15),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: CarteInformation(titre: "Courses", valeur: "${courses.length}", icone: Icons.local_shipping),
-                            ),
-                            const SizedBox(width: 15),
-                            Expanded(
-                              child: CarteInformation(titre: "Livrées", valeur: "$livrees", icone: Icons.check_circle, couleurIcone: Colors.green, couleurValeur: Colors.green),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 15),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: CarteInformation(titre: "En cours", valeur: "$enAttente", icone: Icons.schedule, couleurIcone: Colors.orange, couleurValeur: Colors.orange),
-                            ),
-                            const SizedBox(width: 15),
-                            Expanded(
-                              child: CarteInformation(titre: "Note", valeur: "${transporteur.noteMoyenne} ", icone: Icons.star, couleurIcone: Colors.amber, couleurValeur: Colors.amber),
-                            ),
-                          ],
-                        ),
-                      ],
-                    );
-                  }
-                ),
+                          const SizedBox(height: 15),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: CarteInformation(
+                                    titre: "Courses",
+                                    valeur: "${courses.length}",
+                                    icone: Icons.local_shipping),
+                              ),
+                              const SizedBox(width: 15),
+                              Expanded(
+                                child: CarteInformation(
+                                    titre: "Livrées",
+                                    valeur: "$livrees",
+                                    icone: Icons.check_circle,
+                                    couleurIcone: Colors.green,
+                                    couleurValeur: Colors.green),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: 15),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: CarteInformation(
+                                    titre: "En cours",
+                                    valeur: "$enAttente",
+                                    icone: Icons.schedule,
+                                    couleurIcone: Colors.orange,
+                                    couleurValeur: Colors.orange),
+                              ),
+                              const SizedBox(width: 15),
+                              Expanded(
+                                child: CarteInformation(
+                                    titre: "Note",
+                                    valeur: "${transporteur.noteMoyenne} ",
+                                    icone: Icons.star,
+                                    couleurIcone: Colors.amber,
+                                    couleurValeur: Colors.amber),
+                              ),
+                            ],
+                          ),
+                        ],
+                      );
+                    }),
 
                 const SizedBox(height: 30),
 
-                _boutonOption(Icons.workspace_premium, "Mes abonnements", () => context.push(RoutesApplication.abonnement)),
-                _boutonOption(Icons.edit, "Modifier le profil", () => context.push(RoutesApplication.modifierProfil)),
-                _boutonOption(Icons.lock, "Changer le mot de passe", () => context.push(RoutesApplication.changerMotDePasse)),
+                _boutonOption(Icons.workspace_premium, "Mes abonnements",
+                    () => context.push(RoutesApplication.abonnement)),
+                _boutonOption(Icons.edit, "Modifier le profil",
+                    () => context.push(RoutesApplication.modifierProfil)),
+                _boutonOption(Icons.lock, "Changer le mot de passe",
+                    () => context.push(RoutesApplication.changerMotDePasse)),
                 _boutonOption(Icons.settings, "Paramètres", () {}),
                 _boutonOption(Icons.help, "Aide & Support", () {}),
 
@@ -212,7 +262,8 @@ class ProfilTransporteur extends ConsumerWidget {
                       elevation: 0,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(15),
-                        side: BorderSide(color: Colors.red.withValues(alpha: 0.3)),
+                        side: BorderSide(
+                            color: Colors.red.withValues(alpha: 0.3)),
                       ),
                     ),
                     onPressed: () async {
@@ -220,7 +271,8 @@ class ProfilTransporteur extends ConsumerWidget {
                       if (context.mounted) context.go("/connexion");
                     },
                     icon: const Icon(Icons.logout),
-                    label: const Text("Déconnexion", style: TextStyle(fontWeight: FontWeight.bold)),
+                    label: const Text("Déconnexion",
+                        style: TextStyle(fontWeight: FontWeight.bold)),
                   ),
                 ),
 
@@ -244,28 +296,9 @@ class ProfilTransporteur extends ConsumerWidget {
       child: ListTile(
         leading: Icon(icone, color: CouleursApp.primaire),
         title: Text(texte, style: const TextStyle(fontWeight: FontWeight.w600)),
-        trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.white54),
+        trailing: const Icon(Icons.arrow_forward_ios,
+            size: 16, color: Colors.white54),
         onTap: action,
-      ),
-    );
-  }
-
-  Widget _statistique(String titre, String valeur, IconData icone) {
-    return Container(
-      padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
-      ),
-      child: Column(
-        children: [
-          Icon(icone, color: CouleursApp.primaire, size: 30),
-          const SizedBox(height: 10),
-          Text(valeur, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18)),
-          const SizedBox(height: 4),
-          Text(titre, style: const TextStyle(color: Colors.white54, fontSize: 12)),
-        ],
       ),
     );
   }
@@ -273,9 +306,10 @@ class ProfilTransporteur extends ConsumerWidget {
   Widget _buildAbonnementCard(BuildContext context, transporteur) {
     bool estValide = transporteur.abonnementValide;
     int joursRestants = 0;
-    
+
     if (transporteur.dateFinAbonnement != null) {
-      joursRestants = transporteur.dateFinAbonnement!.difference(DateTime.now()).inDays;
+      joursRestants =
+          transporteur.dateFinAbonnement!.difference(DateTime.now()).inDays;
     }
 
     return Container(
@@ -283,8 +317,11 @@ class ProfilTransporteur extends ConsumerWidget {
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         gradient: LinearGradient(
-          colors: estValide 
-              ? [CouleursApp.primaire.withValues(alpha: 0.8), CouleursApp.primaire]
+          colors: estValide
+              ? [
+                  CouleursApp.primaire.withValues(alpha: 0.8),
+                  CouleursApp.primaire
+                ]
               : [Colors.orange.shade400, Colors.red.shade400],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
@@ -292,7 +329,8 @@ class ProfilTransporteur extends ConsumerWidget {
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: (estValide ? CouleursApp.primaire : Colors.red).withValues(alpha: 0.3),
+            color: (estValide ? CouleursApp.primaire : Colors.red)
+                .withValues(alpha: 0.3),
             blurRadius: 10,
             offset: const Offset(0, 5),
           )
@@ -303,11 +341,15 @@ class ProfilTransporteur extends ConsumerWidget {
         children: [
           Row(
             children: [
-              Icon(estValide ? Icons.verified : Icons.warning_amber_rounded, color: Colors.white, size: 28),
+              Icon(estValide ? Icons.verified : Icons.warning_amber_rounded,
+                  color: Colors.white, size: 28),
               const SizedBox(width: 10),
               Text(
                 "Statut de l'abonnement",
-                style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18),
+                style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18),
               ),
             ],
           ),
@@ -315,7 +357,10 @@ class ProfilTransporteur extends ConsumerWidget {
           if (estValide) ...[
             Text(
               "Il vous reste $joursRestants jour(s)",
-              style: const TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900),
+              style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 22,
+                  fontWeight: FontWeight.w900),
             ),
             const SizedBox(height: 5),
             Text(
@@ -325,7 +370,10 @@ class ProfilTransporteur extends ConsumerWidget {
           ] else ...[
             const Text(
               "Abonnement expiré",
-              style: TextStyle(color: Colors.white, fontSize: 22, fontWeight: FontWeight.w900),
+              style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 22,
+                  fontWeight: FontWeight.w900),
             ),
             const SizedBox(height: 5),
             const Text(
@@ -339,9 +387,12 @@ class ProfilTransporteur extends ConsumerWidget {
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF08111F),
               foregroundColor: estValide ? CouleursApp.primaire : Colors.red,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10)),
             ),
-            child: Text(estValide ? "Prolonger l'abonnement" : "Renouveler maintenant", style: const TextStyle(fontWeight: FontWeight.bold)),
+            child: Text(
+                estValide ? "Prolonger l'abonnement" : "Renouveler maintenant",
+                style: const TextStyle(fontWeight: FontWeight.bold)),
           ),
         ],
       ),
