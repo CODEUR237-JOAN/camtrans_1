@@ -152,9 +152,7 @@ class _SuiviTransporteurState extends ConsumerState<SuiviTransporteur> {
                   heroTag: "btn_mute_vocal",
                   backgroundColor: const Color(0xFF0F172A),
                   onPressed: () {
-                    final navVocale = ref.read(serviceNavigationVocaleProvider);
-                    navVocale.basculerMute();
-                    setState(() {}); // Rafraîchir l'icône
+                    ref.read(serviceNavigationVocaleProvider).basculerMute();
                   },
                   child: Icon(
                     ref.watch(serviceNavigationVocaleProvider).estMute

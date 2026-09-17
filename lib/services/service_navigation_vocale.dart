@@ -5,11 +5,12 @@ import 'package:flutter_tts/flutter_tts.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:update_camtrans/services/service_routage.dart';
 
-final serviceNavigationVocaleProvider = Provider<ServiceNavigationVocale>((ref) {
+final serviceNavigationVocaleProvider =
+    ChangeNotifierProvider<ServiceNavigationVocale>((ref) {
   return ServiceNavigationVocale();
 });
 
-class ServiceNavigationVocale {
+class ServiceNavigationVocale extends ChangeNotifier {
   final FlutterTts _tts = FlutterTts();
   
   bool _estMute = false;
@@ -35,6 +36,7 @@ class ServiceNavigationVocale {
 
   void basculerMute() {
     _estMute = !_estMute;
+    notifyListeners(); // Rafraîchit le bouton dans l'UI
     if (_estMute) {
       _tts.stop();
     } else {
@@ -66,6 +68,7 @@ class ServiceNavigationVocale {
     _navigationActive = false;
     _traiterEnCours = null;
     _tts.stop();
+    notifyListeners();
   }
 
   void mettreAJourPosition(LatLng positionActuelle) {

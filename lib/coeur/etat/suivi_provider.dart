@@ -116,8 +116,14 @@ class SuiviNotifier extends StateNotifier<EtatSuivi> {
           ).then((infoTrajet) {
             if (infoTrajet != null && mounted) {
               state = state.copierAvec(infoTrajet: infoTrajet);
-              // Si la course est en cours, démarrer la navigation vocale
-              if (course.statut == StatutCourse.charge || course.statut == StatutCourse.enTransit) {
+              // Démarrer la navigation vocale dès que le transporteur est en route
+              final statutsActifs = [
+                StatutCourse.enRouteDepart,
+                StatutCourse.arriveDepart,
+                StatutCourse.charge,
+                StatutCourse.enTransit,
+              ];
+              if (statutsActifs.contains(course.statut)) {
                 _navVocale.demarrerNavigation(infoTrajet);
               }
             }
@@ -167,8 +173,8 @@ class SuiviNotifier extends StateNotifier<EtatSuivi> {
           tempsRestant = distanceRestante / 8.3;
           
           // Mise à jour de la navigation vocale pour le chauffeur
-          final positionActuelle = LatLng(transporteur.latitude, transporteur.longitude);
-          _navVocale.mettreAJourPosition(positionActuelle);
+          _navVocale.mettreAJourPosition(
+              LatLng(transporteur.latitude, transporteur.longitude));
         }
 
         state = state.copierAvec(
@@ -180,7 +186,7 @@ class SuiviNotifier extends StateNotifier<EtatSuivi> {
         // ✅ AMÉLIORATION 2.3: Ne géocoder que si la position a changé de >100m
         // Cela réduit massivement les appels API inutiles à chaque update Firestore
         if (transporteur.latitude != 0 && transporteur.longitude != 0) {
-          final positionActuelle =
+          final positionNavVocale =
               LatLng(transporteur.latitude, transporteur.longitude);
           final bool doitGeocoderDernierePosition =
               _dernierePositionGeocodee == null;
@@ -189,13 +195,13 @@ class SuiviNotifier extends StateNotifier<EtatSuivi> {
                   const Distance().as(
                         LengthUnit.Meter,
                         _dernierePositionGeocodee!,
-                        positionActuelle,
+                        positionNavVocale,
                       ) >
                       _seuilGeocodingMetres;
 
           if (doitGeocoderDernierePosition ||
               positionChangeeSignificativement) {
-            _dernierePositionGeocodee = positionActuelle;
+            _dernierePositionGeocodee = positionNavVocale;
             _gps
                 .obtenirAdresse(
               latitude: transporteur.latitude,
