@@ -209,8 +209,9 @@ class SuiviNotifier extends StateNotifier<EtatSuivi> {
             )
                 .then((adresse) {
               final quartier = adresse.split(',').first.trim();
-              if (mounted)
+              if (mounted) {
                 state = state.copierAvec(quartierTransporteur: quartier);
+              }
             }).catchError((_) {});
           }
         }
