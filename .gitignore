@@ -99,3 +99,7 @@ worker_dispatch.js
 worker_notifications.js
 setup_admin.js
 find_emojis.dart
+
+# Clé de compte de service Firebase Admin (contient une clé privée)
+lib/services/service_fcm_admin.dart
+

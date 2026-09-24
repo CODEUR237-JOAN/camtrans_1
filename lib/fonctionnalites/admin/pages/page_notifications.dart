@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:update_camtrans/coeur/constantes/couleurs.dart';
 import 'package:update_camtrans/coeur/widgets/loader_premium.dart';
+import 'package:update_camtrans/services/service_fcm_admin.dart';
 
 class PageNotifications extends ConsumerStatefulWidget {
   const PageNotifications({super.key});
@@ -34,15 +35,25 @@ class _PageNotificationsState extends ConsumerState<PageNotifications> {
     setState(() => _enCours = true);
 
     try {
+      // 1. Envoyer réellement les notifications push via FCM v1
+      final resultat = await ServiceFcmAdmin.envoyerNotificationGlobale(
+        titre: titre,
+        message: message,
+        cible: _cible,
+      );
+
+      // 2. Enregistrer l'historique dans Firestore
       final refNotif =
           FirebaseFirestore.instance.collection('notifications_push').doc();
-
       await refNotif.set({
         'id': refNotif.id,
         'titre': titre,
         'message': message,
         'cible': _cible,
-        'status': 'pending', // Le script Node.js écoute ce statut
+        'status': 'envoye',
+        'totalDestinataires': resultat.total,
+        'totalEnvoyes': resultat.succes,
+        'totalEchecs': resultat.echecs,
         'dateCreation': FieldValue.serverTimestamp(),
       });
 
@@ -50,22 +61,29 @@ class _PageNotificationsState extends ConsumerState<PageNotifications> {
         _titreController.clear();
         _messageController.clear();
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text("Notification programmée avec succès !"),
-            backgroundColor: Colors.green,
+          SnackBar(
+            content: Text(
+              resultat.total == 0
+                  ? "Aucun appareil trouvé pour la cible sélectionnée."
+                  : "✅ ${resultat.succes}/${resultat.total} notification(s) envoyée(s) avec succès !",
+            ),
+            backgroundColor:
+                resultat.succes > 0 ? Colors.green : Colors.orange,
           ),
         );
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Erreur: $e"), backgroundColor: Colors.red),
+          SnackBar(
+              content: Text("Erreur: $e"), backgroundColor: Colors.red),
         );
       }
     } finally {
       if (mounted) setState(() => _enCours = false);
     }
   }
+
 
   @override
   Widget build(BuildContext context) {
