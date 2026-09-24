@@ -1,4 +1,4 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+﻿import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:update_camtrans/services/service_ia.dart';
@@ -339,7 +339,7 @@ class ServiceAssistantVocal extends StateNotifier<EtatAssistant> {
       tempsApprocheMin: 0,
       candidats: const [],
       indexCandidatActuel: 0,
-      codePinLivraison: "",
+      codePinCourse: "",
       fondsDebloques: false,
     );
 

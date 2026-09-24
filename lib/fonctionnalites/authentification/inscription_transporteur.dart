@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
@@ -284,7 +284,7 @@ class _InscriptionTransporteurState
     // Texte par défaut si aucun texte n'a encore été défini par l'admin
     const texteParDefaut = "Bienvenue sur CamTrans !\n\n"
         "1. Engagements du Transporteur\n"
-        "Vous vous engagez à maintenir votre véhicule en bon état et à respecter les délais de livraison.\n\n"
+        "Vous vous engagez à maintenir votre véhicule en bon état et à respecter les délais de course.\n\n"
         "2. Gammes et Tarification\n"
         "La gamme 'Confort' requiert une validation stricte par l'administrateur. Tout signalement client peut entraîner une rétrogradation vers la gamme 'Éco'.\n\n"
         "3. Confidentialité\n"

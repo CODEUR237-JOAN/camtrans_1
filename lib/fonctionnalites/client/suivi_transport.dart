@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:latlong2/latlong.dart';
@@ -578,7 +578,7 @@ class _SuiviTransportState extends ConsumerState<SuiviTransport> {
                 ),
                 child: Text(
                     course.statut == StatutCourse.arriveDestination
-                        ? "Confirmer la livraison"
+                        ? "Confirmer la course"
                         : "Valider l'arrivée",
                     style: const TextStyle(
                         fontSize: 16, fontWeight: FontWeight.bold)),

@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -526,7 +526,7 @@ class _SuiviTransporteurState extends ConsumerState<SuiviTransporteur> {
             style: GoogleFonts.poppins(
                 color: Colors.white, fontWeight: FontWeight.bold)),
         content: Text(
-          "Confirmez-vous que la livraison est terminée et la marchandise remise au client ?",
+          "Confirmez-vous que la course est terminée et la marchandise remise au client ?",
           style: GoogleFonts.inter(color: Colors.white70),
         ),
         actions: [

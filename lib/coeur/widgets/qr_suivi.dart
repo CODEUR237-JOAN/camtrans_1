@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -12,7 +12,7 @@ import 'package:update_camtrans/coeur/constantes/couleurs.dart';
 /// Utilise le package qr_flutter (déjà installé dans pubspec.yaml).
 ///
 /// Le client peut afficher ce QR Code pour permettre au destinataire
-/// de scanner et suivre la livraison en temps réel, sans avoir à
+/// de scanner et suivre la course en temps réel, sans avoir à
 /// se connecter à l'application CamTrans.
 ///
 /// Usage:
@@ -83,7 +83,7 @@ class QrSuivi extends StatelessWidget {
                     ),
                   ),
                   Text(
-                    "Scannez pour suivre cette livraison",
+                    "Scannez pour suivre cette course",
                     style:
                         GoogleFonts.inter(color: Colors.white54, fontSize: 12),
                   ),
@@ -214,7 +214,7 @@ class QrSuivi extends StatelessWidget {
                 const SizedBox(width: 10),
                 Expanded(
                   child: Text(
-                    "Le destinataire peut scanner ce QR Code pour suivre votre livraison en temps réel, sans télécharger l'app.",
+                    "Le destinataire peut scanner ce QR Code pour suivre votre course en temps réel, sans télécharger l'app.",
                     style: GoogleFonts.inter(
                         color: Colors.white54, fontSize: 12, height: 1.5),
                   ),

@@ -1,4 +1,4 @@
-import 'package:cloud_firestore/cloud_firestore.dart';
+﻿import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:update_camtrans/services/service_firestore.dart';
 import 'package:update_camtrans/services/service_authentification.dart';
@@ -135,7 +135,7 @@ final fluxCourseProposeeProvider = StreamProvider.autoDispose<Course?>((ref) {
   });
 });
 
-// Course active (celle en cours de livraison)
+// Course active (celle en cours de course)
 final activeCourseProvider = Provider.autoDispose<Course?>((ref) {
   final coursesAsync = ref.watch(fluxMesCoursesProvider);
   return coursesAsync.maybeWhen(

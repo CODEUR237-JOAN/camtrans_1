@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -122,7 +122,7 @@ class Profil extends ConsumerWidget {
                     }
 
                     return _buildStats(
-                      livraisons: livrees.length,
+                      courses: livrees.length,
                       depenses: depenses,
                       enCours: enCours.length,
                     );
@@ -276,7 +276,7 @@ class Profil extends ConsumerWidget {
   }
 
   Widget _buildStats(
-      {required int livraisons,
+      {required int courses,
       required double depenses,
       required int enCours}) {
     String depensesText = depenses >= 1000
@@ -288,7 +288,7 @@ class Profil extends ConsumerWidget {
       child: ListView(
         scrollDirection: Axis.horizontal,
         children: [
-          _buildStatCard("Livraisons", livraisons.toString(),
+          _buildStatCard("Courses", courses.toString(),
               Iconsax.box_tick_copy, CouleursApp.succes),
           const SizedBox(width: 15),
           _buildStatCard("Dépenses", depensesText, Iconsax.coin_copy,

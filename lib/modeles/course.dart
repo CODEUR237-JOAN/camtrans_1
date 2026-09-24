@@ -1,4 +1,4 @@
-import 'package:update_camtrans/coeur/utilitaires/parseur.dart';
+﻿import 'package:update_camtrans/coeur/utilitaires/parseur.dart';
 import 'package:update_camtrans/coeur/constantes/statuts.dart';
 
 class Course {
@@ -58,7 +58,7 @@ class Course {
   final DateTime? expirationProposition;
 
   //---------------- Escrow PIN -------------//
-  final String codePinLivraison;
+  final String codePinCourse;
   final bool fondsDebloques;
 
   //---------------- Archivage logique -------//
@@ -124,7 +124,7 @@ class Course {
     this.candidats = const [],
     this.indexCandidatActuel = 0,
     this.expirationProposition,
-    this.codePinLivraison = "",
+    this.codePinCourse = "",
     this.fondsDebloques = false,
     this.archivePourTransporteur = false,
     this.archivePourClient = false,
@@ -181,7 +181,7 @@ class Course {
     List<String>? candidats,
     int? indexCandidatActuel,
     DateTime? expirationProposition,
-    String? codePinLivraison,
+    String? codePinCourse,
     bool? fondsDebloques,
     bool? archivePourTransporteur,
     bool? archivePourClient,
@@ -240,7 +240,7 @@ class Course {
       indexCandidatActuel: indexCandidatActuel ?? this.indexCandidatActuel,
       expirationProposition:
           expirationProposition ?? this.expirationProposition,
-      codePinLivraison: codePinLivraison ?? this.codePinLivraison,
+      codePinCourse: codePinCourse ?? this.codePinCourse,
       fondsDebloques: fondsDebloques ?? this.fondsDebloques,
       archivePourTransporteur:
           archivePourTransporteur ?? this.archivePourTransporteur,
@@ -300,7 +300,7 @@ class Course {
       "candidats": candidats,
       "indexCandidatActuel": indexCandidatActuel,
       "expirationProposition": expirationProposition?.toIso8601String(),
-      "codePinLivraison": codePinLivraison,
+      "codePinCourse": codePinCourse,
       "fondsDebloques": fondsDebloques,
       // ✅ FIX : Champs d'archivage logique — étaient absents, causant une perte de données
       "archivePourTransporteur": archivePourTransporteur,
@@ -368,7 +368,7 @@ class Course {
       expirationProposition: map['expirationProposition'] != null
           ? Parseur.toDateTime(map['expirationProposition'])
           : null,
-      codePinLivraison: map['codePinLivraison'] ?? "",
+      codePinCourse: map['codePinCourse'] ?? "",
       fondsDebloques: map['fondsDebloques'] ?? false,
       archivePourTransporteur: map['archivePourTransporteur'] ?? false,
       archivePourClient: map['archivePourClient'] ?? false,

@@ -373,12 +373,14 @@ class ServicePaiement {
       donnees: paiement.toMap(),
     );
 
-    // Mettre à jour le statut de la course
-    await _firestore.modifierDocument(
-      collection: 'courses',
-      id: courseId,
-      donnees: {'paiementEffectue': true},
-    );
+    // Mettre à jour le statut de la course (uniquement si ce n'est pas un abonnement)
+    if (!courseId.startsWith('SUB-')) {
+      await _firestore.modifierDocument(
+        collection: 'courses',
+        id: courseId,
+        donnees: {'paiementEffectue': true},
+      );
+    }
 
     return paiement;
   }

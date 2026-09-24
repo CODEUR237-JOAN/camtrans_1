@@ -1,4 +1,4 @@
-// =======================================================
+﻿// =======================================================
 //
 // FICHIER : images.dart
 // PROJET : TransConnect Cameroun
@@ -165,7 +165,7 @@ class ImagesApp {
 
   static const String camion = "assets/animations/camion.json";
 
-  static const String livraison = "assets/animations/livraison.json";
+  static const String course = "assets/animations/livraison.json";
 
   static const String gps = "assets/animations/gps.json";
 

@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:go_router/go_router.dart';
 import 'package:update_camtrans/coeur/constantes/couleurs.dart';
@@ -60,7 +60,7 @@ class _EcranEvaluationState extends ConsumerState<EcranEvaluation> {
 
               const SizedBox(height: 8),
               Text(
-                "Comment s'est passée votre livraison ?",
+                "Comment s'est passée votre course ?",
                 textAlign: TextAlign.center,
                 style: GoogleFonts.poppins(color: Colors.white54, fontSize: 16),
               ),

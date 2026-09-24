@@ -1,4 +1,4 @@
-import 'dart:ui';
+﻿import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
@@ -532,7 +532,7 @@ class _ResumeExpeditionBottomSheetState
                       candidats: candidatsFinaux,
                       indexCandidatActuel: 0,
                       expirationProposition: expiration,
-                      codePinLivraison: pin,
+                      codePinCourse: pin,
                       fondsDebloques: false,
                     );
 

@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
@@ -11,15 +11,15 @@ import 'package:update_camtrans/services/service_authentification.dart';
 import 'package:update_camtrans/services/service_firestore.dart';
 import 'package:update_camtrans/coeur/widgets/loader_premium.dart';
 
-class HistoriqueLivraisons extends ConsumerStatefulWidget {
-  const HistoriqueLivraisons({super.key});
+class HistoriqueCourses extends ConsumerStatefulWidget {
+  const HistoriqueCourses({super.key});
 
   @override
-  ConsumerState<HistoriqueLivraisons> createState() =>
-      _HistoriquelivraisonsState();
+  ConsumerState<HistoriqueCourses> createState() =>
+      _HistoriquecoursesState();
 }
 
-class _HistoriquelivraisonsState extends ConsumerState<HistoriqueLivraisons> {
+class _HistoriquecoursesState extends ConsumerState<HistoriqueCourses> {
   bool _suppressionEnCours = false;
 
   bool _peutSupprimer(Course course) => StatutCourse.estTerminee(course.statut);
@@ -30,7 +30,7 @@ class _HistoriquelivraisonsState extends ConsumerState<HistoriqueLivraisons> {
       builder: (_) => _DialogConfirmation(
         titre: "Vider l'historique ?",
         message:
-            "Toutes vos livraisons terminées/annulées seront supprimées définitivement.",
+            "Toutes vos courses terminées/annulées seront supprimées définitivement.",
         bouton: "Tout supprimer",
         couleur: CouleursApp.erreur,
       ),
@@ -46,7 +46,7 @@ class _HistoriquelivraisonsState extends ConsumerState<HistoriqueLivraisons> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text("$nb livraison(s) supprimée(s)"),
+            content: Text("$nb course(s) supprimée(s)"),
             backgroundColor: Colors.green,
           ),
         );
@@ -63,7 +63,7 @@ class _HistoriquelivraisonsState extends ConsumerState<HistoriqueLivraisons> {
     return Scaffold(
       backgroundColor: const Color(0xFF08111F),
       appBar: AppBar(
-        title: const Text("Historique des livraisons"),
+        title: const Text("Historique des courses"),
         backgroundColor: const Color(0xFF08111F),
         elevation: 0,
         iconTheme: const IconThemeData(color: Colors.white70),
@@ -71,7 +71,7 @@ class _HistoriquelivraisonsState extends ConsumerState<HistoriqueLivraisons> {
             color: Colors.white70, fontWeight: FontWeight.bold, fontSize: 18),
         actions: [
           Tooltip(
-            message: "Supprimer les livraisons terminées/annulées",
+            message: "Supprimer les courses terminées/annulées",
             child: IconButton(
               icon: _suppressionEnCours
                   ? const SizedBox(
@@ -105,7 +105,7 @@ class _HistoriquelivraisonsState extends ConsumerState<HistoriqueLivraisons> {
                             style: TextStyle(color: Colors.white70)),
                         SizedBox(height: 6),
                         Text(
-                          "Glissez vers la gauche pour supprimer une livraison terminée.",
+                          "Glissez vers la gauche pour supprimer une course terminée.",
                           style: TextStyle(color: Colors.white, fontSize: 14),
                         ),
                       ],
@@ -129,7 +129,7 @@ class _HistoriquelivraisonsState extends ConsumerState<HistoriqueLivraisons> {
                   if (coursesVisibles.isEmpty) {
                     return const Center(
                         child: Text(
-                            "Aucune livraison complétée. C'est le moment de prendre la route ! 🚚"));
+                            "Aucune course complétée. C'est le moment de prendre la route ! 🚚"));
                   }
 
                   return ListView.builder(
@@ -221,7 +221,7 @@ class _HistoriquelivraisonsState extends ConsumerState<HistoriqueLivraisons> {
                             return await showDialog<bool>(
                               context: context,
                               builder: (_) => _DialogConfirmation(
-                                titre: "Supprimer cette livraison ?",
+                                titre: "Supprimer cette course ?",
                                 message: "Cette action est irréversible.",
                                 bouton: "Supprimer",
                                 couleur: CouleursApp.erreur,
@@ -240,7 +240,7 @@ class _HistoriquelivraisonsState extends ConsumerState<HistoriqueLivraisons> {
                             if (context.mounted) {
                               ScaffoldMessenger.of(context).showSnackBar(
                                 const SnackBar(
-                                  content: Text("Livraison archivée"),
+                                  content: Text("Course archivée"),
                                   backgroundColor: Colors.green,
                                 ),
                               );

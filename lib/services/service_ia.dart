@@ -1,4 +1,4 @@
-import 'dart:convert';
+﻿import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/foundation.dart';
@@ -342,7 +342,7 @@ class ServiceIA {
     final prompt = "L'utilisateur a dit : \"$texte\"\n\n"
         "Analyse cette phrase et extrais une intention de commande de transport.\n"
         "Réponds UNIQUEMENT en JSON avec ces clés :\n"
-        "- intention : 'CREER_COURSE' si c'est une demande de transport/remorquage/livraison, 'CONSULTER_COURSES' si l'utilisateur veut voir ses commandes ou courses, 'CONSULTER_REVENUS' si le chauffeur demande ses gains, 'INFO_SERVICE' si c'est une question sur les services, sinon 'INCONNU'\n"
+        "- intention : 'CREER_COURSE' si c'est une demande de transport/remorquage/course, 'CONSULTER_COURSES' si l'utilisateur veut voir ses commandes ou courses, 'CONSULTER_REVENUS' si le chauffeur demande ses gains, 'INFO_SERVICE' si c'est une question sur les services, sinon 'INCONNU'\n"
         "- depart : lieu de départ au Cameroun (chaîne vide si non mentionné)\n"
         "- arrivee : lieu d'arrivée au Cameroun (chaîne vide si non mentionné)\n"
         "- marchandise : type de service parmi (Marchandises générales, Déménagement, Matériaux de construction, Produits agricoles, Transport frigorifique, Convoi de véhicules, Remorquage) ou chaîne vide\n"

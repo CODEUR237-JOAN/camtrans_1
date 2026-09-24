@@ -1,4 +1,4 @@
-import 'package:flutter_animate/flutter_animate.dart';
+﻿import 'package:flutter_animate/flutter_animate.dart';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -455,7 +455,7 @@ class _TableauDeBordTransporteurState
                   TextButton(
                       onPressed: () {
                         context.push(
-                            RoutesApplication.historiqueLivraisonsTransporteur);
+                            RoutesApplication.historiqueCoursesTransporteur);
                       },
                       child: Text("Voir tout",
                           style:
@@ -654,7 +654,7 @@ class _TableauDeBordTransporteurState
           emoji: "📦",
           titre: "Créneau commercial optimal",
           description:
-              "Les livraisons B2B sont fréquentes le matin. Concentrez-vous sur les zones industrielles.",
+              "Les courses B2B sont fréquentes le matin. Concentrez-vous sur les zones industrielles.",
           couleur: CouleursApp.primaire);
     } else if (heure >= 12 && heure < 14) {
       return _ConseilJour(
@@ -668,7 +668,7 @@ class _TableauDeBordTransporteurState
           emoji: "🚛",
           titre: "L'après-midi est propice aux longues courses",
           description:
-              "Les trajets interurbains et livraisons commerciales sont fréquents entre 14h-18h.",
+              "Les trajets interurbains et courses commerciales sont fréquents entre 14h-18h.",
           couleur: CouleursApp.primaireNeon);
     } else if (heure >= 18 && heure < 22) {
       return _ConseilJour(

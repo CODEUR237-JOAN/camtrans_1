@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:update_camtrans/coeur/widgets/assistant_vocal_widget.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -441,7 +441,7 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
   }
 
   // ==========================================
-  // LIVRAISON EN COURS (TIMELINE)
+  // COURSE EN COURS (TIMELINE)
   // ==========================================
   Widget _buildActiveShipment(Course course) {
     bool isTransit = StatutCourse.estActive(course.statut);

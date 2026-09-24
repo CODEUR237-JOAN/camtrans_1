@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:update_camtrans/coeur/animations/transitions_page.dart';
@@ -28,7 +28,7 @@ import 'package:update_camtrans/fonctionnalites/client/ecran_chat.dart';
 import 'package:update_camtrans/fonctionnalites/client/ecran_evaluation.dart';
 import 'package:update_camtrans/fonctionnalites/profil/modifier_profil.dart';
 import 'package:update_camtrans/fonctionnalites/profil/changer_mot_de_passe.dart';
-import 'package:update_camtrans/fonctionnalites/transporteur/historique_livraisons.dart';
+import 'package:update_camtrans/fonctionnalites/transporteur/historique_courses.dart';
 import 'package:update_camtrans/fonctionnalites/transporteur/revenus.dart';
 import 'package:update_camtrans/fonctionnalites/transporteur/portefeuille.dart';
 import 'package:update_camtrans/fonctionnalites/transporteur/documents.dart';
@@ -68,8 +68,8 @@ class RoutesApplication {
   static const String admin = "/admin";
   static const String adressesFavorites = "/adresses-favorites";
   static const String chat = "/chat";
-  static const String historiqueLivraisonsTransporteur =
-      "/historique-livraisons-transporteur";
+  static const String historiqueCoursesTransporteur =
+      "/historique-courses-transporteur";
   static const String revenus = "/revenus";
   static const String portefeuille = "/portefeuille";
   static const String documents = "/documents";
@@ -279,9 +279,9 @@ class RoutesApplication {
         },
       ),
       GoRoute(
-        path: historiqueLivraisonsTransporteur,
+        path: historiqueCoursesTransporteur,
         pageBuilder: (context, state) =>
-            _page(const HistoriqueLivraisons(), state.pageKey),
+            _page(const HistoriqueCourses(), state.pageKey),
       ),
       GoRoute(
         path: admin,
