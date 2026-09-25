@@ -77,8 +77,8 @@ class ServicePaiement {
         "CAMTRANS-${courseId.substring(0, 5).toUpperCase()}-${DateTime.now().millisecondsSinceEpoch}";
 
     // L'API Demo de Campay n'accepte pas les transactions de plus de 25 FCFA.
-    // Pour la soutenance, on envoie 7 FCFA à Campay, mais on enregistre le vrai prix dans Firebase.
-    final double montantCampay = ApiKeys.isCampayProduction ? montant : 7.0;
+    // Pour la soutenance, on envoie 5 FCFA à Campay, mais on enregistre le vrai prix dans Firebase.
+    final double montantCampay = ApiKeys.isCampayProduction ? montant : 5.0;
 
     final collectResponse = await http.post(
       Uri.parse('$_baseUrl/collect/'),
