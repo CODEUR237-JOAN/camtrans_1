@@ -110,6 +110,11 @@ service cloud.firestore {
         estAdmin() ||
         (resource.data.clientId == request.auth.uid && resource.data.statut == 'recherche')
       );
+
+      // Sous-collection des messages du chat in-app
+      match /messages/{messageId} {
+        allow read, write: if estConnecte();
+      }
     }
 
     // ============================================================
