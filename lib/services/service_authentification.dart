@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'service_presence.dart';
@@ -17,6 +18,7 @@ class ServiceAuthentification {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final GoogleSignIn _googleSignIn = GoogleSignIn(
     scopes: ['email', 'profile'],
+    clientId: kIsWeb ? 'dummy-client-id-for-web.apps.googleusercontent.com' : null,
   );
 
   /// Utilisateur connecté

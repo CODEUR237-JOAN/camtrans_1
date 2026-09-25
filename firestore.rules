@@ -152,7 +152,9 @@ service cloud.firestore {
     // Utilisée uniquement par l'admin depuis le tableau de bord.
     // ============================================================
     match /notifications_push/{notifId} {
-      allow read, write: if estAdmin();
+      allow read: if estAdmin();
+      allow create: if estConnecte();
+      allow update, delete: if estAdmin();
     }
 
     // ============================================================

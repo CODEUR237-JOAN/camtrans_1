@@ -1,4 +1,4 @@
-﻿import 'package:flutter_animate/flutter_animate.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
@@ -399,42 +399,22 @@ class _TableauDeBordTransporteurState
                     titre: "Courses\ndisponibles",
                     icone: Icons.map,
                     auClic: () => setState(() => indexNavigation = 1),
-                  )
-                      .animate(
-                          onPlay: (controller) =>
-                              controller.repeat(reverse: true))
-                      .moveY(begin: -2, end: 2, duration: 2.seconds)
-                      .scale(delay: 900.ms, curve: Curves.easeOutBack),
+                  ),
                   CarteInformation(
                     titre: "Revenus",
                     icone: Icons.account_balance_wallet,
                     auClic: () => context.push("/revenus"),
-                  )
-                      .animate(
-                          onPlay: (controller) =>
-                              controller.repeat(reverse: true))
-                      .moveY(begin: 2, end: -2, duration: 2.seconds)
-                      .scale(delay: 1000.ms, curve: Curves.easeOutBack),
+                  ),
                   CarteInformation(
                     titre: "Portefeuille",
                     icone: Icons.wallet,
                     auClic: () => context.push("/portefeuille"),
-                  )
-                      .animate(
-                          onPlay: (controller) =>
-                              controller.repeat(reverse: true))
-                      .moveY(begin: -2, end: 2, duration: 2.seconds)
-                      .scale(delay: 1100.ms, curve: Curves.easeOutBack),
+                  ),
                   CarteInformation(
                     titre: "Documents",
                     icone: Icons.description,
                     auClic: () => context.push("/documents"),
-                  )
-                      .animate(
-                          onPlay: (controller) =>
-                              controller.repeat(reverse: true))
-                      .moveY(begin: 2, end: -2, duration: 2.seconds)
-                      .scale(delay: 1200.ms, curve: Curves.easeOutBack),
+                  ),
                 ],
               ),
 

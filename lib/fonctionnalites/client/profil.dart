@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -92,7 +92,7 @@ class Profil extends ConsumerWidget {
                 ),
 
                 const Text(
-                  "Client TransConnect",
+                  "Client CamTrans",
                   style: TextStyle(
                       color: Colors.white70, fontWeight: FontWeight.w500),
                 ),

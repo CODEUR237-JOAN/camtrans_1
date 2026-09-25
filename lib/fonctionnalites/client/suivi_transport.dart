@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:latlong2/latlong.dart';
@@ -122,7 +122,18 @@ class _SuiviTransportState extends ConsumerState<SuiviTransport> {
           elevation: 0,
           iconTheme: const IconThemeData(color: Color(0xFF08111F)),
         ),
-        body: const Center(child: Text('Course introuvable ou inaccessible.')),
+        body: Center(
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: Text(
+              etatSuivi.erreur != null
+                  ? 'DÉTAIL ERREUR: ${etatSuivi.erreur}'
+                  : 'Course introuvable ou inaccessible.',
+              style: const TextStyle(color: Colors.redAccent, fontSize: 16),
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ),
       );
     }
 
@@ -338,7 +349,7 @@ class _SuiviTransportState extends ConsumerState<SuiviTransport> {
   }
 
   Widget _buildTransporteurInfo(
-      BuildContext context, Transporteur transporteur, String? quartier) {
+      BuildContext context, Transporteur transporteur, String? quartier, String courseId) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -400,7 +411,7 @@ class _SuiviTransportState extends ConsumerState<SuiviTransport> {
             children: [
               GestureDetector(
                 onTap: () {
-                  context.push("/chat", extra: {"transporteur": transporteur});
+                  context.push("/chat", extra: {"courseId": courseId});
                 },
                 child: Container(
                   padding: const EdgeInsets.all(10),
@@ -539,7 +550,7 @@ class _SuiviTransportState extends ConsumerState<SuiviTransport> {
 
           // Infos Chauffeur
           if (transporteur != null) ...[
-            _buildTransporteurInfo(context, transporteur, quartier),
+            _buildTransporteurInfo(context, transporteur, quartier, course.id),
             const SizedBox(height: 16),
           ],
 
@@ -681,43 +692,48 @@ class _SuiviTransportState extends ConsumerState<SuiviTransport> {
     if (_enCoursDeRedirection) return;
     _enCoursDeRedirection = true;
     try {
-      final List<dynamic> candidats = course.candidats;
-      final int index = course.indexCandidatActuel;
-      final int nextIndex = index + 1;
+      final docRef = FirebaseFirestore.instance.collection('courses').doc(course.id);
+      
+      await FirebaseFirestore.instance.runTransaction((transaction) async {
+        final snapshot = await transaction.get(docRef);
+        if (!snapshot.exists || snapshot.data() == null) return;
+        
+        final data = snapshot.data()!;
+        
+        // SECURITE CRITIQUE : Vérifier si la course a déjà été acceptée !
+        if (data['statut'] != StatutCourse.propose && data['statut'] != StatutCourse.recherche) {
+          // Si le statut est "attribue" ou plus, on abandonne l'affectation automatique.
+          return; 
+        }
 
-      final serviceFs = ref.read(serviceFirestoreProvider);
+        final List<dynamic> candidats = data['candidats'] ?? [];
+        final int index = data['indexCandidatActuel'] ?? 0;
+        final int nextIndex = index + 1;
 
-      if (nextIndex < candidats.length) {
-        final prochainId = candidats[nextIndex] as String;
-        await serviceFs
-            .modifierDocument(collection: 'courses', id: course.id, donnees: {
-          'indexCandidatActuel': nextIndex,
-          'transporteurId': prochainId,
-          'expirationProposition':
-              DateTime.now().add(const Duration(seconds: 30)).toIso8601String(),
-        });
-
-        // Push notification for the next candidate
-        await FirebaseFirestore.instance.collection('notifications_push').add({
-          'titre': '🚨 NOUVELLE COURSE !',
-          'message':
-              'Une course à proximité vous est proposée. Acceptez vite !',
-          'cible': 'transporteur',
-          'cibleId': prochainId,
-          'status': 'pending',
-          'createdAt': FieldValue.serverTimestamp(),
-        });
-      } else {
-        // Plus aucun candidat : on passe au marché public
-        await serviceFs
-            .modifierDocument(collection: 'courses', id: course.id, donnees: {
-          'statut': StatutCourse.recherche,
-          'transporteurId': '',
-          'indexCandidatActuel': nextIndex,
-        });
-      }
+        if (nextIndex < candidats.length) {
+          final prochainId = candidats[nextIndex] as String;
+          transaction.update(docRef, {
+            'indexCandidatActuel': nextIndex,
+            'transporteurId': prochainId,
+            'statut': StatutCourse.propose,
+            'expirationProposition':
+                DateTime.now().add(const Duration(seconds: 30)).toIso8601String(),
+          });
+          
+          // Note : La notification Push devrait être idéalement envoyée par une Cloud Function
+          // sur écoute du changement de transporteurId.
+        } else {
+          // Plus aucun candidat : on passe au marché public
+          transaction.update(docRef, {
+            'statut': StatutCourse.recherche,
+            'transporteurId': '',
+            'indexCandidatActuel': nextIndex,
+          });
+        }
+      });
+      
     } catch (e) {
-      debugPrint("Erreur lors du passage au transporteur suivant: $e");
+      debugPrint("Erreur lors du passage au transporteur suivant: \$e");
     } finally {
       // Petite pause avant de permettre un autre appel (debouncing)
       await Future.delayed(const Duration(seconds: 2));

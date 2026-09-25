@@ -10,6 +10,7 @@ import 'package:update_camtrans/coeur/constantes/statuts.dart';
 import 'package:update_camtrans/coeur/etat/transporteur_provider.dart';
 import 'package:update_camtrans/modeles/course.dart';
 import 'package:update_camtrans/coeur/widgets/loader_premium.dart';
+import 'package:go_router/go_router.dart';
 
 class MarcheDemandes extends ConsumerStatefulWidget {
   const MarcheDemandes({super.key});
@@ -174,6 +175,8 @@ class _MarcheDemandesState extends ConsumerState<MarcheDemandes> {
                 RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           ),
         );
+        // Redirection automatique vers l'écran de suivi
+        context.push('/suivi/${course.id}');
       }
     } catch (e) {
       if (mounted) {

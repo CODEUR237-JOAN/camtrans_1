@@ -1,7 +1,9 @@
+import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:http/http.dart' as http;
 
 final serviceGpsProvider = Provider<ServiceGps>((ref) {
   return ServiceGps();
@@ -126,12 +128,42 @@ class ServiceGps {
       );
 
       if (locations.isEmpty) {
-        return null;
+        return await _geocodingFallback(requete);
       }
 
       return locations.first;
     } catch (e) {
-      debugPrint("Erreur geocoding pour $adresse : $e");
+      debugPrint("Erreur geocoding primaire pour $adresse : $e");
+      // Fallback vers OpenStreetMap si le geocoder natif échoue (ex: Web ou Google Services manquant)
+      return await _geocodingFallback(adresse);
+    }
+  }
+
+  Future<Location?> _geocodingFallback(String adresse) async {
+    try {
+      String requete = adresse;
+      if (!requete.toLowerCase().contains("cameroun") &&
+          !requete.toLowerCase().contains("cameroon")) {
+        requete = "$requete, Cameroun";
+      }
+      final url = Uri.parse('https://nominatim.openstreetmap.org/search?q=${Uri.encodeComponent(requete)}&format=json&limit=1');
+      final reponse = await http.get(url, headers: {'User-Agent': 'CamTransApp'});
+      
+      if (reponse.statusCode == 200) {
+        final List donnees = jsonDecode(reponse.body);
+        if (donnees.isNotEmpty) {
+          final lat = double.parse(donnees[0]['lat'].toString());
+          final lon = double.parse(donnees[0]['lon'].toString());
+          return Location(
+            latitude: lat,
+            longitude: lon,
+            timestamp: DateTime.now(),
+          );
+        }
+      }
+      return null;
+    } catch (e) {
+      debugPrint("Erreur geocoding fallback pour $adresse : $e");
       return null;
     }
   }

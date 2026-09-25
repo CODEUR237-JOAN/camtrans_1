@@ -1,4 +1,4 @@
-﻿import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:update_camtrans/services/service_firestore.dart';
 import 'package:update_camtrans/services/service_authentification.dart';
@@ -6,6 +6,7 @@ import 'package:update_camtrans/modeles/transporteur.dart';
 import 'package:update_camtrans/modeles/course.dart';
 import 'package:update_camtrans/modeles/paiement.dart';
 import 'package:update_camtrans/coeur/constantes/statuts.dart';
+import 'package:update_camtrans/services/service_presence.dart';
 
 // ID du transporteur actuellement connecté (lié à Firebase Auth)
 final currentTransporteurIdProvider = Provider<String>((ref) {
@@ -20,6 +21,9 @@ final currentTransporteurProvider =
   final transporteurId = ref.watch(currentTransporteurIdProvider);
 
   if (transporteurId.isEmpty) return Stream.value(null);
+
+  // Démarrer la présence UNE SEULE FOIS à la création du provider
+  ServicePresence().demarrer(role: 'transporteur');
 
   return firestore
       .fluxDocument(collection: 'transporteurs', id: transporteurId)

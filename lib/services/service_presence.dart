@@ -42,8 +42,11 @@ class ServicePresence with WidgetsBindingObserver {
         break;
       case AppLifecycleState.paused:
       case AppLifecycleState.inactive:
-      case AppLifecycleState.detached:
       case AppLifecycleState.hidden:
+        // Le chauffeur peut être en arrière-plan (ex: Google Maps) ou sur un autre onglet web.
+        // On ne le déconnecte pas immédiatement pour qu'il puisse recevoir des courses.
+        break;
+      case AppLifecycleState.detached:
         _arreterHeartbeat();
         _setEnLigne(false);
         break;

@@ -1,4 +1,4 @@
-﻿import 'dart:ui';
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
@@ -380,9 +380,10 @@ class _ResumeExpeditionBottomSheetState
                     }
 
                     // ✅ PHASE 4: ALGORTIHME DE DISPATCH - Recherche des transporteurs à proximité
-                    final typeVehiculeRequis =
-                        etatEstimation.resultat?.vehiculeRecommande ??
-                            etat.categorieVehicule;
+                    final typeVehiculeRequis = etat.categorieService == 'Remorque'
+                        ? 'Dépanneuse'
+                        : (etatEstimation.resultat?.vehiculeRecommande ??
+                            etat.categorieVehicule);
 
                     // 1. Récupérer tous les transporteurs en ligne et valides
                     final transporteursSnap = await FirebaseFirestore.instance
@@ -456,6 +457,9 @@ class _ResumeExpeditionBottomSheetState
                       candidatsFinaux.remove(etat.chauffeurPropose!.id);
                       candidatsFinaux.insert(0, etat.chauffeurPropose!.id);
                     }
+
+                    // 🚨 Info : Si aucun candidat n'est trouvé, la course sera quand même créée
+                    // avec le statut "recherche" pour qu'un transporteur puisse la prendre plus tard.
 
                     // 5. Déterminer le statut initial de la course
                     String statutInitial = StatutCourse.recherche;
@@ -587,9 +591,11 @@ class _ResumeExpeditionBottomSheetState
                           behavior: SnackBarBehavior.floating,
                         ),
                       );
-                      context.push('/suivi/${course.id}');
+                      context.go('/tableau-bord-client');
                     }
-                  } catch (e) {
+                  } catch (e, stacktrace) {
+                    debugPrint("❌ ERREUR CREATION COURSE: $e");
+                    debugPrint("Stacktrace: $stacktrace");
                     if (context.mounted) {
                       Navigator.pop(context); // Fermer le radar
                       ScaffoldMessenger.of(context).showSnackBar(

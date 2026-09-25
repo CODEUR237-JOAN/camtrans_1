@@ -18,9 +18,17 @@ class ServicePaiement {
 
   ServicePaiement(this._firestore);
 
-  String get _baseUrl => ApiKeys.isCampayProduction
-      ? 'https://www.campay.net/api'
-      : 'https://demo.campay.net/api';
+  String get _baseUrl {
+    final String url = ApiKeys.isCampayProduction
+        ? 'https://www.campay.net/api'
+        : 'https://demo.campay.net/api';
+    
+    // N'affecte QUE le web. Sur mobile (Android/iOS), kIsWeb est faux et l'URL normale est utilisée.
+    if (kIsWeb) {
+      return 'https://corsproxy.io/?$url';
+    }
+    return url;
+  }
 
   /// 1. Authentification : Obtenir le Token Campay
   Future<String> _obtenirToken() async {
@@ -378,8 +386,29 @@ class ServicePaiement {
       await _firestore.modifierDocument(
         collection: 'courses',
         id: courseId,
-        donnees: {'paiementEffectue': true},
+        donnees: {
+          'paiementEffectue': true,
+          'modePaiement': methode,
+          'statut': 'terminee'
+        },
       );
+    }
+    
+    // Si paiement digital (pas d'espèces), créditer le portefeuille du transporteur
+    if (methode != "Espèces" && transporteurId.isNotEmpty && !courseId.startsWith('SUB-')) {
+      final montantNet = montant * 0.98; // ex: 2% de frais
+      try {
+        final refTransp = FirebaseFirestore.instance.collection('transporteurs').doc(transporteurId);
+        await FirebaseFirestore.instance.runTransaction((transaction) async {
+          final snapshot = await transaction.get(refTransp);
+          if (snapshot.exists) {
+            final double soldeActuel = (snapshot.data()?['soldePortefeuille'] ?? 0).toDouble();
+            transaction.update(refTransp, {'soldePortefeuille': soldeActuel + montantNet});
+          }
+        });
+      } catch (e) {
+        debugPrint("Erreur lors de la mise à jour du portefeuille du transporteur : $e");
+      }
     }
 
     return paiement;

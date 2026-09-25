@@ -177,6 +177,16 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
     }
 
     if (_etapeCourante == 3) {
+      if (etat.depart.isEmpty) {
+        if (_isLoadingGps) {
+          _montrerErreur("Localisation GPS en cours... Veuillez patienter quelques secondes.");
+        } else {
+          _montrerErreur("Position de départ introuvable. Tentative de récupération...");
+          _fetchGPSLocation(notifier);
+        }
+        return;
+      }
+      
       // Auto-assignation de la date et de l'heure (Commande immédiate)
       notifier.setDateTransport(DateTime.now());
       notifier.setHeureTransport(TimeOfDay.now());
@@ -185,8 +195,8 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
       notifier.estimerAvecIA();
     }
 
-    if (_etapeCourante == 3) {
-      // Lancement automatique du GPS pour l'étape 4 (Itinéraire)
+    if (_etapeCourante == 2) {
+      // Lancement automatique du GPS au moment d'entrer dans l'étape 3 (Trajet)
       if (etat.depart.isEmpty) {
         _fetchGPSLocation(notifier);
       }
@@ -936,114 +946,6 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Départ avec Autocomplete
-              Row(
-                children: [
-                  const Icon(Icons.my_location,
-                      color: CouleursApp.primaire, size: 16),
-                  const SizedBox(width: 6),
-                  Text("Quartier de Départ",
-                      style: GoogleFonts.poppins(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w600,
-                          fontSize: 14)),
-                ],
-              ),
-              const SizedBox(height: 8),
-
-              Autocomplete<String>(
-                optionsBuilder: (TextEditingValue textEditingValue) {
-                  if (textEditingValue.text.isEmpty)
-                    return const Iterable<String>.empty();
-                  return _quartiersCameroun.where((String option) => option
-                      .toLowerCase()
-                      .contains(textEditingValue.text.toLowerCase()));
-                },
-                onSelected: (String selection) {
-                  notifier.setDepart(selection);
-                  _departController.text = selection;
-                },
-                fieldViewBuilder:
-                    (context, controller, focusNode, onFieldSubmitted) {
-                  if (controller.text.isEmpty &&
-                      _departController.text.isNotEmpty)
-                    controller.text = _departController.text;
-                  controller.addListener(() {
-                    if (controller.text != _departController.text) {
-                      _departController.text = controller.text;
-                      notifier.setDepart(controller.text);
-                    }
-                  });
-                  return TextField(
-                    controller: controller,
-                    focusNode: focusNode,
-                    style: const TextStyle(color: Colors.white),
-                    decoration: InputDecoration(
-                      hintText: _isLoadingGps
-                          ? "Recherche GPS en cours..."
-                          : "Entrez votre quartier exact",
-                      hintStyle: TextStyle(
-                          color: _isLoadingGps
-                              ? CouleursApp.primaire
-                              : Colors.white54),
-                      prefixIcon: _isLoadingGps
-                          ? const Padding(
-                              padding: EdgeInsets.all(12),
-                              child: SizedBox(
-                                  width: 16,
-                                  height: 16,
-                                  child: LoaderPremium(size: 20)))
-                          : const Icon(Iconsax.location, color: Colors.white70),
-                      filled: true,
-                      fillColor: const Color(0xFF10192A),
-                      border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(16),
-                          borderSide: BorderSide(
-                              color: Colors.white.withValues(alpha: 0.1))),
-                      enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(16),
-                          borderSide: BorderSide(
-                              color: Colors.white.withValues(alpha: 0.07))),
-                      focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(16),
-                          borderSide: BorderSide(
-                              color:
-                                  CouleursApp.primaire.withValues(alpha: 0.5))),
-                    ),
-                  );
-                },
-                optionsViewBuilder: (context, onSelected, options) {
-                  return Align(
-                    alignment: Alignment.topLeft,
-                    child: Material(
-                      elevation: 4.0,
-                      borderRadius: BorderRadius.circular(16),
-                      color: const Color(0xFF10192A),
-                      child: Container(
-                        width: MediaQuery.of(context).size.width - 64,
-                        constraints: const BoxConstraints(maxHeight: 200),
-                        child: ListView.builder(
-                          padding: EdgeInsets.zero,
-                          shrinkWrap: true,
-                          itemCount: options.length,
-                          itemBuilder: (BuildContext context, int index) {
-                            final String option = options.elementAt(index);
-                            return ListTile(
-                              leading: const Icon(Icons.location_on,
-                                  color: Colors.white54),
-                              title: Text(option,
-                                  style: const TextStyle(color: Colors.white)),
-                              onTap: () => onSelected(option),
-                            );
-                          },
-                        ),
-                      ),
-                    ),
-                  );
-                },
-              ),
-              const SizedBox(height: 16),
-
               // Destination avec Autocomplete
               Row(
                 children: [

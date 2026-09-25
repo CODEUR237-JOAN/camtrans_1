@@ -263,6 +263,18 @@ class _InscriptionClientState extends ConsumerState<InscriptionClient> {
                 children: [
                   const SizedBox(height: 10),
 
+                  // Logo
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(20),
+                    child: Image.asset(
+                      'assets/images/logo_camtrans.jpg',
+                      width: 80,
+                      height: 80,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                  const SizedBox(height: 15),
+
                   // Titre
                   const Text(
                     "Créer votre compte",

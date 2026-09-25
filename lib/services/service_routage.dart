@@ -49,7 +49,7 @@ class ServiceRoutage {
       final String url = 'http://router.project-osrm.org/route/v1/driving/'
           '${depart.longitude},${depart.latitude};'
           '${arrivee.longitude},${arrivee.latitude}'
-          '?overview=full&geometries=geojson&steps=true&language=fr';
+          '?overview=full&geometries=geojson&steps=true';
 
       final response = await _dio.get(url);
 

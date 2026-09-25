@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:update_camtrans/coeur/widgets/assistant_vocal_widget.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -15,7 +15,7 @@ import 'package:update_camtrans/services/service_authentification.dart';
 import 'package:update_camtrans/services/service_firestore.dart';
 
 import 'historique.dart';
-import 'suivi_transport.dart';
+import 'package:update_camtrans/fonctionnalites/suivi_course/ecran_suivi_course.dart';
 import 'package:update_camtrans/fonctionnalites/notifications/notifications.dart';
 import 'profil.dart';
 import 'package:update_camtrans/coeur/etat/notification_provider.dart';
@@ -180,7 +180,7 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
                             ),
                           );
                         }
-                        return SuiviTransport(
+                        return EcranSuiviCourse(
                             courseId: enCours.first.id, isFullScreen: false);
                       },
                       loading: () => const Scaffold(
@@ -506,31 +506,39 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text("Départ",
-                        style: TextStyle(color: Colors.white70, fontSize: 13)),
-                    Text(
-                        course.adresseDepart.isNotEmpty
-                            ? course.adresseDepart
-                            : "Inconnu",
-                        style: const TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 15)),
-                  ],
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text("Départ",
+                          style: TextStyle(color: Colors.white70, fontSize: 13)),
+                      Text(
+                          course.adresseDepart.isNotEmpty
+                              ? course.adresseDepart
+                              : "Inconnu",
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 15)),
+                    ],
+                  ),
                 ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    const Text("Arrivée",
-                        style: TextStyle(color: Colors.white70, fontSize: 13)),
-                    Text(
-                        course.adresseArrivee.isNotEmpty
-                            ? course.adresseArrivee
-                            : "Inconnu",
-                        style: const TextStyle(
-                            fontWeight: FontWeight.bold, fontSize: 15)),
-                  ],
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
+                    children: [
+                      const Text("Arrivée",
+                          style: TextStyle(color: Colors.white70, fontSize: 13)),
+                      Text(
+                          course.adresseArrivee.isNotEmpty
+                              ? course.adresseArrivee
+                              : "Inconnu",
+                          overflow: TextOverflow.ellipsis,
+                          textAlign: TextAlign.right,
+                          style: const TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 15)),
+                    ],
+                  ),
                 ),
               ],
             ),
@@ -924,21 +932,24 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
                 ),
               ],
             ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min, // Critical for the "dock" look
-              children: [
-                _buildNavItem(
-                    0, Iconsax.home_2_copy, Iconsax.home_2, "Accueil"),
-                _buildNavItem(1, Iconsax.truck_copy, Iconsax.truck, "Commandes"),
-                // Bouton IA central — mode compact, intégré dans la navbar
-                const Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 4),
-                  child: BoutonAssistantVocal(compact: true),
-                ),
-                _buildNavItem(3, Iconsax.notification_copy,
-                    Iconsax.notification, "Alerte"),
-                _buildNavItem(4, Iconsax.user_copy, Iconsax.user, "Profil"),
-              ],
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Row(
+                mainAxisSize: MainAxisSize.min, // Critical for the "dock" look
+                children: [
+                  _buildNavItem(
+                      0, Iconsax.home_2_copy, Iconsax.home_2, "Accueil"),
+                  _buildNavItem(1, Iconsax.truck_copy, Iconsax.truck, "Commandes"),
+                  // Bouton IA central — mode compact, intégré dans la navbar
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 4),
+                    child: BoutonAssistantVocal(compact: true),
+                  ),
+                  _buildNavItem(3, Iconsax.notification_copy,
+                      Iconsax.notification, "Alerte"),
+                  _buildNavItem(4, Iconsax.user_copy, Iconsax.user, "Profil"),
+                ],
+              ),
             ),
           ),
         ),

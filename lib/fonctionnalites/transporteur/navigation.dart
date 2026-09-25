@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:update_camtrans/coeur/etat/transporteur_provider.dart';
 import 'package:update_camtrans/services/service_gps.dart';
-import 'package:update_camtrans/fonctionnalites/transporteur/suivi_transporteur.dart';
+import 'package:update_camtrans/fonctionnalites/suivi_course/ecran_suivi_course.dart';
 
 class NavigationTransporteur extends ConsumerStatefulWidget {
   const NavigationTransporteur({super.key});
@@ -61,6 +61,6 @@ class _NavigationTransporteurState
     }
 
     // Le transporteur est redirigé vers SA vue de suivi complète
-    return SuiviTransporteur(courseId: activeCourse.id);
+    return EcranSuiviCourse(courseId: activeCourse.id, isFullScreen: false);
   }
 }

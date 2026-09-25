@@ -1,9 +1,10 @@
-﻿import 'dart:convert';
+import 'dart:convert';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter/foundation.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:google_generative_ai/google_generative_ai.dart';
+import 'package:http/http.dart' as http;
 
 // ============================================================
 // FOURNISSEUR RIVERPOD
@@ -39,9 +40,13 @@ class ServiceIA {
 
   // Historique de la conversation pour l'assistant chat (format Gemini)
   final List<Content> _historique = [];
+  
+  // Historique de la conversation pour Claude
+  final List<Map<String, dynamic>> _historiqueClaude = [];
 
   ServiceIA() {
     _historique.clear();
+    _historiqueClaude.clear();
   }
 
   // ----------------------------------------------------------
@@ -74,6 +79,84 @@ class ServiceIA {
       systemInstruction:
           contexteSysteme != null ? Content.system(contexteSysteme) : null,
     );
+  }
+
+  // ----------------------------------------------------------
+  // APPEL DIRECT API CLAUDE (REST)
+  // ----------------------------------------------------------
+  Future<String> _appelerClaudeText({
+    required String systeme,
+    required String promptUser,
+    List<Map<String, dynamic>>? messagesExistants,
+    List<XFile>? fichiersImages,
+  }) async {
+    final apiKey = dotenv.env['CLAUDE_API_KEY'] ?? '';
+    if (apiKey.isEmpty) throw Exception("Clé Claude absente du .env");
+
+    final url = Uri.parse('https://api.anthropic.com/v1/messages');
+    
+    List<Map<String, dynamic>> contentBlocs = [];
+    if (fichiersImages != null && fichiersImages.isNotEmpty) {
+      for (final f in fichiersImages) {
+        final bytes = await f.readAsBytes();
+        final base64Image = base64Encode(bytes);
+        contentBlocs.add({
+          "type": "image",
+          "source": {
+            "type": "base64",
+            "media_type": "image/jpeg",
+            "data": base64Image
+          }
+        });
+      }
+    }
+    contentBlocs.add({"type": "text", "text": promptUser});
+
+    List<Map<String, dynamic>> messages = messagesExistants ?? [];
+    messages.add({"role": "user", "content": contentBlocs});
+
+    final requestBody = {
+      "model": "claude-3-haiku-20240307",
+      "max_tokens": 1024,
+      "system": systeme,
+      "messages": messages,
+    };
+
+    final response = await http.post(
+      url,
+      headers: {
+        "x-api-key": apiKey,
+        "anthropic-version": "2023-06-01",
+        "content-type": "application/json",
+      },
+      body: jsonEncode(requestBody),
+    );
+
+    if (response.statusCode == 200) {
+      final jsonResponse = jsonDecode(response.body);
+      final text = jsonResponse['content'][0]['text'];
+      // Ajout de la réponse dans l'historique
+      messages.add({"role": "assistant", "content": text});
+      return text;
+    } else {
+      throw Exception("Erreur Claude: ${response.statusCode} - ${response.body}");
+    }
+  }
+
+  Future<Map<String, dynamic>> _appelerClaudeJson({
+    required String systeme,
+    required String promptUser,
+    List<XFile>? fichiersImages,
+  }) async {
+    final text = await _appelerClaudeText(
+      systeme: systeme,
+      promptUser: promptUser + "\n\nIMPORTANT: Réponds UNIQUEMENT en JSON valide. Ne fournis aucune autre explication.",
+      fichiersImages: fichiersImages,
+      messagesExistants: [],
+    );
+    final data = _extraireJson(text);
+    if (data == null) throw Exception("Format JSON invalide depuis Claude");
+    return data;
   }
 
   // ----------------------------------------------------------
@@ -124,6 +207,57 @@ class ServiceIA {
     required String contexteSysteme,
     required Map<String, dynamic> reponseParDefaut,
   }) async {
+    // 1. Essai avec Claude (Priorité)
+    final apiKeyClaude = dotenv.env['CLAUDE_API_KEY'] ?? '';
+    if (apiKeyClaude.isNotEmpty) {
+      try {
+        List<Map<String, dynamic>> claudeContentBlocs = [];
+        for (var part in contenu.first.parts) {
+          if (part is TextPart) {
+            claudeContentBlocs.add({"type": "text", "text": part.text});
+          } else if (part is DataPart) {
+            final base64Image = base64Encode(part.bytes);
+            claudeContentBlocs.add({
+              "type": "image",
+              "source": {
+                "type": "base64",
+                "media_type": part.mimeType,
+                "data": base64Image
+              }
+            });
+          }
+        }
+
+        final url = Uri.parse('https://api.anthropic.com/v1/messages');
+        final requestBody = {
+          "model": "claude-3-haiku-20240307",
+          "max_tokens": 1024,
+          "system": contexteSysteme + "\nIMPORTANT: Réponds UNIQUEMENT en JSON valide. Ne fournis aucune autre explication.",
+          "messages": [{"role": "user", "content": claudeContentBlocs}],
+        };
+
+        final response = await http.post(
+          url,
+          headers: {
+            "x-api-key": apiKeyClaude,
+            "anthropic-version": "2023-06-01",
+            "content-type": "application/json",
+          },
+          body: jsonEncode(requestBody),
+        );
+
+        if (response.statusCode == 200) {
+          final text = jsonDecode(response.body)['content'][0]['text'];
+          final data = _extraireJson(text);
+          if (data != null) return data;
+        }
+        // Silence l'erreur et passe à Gemini
+      } catch (e) {
+        // Silence l'erreur et passe à Gemini
+      }
+    }
+
+    // 2. Basculement (Fallback) sur Gemini
     final modele = _getModele(modeJson: true, contexteSysteme: contexteSysteme);
 
     for (int tentative = 1; tentative <= _maxTentatives; tentative++) {
@@ -166,9 +300,38 @@ class ServiceIA {
     String prompt, {
     List<XFile>? fichiersImages,
   }) async* {
+    final systemPrompt = "Tu es l'assistant IA officiel de CamTrans, une application camerounaise qui met en relation "
+            "des clients avec des chauffeurs de camions (lourds et légers) sur l'ensemble du territoire camerounais. "
+            "Les services proposés sont : transport de marchandises générales, déménagement, "
+            "matériaux de construction, produits agricoles, transport frigorifique, convoi de véhicules, remorquage. "
+            "Tu peux estimer les prix, recommander le véhicule adapté parmi (Moto, Tricycle, Pick-up, Camionnette, Camion léger, Camion moyen, Dépanneuse, Semi-remorque, Camion Benne, Camion Plateau, Camion Citerne, Fourgon, Conteneur), "
+            "estimer les volumes, et donner des conseils pratiques de transport et d'emballage. "
+            "Sois concis, professionnel et rassurant. Réponds toujours en français.";
+
+    // Tentative Claude en priorité
+    final apiKeyClaude = dotenv.env['CLAUDE_API_KEY'] ?? '';
+    if (apiKeyClaude.isNotEmpty) {
+      try {
+        final reponseClaude = await _appelerClaudeText(
+          systeme: systemPrompt,
+          promptUser: prompt,
+          fichiersImages: fichiersImages,
+          messagesExistants: _historiqueClaude,
+        );
+        yield reponseClaude;
+        
+        // Sync Gemini history
+        _historique.add(Content.multi([TextPart(prompt)]));
+        _historique.add(Content.model([TextPart(reponseClaude)]));
+        return;
+      } catch (e) {
+        // Silence l'erreur pour la prod, et on continue avec Gemini
+      }
+    }
+
     final apiKey = dotenv.env['GEMINI_API_KEY'] ?? '';
     if (apiKey.isEmpty) {
-      yield "L'assistant est indisponible : clé API Gemini manquante dans le fichier .env.";
+      yield "L'assistant est indisponible : clés API manquantes dans le fichier .env.";
       return;
     }
 

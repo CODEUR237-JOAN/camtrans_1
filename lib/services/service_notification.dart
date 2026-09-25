@@ -58,7 +58,16 @@ class ServiceNotification {
   // ===========================
 
   static Future<String?> obtenirToken() async {
-    return await _messaging.getToken();
+    try {
+      if (kIsWeb) {
+        return await _messaging.getToken(
+            vapidKey: "BEl62iUYgUivxIkv69yViEuiBIa-Ib9-SkvMeAtA3LFgDyeMGOF-CxgHwBIV_G0Rks4C4f1c1q5g0V-0f_r7W54"); // Optionnel, évite un crash Web
+      }
+      return await _messaging.getToken();
+    } catch (e) {
+      debugPrint("Erreur getToken: \$e");
+      return null;
+    }
   }
 
   static Future<void> enregistrerTokenUtilisateur(

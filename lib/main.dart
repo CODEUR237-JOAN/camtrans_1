@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -36,14 +37,20 @@ Future<void> main() async {
 
     // Configuration de Firestore pour permettre un fonctionnement sans connexion internet.
     // Cela garantit que les utilisateurs peuvent consulter leurs données même hors ligne.
-    FirebaseFirestore.instance.settings = const Settings(
-      persistenceEnabled: true,
-      cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED,
-    );
-    debugPrint("[SUCCÈS] Mode hors-ligne de la base de données activé.");
+    try {
+      FirebaseFirestore.instance.settings = const Settings(
+        persistenceEnabled: true,
+        cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED,
+      );
+      debugPrint("[SUCCÈS] Mode hors-ligne de la base de données activé.");
+    } catch (e) {
+      debugPrint("[AVERTISSEMENT] Le mode hors-ligne n'a pas pu être activé (souvent normal sur Web).");
+    }
 
-    // Enregistrement du service de notifications pour fonctionner en arrière-plan.
-    FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+    // Enregistrement du service de notifications pour fonctionner en arrière-plan (Mobile uniquement).
+    if (!kIsWeb) {
+      FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+    }
 
     // Initialisation et configuration des notifications locales.
     await ServiceNotification.initialiser();

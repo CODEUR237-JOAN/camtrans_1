@@ -221,28 +221,28 @@ class _ConnexionState extends ConsumerState<Connexion> {
                   children: [
                     const SizedBox(height: 20),
 
-                    // Logo avec glow
+                    // Logo de l'application
                     AnimationScaleBounce(
                       delay: const Duration(milliseconds: 100),
                       child: Container(
-                        padding: const EdgeInsets.all(18),
                         decoration: BoxDecoration(
-                          gradient: CouleursApp.degradePrincipal,
-                          shape: BoxShape.circle,
+                          borderRadius: BorderRadius.circular(20),
                           boxShadow: [
-                            CouleursApp.ombreNeon(blurRadius: 25),
                             BoxShadow(
-                              color:
-                                  CouleursApp.primaire.withValues(alpha: 0.2),
-                              blurRadius: 40,
-                              spreadRadius: 4,
+                              color: CouleursApp.primaire.withValues(alpha: 0.3),
+                              blurRadius: 20,
+                              spreadRadius: 2,
                             ),
                           ],
                         ),
-                        child: const Icon(
-                          Icons.local_shipping,
-                          size: 56,
-                          color: Colors.white,
+                        child: ClipRRect(
+                          borderRadius: BorderRadius.circular(20),
+                          child: Image.asset(
+                            'assets/images/logo_camtrans.jpg',
+                            width: 100,
+                            height: 100,
+                            fit: BoxFit.cover,
+                          ),
                         ),
                       ),
                     ),

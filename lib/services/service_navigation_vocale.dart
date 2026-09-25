@@ -46,22 +46,19 @@ class ServiceNavigationVocale extends ChangeNotifier {
   
   bool get estMute => _estMute;
 
-  void demarrerNavigation(InfoTrajet trajet) {
+  void demarrerNavigation(InfoTrajet trajet, {required bool versClient}) {
     _traiterEnCours = trajet;
     _navigationActive = true;
     _indexEtapeCourante = 0;
     _aAnnoncePreAlerte = false;
     _aAnnonceAlerteImmediate = false;
     
-    // Message d'accueil humanisé
-    final messages = [
-      "En route ! Conduisez prudemment.",
-      "C'est parti. Suivez l'itinéraire en toute sécurité.",
-      "L'itinéraire est prêt. Bonne route !"
-    ];
-    final msg = messages[Random().nextInt(messages.length)];
-    
-    _parler(msg);
+    // Annonce de début de phase
+    if (versClient) {
+      _parler("Direction : récupération du client.");
+    } else {
+      _parler("Direction : livraison à destination.");
+    }
   }
 
   void arreterNavigation() {
@@ -88,13 +85,13 @@ class ServiceNavigationVocale extends ChangeNotifier {
       return;
     }
 
-    // Logique d'annonce (300m = pré-alerte, 50m = alerte immédiate)
-    if (distanceMetres <= 300 && distanceMetres > 100 && !_aAnnoncePreAlerte) {
+    // Logique d'annonce basée sur VTC (500m = pré-alerte, 100m = alerte immédiate)
+    if (distanceMetres <= 500 && distanceMetres > 150 && !_aAnnoncePreAlerte) {
       _aAnnoncePreAlerte = true;
       String phrase = _humaniserInstruction(etapeCourante, estPreAlerte: true);
       _parler("Dans environ ${((distanceMetres/50).round()*50)} mètres, $phrase");
     } 
-    else if (distanceMetres <= 60 && !_aAnnonceAlerteImmediate) {
+    else if (distanceMetres <= 100 && !_aAnnonceAlerteImmediate) {
       _aAnnonceAlerteImmediate = true;
       String phrase = _humaniserInstruction(etapeCourante, estPreAlerte: false);
       _parler("Maintenant, $phrase");
@@ -109,7 +106,7 @@ class ServiceNavigationVocale extends ChangeNotifier {
       // Si c'est la dernière étape (arrivée)
       if (_indexEtapeCourante >= etapes.length || 
           (_indexEtapeCourante == etapes.length - 1 && etapes.last.type == 'arrive')) {
-        _parler("Vous êtes arrivé à destination. Bon travail !");
+        _parler("Vous êtes arrivé à destination.");
         arreterNavigation();
       }
     }

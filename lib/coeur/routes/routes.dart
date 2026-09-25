@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:update_camtrans/coeur/animations/transitions_page.dart';
@@ -24,7 +24,7 @@ import 'package:update_camtrans/fonctionnalites/ia/ecran_assistant_ia.dart';
 import 'package:update_camtrans/fonctionnalites/paiement/ecran_paiement.dart';
 import 'package:update_camtrans/fonctionnalites/admin/tableau_de_bord_admin.dart';
 import 'package:update_camtrans/fonctionnalites/client/adresses_favorites.dart';
-import 'package:update_camtrans/fonctionnalites/client/ecran_chat.dart';
+import 'package:update_camtrans/fonctionnalites/chat/ecran_chat.dart';
 import 'package:update_camtrans/fonctionnalites/client/ecran_evaluation.dart';
 import 'package:update_camtrans/fonctionnalites/profil/modifier_profil.dart';
 import 'package:update_camtrans/fonctionnalites/profil/changer_mot_de_passe.dart';
@@ -36,6 +36,7 @@ import 'package:update_camtrans/modeles/transporteur.dart';
 import 'package:update_camtrans/modeles/course.dart';
 import 'package:update_camtrans/fonctionnalites/transporteur/page_abonnement.dart';
 import 'package:update_camtrans/fonctionnalites/transporteur/suivi_transporteur.dart';
+import 'package:update_camtrans/fonctionnalites/suivi_course/ecran_suivi_course.dart';
 
 class RoutesApplication {
   RoutesApplication._();
@@ -165,7 +166,7 @@ class RoutesApplication {
       GoRoute(
         path: suivi,
         pageBuilder: (context, state) => _page(
-          const SuiviTransport(courseId: ""),
+          const EcranSuiviCourse(courseId: ""),
           state.pageKey,
         ),
       ),
@@ -173,7 +174,7 @@ class RoutesApplication {
       GoRoute(
         path: suiviAvecId,
         pageBuilder: (context, state) => _page(
-          SuiviTransport(courseId: state.pathParameters['courseId'] ?? ""),
+          EcranSuiviCourse(courseId: state.pathParameters['courseId'] ?? ""),
           state.pageKey,
         ),
       ),
@@ -245,10 +246,8 @@ class RoutesApplication {
         path: chat,
         pageBuilder: (context, state) {
           final args = state.extra as Map<String, dynamic>?;
-          // ✅ FIX : Cast sécurisé — évite un crash TypeError si les args sont absents
-          final transporteur = args?['transporteur'] as Transporteur?;
-          if (transporteur == null) {
-            // Redirection vers le tableau de bord si les arguments sont invalides
+          final courseId = args?['courseId'] as String?;
+          if (courseId == null) {
             return _page(
               const Scaffold(
                 body: Center(
@@ -275,7 +274,7 @@ class RoutesApplication {
               state.pageKey,
             );
           }
-          return _page(EcranChat(transporteur: transporteur), state.pageKey);
+          return _page(EcranChat(courseId: courseId), state.pageKey);
         },
       ),
       GoRoute(
@@ -328,7 +327,7 @@ class RoutesApplication {
       GoRoute(
         path: suiviTransporteur,
         pageBuilder: (context, state) => _page(
-          SuiviTransporteur(courseId: state.pathParameters['courseId'] ?? ""),
+          EcranSuiviCourse(courseId: state.pathParameters['courseId'] ?? ""),
           state.pageKey,
         ),
       ),

@@ -84,7 +84,7 @@ class ChoixProfil extends StatelessWidget {
                           style: TextStyle(
                             fontSize: 31,
                             fontWeight: FontWeight.w900,
-                            color: CouleursApp.textePrincipal,
+                            color: Colors.white,
                             height: 1.08,
                           ),
                         ),
@@ -93,7 +93,7 @@ class ChoixProfil extends StatelessWidget {
                           'Choisissez votre espace pour obtenir les bons outils, les bons indicateurs et les bonnes actions des le depart.',
                           style: TextStyle(
                             fontSize: 15,
-                            color: CouleursApp.texteSecondaire,
+                            color: Colors.white70,
                             height: 1.55,
                             fontWeight: FontWeight.w500,
                           ),

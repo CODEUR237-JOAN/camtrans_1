@@ -89,7 +89,7 @@ class _PopupPropositionCourseState
           backgroundColor: CouleursApp.succes,
         ));
         // Rediriger le transporteur vers SA page de suivi spécifique
-        context.push('/suivi-transporteur/${widget.course.id}');
+        context.push('/suivi/${widget.course.id}');
       }
     } catch (e) {
       if (mounted) {

@@ -61,6 +61,9 @@ final currentClientProvider = StreamProvider.autoDispose<Client?>((ref) {
 
   final firestore = ref.watch(serviceFirestoreProvider);
 
+  // Démarrer la présence UNE SEULE FOIS à la création du provider
+  ServicePresence().demarrer(role: 'client');
+
   return firestore.fluxDocument(collection: 'clients', id: userId).map((doc) {
     if (!doc.exists || doc.data() == null) return null;
     return Client.fromMap(doc.data()!);

@@ -124,7 +124,8 @@ class SuiviNotifier extends StateNotifier<EtatSuivi> {
                 StatutCourse.enTransit,
               ];
               if (statutsActifs.contains(course.statut)) {
-                _navVocale.demarrerNavigation(infoTrajet);
+                final versClient = course.statut == StatutCourse.enRouteDepart || course.statut == StatutCourse.arriveDepart;
+                _navVocale.demarrerNavigation(infoTrajet, versClient: versClient);
               }
             }
           });

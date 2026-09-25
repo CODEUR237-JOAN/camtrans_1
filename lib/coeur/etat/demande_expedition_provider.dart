@@ -92,7 +92,7 @@ class EtatDemandeExpedition {
       case 2:
         return optionGamme.isNotEmpty;
       case 3:
-        return depart.isNotEmpty && destination.isNotEmpty;
+        return destination.isNotEmpty;
       default:
         return true;
     }
