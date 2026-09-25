@@ -27,6 +27,7 @@ class EcranSuiviCourse extends ConsumerStatefulWidget {
 
 class _EcranSuiviCourseState extends ConsumerState<EcranSuiviCourse> {
   final MapController _mapController = MapController();
+  bool _redirigeVersPaiement = false;
 
   @override
   Widget build(BuildContext context) {
@@ -129,6 +130,22 @@ class _EcranSuiviCourseState extends ConsumerState<EcranSuiviCourse> {
     final notifier = ref.read(suiviCourseProvider(widget.courseId).notifier);
     final roleAsync = ref.watch(userRoleProvider);
     final isChauffeur = roleAsync.valueOrNull == 'transporteur';
+
+    // [NOUVEAU] Redirection immédiate si le client ouvre l'écran d'une course déjà à destination
+    if (!isChauffeur && 
+        etatSuivi.course?.statut == 'arrive_destination' && 
+        !_redirigeVersPaiement) {
+      _redirigeVersPaiement = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        final c = etatSuivi.course!;
+        final double montant = c.prixFinal > 0 ? c.prixFinal : c.prixEstime;
+        GoRouter.of(context).push('/paiement', extra: {
+          'courseId': c.id,
+          'montant': montant,
+          'transporteurId': c.transporteurId,
+        });
+      });
+    }
 
     if (etatSuivi.isLoading || etatSuivi.course == null) {
       return const Scaffold(
