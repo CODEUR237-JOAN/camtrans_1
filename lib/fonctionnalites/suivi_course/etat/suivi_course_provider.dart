@@ -253,11 +253,14 @@ class SuiviCourseNotifier extends StateNotifier<SuiviCourseEtat> {
   Future<void> terminerCourse() async {
     if (state.course == null) return;
     try {
+      print("APPEL DE terminerCourse POUR courseId : \$courseId");
       await FirebaseFirestore.instance.collection('courses').doc(courseId).update({
         'statut': StatutCourse.arriveDestination,
         'dateModification': FieldValue.serverTimestamp(),
       });
+      print("MISE A JOUR FIREBASE REUSSIE : arrive_destination");
     } catch (e) {
+      print("ERREUR DANS terminerCourse : \$e");
       state = state.copyWith(erreur: "Erreur lors de la fin de course : \$e");
     }
   }

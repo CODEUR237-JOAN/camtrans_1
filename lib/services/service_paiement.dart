@@ -387,15 +387,26 @@ class ServicePaiement {
 
     // Mettre à jour le statut de la course (uniquement si ce n'est pas un abonnement)
     if (!courseId.startsWith('SUB-')) {
-      await _firestore.modifierDocument(
-        collection: 'courses',
-        id: courseId,
-        donnees: {
-          'paiementEffectue': true,
-          'modePaiement': methode,
-          'statut': 'terminee'
-        },
-      );
+      if (methode == "Espèces") {
+        await _firestore.modifierDocument(
+          collection: 'courses',
+          id: courseId,
+          donnees: {
+            'modePaiement': methode,
+            'statut': 'attente_paiement_especes'
+          },
+        );
+      } else {
+        await _firestore.modifierDocument(
+          collection: 'courses',
+          id: courseId,
+          donnees: {
+            'paiementEffectue': true,
+            'modePaiement': methode,
+            'statut': 'terminee'
+          },
+        );
+      }
     }
     
     // Si paiement digital (pas d'espèces), créditer le portefeuille du transporteur
