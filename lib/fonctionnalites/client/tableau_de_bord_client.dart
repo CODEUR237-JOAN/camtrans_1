@@ -600,10 +600,10 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
                       backgroundColor: CouleursApp.succes));
                 }
               } catch (e) {
-                print("ERREUR FIRESTORE LORS DE L'ANNULATION : \$e");
+                print("ERREUR FIRESTORE LORS DE L'ANNULATION : $e");
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                      content: Text("Erreur lors de l'annulation : \$e",
+                      content: Text("Erreur : $e",
                           style: const TextStyle(color: Colors.white)),
                       backgroundColor: CouleursApp.erreur));
                 }
