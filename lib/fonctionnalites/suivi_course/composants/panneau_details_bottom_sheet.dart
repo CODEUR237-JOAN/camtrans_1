@@ -186,6 +186,25 @@ class PanneauDetailsBottomSheet extends StatelessWidget {
                         ),
                       ),
                     )
+                  else if (isChauffeur && etat.course?.statut == StatutCourse.arriveDestination)
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      decoration: BoxDecoration(
+                        color: Colors.grey.shade800,
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Center(
+                        child: Text(
+                          "Attente du paiement du client...",
+                          style: GoogleFonts.poppins(
+                            color: Colors.white70,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    )
                   else if (isChauffeur && etat.phase == PhaseSuivi.trajet)
                     SizedBox(
                       width: double.infinity,
@@ -238,25 +257,6 @@ class PanneauDetailsBottomSheet extends StatelessWidget {
                         ),
                       ),
                     )
-                  else if (isChauffeur && etat.course?.statut == StatutCourse.arriveDestination)
-                    Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      decoration: BoxDecoration(
-                        color: Colors.grey.shade800,
-                        borderRadius: BorderRadius.circular(16),
-                      ),
-                      child: Center(
-                        child: Text(
-                          "Attente du paiement du client...",
-                          style: GoogleFonts.poppins(
-                            color: Colors.white70,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                    ),
                     
                   // Espacement pour scroller confortablement
                   const SizedBox(height: 24),
