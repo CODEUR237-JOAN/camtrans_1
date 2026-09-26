@@ -86,8 +86,11 @@ class PageVueEnsemble extends ConsumerWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      Wrap(
+                        alignment: WrapAlignment.spaceBetween,
+                        spacing: 16,
+                        runSpacing: 16,
+                        crossAxisAlignment: WrapCrossAlignment.center,
                         children: [
                           Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -1030,12 +1033,14 @@ class _KpiCard extends StatelessWidget {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(titre.toUpperCase(),
-                  style: GoogleFonts.inter(
-                      color: Colors.white54,
-                      fontSize: 11,
-                      fontWeight: FontWeight.w600,
-                      letterSpacing: 0.5)),
+              Expanded(
+                child: Text(titre.toUpperCase(),
+                    style: GoogleFonts.inter(
+                        color: Colors.white54,
+                        fontSize: 11,
+                        fontWeight: FontWeight.w600,
+                        letterSpacing: 0.5)),
+              ),
               Icon(icone, color: couleur.withValues(alpha: 0.7), size: 16),
             ],
           ),
@@ -1053,7 +1058,8 @@ class _KpiCard extends StatelessWidget {
             ),
           ),
           const SizedBox(height: 4),
-          Row(
+          Wrap(
+            crossAxisAlignment: WrapCrossAlignment.center,
             children: [
               Icon(trend >= 0 ? Icons.arrow_drop_up : Icons.arrow_drop_down,
                   color: trend >= 0 ? CouleursApp.succes : CouleursApp.erreur,

@@ -54,7 +54,7 @@ class _DocumentsState extends ConsumerState<Documents> {
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-                content: Text("Erreur lors de l'upload: $e"),
+                content: Text("Erreur lors du téléchargement : $e"),
                 backgroundColor: Colors.red),
           );
         }
@@ -170,7 +170,7 @@ class _DocumentsState extends ConsumerState<Documents> {
                         ),
                         SizedBox(height: 10),
                         Text(
-                          "Uploadez des photos claires de vos documents afin d'être vérifié par l'administration.",
+                          "Téléchargez des photos claires de vos documents afin d'être vérifié par l'administration.",
                           style: TextStyle(color: Colors.white, fontSize: 17),
                         ),
                       ],

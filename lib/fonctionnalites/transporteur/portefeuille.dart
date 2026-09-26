@@ -292,13 +292,28 @@ class Portefeuille extends ConsumerWidget {
                               if (messageErreur.startsWith("Exception: ")) {
                                 messageErreur = messageErreur.replaceFirst("Exception: ", "");
                               }
-                              
-                              ScaffoldMessenger.of(ctx).showSnackBar(
-                                SnackBar(
-                                  content: Text(messageErreur, style: const TextStyle(color: Colors.white)),
-                                  backgroundColor: Colors.red,
-                                  duration: const Duration(seconds: 4),
-                                )
+                              showDialog(
+                                context: ctx,
+                                builder: (BuildContext dialogCtx) {
+                                  return AlertDialog(
+                                    title: const Row(
+                                      children: [
+                                        Icon(Icons.error_outline, color: Colors.red),
+                                        SizedBox(width: 8),
+                                        Text("Échec du retrait", style: TextStyle(color: Colors.red, fontSize: 18)),
+                                      ],
+                                    ),
+                                    content: Text(messageErreur, style: const TextStyle(color: Colors.white)),
+                                    actions: [
+                                      TextButton(
+                                        onPressed: () => Navigator.pop(dialogCtx),
+                                        child: const Text("COMPRIS", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                                      ),
+                                    ],
+                                    backgroundColor: const Color(0xFF1A2235),
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                                  );
+                                }
                               );
                               
                               // Vider les champs
