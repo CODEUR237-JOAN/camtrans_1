@@ -590,7 +590,6 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
                   id: courseId,
                   donnees: {
                     'statut': StatutCourse.annulee,
-                    'dateModification': FieldValue.serverTimestamp(),
                   },
                 );
                 print("MISE A JOUR REUSSIE !");

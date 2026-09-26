@@ -204,7 +204,7 @@ class PanneauDetailsBottomSheet extends StatelessWidget {
                           ),
                         ),
                       ),
-                    )
+                    ),
                   else if (isChauffeur && etat.phase == PhaseSuivi.trajet)
                     SizedBox(
                       width: double.infinity,

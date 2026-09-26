@@ -639,7 +639,6 @@ class _SuiviTransportState extends ConsumerState<SuiviTransport> {
                   id: courseId,
                   donnees: {
                     'statut': StatutCourse.annulee,
-                    'dateModification': FieldValue.serverTimestamp(),
                   },
                 );
                 if (context.mounted) {
