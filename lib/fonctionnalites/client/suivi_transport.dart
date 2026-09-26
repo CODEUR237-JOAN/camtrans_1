@@ -633,13 +633,27 @@ class _SuiviTransportState extends ConsumerState<SuiviTransport> {
             onPressed: () async {
               Navigator.pop(ctx);
               final courseId = widget.courseId;
-              await ref.read(serviceFirestoreProvider).modifierDocument(
-                collection: 'courses',
-                id: courseId,
-                donnees: {'statut': StatutCourse.annulee},
-              );
-              if (context.mounted) {
-                context.go('/');
+              try {
+                await ref.read(serviceFirestoreProvider).modifierDocument(
+                  collection: 'courses',
+                  id: courseId,
+                  donnees: {
+                    'statut': StatutCourse.annulee,
+                    'dateModification': FieldValue.serverTimestamp(),
+                  },
+                );
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                      content: Text("Course annulée.", style: TextStyle(color: Colors.white)),
+                      backgroundColor: CouleursApp.succes));
+                  context.go('/');
+                }
+              } catch (e) {
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                      content: Text("Erreur lors de l'annulation : \$e", style: const TextStyle(color: Colors.white)),
+                      backgroundColor: CouleursApp.erreur));
+                }
               }
             },
             style: ElevatedButton.styleFrom(

@@ -567,6 +567,7 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
   }
 
   void _confirmerAnnulation(BuildContext context, String courseId) {
+    print("OUVERTURE DU DIALOG D'ANNULATION POUR LA COURSE \$courseId");
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -580,17 +581,33 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
           ),
           ElevatedButton(
             onPressed: () async {
+              print("CLIC SUR OUI, ANNULER !");
               Navigator.pop(ctx);
-              await ref.read(serviceFirestoreProvider).modifierDocument(
-                collection: 'courses',
-                id: courseId,
-                donnees: {'statut': StatutCourse.annulee},
-              );
-              if (context.mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                    content: Text("La course a été annulée.",
-                        style: TextStyle(color: Colors.white)),
-                    backgroundColor: CouleursApp.erreur));
+              try {
+                print("LANCEMENT DE LA MISE A JOUR FIRESTORE...");
+                await ref.read(serviceFirestoreProvider).modifierDocument(
+                  collection: 'courses',
+                  id: courseId,
+                  donnees: {
+                    'statut': StatutCourse.annulee,
+                    'dateModification': FieldValue.serverTimestamp(),
+                  },
+                );
+                print("MISE A JOUR REUSSIE !");
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                      content: Text("La course a été annulée.",
+                          style: TextStyle(color: Colors.white)),
+                      backgroundColor: CouleursApp.succes));
+                }
+              } catch (e) {
+                print("ERREUR FIRESTORE LORS DE L'ANNULATION : \$e");
+                if (context.mounted) {
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                      content: Text("Erreur lors de l'annulation : \$e",
+                          style: const TextStyle(color: Colors.white)),
+                      backgroundColor: CouleursApp.erreur));
+                }
               }
             },
             style: ElevatedButton.styleFrom(
