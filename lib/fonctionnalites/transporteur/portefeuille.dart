@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:update_camtrans/services/service_authentification.dart';
 
 import 'package:update_camtrans/coeur/constantes/couleurs.dart';
 import 'package:update_camtrans/coeur/constantes/tailles.dart';
@@ -140,6 +141,7 @@ class Portefeuille extends ConsumerWidget {
   void _demanderRetrait(BuildContext context, WidgetRef ref, String methode, double soldeDisponible) {
     final TextEditingController montantController = TextEditingController();
     final TextEditingController compteController = TextEditingController();
+    final TextEditingController mdpController = TextEditingController();
     bool isLoading = false;
     
     showModalBottomSheet(
@@ -189,6 +191,19 @@ class Portefeuille extends ConsumerWidget {
                         focusedBorder: OutlineInputBorder(borderSide: const BorderSide(color: CouleursApp.primaire), borderRadius: BorderRadius.circular(12)),
                       ),
                     ),
+                    const SizedBox(height: 16),
+                    
+                    TextField(
+                      controller: mdpController,
+                      obscureText: true,
+                      style: const TextStyle(color: Colors.white),
+                      decoration: InputDecoration(
+                        labelText: "Mot de passe",
+                        labelStyle: const TextStyle(color: Colors.white54),
+                        enabledBorder: OutlineInputBorder(borderSide: const BorderSide(color: Colors.white24), borderRadius: BorderRadius.circular(12)),
+                        focusedBorder: OutlineInputBorder(borderSide: const BorderSide(color: CouleursApp.primaire), borderRadius: BorderRadius.circular(12)),
+                      ),
+                    ),
                     const SizedBox(height: 24),
                     
                     SizedBox(
@@ -202,8 +217,9 @@ class Portefeuille extends ConsumerWidget {
                         onPressed: isLoading ? null : () async {
                           final montantText = montantController.text.trim();
                           final compte = compteController.text.trim();
+                          final mdp = mdpController.text;
                           
-                          if (montantText.isEmpty || compte.isEmpty) {
+                          if (montantText.isEmpty || compte.isEmpty || mdp.isEmpty) {
                             ScaffoldMessenger.of(ctx).showSnackBar(const SnackBar(content: Text("Veuillez remplir tous les champs")));
                             return;
                           }
@@ -222,6 +238,16 @@ class Portefeuille extends ConsumerWidget {
                           setState(() => isLoading = true);
                           
                           try {
+                            final authService = ref.read(serviceAuthentificationProvider);
+                            final currentUser = authService.utilisateur;
+                            
+                            if (currentUser == null || currentUser.email == null) {
+                               throw Exception("Utilisateur non connecté ou e-mail introuvable.");
+                            }
+                            
+                            // Reauthentifier (lance une erreur si mdp incorrect)
+                            await authService.reauthentifier(currentUser.email!, mdp);
+
                             final transporteurId = ref.read(currentTransporteurIdProvider);
                             
                             await FirebaseFirestore.instance.collection('paiements').add({
