@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:update_camtrans/coeur/constantes/couleurs.dart';
+import 'package:flutter_map_cancellable_tile_provider/flutter_map_cancellable_tile_provider.dart';
 
 import '../etat/suivi_course_etat.dart';
 
@@ -17,7 +18,9 @@ class CarteSuiviInteractive extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (etat.positionChauffeur == null) {
+    final centerPosition = etat.positionChauffeur ?? etat.positionClient;
+    
+    if (centerPosition == null) {
       return const Center(
         child: CircularProgressIndicator(color: CouleursApp.primaire),
       );
@@ -30,13 +33,14 @@ class CarteSuiviInteractive extends StatelessWidget {
     return FlutterMap(
       mapController: mapController,
       options: MapOptions(
-        initialCenter: etat.positionChauffeur!,
+        initialCenter: centerPosition,
         initialZoom: 16.0,
       ),
       children: [
         TileLayer(
           urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
           userAgentPackageName: 'com.camtrans.app',
+          tileProvider: CancellableNetworkTileProvider(),
         ),
         if (etat.pointsItineraire.isNotEmpty)
           PolylineLayer(
@@ -51,30 +55,31 @@ class CarteSuiviInteractive extends StatelessWidget {
         MarkerLayer(
           markers: [
             // Marqueur Chauffeur
-            Marker(
-              point: etat.positionChauffeur!,
-              width: 50,
-              height: 50,
-              child: Container(
-                decoration: BoxDecoration(
-                  color: const Color(0xFF145C43), // Vert transporteur
-                  shape: BoxShape.circle,
-                  border: Border.all(color: Colors.white, width: 3),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 0.3),
-                      blurRadius: 8,
-                      offset: const Offset(0, 4),
-                    )
-                  ],
-                ),
-                child: const Icon(
-                  Icons.local_shipping,
-                  color: Colors.white,
-                  size: 24,
+            if (etat.positionChauffeur != null)
+              Marker(
+                point: etat.positionChauffeur!,
+                width: 50,
+                height: 50,
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: const Color(0xFF145C43), // Vert transporteur
+                    shape: BoxShape.circle,
+                    border: Border.all(color: Colors.white, width: 3),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.3),
+                        blurRadius: 8,
+                        offset: const Offset(0, 4),
+                      )
+                    ],
+                  ),
+                  child: const Icon(
+                    Icons.local_shipping,
+                    color: Colors.white,
+                    size: 24,
+                  ),
                 ),
               ),
-            ),
             // Marqueur Cible (Client ou Destination)
             if (cible != null)
               Marker(

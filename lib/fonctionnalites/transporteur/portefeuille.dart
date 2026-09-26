@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'package:update_camtrans/coeur/constantes/couleurs.dart';
 import 'package:update_camtrans/coeur/constantes/tailles.dart';
@@ -14,6 +15,7 @@ class Portefeuille extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final statsRevenus = ref.watch(statsRevenusProvider);
     final fluxRevenus = ref.watch(fluxMesRevenusProvider);
+    final solde = statsRevenus['total'] ?? 0.0;
 
     return Scaffold(
       backgroundColor: const Color(0xFF08111F),
@@ -80,31 +82,19 @@ class Portefeuille extends ConsumerWidget {
             BoutonPrincipal(
               texte: "Retirer via Orange Money",
               icone: Icons.account_balance_wallet,
-              auClic: () {
-                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                    content: Text(
-                        "Service de retrait non disponible en environnement de test.")));
-              },
+              auClic: () => _demanderRetrait(context, ref, "Orange Money", solde),
             ),
             const SizedBox(height: 15),
             BoutonPrincipal(
               texte: "Retirer via MTN Mobile Money",
               icone: Icons.phone_android,
-              auClic: () {
-                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                    content: Text(
-                        "Service de retrait non disponible en environnement de test.")));
-              },
+              auClic: () => _demanderRetrait(context, ref, "MTN Mobile Money", solde),
             ),
             const SizedBox(height: 15),
             BoutonPrincipal(
               texte: "Virement bancaire",
               icone: Icons.account_balance,
-              auClic: () {
-                ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                    content: Text(
-                        "Service de retrait non disponible en environnement de test.")));
-              },
+              auClic: () => _demanderRetrait(context, ref, "Virement bancaire", solde),
             ),
             const SizedBox(height: 30),
             const Text(
@@ -131,11 +121,11 @@ class Portefeuille extends ConsumerWidget {
                     itemBuilder: (context, index) {
                       final paiement = paiements[index];
                       return _transaction(
-                        "Paiement course",
-                        "Via ${paiement.methodePaiement}",
-                        "+${paiement.montantNet.toStringAsFixed(0)} FCFA",
-                        Colors.green,
-                        Icons.arrow_downward,
+                        paiement.courseId == 'RETRAIT' ? "Retrait de fonds" : "Paiement course",
+                        paiement.courseId == 'RETRAIT' ? paiement.reference : "Via ${paiement.methodePaiement}",
+                        paiement.montantNet > 0 ? "+${paiement.montantNet.toStringAsFixed(0)} FCFA" : "${paiement.montantNet.toStringAsFixed(0)} FCFA",
+                        paiement.montantNet > 0 ? Colors.green : Colors.redAccent,
+                        paiement.montantNet > 0 ? Icons.arrow_downward : Icons.arrow_upward,
                       );
                     },
                   );
@@ -144,6 +134,143 @@ class Portefeuille extends ConsumerWidget {
           ],
         ),
       ),
+    );
+  }
+
+  void _demanderRetrait(BuildContext context, WidgetRef ref, String methode, double soldeDisponible) {
+    final TextEditingController montantController = TextEditingController();
+    final TextEditingController compteController = TextEditingController();
+    bool isLoading = false;
+    
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: CouleursApp.fondSombreSecondaire,
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(24))),
+      builder: (ctx) {
+        return StatefulBuilder(
+          builder: (BuildContext context, StateSetter setState) {
+            return Padding(
+              padding: EdgeInsets.only(
+                bottom: MediaQuery.of(ctx).viewInsets.bottom,
+                left: 24, right: 24, top: 24,
+              ),
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    const Text("Demande de retrait", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white)),
+                    const SizedBox(height: 8),
+                    Text("Méthode : $methode", style: const TextStyle(color: Colors.white70)),
+                    const SizedBox(height: 24),
+                    
+                    TextField(
+                      controller: compteController,
+                      keyboardType: methode == "Virement bancaire" ? TextInputType.text : TextInputType.phone,
+                      style: const TextStyle(color: Colors.white),
+                      decoration: InputDecoration(
+                        labelText: methode == "Virement bancaire" ? "IBAN / Numéro de compte" : "Numéro de téléphone",
+                        labelStyle: const TextStyle(color: Colors.white54),
+                        enabledBorder: OutlineInputBorder(borderSide: const BorderSide(color: Colors.white24), borderRadius: BorderRadius.circular(12)),
+                        focusedBorder: OutlineInputBorder(borderSide: const BorderSide(color: CouleursApp.primaire), borderRadius: BorderRadius.circular(12)),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    
+                    TextField(
+                      controller: montantController,
+                      keyboardType: TextInputType.number,
+                      style: const TextStyle(color: Colors.white),
+                      decoration: InputDecoration(
+                        labelText: "Montant à retirer (Max: ${soldeDisponible.toStringAsFixed(0)} FCFA)",
+                        labelStyle: const TextStyle(color: Colors.white54),
+                        enabledBorder: OutlineInputBorder(borderSide: const BorderSide(color: Colors.white24), borderRadius: BorderRadius.circular(12)),
+                        focusedBorder: OutlineInputBorder(borderSide: const BorderSide(color: CouleursApp.primaire), borderRadius: BorderRadius.circular(12)),
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                    
+                    SizedBox(
+                      width: double.infinity,
+                      height: 50,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: CouleursApp.primaire,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        ),
+                        onPressed: isLoading ? null : () async {
+                          final montantText = montantController.text.trim();
+                          final compte = compteController.text.trim();
+                          
+                          if (montantText.isEmpty || compte.isEmpty) {
+                            ScaffoldMessenger.of(ctx).showSnackBar(const SnackBar(content: Text("Veuillez remplir tous les champs")));
+                            return;
+                          }
+                          
+                          final double? montant = double.tryParse(montantText);
+                          if (montant == null || montant <= 0) {
+                            ScaffoldMessenger.of(ctx).showSnackBar(const SnackBar(content: Text("Montant invalide")));
+                            return;
+                          }
+                          
+                          if (montant > soldeDisponible) {
+                            ScaffoldMessenger.of(ctx).showSnackBar(const SnackBar(content: Text("Solde insuffisant")));
+                            return;
+                          }
+                          
+                          setState(() => isLoading = true);
+                          
+                          try {
+                            final transporteurId = ref.read(currentTransporteurIdProvider);
+                            
+                            await FirebaseFirestore.instance.collection('paiements').add({
+                              'transporteurId': transporteurId,
+                              'clientId': '',
+                              'courseId': 'RETRAIT',
+                              'montant': -montant,
+                              'montantNet': -montant,
+                              'devise': 'FCFA',
+                              'methodePaiement': methode,
+                              'numeroTransaction': 'RET-${DateTime.now().millisecondsSinceEpoch}',
+                              'statut': 'succès',
+                              'datePaiement': DateTime.now().toIso8601String(),
+                              'paiementConfirme': true,
+                              'reference': 'Retrait vers $compte',
+                              'operateur': methode,
+                              'telephonePayeur': compte,
+                              'commentaire': 'Demande de retrait',
+                              'fraisTransaction': 0.0,
+                              'remboursementEffectue': false,
+                            });
+                            
+                            if (ctx.mounted) {
+                              Navigator.pop(ctx);
+                              ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                                content: Text("Retrait effectué avec succès"),
+                                backgroundColor: CouleursApp.succes,
+                              ));
+                            }
+                          } catch (e) {
+                            if (ctx.mounted) {
+                              ScaffoldMessenger.of(ctx).showSnackBar(SnackBar(content: Text("Erreur: $e")));
+                              setState(() => isLoading = false);
+                            }
+                          }
+                        },
+                        child: isLoading 
+                            ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
+                            : const Text("Confirmer le retrait", style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                  ],
+                ),
+              ),
+            );
+          }
+        );
+      }
     );
   }
 

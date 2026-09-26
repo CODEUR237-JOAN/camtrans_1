@@ -237,17 +237,19 @@ class Facture extends ConsumerWidget {
             child: Icon(icon, color: CouleursApp.primaire, size: 20),
           ),
           const SizedBox(width: 14),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(label,
-                  style: const TextStyle(color: Colors.white54, fontSize: 12)),
-              Text(value.isNotEmpty ? value : "-",
-                  style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 14,
-                      color: Colors.white)),
-            ],
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(label,
+                    style: const TextStyle(color: Colors.white54, fontSize: 12)),
+                Text(value.isNotEmpty ? value : "-",
+                    style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                        color: Colors.white)),
+              ],
+            ),
           ),
         ],
       ),

@@ -425,10 +425,20 @@ class _SuiviTransportState extends ConsumerState<SuiviTransport> {
               ),
               GestureDetector(
                 onTap: () async {
-                  final Uri telUrl =
-                      Uri(scheme: 'tel', path: transporteur.telephone);
-                  if (await canLaunchUrl(telUrl)) {
-                    await launchUrl(telUrl);
+                  final telClean = transporteur.telephone.replaceAll(' ', '');
+                  final Uri telUrl = Uri.parse('tel:$telClean');
+                  try {
+                    if (await canLaunchUrl(telUrl)) {
+                      await launchUrl(telUrl);
+                    } else {
+                      await launchUrl(telUrl, mode: LaunchMode.externalApplication);
+                    }
+                  } catch (e) {
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text("Impossible de lancer l'appel pour $telClean")),
+                      );
+                    }
                   }
                 },
                 child: Container(

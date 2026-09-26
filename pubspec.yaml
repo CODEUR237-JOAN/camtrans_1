@@ -101,6 +101,7 @@ dependencies:
   permission_handler: ^11.3.1
   google_sign_in: 6.2.2
   googleapis_auth: ^2.3.4
+  flutter_map_cancellable_tile_provider: ^3.0.2
 
 dev_dependencies:
   flutter_test:

@@ -10,19 +10,37 @@ import '../etat/suivi_course_etat.dart';
 class PanneauDetailsBottomSheet extends StatelessWidget {
   final SuiviCourseEtat etat;
   final VoidCallback onBoutonAction;
+  final VoidCallback? onAnnulerAction;
   final bool isChauffeur;
 
   const PanneauDetailsBottomSheet({
     Key? key,
     required this.etat,
     required this.onBoutonAction,
+    this.onAnnulerAction,
     this.isChauffeur = false,
   }) : super(key: key);
 
-  void _appeler(String numero) async {
-    final Uri url = Uri.parse('tel:$numero');
-    if (await canLaunchUrl(url)) {
-      await launchUrl(url);
+  void _appeler(BuildContext context, String numero) async {
+    if (numero.isEmpty) return;
+    
+    // Nettoyer le numéro (enlever les espaces)
+    final numeroPropre = numero.replaceAll(' ', '');
+    final Uri url = Uri.parse('tel:$numeroPropre');
+    
+    try {
+      if (await canLaunchUrl(url)) {
+        await launchUrl(url);
+      } else {
+        // En cas d'échec de canLaunchUrl (bug Android 11+ par exemple), on tente quand même
+        await launchUrl(url, mode: LaunchMode.externalApplication);
+      }
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Impossible de lancer l'appel pour le numéro $numeroPropre.")),
+        );
+      }
     }
   }
 
@@ -31,9 +49,15 @@ class PanneauDetailsBottomSheet extends StatelessWidget {
     if (etat.course == null) return const SizedBox.shrink();
     
     final course = etat.course!;
-    final titre = etat.phase == PhaseSuivi.approche
-        ? (isChauffeur ? "En approche : ${etat.distanceRestanteMetres}m" : "Le chauffeur arrive (${etat.distanceRestanteMetres}m)")
-        : (isChauffeur ? "Trajet vers la destination" : "En route vers la destination");
+    
+    String titre = "";
+    if (etat.phase == PhaseSuivi.recherche) {
+      titre = "Recherche d'un transporteur...";
+    } else if (etat.phase == PhaseSuivi.approche) {
+      titre = isChauffeur ? "En approche : ${etat.distanceRestanteMetres}m" : "Le chauffeur arrive (${etat.distanceRestanteMetres}m)";
+    } else {
+      titre = isChauffeur ? "Trajet vers la destination" : "En route vers la destination";
+    }
 
     return DraggableScrollableSheet(
       initialChildSize: 0.25,
@@ -152,7 +176,7 @@ class PanneauDetailsBottomSheet extends StatelessWidget {
                       ),
                       const SizedBox(width: 8),
                       IconButton(
-                        onPressed: () => _appeler(
+                        onPressed: () => _appeler(context,
                             isChauffeur ? course.telephoneClient : course.telephoneTransporteur),
                         icon: const Icon(Icons.phone, color: Colors.white),
                         style: IconButton.styleFrom(
@@ -258,6 +282,32 @@ class PanneauDetailsBottomSheet extends StatelessWidget {
                       ),
                     ),
                     
+                  if (isChauffeur && (etat.phase == PhaseSuivi.approche || etat.phase == PhaseSuivi.trajet))
+                    Padding(
+                      padding: const EdgeInsets.only(top: 16),
+                      child: SizedBox(
+                        width: double.infinity,
+                        child: OutlinedButton(
+                          onPressed: onAnnulerAction,
+                          style: OutlinedButton.styleFrom(
+                            side: const BorderSide(color: CouleursApp.erreur, width: 1.5),
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                          ),
+                          child: Text(
+                            "Annuler la course",
+                            style: GoogleFonts.poppins(
+                              color: CouleursApp.erreur,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+
                   // Espacement pour scroller confortablement
                   const SizedBox(height: 24),
                 ],

@@ -58,13 +58,17 @@ class _EcranSuiviCourseState extends ConsumerState<EcranSuiviCourse> {
         final c = next.course!;
         final double montant = c.prixFinal > 0 ? c.prixFinal : c.prixEstime;
         // On utilise un PostFrameCallback pour s'assurer que la frame courante est finie
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          GoRouter.of(context).push('/paiement', extra: {
-            'courseId': c.id,
-            'montant': montant,
-            'transporteurId': c.transporteurId,
+        if (!_redirigeVersPaiement) {
+          _redirigeVersPaiement = true;
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (!context.mounted) return;
+            GoRouter.of(context).push('/paiement', extra: {
+              'courseId': c.id,
+              'montant': montant,
+              'transporteurId': c.transporteurId,
+            });
           });
-        });
+        }
       }
 
       // Gestion côté transporteur de la fin de course et confirmation espèces
@@ -73,6 +77,7 @@ class _EcranSuiviCourseState extends ConsumerState<EcranSuiviCourse> {
           final c = next.course!;
           final double montant = c.prixFinal > 0 ? c.prixFinal : c.prixEstime;
           WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (!mounted) return;
             showDialog(
               context: context,
               barrierDismissible: false,
@@ -112,31 +117,59 @@ class _EcranSuiviCourseState extends ConsumerState<EcranSuiviCourse> {
         // Si la course est terminée (soit paiement digital direct, soit confirmation espèces effectuée)
         if (nouveauStatut == 'terminee' && ancienStatut != 'terminee') {
           WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (!mounted) return;
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
                 content: Text("Course terminée avec succès ! Le paiement a été validé."),
                 backgroundColor: CouleursApp.succes,
               ),
             );
-            if (Navigator.of(context).canPop()) {
+            if (widget.isFullScreen && Navigator.of(context).canPop()) {
               Navigator.of(context).pop(); // Retour au tableau de bord
             }
           });
         }
+      }
+
+      // Si la course est annulée
+      if (nouveauStatut == 'annulee' && ancienStatut != 'annulee') {
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          if (!mounted) return;
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text("La course a été annulée."),
+              backgroundColor: CouleursApp.erreur,
+            ),
+          );
+          if (widget.isFullScreen && Navigator.of(context).canPop()) {
+            Navigator.of(context).pop();
+          }
+        });
       }
     });
 
     final etatSuivi = ref.watch(suiviCourseProvider(widget.courseId));
     final notifier = ref.read(suiviCourseProvider(widget.courseId).notifier);
     final roleAsync = ref.watch(userRoleProvider);
+    
+    if (roleAsync.isLoading) {
+      return const Scaffold(
+        backgroundColor: CouleursApp.fondSombre,
+        body: Center(child: CircularProgressIndicator(color: CouleursApp.primaire)),
+      );
+    }
+
     final isChauffeur = roleAsync.valueOrNull == 'transporteur';
+    final isClient = roleAsync.valueOrNull == 'client';
 
     // [NOUVEAU] Redirection immédiate si le client ouvre l'écran d'une course déjà à destination
-    if (!isChauffeur && 
+    if (isClient && 
         etatSuivi.course?.statut == 'arrive_destination' && 
         !_redirigeVersPaiement) {
       _redirigeVersPaiement = true;
       WidgetsBinding.instance.addPostFrameCallback((_) {
+        // Double check mounted
+        if (!context.mounted) return;
         final c = etatSuivi.course!;
         final double montant = c.prixFinal > 0 ? c.prixFinal : c.prixEstime;
         GoRouter.of(context).push('/paiement', extra: {
@@ -223,6 +256,33 @@ class _EcranSuiviCourseState extends ConsumerState<EcranSuiviCourse> {
                 notifier.terminerCourse();
                 // On ne fait pas pop() ici : on attend le paiement du client.
               }
+            },
+            onAnnulerAction: () {
+              showDialog(
+                context: context,
+                builder: (ctx) => AlertDialog(
+                  backgroundColor: CouleursApp.fondSombreSecondaire,
+                  title: const Text("Annuler la course", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                  content: const Text(
+                    "Êtes-vous sûr de vouloir annuler cette course ? Cette action est irréversible.",
+                    style: TextStyle(color: Colors.white70),
+                  ),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.pop(ctx),
+                      child: const Text("Non, retour", style: TextStyle(color: Colors.grey)),
+                    ),
+                    ElevatedButton(
+                      style: ElevatedButton.styleFrom(backgroundColor: CouleursApp.erreur),
+                      onPressed: () {
+                        Navigator.pop(ctx);
+                        notifier.annulerCourse();
+                      },
+                      child: const Text("Oui, annuler", style: TextStyle(color: Colors.white)),
+                    ),
+                  ],
+                ),
+              );
             },
           ),
         ],

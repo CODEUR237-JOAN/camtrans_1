@@ -7,6 +7,7 @@ import 'package:update_camtrans/coeur/constantes/statuts.dart';
 import 'package:update_camtrans/coeur/etat/utilisateur_provider.dart';
 import 'package:update_camtrans/modeles/course.dart';
 import 'package:update_camtrans/services/service_routage.dart';
+import 'package:update_camtrans/services/service_gps.dart';
 
 import 'suivi_course_etat.dart';
 import '../services/service_navigation_vocale.dart';
@@ -29,6 +30,8 @@ class SuiviCourseNotifier extends StateNotifier<SuiviCourseEtat> {
   StreamSubscription<DocumentSnapshot>? _transporteurSub;
 
   void _initialiser() async {
+    final role = await ref.read(userRoleProvider.future);
+
     // 1. Écoute du document de la course dans Firestore
     _courseSub = FirebaseFirestore.instance
         .collection('courses')
@@ -44,7 +47,6 @@ class SuiviCourseNotifier extends StateNotifier<SuiviCourseEtat> {
     });
 
     // 2. Écoute de la position GPS selon le rôle
-    final role = await ref.read(userRoleProvider.future);
     if (role == 'transporteur') {
       _positionSub = Geolocator.getPositionStream(
         locationSettings: const LocationSettings(
@@ -118,6 +120,19 @@ class SuiviCourseNotifier extends StateNotifier<SuiviCourseEtat> {
   }
 
   void _mettreAJourPositionChauffeur(LatLng position) {
+    // Éviter de recalculer si la position a très peu changé (moins de 10m)
+    if (state.positionChauffeur != null) {
+      final distanceGps = ref.read(serviceGpsProvider).calculerDistance(
+        latitudeDepart: state.positionChauffeur!.latitude,
+        longitudeDepart: state.positionChauffeur!.longitude,
+        latitudeArrivee: position.latitude,
+        longitudeArrivee: position.longitude,
+      );
+      if (distanceGps < 0.01) { // Moins de 10 mètres
+        return;
+      }
+    }
+
     state = state.copyWith(positionChauffeur: position);
     _calculerItineraire();
     _verifierProximite();
@@ -262,6 +277,18 @@ class SuiviCourseNotifier extends StateNotifier<SuiviCourseEtat> {
     } catch (e) {
       print("ERREUR DANS terminerCourse : \$e");
       state = state.copyWith(erreur: "Erreur lors de la fin de course : \$e");
+    }
+  }
+
+  Future<void> annulerCourse() async {
+    if (state.course == null) return;
+    try {
+      await FirebaseFirestore.instance.collection('courses').doc(courseId).update({
+        'statut': StatutCourse.annulee,
+        'dateModification': FieldValue.serverTimestamp(),
+      });
+    } catch (e) {
+      state = state.copyWith(erreur: "Erreur lors de l'annulation : \$e");
     }
   }
 
