@@ -204,7 +204,7 @@ class PanneauDetailsBottomSheet extends StatelessWidget {
                           ),
                         ),
                       ),
-                    ),
+                    )
                   else if (isChauffeur && etat.phase == PhaseSuivi.trajet)
                     SizedBox(
                       width: double.infinity,
@@ -256,7 +256,7 @@ class PanneauDetailsBottomSheet extends StatelessWidget {
                           ),
                         ),
                       ),
-                    )
+                    ),
                     
                   // Espacement pour scroller confortablement
                   const SizedBox(height: 24),
