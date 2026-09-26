@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:update_camtrans/services/service_authentification.dart';
+import 'package:update_camtrans/services/service_paiement.dart';
 
 import 'package:update_camtrans/coeur/constantes/couleurs.dart';
 import 'package:update_camtrans/coeur/constantes/tailles.dart';
@@ -249,6 +250,14 @@ class Portefeuille extends ConsumerWidget {
                             await authService.reauthentifier(currentUser.email!, mdp);
 
                             final transporteurId = ref.read(currentTransporteurIdProvider);
+                            final servicePaiement = ref.read(servicePaiementProvider);
+                            
+                            // Appeler l'API de paiement Campay pour faire le transfert
+                            await servicePaiement.initierRetraitMobileMoney(
+                              montant: montant,
+                              telephoneBeneficiaire: compte,
+                              description: "Retrait portefeuille CamTrans",
+                            );
                             
                             await FirebaseFirestore.instance.collection('paiements').add({
                               'transporteurId': transporteurId,

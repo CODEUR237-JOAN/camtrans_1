@@ -186,6 +186,46 @@ class ServicePaiement {
     );
   }
 
+  /// 3. Retrait (Décaissement / Payout) via Campay
+  Future<bool> initierRetraitMobileMoney({
+    required double montant,
+    required String telephoneBeneficiaire,
+    required String description,
+  }) async {
+    final token = await _obtenirToken();
+
+    String phone = telephoneBeneficiaire.replaceAll(RegExp(r'[^0-9]'), '');
+    if (phone.length == 9) phone = "237$phone"; // Ajouter l'indicatif si manquant
+
+    final refExterne = "RET-${DateTime.now().millisecondsSinceEpoch}";
+    final double montantCampay = ApiKeys.isCampayProduction ? montant : 10.0;
+
+    final response = await http.post(
+      Uri.parse('$_baseUrl/withdraw/'),
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Token $token',
+      },
+      body: jsonEncode({
+        "amount": montantCampay.toInt().toString(),
+        "to": phone,
+        "description": description,
+        "external_reference": refExterne
+      }),
+    );
+
+    if (response.statusCode == 200 || response.statusCode == 201) {
+      // Pour une application de production, on ferait un webhook ou un polling
+      // pour s'assurer que le statut passe à SUCCESSFUL.
+      // Ici, si l'API accepte la requête, on considère que le retrait est initié avec succès.
+      return true;
+    } else {
+      debugPrint("Erreur de retrait Campay: ${response.body}");
+      final errorMsg = jsonDecode(response.body)['message'] ?? 'Erreur inconnue';
+      throw Exception("Le transfert a échoué: $errorMsg");
+    }
+  }
+
   /// Traitement d'un abonnement via CamPay
   Future<bool> initierPaiementAbonnement({
     required String transporteurId,
