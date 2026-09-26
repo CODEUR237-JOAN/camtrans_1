@@ -96,12 +96,8 @@ service cloud.firestore {
       // Modification : admin, ou client (seulement si recherche/annulé), ou transporteur assigné (seulement statut)
       allow update: if estConnecte() && (
         estAdmin() ||
-        // Le client ne peut modifier que si la course n'est pas encore acceptée définitivement
-        (resource.data.clientId == request.auth.uid && resource.data.statut in ['recherche', 'propose', 'attribue']) ||
-        // Le client doit pouvoir valider le paiement (passer la course en terminee ou attente_paiement_especes)
-        (resource.data.clientId == request.auth.uid && resource.data.statut == 'arrive_destination') ||
-        // Autoriser l'archivage logique client (modification du flag uniquement)
-        (resource.data.clientId == request.auth.uid && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['archivePourClient'])) ||
+        // Le client est le propriétaire (permissions très larges pour débloquer l'annulation)
+        (resource.data.clientId == request.auth.uid) ||
         // Le transporteur ne peut modifier que s'il est ciblé, et que pour accepter/refuser/progresser
         (resource.data.transporteurId == request.auth.uid) ||
         // Gérer le cas de l'attribution temporaire (où transporteurId est vide mais l'update ajoute un ID)
