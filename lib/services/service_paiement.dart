@@ -221,8 +221,30 @@ class ServicePaiement {
       return true;
     } else {
       debugPrint("Erreur de retrait Campay: ${response.body}");
-      final errorMsg = jsonDecode(response.body)['message'] ?? 'Erreur inconnue';
-      throw Exception("Le transfert a échoué: $errorMsg");
+      try {
+        final errorData = jsonDecode(response.body);
+        final errorCode = errorData['error_code']?.toString() ?? '';
+        final errorMessage = errorData['message']?.toString() ?? '';
+        
+        String messageAmical = "Le service de transfert est momentanément indisponible.";
+        
+        if (errorMessage.contains("Invalid phone number") || errorCode == "ER101") {
+          messageAmical = "Ce numéro de téléphone est invalide. Veuillez entrer un numéro de téléphone correct (ex: 690XXXXXX).";
+        } else if (errorMessage.contains("UNAUTHORIZED")) {
+          messageAmical = "Les retraits sont actuellement désactivés par l'opérateur financier.";
+        } else if (errorMessage.toLowerCase().contains("insufficient") || errorCode == "ER102") {
+          messageAmical = "Le service ne dispose pas d'assez de fonds pour honorer ce retrait.";
+        } else if (errorMessage.isNotEmpty) {
+          messageAmical = "Erreur de l'opérateur : $errorMessage";
+        }
+        
+        throw Exception(messageAmical);
+      } catch (e) {
+        if (e is FormatException) {
+          throw Exception("Le service de transfert est injoignable pour le moment.");
+        }
+        rethrow;
+      }
     }
   }
 

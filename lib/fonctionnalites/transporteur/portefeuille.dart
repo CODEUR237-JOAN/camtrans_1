@@ -288,7 +288,24 @@ class Portefeuille extends ConsumerWidget {
                             }
                           } catch (e) {
                             if (ctx.mounted) {
-                              ScaffoldMessenger.of(ctx).showSnackBar(SnackBar(content: Text("Erreur: $e")));
+                              String messageErreur = e.toString();
+                              if (messageErreur.startsWith("Exception: ")) {
+                                messageErreur = messageErreur.replaceFirst("Exception: ", "");
+                              }
+                              
+                              ScaffoldMessenger.of(ctx).showSnackBar(
+                                SnackBar(
+                                  content: Text(messageErreur, style: const TextStyle(color: Colors.white)),
+                                  backgroundColor: Colors.red,
+                                  duration: const Duration(seconds: 4),
+                                )
+                              );
+                              
+                              // Vider les champs
+                              montantController.clear();
+                              compteController.clear();
+                              mdpController.clear();
+                              
                               setState(() => isLoading = false);
                             }
                           }
