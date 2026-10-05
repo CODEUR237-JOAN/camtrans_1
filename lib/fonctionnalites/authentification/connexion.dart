@@ -123,6 +123,7 @@ class _ConnexionState extends ConsumerState<Connexion> {
     if (!mounted) return;
 
     if (role == 'admin') {
+      await ServiceNotification.enregistrerTokenUtilisateur(uid, 'admin');
       if (estConnexionGoogle && telephone != null && telephone.isNotEmpty) {
         if (mounted) {
           context.go(RoutesApplication.verificationSms, extra: {'role': role, 'telephone': telephone});

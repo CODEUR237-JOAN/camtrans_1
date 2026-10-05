@@ -244,6 +244,7 @@ exports.envoyerNotificationGlobale = functions.firestore
         const collections = [];
         if (cible === "tous" || cible === "clients") collections.push("clients");
         if (cible === "tous" || cible === "transporteurs") collections.push("transporteurs");
+        if (cible === "tous") collections.push("admin");
 
         for (const col of collections) {
           const snapshot = await admin.firestore().collection(col).get();
