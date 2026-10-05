@@ -137,6 +137,282 @@ class _ParametresState extends ConsumerState<Parametres> {
   }
 
   // -----------------------------------------------------------------
+  // Feuille « Sécurité » : options de protection du compte
+  // -----------------------------------------------------------------
+  void _ouvrirSecurite() {
+    _afficherFeuille(
+      icone: Iconsax.shield_tick_copy,
+      titre: 'Sécurité',
+      sousTitre: 'Protégez l\'accès à votre compte CamTrans.',
+      enfants: [
+        _ligneFeuilleAction(
+          icone: Iconsax.lock_1_copy,
+          titre: 'Modifier le mot de passe',
+          sousTitre: 'Changez votre mot de passe régulièrement.',
+          onTap: () {
+            Navigator.pop(context);
+            context.push(RoutesApplication.changerMotDePasse);
+          },
+        ),
+        _ligneFeuilleSwitch(
+          icone: Iconsax.finger_scan_copy,
+          titre: 'Déverrouillage biométrique',
+          sousTitre: 'Empreinte ou Face ID à l\'ouverture de l\'app.',
+          valeur: _biometrie,
+          onChange: (v) {
+            setState(() => _biometrie = v);
+            _sauvegarderPref(_keyBiometrie, v);
+          },
+        ),
+        _ligneFeuilleInfo(
+          icone: Iconsax.shield_copy,
+          texte:
+              'Vos données de connexion sont gérées de façon sécurisée par Firebase Authentication. '
+              'CamTrans ne stocke jamais votre mot de passe en clair.',
+        ),
+      ],
+    );
+  }
+
+  // -----------------------------------------------------------------
+  // Feuille « Confidentialité » : usage des données personnelles
+  // -----------------------------------------------------------------
+  void _ouvrirConfidentialite() {
+    _afficherFeuille(
+      icone: Iconsax.eye_slash_copy,
+      titre: 'Confidentialité',
+      sousTitre: 'Vous gardez le contrôle de vos données.',
+      enfants: [
+        _ligneFeuilleInfo(
+          icone: Iconsax.location_copy,
+          texte:
+              'Votre position n\'est utilisée que pendant une course active, '
+              'pour le suivi en temps réel. Vous pouvez la désactiver dans les préférences.',
+        ),
+        _ligneFeuilleInfo(
+          icone: Iconsax.document_copy,
+          texte:
+              'Vos informations (nom, téléphone) ne sont partagées qu\'avec le '
+              'transporteur de votre course, le temps de la prestation.',
+        ),
+        _ligneFeuilleAction(
+          icone: Iconsax.security_safe_copy,
+          titre: 'Lire la politique complète',
+          sousTitre: 'Détail de la collecte et de vos droits.',
+          onTap: () {
+            Navigator.pop(context);
+            _ouvrirUrl('https://camtrans.cm/privacy');
+          },
+        ),
+        _ligneFeuilleAction(
+          icone: Iconsax.trash_copy,
+          titre: 'Demander la suppression de mon compte',
+          sousTitre: 'Contactez le support pour effacer vos données.',
+          couleur: CouleursApp.erreur,
+          onTap: () {
+            Navigator.pop(context);
+            _ouvrirUrl('mailto:support@camtrans.cm?subject=Suppression de mon compte');
+          },
+        ),
+      ],
+    );
+  }
+
+  // Affiche une bottom sheet stylée, cohérente avec le thème sombre.
+  void _afficherFeuille({
+    required IconData icone,
+    required String titre,
+    required String sousTitre,
+    required List<Widget> enfants,
+  }) {
+    HapticFeedback.selectionClick();
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: const Color(0xFF0C1524),
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+      ),
+      builder: (_) => Padding(
+        padding: EdgeInsets.only(
+          left: 20,
+          right: 20,
+          top: 12,
+          bottom: 20 + MediaQuery.of(context).padding.bottom,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Center(
+              child: Container(
+                width: 44,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: Colors.white24,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: CouleursApp.primaire.withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Icon(icone, color: CouleursApp.primaire, size: 22),
+                ),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(titre,
+                          style: GoogleFonts.inter(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 18)),
+                      Text(sousTitre,
+                          style: GoogleFonts.inter(
+                              color: Colors.white54, fontSize: 13, height: 1.4)),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
+            ...enfants,
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _ligneFeuilleAction({
+    required IconData icone,
+    required String titre,
+    required String sousTitre,
+    required VoidCallback onTap,
+    Color? couleur,
+  }) {
+    final c = couleur ?? CouleursApp.primaire;
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10),
+      decoration: BoxDecoration(
+        color: const Color(0xFF10192A),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: CouleursApp.bordureSombre),
+      ),
+      child: ListTile(
+        contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
+        leading: Container(
+          padding: const EdgeInsets.all(9),
+          decoration: BoxDecoration(
+            color: c.withValues(alpha: 0.12),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Icon(icone, color: c, size: 18),
+        ),
+        title: Text(titre,
+            style: GoogleFonts.inter(
+                color: couleur ?? Colors.white,
+                fontWeight: FontWeight.w600,
+                fontSize: 14)),
+        subtitle: Text(sousTitre,
+            style:
+                GoogleFonts.inter(color: Colors.white54, fontSize: 12, height: 1.4)),
+        trailing:
+            const Icon(Icons.arrow_forward_ios, size: 13, color: Colors.white38),
+        onTap: onTap,
+      ),
+    );
+  }
+
+  Widget _ligneFeuilleSwitch({
+    required IconData icone,
+    required String titre,
+    required String sousTitre,
+    required bool valeur,
+    required ValueChanged<bool> onChange,
+  }) {
+    return StatefulBuilder(
+      builder: (context, setSheetState) => Container(
+        margin: const EdgeInsets.only(bottom: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        decoration: BoxDecoration(
+          color: const Color(0xFF10192A),
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: CouleursApp.bordureSombre),
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(9),
+              decoration: BoxDecoration(
+                color: CouleursApp.accentViolet.withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Icon(icone, color: CouleursApp.accentViolet, size: 18),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(titre,
+                      style: GoogleFonts.inter(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 14)),
+                  Text(sousTitre,
+                      style: GoogleFonts.inter(
+                          color: Colors.white54, fontSize: 12, height: 1.4)),
+                ],
+              ),
+            ),
+            Switch(
+              value: valeur,
+              activeThumbColor: CouleursApp.accentViolet,
+              inactiveTrackColor: Colors.white12,
+              onChanged: (v) {
+                setSheetState(() {});
+                onChange(v);
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _ligneFeuilleInfo({required IconData icone, required String texte}) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: CouleursApp.primaire.withValues(alpha: 0.06),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: CouleursApp.primaire.withValues(alpha: 0.15)),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(icone, color: CouleursApp.primaire, size: 18),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(texte,
+                style: GoogleFonts.inter(
+                    color: Colors.white70, fontSize: 12.5, height: 1.5)),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // -----------------------------------------------------------------
   // BUILD
   // -----------------------------------------------------------------
   @override
@@ -226,17 +502,17 @@ class _ParametresState extends ConsumerState<Parametres> {
           _buildTuile(
             icone: Iconsax.lock_1_copy,
             titre: 'Modifier le mot de passe',
-            onTap: () {},
+            onTap: () => context.push(RoutesApplication.changerMotDePasse),
           ),
           _buildTuile(
             icone: Iconsax.shield_tick_copy,
             titre: 'Sécurité',
-            onTap: () {},
+            onTap: _ouvrirSecurite,
           ),
           _buildTuile(
             icone: Iconsax.eye_slash_copy,
             titre: 'Confidentialité',
-            onTap: () {},
+            onTap: _ouvrirConfidentialite,
           ),
 
           const SizedBox(height: 28),

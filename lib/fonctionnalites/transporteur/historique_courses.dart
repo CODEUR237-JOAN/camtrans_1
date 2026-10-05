@@ -194,10 +194,17 @@ class _HistoriquecoursesState extends ConsumerState<HistoriqueCourses> {
                             ],
                           ),
                           onTap: () {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                    content:
-                                        Text("Détails bientôt disponibles.")));
+                            showModalBottomSheet(
+                              context: context,
+                              backgroundColor: const Color(0xFF0C1524),
+                              isScrollControlled: true,
+                              shape: const RoundedRectangleBorder(
+                                borderRadius: BorderRadius.vertical(
+                                    top: Radius.circular(24)),
+                              ),
+                              builder: (_) =>
+                                  _FeuilleDetailsCourse(course: course),
+                            );
                           },
                         ),
                       );
@@ -307,6 +314,152 @@ class _DialogConfirmation extends StatelessWidget {
           child: Text(bouton),
         ),
       ],
+    );
+  }
+}
+
+// =====================================================================
+// Fiche détaillée d'une course (bottom sheet) — affichée au tap sur une
+// course de l'historique. Lecture seule, cohérente avec le thème sombre.
+// =====================================================================
+class _FeuilleDetailsCourse extends StatelessWidget {
+  final Course course;
+  const _FeuilleDetailsCourse({required this.course});
+
+  @override
+  Widget build(BuildContext context) {
+    final bool terminee = StatutCourse.estTerminee(course.statut);
+    final Color couleurStatut = terminee ? Colors.green : Colors.orange;
+    final double prix =
+        course.prixFinal > 0 ? course.prixFinal : course.prixEstime;
+
+    return Padding(
+      padding: EdgeInsets.only(
+        left: 20,
+        right: 20,
+        top: 12,
+        bottom: 20 + MediaQuery.of(context).padding.bottom,
+      ),
+      child: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Center(
+              child: Container(
+                width: 44,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: Colors.white24,
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+            ),
+            const SizedBox(height: 20),
+
+            // En-tête : itinéraire
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                    color: CouleursApp.primaire.withValues(alpha: 0.12),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: const Icon(Icons.local_shipping,
+                      color: CouleursApp.primaire, size: 22),
+                ),
+                const SizedBox(width: 14),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "${course.adresseDepart} → ${course.adresseArrivee}",
+                        style: const TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 15),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        DateFormat('dd MMMM yyyy – HH:mm')
+                            .format(course.dateCreation),
+                        style: const TextStyle(
+                            color: Colors.white54, fontSize: 12),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+
+            // Statut
+            Container(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+              decoration: BoxDecoration(
+                color: couleurStatut.withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Text(
+                StatutCourse.libelle(course.statut).toUpperCase(),
+                style: TextStyle(
+                    color: couleurStatut,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 12),
+              ),
+            ),
+            const SizedBox(height: 20),
+
+            // Détails
+            _ligne(Icons.payments_outlined, "Prix",
+                "${prix.toStringAsFixed(0)} FCFA"),
+            _ligne(Icons.credit_card_outlined, "Paiement",
+                course.modePaiement.isEmpty ? "Non renseigné" : course.modePaiement),
+            if (course.typeVehicule.isNotEmpty)
+              _ligne(Icons.directions_car_outlined, "Véhicule",
+                  course.typeVehicule),
+            if (course.distanceKm > 0)
+              _ligne(Icons.straighten_outlined, "Distance",
+                  "${course.distanceKm.toStringAsFixed(1)} km"),
+            if (course.nomClient.isNotEmpty)
+              _ligne(Icons.person_outline, "Client", course.nomClient),
+            if (course.telephoneClient.isNotEmpty)
+              _ligne(Icons.phone_outlined, "Téléphone",
+                  course.telephoneClient),
+            if (course.noteClient > 0)
+              _ligne(Icons.star_outline, "Note reçue",
+                  "${course.noteClient.toStringAsFixed(1)} / 5"),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _ligne(IconData icone, String libelle, String valeur) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Row(
+        children: [
+          Icon(icone, color: Colors.white38, size: 18),
+          const SizedBox(width: 12),
+          Text(libelle,
+              style: const TextStyle(color: Colors.white54, fontSize: 13)),
+          const Spacer(),
+          Flexible(
+            child: Text(
+              valeur,
+              textAlign: TextAlign.right,
+              style: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 13),
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
