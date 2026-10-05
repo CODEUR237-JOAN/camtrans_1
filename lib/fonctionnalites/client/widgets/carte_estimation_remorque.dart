@@ -39,10 +39,10 @@ class CarteEstimationRemorque extends StatelessWidget {
         color: const Color(0xFF0F172A).withValues(alpha: 0.92),
         borderRadius: BorderRadius.circular(24),
         border:
-            Border.all(color: const Color(0xFF12B76A).withValues(alpha: 0.25)),
+            Border.all(color: const Color(0xFF007ACC).withValues(alpha: 0.25)),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF12B76A).withValues(alpha: 0.12),
+            color: const Color(0xFF007ACC).withValues(alpha: 0.12),
             blurRadius: 24,
             spreadRadius: 2,
           ),
@@ -70,11 +70,11 @@ class CarteEstimationRemorque extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.all(10),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF12B76A).withValues(alpha: 0.15),
+                        color: const Color(0xFF007ACC).withValues(alpha: 0.15),
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: const Icon(Icons.car_repair,
-                          color: Color(0xFF12B76A), size: 22),
+                          color: Color(0xFF007ACC), size: 22),
                     ),
                     const SizedBox(width: 12),
                     Expanded(
@@ -145,7 +145,7 @@ class CarteEstimationRemorque extends StatelessWidget {
                         return Text(
                           '${value.toInt().toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (m) => '${m[1]} ')} FCFA',
                           style: GoogleFonts.poppins(
-                            color: const Color(0xFF12B76A),
+                            color: const Color(0xFF007ACC),
                             fontSize: 36,
                             fontWeight: FontWeight.w800,
                             letterSpacing: -1,

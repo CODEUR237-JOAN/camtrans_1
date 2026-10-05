@@ -305,7 +305,7 @@ class _ResumeExpeditionBottomSheetState
                 borderRadius: BorderRadius.circular(16),
                 gradient: etat.categorieService == "Remorque"
                     ? const LinearGradient(
-                        colors: [CouleursApp.succes, Color(0xFF0E9456)],
+                        colors: [Color(0xFF007ACC), Color(0xFF005C99)],
                       )
                     : const LinearGradient(
                         colors: [Color(0xFF3B82F6), Color(0xFF2563EB)],
@@ -313,7 +313,7 @@ class _ResumeExpeditionBottomSheetState
                 boxShadow: [
                   BoxShadow(
                     color: etat.categorieService == "Remorque"
-                        ? CouleursApp.succes.withValues(alpha: 0.35)
+                        ? const Color(0xFF007ACC).withValues(alpha: 0.35)
                         : const Color(0xFF3B82F6).withValues(alpha: 0.35),
                     blurRadius: 16,
                     offset: const Offset(0, 6),
