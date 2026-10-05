@@ -65,7 +65,7 @@ class ServiceNotification {
       }
       return await _messaging.getToken();
     } catch (e) {
-      debugPrint("Erreur getToken: \$e");
+      debugPrint("Erreur getToken: $e");
       return null;
     }
   }
@@ -76,8 +76,14 @@ class ServiceNotification {
       final token = await obtenirToken();
       if (token != null) {
         final db = FirebaseFirestore.instance;
-        final collection =
-            typeUtilisateur == 'client' ? 'clients' : 'transporteurs';
+        String collection;
+        if (typeUtilisateur == 'client') {
+          collection = 'clients';
+        } else if (typeUtilisateur == 'admin') {
+          collection = 'admin';
+        } else {
+          collection = 'transporteurs';
+        }
         await db.collection(collection).doc(userId).set({
           'fcmToken': token,
           'derniereConnexion': FieldValue.serverTimestamp(),
