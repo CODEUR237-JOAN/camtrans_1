@@ -3,6 +3,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:update_camtrans/coeur/etat/utilisateur_provider.dart';
 import 'package:update_camtrans/coeur/constantes/couleurs.dart';
+import 'package:update_camtrans/coeur/widgets/loader_page.dart';
 import 'package:go_router/go_router.dart';
 import 'package:update_camtrans/coeur/widgets/assistant_vocal_widget.dart';
 
@@ -155,7 +156,7 @@ class _EcranSuiviCourseState extends ConsumerState<EcranSuiviCourse> {
     if (roleAsync.isLoading) {
       return const Scaffold(
         backgroundColor: CouleursApp.fondSombre,
-        body: Center(child: CircularProgressIndicator(color: CouleursApp.primaire)),
+        body: LoaderPage(message: 'Chargement du suivi…'),
       );
     }
 
@@ -183,9 +184,7 @@ class _EcranSuiviCourseState extends ConsumerState<EcranSuiviCourse> {
     if (etatSuivi.isLoading || etatSuivi.course == null) {
       return const Scaffold(
         backgroundColor: CouleursApp.fondSombre,
-        body: Center(
-          child: CircularProgressIndicator(color: CouleursApp.primaire),
-        ),
+        body: LoaderPage(message: 'Chargement de la course…'),
       );
     }
 

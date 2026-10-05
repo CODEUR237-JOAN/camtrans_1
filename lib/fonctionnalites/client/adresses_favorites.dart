@@ -6,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 
 import 'package:update_camtrans/coeur/constantes/couleurs.dart';
+import 'package:update_camtrans/coeur/widgets/loader_page.dart';
 import 'package:update_camtrans/coeur/etat/utilisateur_provider.dart';
 import 'package:update_camtrans/services/service_firestore.dart';
 
@@ -165,8 +166,7 @@ class _AdressesFavoritesPageState extends ConsumerState<AdressesFavoritesPage> {
       ),
       body: SafeArea(
         child: clientAsync.when(
-          loading: () => const Center(
-              child: CircularProgressIndicator(color: CouleursApp.primaire)),
+          loading: () => const LoaderPage(),
           error: (e, _) => Center(
               child: Text('Erreur de chargement.',
                   style: GoogleFonts.inter(color: Colors.white70))),

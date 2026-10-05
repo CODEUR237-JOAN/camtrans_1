@@ -8,6 +8,7 @@ import 'package:latlong2/latlong.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:update_camtrans/coeur/constantes/couleurs.dart';
+import 'package:update_camtrans/coeur/widgets/loader_page.dart';
 import 'package:update_camtrans/coeur/constantes/statuts.dart';
 import 'package:update_camtrans/coeur/etat/suivi_provider.dart';
 import 'package:update_camtrans/services/service_firestore.dart';
@@ -72,8 +73,7 @@ class _SuiviTransporteurState extends ConsumerState<SuiviTransporteur> {
     if (etatSuivi.chargement) {
       return const Scaffold(
         backgroundColor: Color(0xFF08111F),
-        body: Center(
-            child: CircularProgressIndicator(color: CouleursApp.primaire)),
+        body: const LoaderPage(message: 'Chargement…'),
       );
     }
 

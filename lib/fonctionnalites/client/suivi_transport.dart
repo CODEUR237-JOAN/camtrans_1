@@ -15,6 +15,7 @@ import 'package:update_camtrans/modeles/transporteur.dart';
 import 'package:update_camtrans/modeles/course.dart';
 import 'package:update_camtrans/services/service_firestore.dart';
 import 'package:update_camtrans/coeur/constantes/couleurs.dart';
+import 'package:update_camtrans/coeur/widgets/loader_page.dart';
 import 'package:update_camtrans/coeur/constantes/statuts.dart';
 import 'widgets/timeline_statut.dart';
 import 'widgets/carte_suivi_abstraite.dart';
@@ -109,8 +110,7 @@ class _SuiviTransportState extends ConsumerState<SuiviTransport> {
     if (etatSuivi.chargement) {
       return const Scaffold(
         backgroundColor: Color(0xFF08111F),
-        body: Center(
-            child: CircularProgressIndicator(color: CouleursApp.primaire)),
+        body: const LoaderPage(message: 'Chargement du suivi…'),
       );
     }
 
