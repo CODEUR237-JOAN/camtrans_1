@@ -59,6 +59,16 @@
 - Les messages sont dans la sous-collection `courses/{courseId}/messages` — **déjà sécurisée** par le commit `6933ba9` (participants + admin). Images sur Cloudinary (preset unsigned), aucune règle Firestore supplémentaire requise.
 **NB :** `lib/fonctionnalites/client/ecran_chat.dart` (ancien chat, paramètre `transporteur`, contient encore le SnackBar « image à venir ») est **du code mort** — non importé/routé. À supprimer lors d'un nettoyage.
 
+### `a09846d` — style(ui) : REBRAND BLEU + polish connexion
+**Fichiers :** `lib/coeur/constantes/couleurs.dart`, `lib/fonctionnalites/authentification/connexion.dart`, `lib/fonctionnalites/client/parametres.dart`
+**⚠️ CHANGEMENT GLOBAL DE MARQUE :** la charte passe du **teal #00C896** au **bleu #007ACC / #33AFFF** (décision utilisateur). Modifié dans `CouleursApp` : `primaire`, `primaireFonce`, `primaireClair`, `primaireNeon`, `accent`, `accentNeon`, et les dégradés `degradePrincipal`/`degradeSplash`/`degradeNeon`. Comme les écrans utilisent les tokens, le bleu se propage partout. Seul 1 dégradé teal était codé en dur (bandeau profil `parametres.dart`) → corrigé. **Le logo/icône (assets) restent teal** tant que l'utilisateur ne fournit pas de nouveaux fichiers.
+Polish connexion : sous-titre humanisé, lueur logo ultra-douce, `maxLines+ellipsis` sur libellés sociaux.
+
+### `2647b27` — style(ui) : polish parcours inscription
+**Fichiers :** `choix_profil.dart`, `inscription_client.dart`, `inscription_transporteur.dart`
+Accents français corrigés (choix_profil) ; sous-titres d'accueil humanisés sous les titres ; titres centrés. Écrans déjà bleu-ready via les tokens.
+**Règle de travail UI (demande utilisateur) :** polish strictement couche présentation (`fonctionnalites/**`, `coeur/widgets`, `coeur/theme`, `coeur/constantes/couleurs.dart`) — JAMAIS services/modeles/etat/auth. `flutter analyze` à lancer par l'utilisateur (Flutter absent de la machine agent).
+
 ---
 
 ## 2. État de déploiement (IMPORTANT)
