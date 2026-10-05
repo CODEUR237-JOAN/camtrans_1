@@ -123,7 +123,7 @@ class _TableauDeBordTransporteurState
     }
 
     return Scaffold(
-      backgroundColor: const Color(0xFF08111F),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       floatingActionButton: const BoutonAssistantVocal(),
       bottomNavigationBar: _buildBottomNav(),
       body: FondPremiumAnime(
@@ -165,7 +165,7 @@ class _TableauDeBordTransporteurState
       loading: () => const Center(child: LoaderPremium()),
       error: (err, _) => Center(
           child: Text("Oups ! Chargement impossible : $err",
-              style: const TextStyle(color: Colors.white70))),
+              style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)))),
       data: (transporteur) {
         final nomAffichage = transporteur != null
             ? transporteur.prenom
@@ -188,11 +188,11 @@ class _TableauDeBordTransporteurState
                     border:
                         Border.all(color: Colors.red.withValues(alpha: 0.4)),
                   ),
-                  child: const Row(
+                  child: Row(
                     children: [
-                      Icon(Icons.warning_amber_rounded,
+                      const Icon(Icons.warning_amber_rounded,
                           color: Colors.red, size: 32),
-                      SizedBox(width: 12),
+                      const SizedBox(width: 12),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -200,12 +200,12 @@ class _TableauDeBordTransporteurState
                             Text("Compte en attente de validation",
                                 style: TextStyle(
                                     fontWeight: FontWeight.bold,
-                                    color: Colors.white)),
-                            SizedBox(height: 4),
+                                    color: Theme.of(context).colorScheme.onSurface)),
+                            const SizedBox(height: 4),
                             Text(
                               "Vos documents sont en cours d'examen par l'administration.",
                               style: TextStyle(
-                                  fontSize: 12, color: Colors.white70),
+                                  fontSize: 12, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)),
                             ),
                           ],
                         ),
@@ -245,7 +245,7 @@ class _TableauDeBordTransporteurState
                         Text(
                           "Bienvenue,",
                           style: GoogleFonts.inter(
-                              color: Colors.white60, fontSize: 14),
+                              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6), fontSize: 14),
                         ),
                         const SizedBox(height: 2),
                         Text(
@@ -258,7 +258,7 @@ class _TableauDeBordTransporteurState
                               letterSpacing: -0.5,
                               color: Theme.of(context).brightness ==
                                       Brightness.dark
-                                  ? Colors.white
+                                  ? Theme.of(context).colorScheme.onSurface
                                   : CouleursApp.textePrincipal),
                         ),
                       ],
@@ -269,7 +269,7 @@ class _TableauDeBordTransporteurState
                     activeThumbColor: Colors.white,
                     activeTrackColor: Colors.green,
                     inactiveThumbColor: Colors.white,
-                    inactiveTrackColor: Colors.white.withValues(alpha: 0.2),
+                    inactiveTrackColor: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.2),
                     onChanged: _chargementDisponibilite
                         ? null
                         : (value) async {
@@ -310,7 +310,7 @@ class _TableauDeBordTransporteurState
                     Text(
                       "Revenus du jour",
                       style: GoogleFonts.inter(
-                          color: Colors.white70,
+                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                           fontSize: 16,
                           fontWeight: FontWeight.w500),
                     ),
@@ -320,7 +320,7 @@ class _TableauDeBordTransporteurState
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                       style: GoogleFonts.inter(
-                        color: Colors.white,
+                        color: Theme.of(context).colorScheme.onSurface,
                         fontSize: 34,
                         fontWeight: FontWeight.w800,
                         letterSpacing: -1.0,
@@ -337,10 +337,10 @@ class _TableauDeBordTransporteurState
                       padding: const EdgeInsets.symmetric(
                           horizontal: 12, vertical: 6),
                       decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.1),
+                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(20),
                         border: Border.all(
-                            color: Colors.white.withValues(alpha: 0.2)),
+                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.2)),
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
@@ -358,7 +358,7 @@ class _TableauDeBordTransporteurState
                                 ? "En ligne et disponible"
                                 : "Hors ligne",
                             style: GoogleFonts.inter(
-                                color: Colors.white,
+                                color: Theme.of(context).colorScheme.onSurface,
                                 fontWeight: FontWeight.w600,
                                 fontSize: 13),
                           ),
@@ -382,7 +382,7 @@ class _TableauDeBordTransporteurState
                     fontWeight: FontWeight.w700,
                     letterSpacing: -0.5,
                     color: Theme.of(context).brightness == Brightness.dark
-                        ? Colors.white
+                        ? Theme.of(context).colorScheme.onSurface
                         : CouleursApp.textePrincipal),
               ),
               const SizedBox(height: 15),
@@ -485,7 +485,7 @@ class _TableauDeBordTransporteurState
                           fontWeight: FontWeight.w700,
                           letterSpacing: -0.5,
                           color: Theme.of(context).brightness == Brightness.dark
-                              ? Colors.white
+                              ? Theme.of(context).colorScheme.onSurface
                               : CouleursApp.textePrincipal)),
                   TextButton(
                       onPressed: () {
@@ -514,7 +514,7 @@ class _TableauDeBordTransporteurState
                                           onPlay: (controller) =>
                                               controller.repeat())
                                       .shimmer(
-                                          color: Colors.white
+                                          color: Theme.of(context).colorScheme.onSurface
                                               .withValues(alpha: 0.08),
                                           duration: 1.5.seconds)),
                         ],
@@ -523,10 +523,10 @@ class _TableauDeBordTransporteurState
                       Text("Hmm, petit souci de chargement : $err 🔧"),
                   data: (courses) {
                     if (courses.isEmpty) {
-                      return const Padding(
-                        padding: EdgeInsets.all(20.0),
+                      return Padding(
+                        padding: const EdgeInsets.all(20.0),
                         child: Text("Aucune course assignée.",
-                            style: TextStyle(color: Colors.white54)),
+                            style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54))),
                       );
                     }
 
@@ -579,8 +579,8 @@ class _TableauDeBordTransporteurState
                             fontWeight: FontWeight.bold, fontSize: 15)),
                     const SizedBox(height: 6),
                     Text(sousTitre,
-                        style: const TextStyle(
-                            color: Colors.white60, fontSize: 13)),
+                        style: TextStyle(
+                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6), fontSize: 13)),
                   ],
                 ),
               ),
@@ -655,7 +655,7 @@ class _TableauDeBordTransporteurState
                 Text(
                   conseil.titre,
                   style: GoogleFonts.inter(
-                      color: Colors.white,
+                      color: Theme.of(context).colorScheme.onSurface,
                       fontWeight: FontWeight.bold,
                       fontSize: 14),
                 ),
@@ -663,7 +663,7 @@ class _TableauDeBordTransporteurState
                 Text(
                   conseil.description,
                   style: GoogleFonts.inter(
-                      color: Colors.white60, fontSize: 12, height: 1.4),
+                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6), fontSize: 12, height: 1.4),
                 ),
               ],
             ),
@@ -734,12 +734,14 @@ class _TableauDeBordTransporteurState
   // BOTTOM NAVIGATION
   // ==========================================
   Widget _buildBottomNav() {
+    final scheme = Theme.of(context).colorScheme;
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.8),
+        color: scheme.surface.withValues(alpha: 0.92),
+        border: Border(top: BorderSide(color: scheme.outlineVariant)),
         boxShadow: [
           BoxShadow(
-              color: Colors.white.withValues(alpha: 0.07),
+              color: scheme.shadow.withValues(alpha: 0.08),
               blurRadius: 30,
               offset: const Offset(0, -10))
         ],
@@ -752,8 +754,8 @@ class _TableauDeBordTransporteurState
             onTap: (index) => setState(() => indexNavigation = index),
             type: BottomNavigationBarType.fixed,
             backgroundColor: Colors.transparent,
-            selectedItemColor: CouleursApp.primaire,
-            unselectedItemColor: CouleursApp.texteSecondaire,
+            selectedItemColor: scheme.primary,
+            unselectedItemColor: scheme.onSurfaceVariant,
             showUnselectedLabels: true,
             selectedLabelStyle:
                 const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),

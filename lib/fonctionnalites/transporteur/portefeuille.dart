@@ -20,7 +20,7 @@ class Portefeuille extends ConsumerWidget {
     final solde = statsRevenus['total'] ?? 0.0;
 
     return Scaffold(
-      backgroundColor: const Color(0xFF08111F),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         title: const Text("Mon portefeuille"),
       ),
@@ -39,15 +39,15 @@ class Portefeuille extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text(
+                  Text(
                     "Solde disponible",
-                    style: TextStyle(color: Colors.white70, fontSize: 16),
+                    style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), fontSize: 16),
                   ),
                   const SizedBox(height: 10),
                   Text(
                     "${solde.toStringAsFixed(0)} FCFA",
-                    style: const TextStyle(
-                      color: Colors.white,
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.onSurface,
                       fontSize: 34,
                       fontWeight: FontWeight.bold,
                     ),
@@ -109,11 +109,11 @@ class Portefeuille extends ConsumerWidget {
                 error: (err, _) => Text("Erreur: $err"),
                 data: (paiements) {
                   if (paiements.isEmpty) {
-                    return const Padding(
-                      padding: EdgeInsets.all(20.0),
+                    return Padding(
+                      padding: const EdgeInsets.all(20.0),
                       child: Center(
                           child: Text("Aucune transaction.",
-                              style: TextStyle(color: Colors.white54))),
+                              style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54)))),
                     );
                   }
                   return ListView.builder(
@@ -122,7 +122,7 @@ class Portefeuille extends ConsumerWidget {
                     itemCount: paiements.length,
                     itemBuilder: (context, index) {
                       final paiement = paiements[index];
-                      return _transaction(
+                      return _transaction(context, 
                         paiement.courseId == 'RETRAIT' ? "Retrait de fonds" : "Paiement course",
                         paiement.courseId == 'RETRAIT' ? paiement.reference : "Via ${paiement.methodePaiement}",
                         paiement.montantNet > 0 ? "+${paiement.montantNet.toStringAsFixed(0)} FCFA" : "${paiement.montantNet.toStringAsFixed(0)} FCFA",
@@ -163,19 +163,19 @@ class Portefeuille extends ConsumerWidget {
                   mainAxisSize: MainAxisSize.min,
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text("Demande de retrait", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Colors.white)),
+                    Text("Demande de retrait", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface)),
                     const SizedBox(height: 8),
-                    Text("Méthode : $methode", style: const TextStyle(color: Colors.white70)),
+                    Text("Méthode : $methode", style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7))),
                     const SizedBox(height: 24),
                     
                     TextField(
                       controller: compteController,
                       keyboardType: methode == "Virement bancaire" ? TextInputType.text : TextInputType.phone,
-                      style: const TextStyle(color: Colors.white),
+                      style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
                       decoration: InputDecoration(
                         labelText: methode == "Virement bancaire" ? "IBAN / Numéro de compte" : "Numéro de téléphone",
-                        labelStyle: const TextStyle(color: Colors.white54),
-                        enabledBorder: OutlineInputBorder(borderSide: const BorderSide(color: Colors.white24), borderRadius: BorderRadius.circular(12)),
+                        labelStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54)),
+                        enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.24)), borderRadius: BorderRadius.circular(12)),
                         focusedBorder: OutlineInputBorder(borderSide: const BorderSide(color: CouleursApp.primaire), borderRadius: BorderRadius.circular(12)),
                       ),
                     ),
@@ -184,11 +184,11 @@ class Portefeuille extends ConsumerWidget {
                     TextField(
                       controller: montantController,
                       keyboardType: TextInputType.number,
-                      style: const TextStyle(color: Colors.white),
+                      style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
                       decoration: InputDecoration(
                         labelText: "Montant à retirer (Max: ${soldeDisponible.toStringAsFixed(0)} FCFA)",
-                        labelStyle: const TextStyle(color: Colors.white54),
-                        enabledBorder: OutlineInputBorder(borderSide: const BorderSide(color: Colors.white24), borderRadius: BorderRadius.circular(12)),
+                        labelStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54)),
+                        enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.24)), borderRadius: BorderRadius.circular(12)),
                         focusedBorder: OutlineInputBorder(borderSide: const BorderSide(color: CouleursApp.primaire), borderRadius: BorderRadius.circular(12)),
                       ),
                     ),
@@ -197,11 +197,11 @@ class Portefeuille extends ConsumerWidget {
                     TextField(
                       controller: mdpController,
                       obscureText: true,
-                      style: const TextStyle(color: Colors.white),
+                      style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
                       decoration: InputDecoration(
                         labelText: "Mot de passe",
-                        labelStyle: const TextStyle(color: Colors.white54),
-                        enabledBorder: OutlineInputBorder(borderSide: const BorderSide(color: Colors.white24), borderRadius: BorderRadius.circular(12)),
+                        labelStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54)),
+                        enabledBorder: OutlineInputBorder(borderSide: BorderSide(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.24)), borderRadius: BorderRadius.circular(12)),
                         focusedBorder: OutlineInputBorder(borderSide: const BorderSide(color: CouleursApp.primaire), borderRadius: BorderRadius.circular(12)),
                       ),
                     ),
@@ -307,7 +307,7 @@ class Portefeuille extends ConsumerWidget {
                                     actions: [
                                       TextButton(
                                         onPressed: () => Navigator.pop(dialogCtx),
-                                        child: const Text("COMPRIS", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                                        child: Text("COMPRIS", style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.bold)),
                                       ),
                                     ],
                                     backgroundColor: const Color(0xFF1A2235),
@@ -326,8 +326,8 @@ class Portefeuille extends ConsumerWidget {
                           }
                         },
                         child: isLoading 
-                            ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                            : const Text("Confirmer le retrait", style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+                            ? SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Theme.of(context).colorScheme.onSurface, strokeWidth: 2))
+                            : Text("Confirmer le retrait", style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 16, fontWeight: FontWeight.bold)),
                       ),
                     ),
                     const SizedBox(height: 24),
@@ -361,19 +361,19 @@ class Portefeuille extends ConsumerWidget {
     );
   }
 
-  Widget _transaction(String titre, String sousTitre, String montant,
+  Widget _transaction(BuildContext context, String titre, String sousTitre, String montant,
       Color couleur, IconData icone) {
     return Card(
-      color: const Color(0xFF10192A),
+      color: Theme.of(context).colorScheme.surface,
       margin: const EdgeInsets.only(bottom: 12),
       child: ListTile(
         leading: CircleAvatar(
           backgroundColor: couleur.withValues(alpha: .15),
           child: Icon(icone, color: couleur),
         ),
-        title: Text(titre, style: const TextStyle(color: Colors.white)),
+        title: Text(titre, style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
         subtitle:
-            Text(sousTitre, style: const TextStyle(color: Colors.white54)),
+            Text(sousTitre, style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54))),
         trailing: Text(
           montant,
           style: TextStyle(

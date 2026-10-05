@@ -93,7 +93,7 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
     });
 
     return Scaffold(
-      backgroundColor: const Color(0xFF08111F),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: Stack(
         children: [
           // Blob lumineux haut-gauche (très subtil)
@@ -153,7 +153,7 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
                             .toList();
                         if (enCours.isEmpty) {
                           return Container(
-                            color: Colors.white,
+                            color: Colors.transparent,
                             child: Center(
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
@@ -161,11 +161,11 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
                                   const Icon(Iconsax.location_copy,
                                       size: 80, color: CouleursApp.primaire),
                                   const SizedBox(height: 20),
-                                  const Text("Aucune course en cours à suivre",
+                                  Text("Aucune course en cours à suivre",
                                       style: TextStyle(
                                           fontWeight: FontWeight.bold,
                                           fontSize: 16,
-                                          color: Colors.white)),
+                                          color: Theme.of(context).colorScheme.onSurface)),
                                   const SizedBox(height: 10),
                                   ElevatedButton(
                                     onPressed: () =>
@@ -316,14 +316,14 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
                     children: [
                       Text(
                         "Bienvenue, $nomAffichage",
-                        style: const TextStyle(
+                        style: TextStyle(
                             fontSize: 22,
                             fontWeight: FontWeight.bold,
-                            color: Colors.white),
+                            color: Theme.of(context).colorScheme.onSurface),
                       ),
-                      const Text(
+                      Text(
                         "Prêt à commencer ?",
-                        style: TextStyle(fontSize: 14, color: Colors.white70),
+                        style: TextStyle(fontSize: 14, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)),
                       ),
                     ],
                   ),
@@ -339,16 +339,16 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
                       Container(
                         padding: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF10192A),
+                          color: Theme.of(context).colorScheme.surface,
                           borderRadius: BorderRadius.circular(15),
                           boxShadow: [
                             BoxShadow(
-                                color: Colors.white.withValues(alpha: 0.07),
+                                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.07),
                                 blurRadius: 10)
                           ],
                         ),
-                        child: const Icon(Iconsax.notification_bing_copy,
-                            color: Colors.white),
+                        child: Icon(Iconsax.notification_bing_copy,
+                            color: Theme.of(context).colorScheme.onSurface),
                       ),
                       if (badgeCount > 0)
                         Positioned(
@@ -402,10 +402,10 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             "Que souhaitez-vous transporter ?",
             style: TextStyle(
-                fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+                fontSize: 18, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface),
           ),
           const SizedBox(height: 16),
           GridView.builder(
@@ -450,7 +450,7 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
       child: Container(
         padding: const EdgeInsets.all(20),
         decoration: BoxDecoration(
-          color: const Color(0xFF10192A),
+          color: Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(24),
           boxShadow: [
             BoxShadow(
@@ -466,13 +466,13 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Expanded(
+                Expanded(
                   child: Text(
                     "Course Active",
                     style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
-                        color: Colors.white),
+                        color: Theme.of(context).colorScheme.onSurface),
                   ),
                 ),
                 const SizedBox(width: 8),
@@ -510,8 +510,8 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text("Départ",
-                          style: TextStyle(color: Colors.white70, fontSize: 13)),
+                      Text("Départ",
+                          style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), fontSize: 13)),
                       Text(
                           course.adresseDepart.isNotEmpty
                               ? course.adresseDepart
@@ -527,8 +527,8 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
-                      const Text("Arrivée",
-                          style: TextStyle(color: Colors.white70, fontSize: 13)),
+                      Text("Arrivée",
+                          style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), fontSize: 13)),
                       Text(
                           course.adresseArrivee.isNotEmpty
                               ? course.adresseArrivee
@@ -645,7 +645,7 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
           height: 3,
           color: active
               ? CouleursApp.primaire
-              : Colors.white.withValues(alpha: 0.1)),
+              : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1)),
     );
   }
 
@@ -661,7 +661,7 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
           borderRadius: BorderRadius.circular(24),
           boxShadow: [
             BoxShadow(
-                color: Colors.white.withValues(alpha: 0.07),
+                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.07),
                 blurRadius: 15,
                 offset: const Offset(0, 5))
           ],
@@ -702,7 +702,7 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
               top: 10,
               child: FloatingActionButton.small(
                 heroTag: "btn_map",
-                backgroundColor: const Color(0xFF10192A),
+                backgroundColor: Theme.of(context).colorScheme.surface,
                 onPressed: () => setState(() => _bottomNavIndex = 2),
                 child: const Icon(Iconsax.maximize_circle_copy,
                     color: CouleursApp.primaireFonce),
@@ -726,11 +726,11 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text("Historique Récent",
+              Text("Historique Récent",
                   style: TextStyle(
                       fontSize: 20,
                       fontWeight: FontWeight.bold,
-                      color: Colors.white)),
+                      color: Theme.of(context).colorScheme.onSurface)),
               TextButton(
                   onPressed: () {
                     context.push(RoutesApplication.historique);
@@ -752,11 +752,11 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
               margin: const EdgeInsets.only(bottom: 15),
               padding: const EdgeInsets.all(15),
               decoration: BoxDecoration(
-                color: const Color(0xFF10192A),
+                color: Theme.of(context).colorScheme.surface,
                 borderRadius: BorderRadius.circular(20),
                 boxShadow: [
                   BoxShadow(
-                      color: Colors.white.withValues(alpha: 0.07),
+                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.07),
                       blurRadius: 10,
                       offset: const Offset(0, 5))
                 ],
@@ -768,7 +768,7 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
                     decoration: BoxDecoration(
                         color: const Color(0xFF1E293B),
                         borderRadius: BorderRadius.circular(15)),
-                    child: const Icon(Iconsax.box_copy, color: Colors.white70),
+                    child: Icon(Iconsax.box_copy, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)),
                   ),
                   const SizedBox(width: 15),
                   Expanded(
@@ -784,8 +784,8 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
                         const SizedBox(height: 4),
                         Text(
                             "${course.adresseDepart} → ${course.adresseArrivee}",
-                            style: const TextStyle(
-                                fontSize: 13, color: Colors.white70),
+                            style: TextStyle(
+                                fontSize: 13, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)),
                             overflow: TextOverflow.ellipsis),
                       ],
                     ),
@@ -794,9 +794,9 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       Text("${course.prixEstime} FCFA",
-                          style: const TextStyle(
+                          style: TextStyle(
                               fontWeight: FontWeight.bold,
-                              color: Colors.white,
+                              color: Theme.of(context).colorScheme.onSurface,
                               fontSize: 14)),
                       const SizedBox(height: 5),
                       Container(
@@ -835,11 +835,11 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
                   height: 100,
                   margin: const EdgeInsets.only(bottom: 15),
                   decoration: BoxDecoration(
-                      color: const Color(0xFF10192A),
+                      color: Theme.of(context).colorScheme.surface,
                       borderRadius: BorderRadius.circular(20)),
                 ).animate(onPlay: (controller) => controller.repeat()).shimmer(
                     duration: 1.5.seconds,
-                    color: const Color(0xFF08111F)
+                    color: Theme.of(context).scaffoldBackgroundColor
                         .withValues(alpha: 0.5))).cast<Widget>(),
       ),
     );
@@ -906,17 +906,17 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
                 size: 50, color: CouleursApp.primaire),
           ),
           const SizedBox(height: 24),
-          const Text("Aucune course active",
+          Text("Aucune course active",
               style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
-                  color: Colors.white)),
+                  color: Theme.of(context).colorScheme.onSurface)),
           const SizedBox(height: 12),
-          const Text(
+          Text(
               "Passez votre première commande en sélectionnant un service ci-dessus.",
               textAlign: TextAlign.center,
               style: TextStyle(
-                  color: Colors.white54, fontSize: 14, height: 1.5)),
+                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5), fontSize: 14, height: 1.5)),
         ],
       ),
     );
@@ -935,10 +935,10 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
             decoration: BoxDecoration(
-              color: const Color(0xFF08111F),
+              color: Theme.of(context).colorScheme.surface,
               borderRadius: BorderRadius.circular(40),
               border: Border.all(
-                  color: Colors.white.withValues(alpha: 0.3), width: 1.5),
+                  color: Theme.of(context).colorScheme.outlineVariant, width: 1.5),
               boxShadow: [
                 BoxShadow(
                   color: CouleursApp.primaire.withValues(alpha: 0.2),
@@ -1010,7 +1010,7 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
               child: Icon(
                 isSelected ? activeIcon : icon,
                 key: ValueKey<bool>(isSelected),
-                color: isSelected ? Colors.white : Colors.white54,
+                color: isSelected ? Colors.white : Theme.of(context).colorScheme.onSurfaceVariant,
                 size: 24,
               ),
             ),
@@ -1078,7 +1078,7 @@ class _ServiceCategoryCardState extends State<_ServiceCategoryCard> {
             decoration: BoxDecoration(
               color: _isHovered
                   ? CouleursApp.primaire.withValues(alpha: 0.1)
-                  : const Color(0xFF10192A),
+                  : Theme.of(context).colorScheme.surface,
               borderRadius: BorderRadius.circular(24),
               border: Border.all(
                 color: _isHovered
@@ -1094,7 +1094,7 @@ class _ServiceCategoryCardState extends State<_ServiceCategoryCard> {
                       offset: const Offset(0, 10))
                 else
                   BoxShadow(
-                      color: Colors.white.withValues(alpha: 0.07),
+                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.07),
                       blurRadius: 10,
                       offset: const Offset(0, 4)),
               ],
@@ -1124,16 +1124,16 @@ class _ServiceCategoryCardState extends State<_ServiceCategoryCard> {
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 14,
-                    color: _isHovered ? CouleursApp.primaire : Colors.white,
+                    color: _isHovered ? CouleursApp.primaire : Theme.of(context).colorScheme.onSurface,
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   widget.desc,
                   textAlign: TextAlign.center,
-                  style: const TextStyle(
+                  style: TextStyle(
                     fontSize: 11,
-                    color: Colors.white70,
+                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                   ),
                 ),
               ],

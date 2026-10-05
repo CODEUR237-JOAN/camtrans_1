@@ -100,7 +100,7 @@ class _EcranPaiementState extends ConsumerState<EcranPaiement> {
 
     return Scaffold(
       extendBodyBehindAppBar: true,
-      backgroundColor: const Color(0xFF08111F),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -117,7 +117,7 @@ class _EcranPaiementState extends ConsumerState<EcranPaiement> {
         ),
         title: Text("Paiement Sécurisé",
             style: GoogleFonts.poppins(
-                color: Colors.white,
+                color: Theme.of(context).colorScheme.onSurface,
                 fontWeight: FontWeight.bold,
                 fontSize: 18)),
         centerTitle: true,
@@ -126,9 +126,9 @@ class _EcranPaiementState extends ConsumerState<EcranPaiement> {
         children: [
           // Background Gradient Sombre
           Container(
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               gradient: LinearGradient(
-                colors: [Color(0xFF08111F), Color(0xFF111827)],
+                colors: [Theme.of(context).scaffoldBackgroundColor, const Color(0xFF111827)],
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
               ),
@@ -170,7 +170,7 @@ class _EcranPaiementState extends ConsumerState<EcranPaiement> {
                             children: [
                               Text("Montant de la course",
                                   style: GoogleFonts.poppins(
-                                      color: Colors.white54, fontSize: 14)),
+                                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 14)),
                               const SizedBox(height: 8),
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
@@ -181,7 +181,7 @@ class _EcranPaiementState extends ConsumerState<EcranPaiement> {
                                     style: GoogleFonts.poppins(
                                         fontSize: 48,
                                         fontWeight: FontWeight.w900,
-                                        color: Colors.white,
+                                        color: Theme.of(context).colorScheme.onSurface,
                                         height: 1),
                                   ),
                                   const SizedBox(width: 8),
@@ -204,7 +204,7 @@ class _EcranPaiementState extends ConsumerState<EcranPaiement> {
                             style: GoogleFonts.poppins(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 18,
-                                color: Colors.white)),
+                                color: Theme.of(context).colorScheme.onSurface)),
                         const SizedBox(height: 16),
 
                         // Liste des méthodes de paiement
@@ -292,7 +292,7 @@ class _EcranPaiementState extends ConsumerState<EcranPaiement> {
                                         style: GoogleFonts.poppins(
                                             fontWeight: FontWeight.w600,
                                             fontSize: 14,
-                                            color: Colors.white70),
+                                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)),
                                       ),
                                       const SizedBox(height: 12),
                                       _buildFloatingTextField(
@@ -333,7 +333,7 @@ class _EcranPaiementState extends ConsumerState<EcranPaiement> {
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
                 color: const Color(0xFF0F172A).withValues(alpha: 0.9),
-                border: const Border(top: BorderSide(color: Colors.white12)),
+                border: Border(top: BorderSide(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.12))),
               ),
               child: SafeArea(
                 top: false,
@@ -393,10 +393,10 @@ class _EcranPaiementState extends ConsumerState<EcranPaiement> {
                         Expanded(
                             child: Text(etatPaiement.erreur!,
                                 style:
-                                    GoogleFonts.poppins(color: Colors.white))),
+                                    GoogleFonts.poppins(color: Theme.of(context).colorScheme.onSurface))),
                         IconButton(
-                          icon: const Icon(Icons.close,
-                              color: Colors.white54, size: 18),
+                          icon: Icon(Icons.close,
+                              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), size: 18),
                           onPressed: () => ref
                               .read(paiementProvider.notifier)
                               .reinitialiser(), // Permet de fermer l'erreur
@@ -416,7 +416,7 @@ class _EcranPaiementState extends ConsumerState<EcranPaiement> {
               child: BackdropFilter(
                 filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
                 child: Container(
-                  color: Colors.white.withValues(alpha: 0.8),
+                  color: Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.85),
                   child: SafeArea(
                     child: Center(
                       child: TicketRecu(
@@ -473,7 +473,7 @@ class _EcranPaiementState extends ConsumerState<EcranPaiement> {
           border: Border.all(
             color: estSelectionne
                 ? brandColor
-                : Colors.white.withValues(alpha: 0.05),
+                : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05),
             width: estSelectionne ? 2 : 1,
           ),
           boxShadow: estSelectionne
@@ -492,11 +492,11 @@ class _EcranPaiementState extends ConsumerState<EcranPaiement> {
               decoration: BoxDecoration(
                 color: estSelectionne
                     ? brandColor.withValues(alpha: 0.2)
-                    : Colors.white.withValues(alpha: 0.05),
+                    : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05),
                 shape: BoxShape.circle,
               ),
               child: Icon(defaultIcon,
-                  color: estSelectionne ? brandColor : Colors.white54,
+                  color: estSelectionne ? brandColor : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54),
                   size: 24),
             ),
             const SizedBox(width: 16),
@@ -508,10 +508,10 @@ class _EcranPaiementState extends ConsumerState<EcranPaiement> {
                       style: GoogleFonts.poppins(
                           fontWeight: FontWeight.bold,
                           fontSize: 16,
-                          color: Colors.white)),
+                          color: Theme.of(context).colorScheme.onSurface)),
                   Text(sousTitre,
                       style: GoogleFonts.poppins(
-                          fontSize: 12, color: Colors.white54)),
+                          fontSize: 12, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54))),
                 ],
               ),
             ),
@@ -520,7 +520,7 @@ class _EcranPaiementState extends ConsumerState<EcranPaiement> {
                 padding: const EdgeInsets.all(4),
                 decoration:
                     BoxDecoration(color: brandColor, shape: BoxShape.circle),
-                child: const Icon(Icons.check, color: Colors.white, size: 16),
+                child: Icon(Icons.check, color: Theme.of(context).colorScheme.onSurface, size: 16),
               ),
           ],
         ),
@@ -541,7 +541,7 @@ class _EcranPaiementState extends ConsumerState<EcranPaiement> {
       focusNode: focusNode,
       keyboardType: keyboardType,
       style:
-          GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.w500),
+          GoogleFonts.poppins(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.w500),
       decoration: InputDecoration(
         hintText: hint,
         hintStyle: GoogleFonts.poppins(
@@ -554,11 +554,11 @@ class _EcranPaiementState extends ConsumerState<EcranPaiement> {
         border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),
             borderSide:
-                BorderSide(color: Colors.white.withValues(alpha: 0.05))),
+                BorderSide(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05))),
         enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),
             borderSide:
-                BorderSide(color: Colors.white.withValues(alpha: 0.05))),
+                BorderSide(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05))),
         focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),
             borderSide: const BorderSide(color: Color(0xFF3B82F6), width: 1.5)),
@@ -580,11 +580,11 @@ class _GlassButton extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.1),
+          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1),
           shape: BoxShape.circle,
-          border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+          border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1)),
         ),
-        child: Icon(icon, color: Colors.white, size: 20),
+        child: Icon(icon, color: Theme.of(context).colorScheme.onSurface, size: 20),
       ),
     );
   }

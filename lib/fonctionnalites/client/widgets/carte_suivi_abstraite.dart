@@ -123,7 +123,7 @@ class _CarteSuiviAbstraiteState extends State<CarteSuiviAbstraite>
                       decoration: BoxDecoration(
                         color: widget.isRemorque
                             ? const Color(0xFF0F172A)
-                            : Colors.white,
+                            : Theme.of(context).colorScheme.onSurface,
                         shape: BoxShape.circle,
                         boxShadow: [
                           BoxShadow(

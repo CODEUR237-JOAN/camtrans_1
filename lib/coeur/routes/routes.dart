@@ -28,6 +28,7 @@ import 'package:update_camtrans/fonctionnalites/client/adresses_favorites.dart';
 import 'package:update_camtrans/fonctionnalites/chat/ecran_chat.dart';
 import 'package:update_camtrans/fonctionnalites/client/ecran_evaluation.dart';
 import 'package:update_camtrans/fonctionnalites/profil/modifier_profil.dart';
+import 'package:update_camtrans/fonctionnalites/client/parametres.dart';
 import 'package:update_camtrans/fonctionnalites/profil/changer_mot_de_passe.dart';
 import 'package:update_camtrans/fonctionnalites/transporteur/historique_courses.dart';
 import 'package:update_camtrans/fonctionnalites/transporteur/entretien.dart';
@@ -61,6 +62,7 @@ class RoutesApplication {
   static const String suiviAvecId = "/suivi/:courseId"; // Route paramétrée
   static const String historique = "/historique";
   static const String factures = "/factures";
+  static const String parametres = "/parametres";
   static const String tableauBordTransporteur = "/tableau-bord-transporteur";
   static const String assistantIA = "/assistant-ia";
   static const String paiement = "/paiement";
@@ -142,6 +144,11 @@ class RoutesApplication {
         path: changerMotDePasse,
         pageBuilder: (context, state) =>
             _page(const ChangerMotDePasse(), state.pageKey),
+      ),
+      GoRoute(
+        path: parametres,
+        pageBuilder: (context, state) =>
+            _page(const Parametres(), state.pageKey),
       ),
       GoRoute(
         path: tableauBordClient,

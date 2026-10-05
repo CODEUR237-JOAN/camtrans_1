@@ -85,7 +85,7 @@ class _PopupPropositionCourseState
         ScaffoldMessenger.of(context).showSnackBar(SnackBar(
           content: Text("Course acceptée ! 🎉",
               style: GoogleFonts.inter(
-                  color: Colors.white, fontWeight: FontWeight.bold)),
+                  color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.bold)),
           backgroundColor: CouleursApp.succes,
         ));
         // Rediriger le transporteur vers SA page de suivi spécifique
@@ -116,7 +116,7 @@ class _PopupPropositionCourseState
         if (!expiration) {
           ScaffoldMessenger.of(context).showSnackBar(SnackBar(
             content: Text("Course refusée.",
-                style: GoogleFonts.inter(color: Colors.white)),
+                style: GoogleFonts.inter(color: Theme.of(context).colorScheme.onSurface)),
             backgroundColor: Colors.grey.shade800,
           ));
         }
@@ -183,7 +183,7 @@ class _PopupPropositionCourseState
                     CircularProgressIndicator(
                       value: progression,
                       strokeWidth: 8,
-                      backgroundColor: Colors.white10,
+                      backgroundColor: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1),
                       valueColor: AlwaysStoppedAnimation<Color>(
                           _secondesRestantes > 10
                               ? CouleursApp.primaire
@@ -194,7 +194,7 @@ class _PopupPropositionCourseState
                         "$_secondesRestantes",
                         style: GoogleFonts.inter(
                           color: _secondesRestantes > 10
-                              ? Colors.white
+                              ? Theme.of(context).colorScheme.onSurface
                               : CouleursApp.erreur,
                           fontSize: 32,
                           fontWeight: FontWeight.bold,
@@ -226,7 +226,7 @@ class _PopupPropositionCourseState
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: Colors.white.withValues(alpha: 0.05),
+                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05),
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Column(
@@ -236,13 +236,13 @@ class _PopupPropositionCourseState
                       children: [
                         Row(
                           children: [
-                            const Icon(Iconsax.routing_2_copy,
-                                color: Colors.white54, size: 16),
+                            Icon(Iconsax.routing_2_copy,
+                                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), size: 16),
                             const SizedBox(width: 8),
                             Text(
                                 "${widget.course.distanceKm.toStringAsFixed(1)} km",
-                                style: const TextStyle(
-                                    color: Colors.white,
+                                style: TextStyle(
+                                    color: Theme.of(context).colorScheme.onSurface,
                                     fontWeight: FontWeight.bold)),
                           ],
                         ),
@@ -260,7 +260,7 @@ class _PopupPropositionCourseState
                         ),
                       ],
                     ),
-                    const Divider(color: Colors.white10, height: 24),
+                    Divider(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1), height: 24),
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -269,8 +269,8 @@ class _PopupPropositionCourseState
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(widget.course.adresseDepart,
-                              style: const TextStyle(
-                                  color: Colors.white70, fontSize: 13),
+                              style: TextStyle(
+                                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), fontSize: 13),
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis),
                         ),
@@ -292,27 +292,27 @@ class _PopupPropositionCourseState
                   border: Border.all(
                       color: CouleursApp.succes.withValues(alpha: 0.3)),
                 ),
-                child: const Row(
+                child: Row(
                   children: [
-                    Icon(Icons.verified,
+                    const Icon(Icons.verified,
                         color: CouleursApp.succes, size: 20),
-                    SizedBox(width: 12),
+                    const SizedBox(width: 12),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
+                          const Text(
                             "Tarif Standardisé CamTrans",
                             style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 13,
                                 color: CouleursApp.succes),
                           ),
-                          SizedBox(height: 2),
+                          const SizedBox(height: 2),
                           Text(
                             "Calculé équitablement. Le prix est fixe et non négociable.",
                             style:
-                                TextStyle(color: Colors.white70, fontSize: 11),
+                                TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), fontSize: 11),
                           ),
                         ],
                       ),
@@ -333,8 +333,8 @@ class _PopupPropositionCourseState
                       child: OutlinedButton(
                         onPressed: () => _refuserCourse(),
                         style: OutlinedButton.styleFrom(
-                          foregroundColor: Colors.white70,
-                          side: const BorderSide(color: Colors.white24),
+                          foregroundColor: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                          side: BorderSide(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.24)),
                           padding: const EdgeInsets.symmetric(vertical: 16),
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12)),

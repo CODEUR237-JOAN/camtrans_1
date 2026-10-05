@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:go_router/go_router.dart';
 import 'package:update_camtrans/coeur/constantes/couleurs.dart';
@@ -23,7 +23,7 @@ class _EcranEvaluationState extends ConsumerState<EcranEvaluation> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF08111F),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -62,7 +62,7 @@ class _EcranEvaluationState extends ConsumerState<EcranEvaluation> {
               Text(
                 "Comment s'est passée votre course ?",
                 textAlign: TextAlign.center,
-                style: GoogleFonts.poppins(color: Colors.white54, fontSize: 16),
+                style: GoogleFonts.poppins(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 16),
               ),
 
               const SizedBox(height: 40),
@@ -83,7 +83,7 @@ class _EcranEvaluationState extends ConsumerState<EcranEvaluation> {
                         index < _note ? Icons.star : Icons.star_border,
                         color: index < _note
                             ? CouleursApp.avertissement
-                            : Colors.white24,
+                            : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.24),
                         size: 40,
                       )
                           .animate(target: index < _note ? 1 : 0)
@@ -101,10 +101,10 @@ class _EcranEvaluationState extends ConsumerState<EcranEvaluation> {
                 TextField(
                   controller: _commentaireController,
                   maxLines: 3,
-                  style: GoogleFonts.poppins(color: Colors.white),
+                  style: GoogleFonts.poppins(color: Theme.of(context).colorScheme.onSurface),
                   decoration: InputDecoration(
                     hintText: "Laissez un commentaire (optionnel)",
-                    hintStyle: GoogleFonts.poppins(color: Colors.white38),
+                    hintStyle: GoogleFonts.poppins(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38)),
                     filled: true,
                     fillColor: const Color(0xFF1A2640).withValues(alpha: 0.05),
                     border: OutlineInputBorder(
@@ -158,7 +158,7 @@ class _EcranEvaluationState extends ConsumerState<EcranEvaluation> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: CouleursApp.primaire,
                     foregroundColor: Colors.white,
-                    disabledBackgroundColor: Colors.white12,
+                    disabledBackgroundColor: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.12),
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16)),
                   ),

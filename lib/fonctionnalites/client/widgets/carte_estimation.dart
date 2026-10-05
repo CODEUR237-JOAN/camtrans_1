@@ -22,16 +22,16 @@ class CarteEstimationIntelligente extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Row(
+          Row(
             children: [
-              Icon(Iconsax.magic_star_copy, color: CouleursApp.primaire),
-              SizedBox(width: 8),
+              const Icon(Iconsax.magic_star_copy, color: CouleursApp.primaire),
+              const SizedBox(width: 8),
               Text(
                 "Estimation Terminée",
                 style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: 16,
-                    color: Colors.white),
+                    color: Theme.of(context).colorScheme.onSurface),
               ),
             ],
           ),
@@ -42,7 +42,7 @@ class CarteEstimationIntelligente extends StatelessWidget {
                 spacing: 16,
                 runSpacing: 16,
                 children: [
-                  _buildMetricCard(
+                  _buildMetricCard(context, 
                     constraints.maxWidth,
                     icon: Iconsax.routing_2_copy,
                     label: "Distance",
@@ -50,7 +50,7 @@ class CarteEstimationIntelligente extends StatelessWidget {
                     suffix: " km",
                     delay: 100,
                   ),
-                  _buildMetricCard(
+                  _buildMetricCard(context, 
                     constraints.maxWidth,
                     icon: Iconsax.clock_copy,
                     label: "Durée est.",
@@ -58,7 +58,7 @@ class CarteEstimationIntelligente extends StatelessWidget {
                     suffix: " min",
                     delay: 200,
                   ),
-                  _buildMetricCard(
+                  _buildMetricCard(context, 
                     constraints.maxWidth,
                     icon: Iconsax.box_copy,
                     label: "Volume",
@@ -66,7 +66,7 @@ class CarteEstimationIntelligente extends StatelessWidget {
                     suffix: " m³",
                     delay: 300,
                   ),
-                  _buildMetricCard(
+                  _buildMetricCard(context, 
                     constraints.maxWidth,
                     icon: Iconsax.weight_copy,
                     label: "Poids",
@@ -92,8 +92,8 @@ class CarteEstimationIntelligente extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text("Véhicule Recommandé",
-                          style: TextStyle(color: Colors.white70, fontSize: 13),
+                      Text("Véhicule Recommandé",
+                          style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), fontSize: 13),
                           overflow: TextOverflow.ellipsis),
                       const SizedBox(height: 4),
                       Row(
@@ -104,10 +104,10 @@ class CarteEstimationIntelligente extends StatelessWidget {
                           Expanded(
                             child: Text(
                               resultat.vehiculeRecommande,
-                              style: const TextStyle(
+                              style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 16,
-                                  color: Colors.white),
+                                  color: Theme.of(context).colorScheme.onSurface),
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
@@ -122,8 +122,8 @@ class CarteEstimationIntelligente extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
-                      const Text("Coût Estimé",
-                          style: TextStyle(color: Colors.white70, fontSize: 13),
+                      Text("Coût Estimé",
+                          style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), fontSize: 13),
                           overflow: TextOverflow.ellipsis),
                       const SizedBox(height: 4),
                       // Compteur d'animation pour le prix
@@ -156,7 +156,7 @@ class CarteEstimationIntelligente extends StatelessWidget {
     );
   }
 
-  Widget _buildMetricCard(double parentWidth,
+  Widget _buildMetricCard(BuildContext context, double parentWidth,
       {required IconData icon,
       required String label,
       required double value,
@@ -169,18 +169,18 @@ class CarteEstimationIntelligente extends StatelessWidget {
       width: width,
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.05),
+        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+        border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1)),
       ),
       child: Row(
         children: [
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.1),
+                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1),
                 shape: BoxShape.circle),
-            child: Icon(icon, size: 16, color: Colors.white),
+            child: Icon(icon, size: 16, color: Theme.of(context).colorScheme.onSurface),
           ),
           const SizedBox(width: 8),
           Expanded(
@@ -189,7 +189,7 @@ class CarteEstimationIntelligente extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(label,
-                    style: const TextStyle(fontSize: 10, color: Colors.white70),
+                    style: TextStyle(fontSize: 10, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)),
                     overflow: TextOverflow.ellipsis),
                 FittedBox(
                   fit: BoxFit.scaleDown,
@@ -205,16 +205,16 @@ class CarteEstimationIntelligente extends StatelessWidget {
                         builder: (context, val, child) {
                           return Text(
                             val.toStringAsFixed(1),
-                            style: const TextStyle(
+                            style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 15,
-                                color: Colors.white),
+                                color: Theme.of(context).colorScheme.onSurface),
                           );
                         },
                       ),
                       Text(suffix,
-                          style: const TextStyle(
-                              fontSize: 11, color: Colors.white70)),
+                          style: TextStyle(
+                              fontSize: 11, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7))),
                     ],
                   ),
                 ),

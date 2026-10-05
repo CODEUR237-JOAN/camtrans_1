@@ -254,7 +254,7 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
 
     return Scaffold(
       extendBodyBehindAppBar: true,
-      backgroundColor: const Color(0xFF08111F),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -277,9 +277,9 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
         children: [
           // Background Gradient Sombre
           Container(
-            decoration: const BoxDecoration(
+            decoration: BoxDecoration(
               gradient: LinearGradient(
-                colors: [Color(0xFF08111F), Color(0xFF111827)],
+                colors: [Theme.of(context).scaffoldBackgroundColor, const Color(0xFF111827)],
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
               ),
@@ -393,7 +393,7 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
           final isActive = stepNum == currentStep;
           final isCompleted = stepNum < currentStep;
 
-          Color circleColor = const Color(0xFF10192A);
+          Color circleColor = Theme.of(context).colorScheme.surface;
           Color textColor = const Color(0xFF475569);
 
           if (isCompleted) {
@@ -401,7 +401,7 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
             textColor = CouleursApp.succes;
           } else if (isActive) {
             circleColor = CouleursApp.primaire;
-            textColor = Colors.white;
+            textColor = Theme.of(context).colorScheme.onSurface;
           }
 
           return Expanded(
@@ -429,7 +429,7 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
                                 fontSize: 10,
                                 fontWeight: FontWeight.bold,
                                 color: isActive
-                                    ? Colors.white
+                                    ? Theme.of(context).colorScheme.onSurface
                                     : const Color(0xFF94A3B8),
                               ),
                             ),
@@ -460,7 +460,7 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
                               colors: [Color(0xFF007ACC), Color(0xFF3B82F6)],
                             )
                           : null,
-                      color: isCompleted ? null : const Color(0xFF10192A),
+                      color: isCompleted ? null : Theme.of(context).colorScheme.surface,
                     ),
                   ),
                 ),
@@ -480,13 +480,13 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
           style: GoogleFonts.poppins(
               fontSize: 24,
               fontWeight: FontWeight.w700,
-              color: Colors.white,
+              color: Theme.of(context).colorScheme.onSurface,
               letterSpacing: -0.5),
         ),
         const SizedBox(height: 8),
         Text(
           subtitle,
-          style: GoogleFonts.poppins(fontSize: 14, color: Colors.white54),
+          style: GoogleFonts.poppins(fontSize: 14, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54)),
         ),
         const SizedBox(height: 24),
       ],
@@ -524,7 +524,7 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
                     Text(
                       "Marque du véhicule",
                       style: GoogleFonts.poppins(
-                        color: Colors.white,
+                        color: Theme.of(context).colorScheme.onSurface,
                         fontWeight: FontWeight.w600,
                         fontSize: 14,
                       ),
@@ -571,12 +571,12 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
                             color: isSelected
                                 ? const Color(0xFF007ACC)
                                     .withValues(alpha: 0.18)
-                                : const Color(0xFF10192A),
+                                : Theme.of(context).colorScheme.surface,
                             borderRadius: BorderRadius.circular(24),
                             border: Border.all(
                               color: isSelected
                                   ? const Color(0xFF007ACC)
-                                  : Colors.white.withValues(alpha: 0.08),
+                                  : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08),
                               width: isSelected ? 2 : 1,
                             ),
                             boxShadow: isSelected
@@ -601,7 +601,7 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
                             style: GoogleFonts.inter(
                               color: isSelected
                                   ? const Color(0xFF007ACC)
-                                  : Colors.white60,
+                                  : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                               fontWeight: isSelected
                                   ? FontWeight.w700
                                   : FontWeight.w400,
@@ -628,7 +628,7 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
                     Text(
                       "Modèle",
                       style: GoogleFonts.poppins(
-                        color: Colors.white,
+                        color: Theme.of(context).colorScheme.onSurface,
                         fontWeight: FontWeight.w600,
                         fontSize: 14,
                       ),
@@ -669,7 +669,7 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
                                     color: Color(0xFF007ACC), size: 28)
                                 .animate(onPlay: (c) => c.repeat())
                                 .shimmer(
-                                    duration: 900.ms, color: Colors.white70)
+                                    duration: 900.ms, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7))
                                 .then()
                                 .scale(
                                   begin: const Offset(0.9, 0.9),
@@ -688,7 +688,7 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
                             Text(
                               "Analyse du véhicule en cours…",
                               style: GoogleFonts.inter(
-                                  color: Colors.white54, fontSize: 13),
+                                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 13),
                             ),
                           ],
                         ),
@@ -717,7 +717,7 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
                         Text(
                           "Masse estimée : ~",
                           style: GoogleFonts.inter(
-                              color: Colors.white70, fontSize: 14),
+                              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), fontSize: 14),
                         ),
                         TweenAnimationBuilder<double>(
                           key: ValueKey(etat.masseEstimeeKg),
@@ -765,7 +765,7 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
                 label: const Text("Ajouter des photos (Optionnel)"),
                 style: OutlinedButton.styleFrom(
                   foregroundColor: Colors.white,
-                  side: BorderSide(color: Colors.white.withValues(alpha: 0.2)),
+                  side: BorderSide(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.2)),
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12)),
                   padding:
@@ -796,10 +796,10 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
                                       Container(
                                           width: 80,
                                           height: 80,
-                                          color: Colors.white
+                                          color: Theme.of(context).colorScheme.onSurface
                                               .withValues(alpha: 0.3),
-                                          child: const Icon(Icons.image,
-                                              color: Colors.white54)),
+                                          child: Icon(Icons.image,
+                                              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54))),
                                 ),
                               ),
                               Positioned(
@@ -809,11 +809,11 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
                                   onTap: () => notifier.supprimerPhoto(index),
                                   child: Container(
                                     padding: const EdgeInsets.all(4),
-                                    decoration: const BoxDecoration(
-                                        color: Colors.white54,
+                                    decoration: BoxDecoration(
+                                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54),
                                         shape: BoxShape.circle),
-                                    child: const Icon(Icons.close,
-                                        size: 14, color: Colors.white),
+                                    child: Icon(Icons.close,
+                                        size: 14, color: Theme.of(context).colorScheme.onSurface),
                                   ),
                                 ),
                               )
@@ -885,10 +885,10 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
         decoration: BoxDecoration(
           color: isSelected
               ? color.withValues(alpha: 0.1)
-              : const Color(0xFF10192A).withValues(alpha: 0.5),
+              : Theme.of(context).colorScheme.surface.withValues(alpha: 0.5),
           borderRadius: BorderRadius.circular(24),
           border: Border.all(
-            color: isSelected ? color : Colors.white.withValues(alpha: 0.05),
+            color: isSelected ? color : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05),
             width: isSelected ? 2 : 1,
           ),
         ),
@@ -909,11 +909,11 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
                       style: GoogleFonts.poppins(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,
-                          color: Colors.white)),
+                          color: Theme.of(context).colorScheme.onSurface)),
                   const SizedBox(height: 4),
                   Text(desc,
                       style: GoogleFonts.poppins(
-                          fontSize: 12, color: Colors.white54)),
+                          fontSize: 12, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54))),
                 ],
               ),
             ),
@@ -993,23 +993,23 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
                   return TextField(
                     controller: controller,
                     focusNode: focusNode,
-                    style: const TextStyle(color: Colors.white),
+                    style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
                     decoration: InputDecoration(
                       hintText: "Entrez un nom de quartier",
-                      hintStyle: const TextStyle(color: Colors.white54),
-                      prefixIcon: const Icon(Iconsax.location_add_copy,
-                          color: Colors.white70),
+                      hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54)),
+                      prefixIcon: Icon(Iconsax.location_add_copy,
+                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)),
                       filled: true,
-                      fillColor: const Color(0xFF10192A),
+                      fillColor: Theme.of(context).colorScheme.surface,
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(16),
                         borderSide: BorderSide(
-                            color: Colors.white.withValues(alpha: 0.1)),
+                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1)),
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(16),
                         borderSide: BorderSide(
-                            color: Colors.white.withValues(alpha: 0.07)),
+                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.07)),
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(16),
@@ -1025,7 +1025,7 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
                     child: Material(
                       elevation: 4.0,
                       borderRadius: BorderRadius.circular(16),
-                      color: const Color(0xFF10192A),
+                      color: Theme.of(context).colorScheme.surface,
                       child: Container(
                         width: MediaQuery.of(context).size.width -
                             64, // Ajustement largeur
@@ -1037,10 +1037,10 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
                           itemBuilder: (BuildContext context, int index) {
                             final option = options.elementAt(index);
                             return ListTile(
-                              leading: const Icon(Icons.location_city,
-                                  color: Colors.white54, size: 20),
+                              leading: Icon(Icons.location_city,
+                                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), size: 20),
                               title: Text(option,
-                                  style: const TextStyle(color: Colors.white)),
+                                  style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
                               onTap: () => onSelected(option),
                             );
                           },
@@ -1089,9 +1089,9 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: const Color(0xFF08111F).withValues(alpha: 0.9),
+        color: Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.9),
         border: Border(
-            top: BorderSide(color: Colors.white.withValues(alpha: 0.06))),
+            top: BorderSide(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.06))),
       ),
       child: SafeArea(
         top: false,
@@ -1186,7 +1186,7 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
       onChanged: onChanged,
       maxLines: maxLines,
       style:
-          GoogleFonts.poppins(color: Colors.white, fontWeight: FontWeight.w500),
+          GoogleFonts.poppins(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.w500),
       decoration: InputDecoration(
         hintText: hint,
         hintStyle: GoogleFonts.poppins(
@@ -1210,17 +1210,17 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
               )
             : null,
         filled: true,
-        fillColor: const Color(0xFF08111F).withValues(alpha: 0.7),
+        fillColor: Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.7),
         contentPadding:
             const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
         border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),
             borderSide:
-                BorderSide(color: Colors.white.withValues(alpha: 0.07))),
+                BorderSide(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.07))),
         enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),
             borderSide:
-                BorderSide(color: Colors.white.withValues(alpha: 0.07))),
+                BorderSide(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.07))),
         focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),
             borderSide: const BorderSide(color: Color(0xFF3B82F6), width: 1.5)),
@@ -1242,14 +1242,14 @@ class _GlassCard extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: const Color(0xFF10192A).withValues(alpha: 0.45),
+            color: Theme.of(context).colorScheme.surface.withValues(alpha: 0.45),
             borderRadius: BorderRadius.circular(24),
             border: Border.all(
-              color: Colors.white.withValues(alpha: 0.08),
+              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08),
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.white.withValues(alpha: 0.05),
+                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05),
                 blurRadius: 20,
                 spreadRadius: -5,
               ),
@@ -1275,11 +1275,11 @@ class _GlassButton extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
-          color: Colors.white.withValues(alpha: 0.1),
+          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1),
           shape: BoxShape.circle,
-          border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+          border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1)),
         ),
-        child: Icon(icon, color: Colors.white, size: 20),
+        child: Icon(icon, color: Theme.of(context).colorScheme.onSurface, size: 20),
       ),
     );
   }
@@ -1413,7 +1413,7 @@ class _AnimatedRadarSearchState extends State<AnimatedRadarSearch> {
                 ],
               ),
               child: Icon(isFinished ? Icons.check : Icons.search,
-                  color: Colors.white, size: 30),
+                  color: Theme.of(context).colorScheme.onSurface, size: 30),
             )
                 .animate(
                   target: isFinished ? 0 : 1,
@@ -1434,7 +1434,7 @@ class _AnimatedRadarSearchState extends State<AnimatedRadarSearch> {
             key: ValueKey<int>(_step),
             textAlign: TextAlign.center,
             style: GoogleFonts.poppins(
-              color: isFinished ? CouleursApp.succes : Colors.white,
+              color: isFinished ? CouleursApp.succes : Theme.of(context).colorScheme.onSurface,
               fontSize: 18,
               fontWeight: FontWeight.bold,
             ),
@@ -1446,7 +1446,7 @@ class _AnimatedRadarSearchState extends State<AnimatedRadarSearch> {
             "Un instant, nous trouvons le meilleur chauffeur pour votre trajet.",
             textAlign: TextAlign.center,
             style: GoogleFonts.poppins(
-              color: Colors.white70,
+              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
               fontSize: 14,
               fontWeight: FontWeight.w600,
             ),

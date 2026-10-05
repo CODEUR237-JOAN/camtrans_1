@@ -79,11 +79,11 @@ class _ResumeExpeditionBottomSheetState
           ? const EdgeInsets.all(16)
           : EdgeInsets.zero,
       decoration: BoxDecoration(
-        color: const Color(0xFF08111F).withValues(alpha: 0.95),
+        color: Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.95),
         borderRadius: etat.categorieService == "Remorque"
             ? BorderRadius.circular(24.0)
             : const BorderRadius.vertical(top: Radius.circular(24.0)),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+        border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1)),
         boxShadow: [
           BoxShadow(
               color: Colors.black.withValues(alpha: 0.3),
@@ -101,7 +101,7 @@ class _ResumeExpeditionBottomSheetState
               height: 4,
               margin: const EdgeInsets.only(bottom: 12),
               decoration: BoxDecoration(
-                color: Colors.white24,
+                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.24),
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -121,13 +121,13 @@ class _ResumeExpeditionBottomSheetState
                           style:
                               Theme.of(context).textTheme.titleLarge?.copyWith(
                                     fontWeight: FontWeight.bold,
-                                    color: Colors.white,
+                                    color: Theme.of(context).colorScheme.onSurface,
                                   ),
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
                       IconButton(
-                        icon: const Icon(Icons.close, color: Colors.white),
+                        icon: Icon(Icons.close, color: Theme.of(context).colorScheme.onSurface),
                         onPressed: () => Navigator.pop(context),
                       ),
                     ],
@@ -262,27 +262,27 @@ class _ResumeExpeditionBottomSheetState
                                 color:
                                     CouleursApp.succes.withValues(alpha: 0.3)),
                           ),
-                          child: const Row(
+                          child: Row(
                             children: [
-                              Icon(Icons.verified,
+                              const Icon(Icons.verified,
                                   color: CouleursApp.succes, size: 20),
-                              SizedBox(width: 12),
+                              const SizedBox(width: 12),
                               Expanded(
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text(
+                                    const Text(
                                       "Tarif Standardisé CamTrans",
                                       style: TextStyle(
                                           fontWeight: FontWeight.bold,
                                           fontSize: 13,
                                           color: CouleursApp.succes),
                                     ),
-                                    SizedBox(height: 2),
+                                    const SizedBox(height: 2),
                                     Text(
                                       "Calculé équitablement selon la distance et le volume. Sans négociation.",
                                       style: TextStyle(
-                                          color: Colors.white70, fontSize: 11),
+                                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), fontSize: 11),
                                     ),
                                   ],
                                 ),
@@ -479,13 +479,13 @@ class _ResumeExpeditionBottomSheetState
                             .read(demandeExpeditionProvider.notifier)
                             .reinitialiser();
                         messenger.showSnackBar(
-                          const SnackBar(
+                          SnackBar(
                             content: Row(
                               children: [
                                 Icon(Icons.no_transfer_rounded,
-                                    color: Colors.white),
-                                SizedBox(width: 12),
-                                Expanded(
+                                    color: Theme.of(context).colorScheme.onSurface),
+                                const SizedBox(width: 12),
+                                const Expanded(
                                   child: Text(
                                     "Réessayez plus tard : aucun véhicule disponible pour le moment.",
                                   ),
@@ -494,7 +494,7 @@ class _ResumeExpeditionBottomSheetState
                             ),
                             backgroundColor: CouleursApp.erreur,
                             behavior: SnackBarBehavior.floating,
-                            duration: Duration(seconds: 5),
+                            duration: const Duration(seconds: 5),
                           ),
                         );
                         routeur.go('/tableau-bord-client');
@@ -595,8 +595,8 @@ class _ResumeExpeditionBottomSheetState
                         SnackBar(
                           content: Row(
                             children: [
-                              const Icon(Icons.check_circle,
-                                  color: Colors.white),
+                              Icon(Icons.check_circle,
+                                  color: Theme.of(context).colorScheme.onSurface),
                               const SizedBox(width: 12),
                               Expanded(
                                   child: Text(
@@ -668,14 +668,14 @@ class _ResumeExpeditionBottomSheetState
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(label,
-                  style: const TextStyle(color: Colors.white54, fontSize: 12)),
+                  style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 12)),
               const SizedBox(height: 2),
               Text(
                 value,
-                style: const TextStyle(
+                style: TextStyle(
                     fontWeight: FontWeight.w600,
                     fontSize: 14,
-                    color: Colors.white),
+                    color: Theme.of(context).colorScheme.onSurface),
               ),
             ],
           ),

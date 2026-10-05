@@ -73,7 +73,7 @@ class _ParametresState extends ConsumerState<Parametres> {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
-        backgroundColor: const Color(0xFF10192A),
+        backgroundColor: Theme.of(context).colorScheme.surface,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: Text(
           'Déconnexion',
@@ -82,13 +82,13 @@ class _ParametresState extends ConsumerState<Parametres> {
         ),
         content: Text(
           'Êtes-vous sûr de vouloir vous déconnecter de CamTrans ?',
-          style: GoogleFonts.inter(color: Colors.white70, height: 1.5),
+          style: GoogleFonts.inter(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), height: 1.5),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
             child: Text('Annuler',
-                style: GoogleFonts.inter(color: Colors.white54)),
+                style: GoogleFonts.inter(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5))),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
@@ -228,7 +228,7 @@ class _ParametresState extends ConsumerState<Parametres> {
     HapticFeedback.selectionClick();
     showModalBottomSheet(
       context: context,
-      backgroundColor: const Color(0xFF0C1524),
+      backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
@@ -249,7 +249,7 @@ class _ParametresState extends ConsumerState<Parametres> {
                 width: 44,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: Colors.white24,
+                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -272,12 +272,12 @@ class _ParametresState extends ConsumerState<Parametres> {
                     children: [
                       Text(titre,
                           style: GoogleFonts.inter(
-                              color: Colors.white,
+                              color: Theme.of(context).colorScheme.onSurface,
                               fontWeight: FontWeight.bold,
                               fontSize: 18)),
                       Text(sousTitre,
                           style: GoogleFonts.inter(
-                              color: Colors.white54, fontSize: 13, height: 1.4)),
+                              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5), fontSize: 13, height: 1.4)),
                     ],
                   ),
                 ),
@@ -302,7 +302,7 @@ class _ParametresState extends ConsumerState<Parametres> {
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
       decoration: BoxDecoration(
-        color: const Color(0xFF10192A),
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: CouleursApp.bordureSombre),
       ),
@@ -318,14 +318,14 @@ class _ParametresState extends ConsumerState<Parametres> {
         ),
         title: Text(titre,
             style: GoogleFonts.inter(
-                color: couleur ?? Colors.white,
+                color: couleur ?? Theme.of(context).colorScheme.onSurface,
                 fontWeight: FontWeight.w600,
                 fontSize: 14)),
         subtitle: Text(sousTitre,
             style:
-                GoogleFonts.inter(color: Colors.white54, fontSize: 12, height: 1.4)),
+                GoogleFonts.inter(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5), fontSize: 12, height: 1.4)),
         trailing:
-            const Icon(Icons.arrow_forward_ios, size: 13, color: Colors.white38),
+            Icon(Icons.arrow_forward_ios, size: 13, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4)),
         onTap: onTap,
       ),
     );
@@ -343,7 +343,7 @@ class _ParametresState extends ConsumerState<Parametres> {
         margin: const EdgeInsets.only(bottom: 10),
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
         decoration: BoxDecoration(
-          color: const Color(0xFF10192A),
+          color: Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(color: CouleursApp.bordureSombre),
         ),
@@ -364,19 +364,19 @@ class _ParametresState extends ConsumerState<Parametres> {
                 children: [
                   Text(titre,
                       style: GoogleFonts.inter(
-                          color: Colors.white,
+                          color: Theme.of(context).colorScheme.onSurface,
                           fontWeight: FontWeight.w600,
                           fontSize: 14)),
                   Text(sousTitre,
                       style: GoogleFonts.inter(
-                          color: Colors.white54, fontSize: 12, height: 1.4)),
+                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5), fontSize: 12, height: 1.4)),
                 ],
               ),
             ),
             Switch(
               value: valeur,
               activeThumbColor: CouleursApp.accentViolet,
-              inactiveTrackColor: Colors.white12,
+              inactiveTrackColor: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1),
               onChanged: (v) {
                 setSheetState(() {});
                 onChange(v);
@@ -405,7 +405,7 @@ class _ParametresState extends ConsumerState<Parametres> {
           Expanded(
             child: Text(texte,
                 style: GoogleFonts.inter(
-                    color: Colors.white70, fontSize: 12.5, height: 1.5)),
+                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), fontSize: 12.5, height: 1.5)),
           ),
         ],
       ),
@@ -423,20 +423,20 @@ class _ParametresState extends ConsumerState<Parametres> {
         : '...';
 
     return Scaffold(
-      backgroundColor: const Color(0xFF08111F),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF08111F),
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         elevation: 0,
         systemOverlayStyle: SystemUiOverlayStyle.light,
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(Iconsax.arrow_left_2_copy, color: Colors.white),
+          icon: Icon(Iconsax.arrow_left_2_copy, color: Theme.of(context).colorScheme.onSurface),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
           'Paramètres',
           style: GoogleFonts.inter(
-              color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18),
+              color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.bold, fontSize: 18),
         ),
       ),
       body: ListView(
@@ -548,7 +548,7 @@ class _ParametresState extends ConsumerState<Parametres> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
             decoration: BoxDecoration(
-              color: const Color(0xFF10192A),
+              color: Theme.of(context).colorScheme.surface,
               borderRadius: BorderRadius.circular(16),
               border: Border.all(color: CouleursApp.bordureSombre),
             ),
@@ -569,12 +569,12 @@ class _ParametresState extends ConsumerState<Parametres> {
                   children: [
                     Text('Version de l\'application',
                         style: GoogleFonts.inter(
-                            color: Colors.white,
+                            color: Theme.of(context).colorScheme.onSurface,
                             fontWeight: FontWeight.w600,
                             fontSize: 14)),
                     Text('1.0.0 — Production',
                         style: GoogleFonts.inter(
-                            color: Colors.white54, fontSize: 12)),
+                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5), fontSize: 12)),
                   ],
                 ),
               ],
@@ -639,13 +639,13 @@ class _ParametresState extends ConsumerState<Parametres> {
         children: [
           CircleAvatar(
             radius: 28,
-            backgroundColor: Colors.white.withValues(alpha: 0.2),
+            backgroundColor: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.2),
             child: Text(
               nom.isNotEmpty ? nom[0].toUpperCase() : 'C',
               style: GoogleFonts.inter(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
-                  color: Colors.white),
+                  color: Theme.of(context).colorScheme.onSurface),
             ),
           ),
           const SizedBox(width: 16),
@@ -656,7 +656,7 @@ class _ParametresState extends ConsumerState<Parametres> {
                 Text(
                   nom,
                   style: GoogleFonts.inter(
-                      color: Colors.white,
+                      color: Theme.of(context).colorScheme.onSurface,
                       fontWeight: FontWeight.bold,
                       fontSize: 16),
                   overflow: TextOverflow.ellipsis,
@@ -664,7 +664,7 @@ class _ParametresState extends ConsumerState<Parametres> {
                 const SizedBox(height: 2),
                 Text(
                   email,
-                  style: GoogleFonts.inter(color: Colors.white70, fontSize: 13),
+                  style: GoogleFonts.inter(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), fontSize: 13),
                   overflow: TextOverflow.ellipsis,
                 ),
               ],
@@ -698,7 +698,7 @@ class _ParametresState extends ConsumerState<Parametres> {
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       decoration: BoxDecoration(
-        color: const Color(0xFF10192A),
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: CouleursApp.bordureSombre),
       ),
@@ -719,12 +719,12 @@ class _ParametresState extends ConsumerState<Parametres> {
               children: [
                 Text(titre,
                     style: GoogleFonts.inter(
-                        color: Colors.white,
+                        color: Theme.of(context).colorScheme.onSurface,
                         fontWeight: FontWeight.w600,
                         fontSize: 14)),
                 Text(sousTitre,
                     style: GoogleFonts.inter(
-                        color: Colors.white54, fontSize: 12, height: 1.4)),
+                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5), fontSize: 12, height: 1.4)),
               ],
             ),
           ),
@@ -732,7 +732,7 @@ class _ParametresState extends ConsumerState<Parametres> {
             value: valeur,
             onChanged: onChange,
             activeThumbColor: couleur,
-            inactiveTrackColor: Colors.white12,
+            inactiveTrackColor: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1),
           ),
         ],
       ),
@@ -747,7 +747,7 @@ class _ParametresState extends ConsumerState<Parametres> {
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
       decoration: BoxDecoration(
-        color: const Color(0xFF10192A),
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: CouleursApp.bordureSombre),
       ),
@@ -764,10 +764,10 @@ class _ParametresState extends ConsumerState<Parametres> {
         title: Text(
           titre,
           style: GoogleFonts.inter(
-              color: Colors.white, fontWeight: FontWeight.w500, fontSize: 14),
+              color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.w500, fontSize: 14),
         ),
-        trailing: const Icon(Icons.arrow_forward_ios,
-            size: 14, color: Colors.white38),
+        trailing: Icon(Icons.arrow_forward_ios,
+            size: 14, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4)),
         onTap: () {
           HapticFeedback.selectionClick();
           onTap();

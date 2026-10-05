@@ -23,13 +23,13 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
     final notificationsAsync = ref.watch(fluxNotificationsProvider);
 
     return Scaffold(
-      backgroundColor: const Color(0xFF08111F),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        title: const Text("Notifications",
-            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white)),
-        backgroundColor: const Color(0xFF08111F),
+        title: Text("Notifications",
+            style: TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface)),
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.white),
+        iconTheme: IconThemeData(color: Theme.of(context).colorScheme.onSurface),
         automaticallyImplyLeading: false,
         actions: [
           notificationsAsync.maybeWhen(
@@ -81,11 +81,11 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
                         children: [
                           Icon(Icons.notifications_none,
                               size: 80,
-                              color: Colors.white.withValues(alpha: 0.1)),
+                              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1)),
                           const SizedBox(height: 16),
-                          const Text("Aucune notification",
+                          Text("Aucune notification",
                               style: TextStyle(
-                                  color: Colors.white54,
+                                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54),
                                   fontWeight: FontWeight.bold)),
                         ],
                       ),
@@ -136,14 +136,14 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
     final dateStr = DateFormat('dd/MM').format(notification.dateCreation);
 
     return Card(
-      color: const Color(0xFF10192A),
+      color: Theme.of(context).colorScheme.surface,
       margin: const EdgeInsets.only(bottom: 15),
       elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(18),
         side: BorderSide(
             color: notification.lue
-                ? Colors.white.withValues(alpha: 0.05)
+                ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05)
                 : couleur.withValues(alpha: 0.3)),
       ),
       child: ListTile(
@@ -163,13 +163,13 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
           children: [
             const SizedBox(height: 4),
             Text(notification.message,
-                style: const TextStyle(color: Colors.white38, fontSize: 13)),
+                style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), fontSize: 13)),
             const SizedBox(height: 8),
             Row(
               children: [
                 Text("$dateStr à $timeStr",
                     style:
-                        const TextStyle(fontSize: 11, color: Colors.white54)),
+                        TextStyle(fontSize: 11, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54))),
                 const Spacer(),
                 if (!notification.lue)
                   Container(
@@ -218,7 +218,7 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
         },
         selectedColor: CouleursApp.primaire,
         labelStyle:
-            TextStyle(color: filtre == valeur ? Colors.white : Colors.white54),
+            TextStyle(color: filtre == valeur ? Theme.of(context).colorScheme.onSurface : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54)),
       ),
     );
   }

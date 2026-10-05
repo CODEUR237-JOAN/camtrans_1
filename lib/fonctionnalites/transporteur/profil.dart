@@ -22,11 +22,11 @@ class ProfilTransporteur extends ConsumerWidget {
     final auth = ref.watch(serviceAuthentificationProvider);
 
     return Scaffold(
-      backgroundColor: const Color(0xFF08111F),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         title: const Text("Mon profil",
             style: TextStyle(fontWeight: FontWeight.bold)),
-        backgroundColor: const Color(0xFF08111F),
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         elevation: 0,
         automaticallyImplyLeading: false,
       ),
@@ -88,7 +88,7 @@ class ProfilTransporteur extends ConsumerWidget {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(20),
                     side:
-                        BorderSide(color: Colors.white.withValues(alpha: 0.08)),
+                        BorderSide(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08)),
                   ),
                   child: Column(
                     children: [
@@ -133,7 +133,7 @@ class ProfilTransporteur extends ConsumerWidget {
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(20),
                     side:
-                        BorderSide(color: Colors.white.withValues(alpha: 0.08)),
+                        BorderSide(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08)),
                   ),
                   child: Column(
                     children: [
@@ -259,14 +259,14 @@ class ProfilTransporteur extends ConsumerWidget {
 
                 const SizedBox(height: 25),
 
-                _boutonOption(Icons.workspace_premium, "Mes abonnements",
+                _boutonOption(context, Icons.workspace_premium, "Mes abonnements",
                     () => context.push(RoutesApplication.abonnement)),
-                _boutonOption(Icons.edit, "Modifier le profil",
+                _boutonOption(context, Icons.edit, "Modifier le profil",
                     () => context.push(RoutesApplication.modifierProfil)),
-                _boutonOption(Icons.lock, "Changer le mot de passe",
+                _boutonOption(context, Icons.lock, "Changer le mot de passe",
                     () => context.push(RoutesApplication.changerMotDePasse)),
-                _boutonOption(Icons.settings, "Paramètres", () {}),
-                _boutonOption(Icons.help, "Aide & Support", () {}),
+                _boutonOption(context, Icons.settings, "Paramètres", () {}),
+                _boutonOption(context, Icons.help, "Aide & Support", () {}),
 
                 const SizedBox(height: 25),
 
@@ -303,19 +303,19 @@ class ProfilTransporteur extends ConsumerWidget {
     );
   }
 
-  Widget _boutonOption(IconData icone, String texte, VoidCallback action) {
+  Widget _boutonOption(BuildContext context, IconData icone, String texte, VoidCallback action) {
     return Card(
       elevation: 0,
       margin: const EdgeInsets.only(bottom: 12),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(15),
-        side: BorderSide(color: Colors.white.withValues(alpha: 0.07)),
+        side: BorderSide(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.07)),
       ),
       child: ListTile(
         leading: Icon(icone, color: CouleursApp.primaire),
         title: Text(texte, style: const TextStyle(fontWeight: FontWeight.w600)),
-        trailing: const Icon(Icons.arrow_forward_ios,
-            size: 16, color: Colors.white54),
+        trailing: Icon(Icons.arrow_forward_ios,
+            size: 16, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54)),
         onTap: action,
       ),
     );
@@ -360,12 +360,12 @@ class ProfilTransporteur extends ConsumerWidget {
           Row(
             children: [
               Icon(estValide ? Icons.verified : Icons.warning_amber_rounded,
-                  color: Colors.white, size: 28),
+                  color: Theme.of(context).colorScheme.onSurface, size: 28),
               const SizedBox(width: 10),
-              const Text(
+              Text(
                 "Statut de l'abonnement",
                 style: TextStyle(
-                    color: Colors.white,
+                    color: Theme.of(context).colorScheme.onSurface,
                     fontWeight: FontWeight.bold,
                     fontSize: 18),
               ),
@@ -375,35 +375,35 @@ class ProfilTransporteur extends ConsumerWidget {
           if (estValide) ...[
             Text(
               "Il vous reste $joursRestants jour(s)",
-              style: const TextStyle(
-                  color: Colors.white,
+              style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface,
                   fontSize: 22,
                   fontWeight: FontWeight.w900),
             ),
             const SizedBox(height: 5),
             Text(
               "Valide jusqu'au ${DateFormat('dd/MM/yyyy à HH:mm').format(transporteur.dateFinAbonnement!)}",
-              style: const TextStyle(color: Colors.white70, fontSize: 13),
+              style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), fontSize: 13),
             ),
           ] else ...[
-            const Text(
+            Text(
               "Abonnement expiré",
               style: TextStyle(
-                  color: Colors.white,
+                  color: Theme.of(context).colorScheme.onSurface,
                   fontSize: 22,
                   fontWeight: FontWeight.w900),
             ),
             const SizedBox(height: 5),
-            const Text(
+            Text(
               "Veuillez renouveler votre abonnement pour continuer à recevoir des courses.",
-              style: TextStyle(color: Colors.white70, fontSize: 13),
+              style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), fontSize: 13),
             ),
           ],
           const SizedBox(height: 15),
           ElevatedButton(
             onPressed: () => context.push(RoutesApplication.abonnement),
             style: ElevatedButton.styleFrom(
-              backgroundColor: const Color(0xFF08111F),
+              backgroundColor: Theme.of(context).scaffoldBackgroundColor,
               foregroundColor: estValide ? CouleursApp.primaire : Colors.red,
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10)),

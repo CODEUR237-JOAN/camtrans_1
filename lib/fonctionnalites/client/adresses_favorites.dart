@@ -88,18 +88,18 @@ class _AdressesFavoritesPageState extends ConsumerState<AdressesFavoritesPage> {
     final confirm = await showDialog<bool>(
       context: context,
       builder: (_) => AlertDialog(
-        backgroundColor: const Color(0xFF10192A),
+        backgroundColor: Theme.of(context).colorScheme.surface,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: Text('Supprimer l\'adresse ?',
             style: GoogleFonts.inter(
-                color: Colors.white, fontWeight: FontWeight.bold)),
+                color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.bold)),
         content: Text('Cette action est irréversible.',
-            style: GoogleFonts.inter(color: Colors.white70)),
+            style: GoogleFonts.inter(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7))),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
             child: Text('Annuler',
-                style: GoogleFonts.inter(color: Colors.white54)),
+                style: GoogleFonts.inter(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54))),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
@@ -148,20 +148,20 @@ class _AdressesFavoritesPageState extends ConsumerState<AdressesFavoritesPage> {
     final clientAsync = ref.watch(currentClientProvider);
 
     return Scaffold(
-      backgroundColor: const Color(0xFF08111F),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF08111F),
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         elevation: 0,
         systemOverlayStyle: SystemUiOverlayStyle.light,
         centerTitle: true,
         leading: IconButton(
-          icon: const Icon(Iconsax.arrow_left_2_copy, color: Colors.white),
+          icon: Icon(Iconsax.arrow_left_2_copy, color: Theme.of(context).colorScheme.onSurface),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
           'Adresses favorites',
           style: GoogleFonts.inter(
-              color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18),
+              color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.bold, fontSize: 18),
         ),
       ),
       body: SafeArea(
@@ -169,12 +169,12 @@ class _AdressesFavoritesPageState extends ConsumerState<AdressesFavoritesPage> {
           loading: () => const LoaderPage(),
           error: (e, _) => Center(
               child: Text('Erreur de chargement.',
-                  style: GoogleFonts.inter(color: Colors.white70))),
+                  style: GoogleFonts.inter(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)))),
           data: (client) {
             if (client == null) {
               return Center(
                   child: Text('Utilisateur non connecté.',
-                      style: GoogleFonts.inter(color: Colors.white70)));
+                      style: GoogleFonts.inter(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7))));
             }
 
             // Décodage des entrées "Label|Adresse"
@@ -191,13 +191,13 @@ class _AdressesFavoritesPageState extends ConsumerState<AdressesFavoritesPage> {
                     style: GoogleFonts.inter(
                         fontSize: 22,
                         fontWeight: FontWeight.w700,
-                        color: Colors.white),
+                        color: Theme.of(context).colorScheme.onSurface),
                   ),
                   const SizedBox(height: 8),
                   Text(
                     'Accédez rapidement à vos destinations récurrentes lors de vos prochaines courses.',
                     style: GoogleFonts.inter(
-                        fontSize: 14, color: Colors.white70, height: 1.5),
+                        fontSize: 14, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), height: 1.5),
                   ),
                   const SizedBox(height: 28),
 
@@ -283,7 +283,7 @@ class _AdressesFavoritesPageState extends ConsumerState<AdressesFavoritesPage> {
             'Ajoutez vos lieux fréquents pour\ngagner du temps lors de vos commandes.',
             textAlign: TextAlign.center,
             style: GoogleFonts.inter(
-                color: Colors.white54, fontSize: 14, height: 1.5),
+                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 14, height: 1.5),
           ),
         ],
       ),
@@ -314,7 +314,7 @@ class _AdressesFavoritesPageState extends ConsumerState<AdressesFavoritesPage> {
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: const Color(0xFF10192A),
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: CouleursApp.bordureSombre),
       ),
@@ -338,14 +338,14 @@ class _AdressesFavoritesPageState extends ConsumerState<AdressesFavoritesPage> {
                   style: GoogleFonts.inter(
                       fontWeight: FontWeight.bold,
                       fontSize: 15,
-                      color: Colors.white),
+                      color: Theme.of(context).colorScheme.onSurface),
                 ),
                 if (adresse.isNotEmpty) ...[
                   const SizedBox(height: 4),
                   Text(
                     adresse,
                     style:
-                        GoogleFonts.inter(fontSize: 13, color: Colors.white60),
+                        GoogleFonts.inter(fontSize: 13, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6)),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ],
@@ -354,7 +354,7 @@ class _AdressesFavoritesPageState extends ConsumerState<AdressesFavoritesPage> {
           ),
           // Menu contextuel opérationnel
           PopupMenuButton<String>(
-            icon: const Icon(Iconsax.more_copy, color: Colors.white54),
+            icon: Icon(Iconsax.more_copy, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54)),
             color: const Color(0xFF1A2640),
             shape:
                 RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
@@ -401,9 +401,9 @@ class _AdressesFavoritesPageState extends ConsumerState<AdressesFavoritesPage> {
             left: 24,
             right: 24,
           ),
-          decoration: const BoxDecoration(
-            color: Color(0xFF10192A),
-            borderRadius: BorderRadius.only(
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.surface,
+            borderRadius: const BorderRadius.only(
               topLeft: Radius.circular(32),
               topRight: Radius.circular(32),
             ),
@@ -417,7 +417,7 @@ class _AdressesFavoritesPageState extends ConsumerState<AdressesFavoritesPage> {
                   width: 50,
                   height: 5,
                   decoration: BoxDecoration(
-                      color: Colors.white24,
+                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.24),
                       borderRadius: BorderRadius.circular(10)),
                 ),
               ),
@@ -427,23 +427,23 @@ class _AdressesFavoritesPageState extends ConsumerState<AdressesFavoritesPage> {
                 style: GoogleFonts.inter(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
-                    color: Colors.white),
+                    color: Theme.of(context).colorScheme.onSurface),
               ),
               const SizedBox(height: 6),
               Text(
                 'Elle sera enregistrée dans votre profil et disponible hors ligne.',
                 style: GoogleFonts.inter(
-                    fontSize: 13, color: Colors.white54, height: 1.4),
+                    fontSize: 13, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), height: 1.4),
               ),
               const SizedBox(height: 24),
 
               // Champ Label
               TextField(
                 controller: _labelController,
-                style: GoogleFonts.inter(color: Colors.white),
+                style: GoogleFonts.inter(color: Theme.of(context).colorScheme.onSurface),
                 decoration: InputDecoration(
                   hintText: 'Label (ex : Maison, Bureau, Parents...)',
-                  hintStyle: GoogleFonts.inter(color: Colors.white38),
+                  hintStyle: GoogleFonts.inter(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38)),
                   filled: true,
                   fillColor: const Color(0xFF1A2640),
                   prefixIcon: const Icon(Iconsax.tag_copy,
@@ -462,7 +462,7 @@ class _AdressesFavoritesPageState extends ConsumerState<AdressesFavoritesPage> {
                 maxLines: 2,
                 decoration: InputDecoration(
                   hintText: 'Adresse complète (quartier, ville...)',
-                  hintStyle: GoogleFonts.inter(color: Colors.white38),
+                  hintStyle: GoogleFonts.inter(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38)),
                   filled: true,
                   fillColor: const Color(0xFF1A2640),
                   prefixIcon: const Padding(
@@ -491,18 +491,18 @@ class _AdressesFavoritesPageState extends ConsumerState<AdressesFavoritesPage> {
                         borderRadius: BorderRadius.circular(16)),
                   ),
                   child: _isSaving
-                      ? const SizedBox(
+                      ? SizedBox(
                           height: 22,
                           width: 22,
                           child: CircularProgressIndicator(
-                              color: Colors.white, strokeWidth: 2.5),
+                              color: Theme.of(context).colorScheme.onSurface, strokeWidth: 2.5),
                         )
                       : Text(
                           'Enregistrer',
                           style: GoogleFonts.inter(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
-                              color: Colors.white),
+                              color: Theme.of(context).colorScheme.onSurface),
                         ),
                 ),
               ),
