@@ -396,7 +396,7 @@ class _InscriptionTransporteurState
                   ClipRRect(
                     borderRadius: BorderRadius.circular(20),
                     child: Image.asset(
-                      'assets/images/logo_camtrans.jpg',
+                      'assets/images/logo_camtrans.png',
                       width: 80,
                       height: 80,
                       fit: BoxFit.cover,

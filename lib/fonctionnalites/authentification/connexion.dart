@@ -241,7 +241,7 @@ class _ConnexionState extends ConsumerState<Connexion> {
                         child: ClipRRect(
                           borderRadius: BorderRadius.circular(20),
                           child: Image.asset(
-                            'assets/images/logo_camtrans.jpg',
+                            'assets/images/logo_camtrans.png',
                             width: 100,
                             height: 100,
                             fit: BoxFit.cover,
