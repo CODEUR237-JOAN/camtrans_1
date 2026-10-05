@@ -216,10 +216,49 @@ class ServicePaiement {
     );
 
     if (response.statusCode == 200 || response.statusCode == 201) {
-      // Pour une application de production, on ferait un webhook ou un polling
-      // pour s'assurer que le statut passe à SUCCESSFUL.
-      // Ici, si l'API accepte la requête, on considère que le retrait est initié avec succès.
-      return true;
+      // Récupérer la référence de transaction pour VÉRIFIER l'aboutissement
+      // réel du retrait (comme pour l'encaissement), plutôt que de supposer
+      // le succès dès l'acceptation de la requête.
+      String reference = '';
+      try {
+        reference = (jsonDecode(response.body)['reference'] ?? '').toString();
+      } catch (_) {}
+
+      // Sans référence, on ne peut pas suivre : on conserve l'ancien
+      // comportement (demande acceptée) pour ne pas bloquer l'utilisateur.
+      if (reference.isEmpty) return true;
+
+      // Polling du statut jusqu'à ~2 minutes (40 × 3 s).
+      String status = "PENDING";
+      int tentatives = 0;
+      while (status == "PENDING" && tentatives < 40) {
+        await Future.delayed(const Duration(seconds: 3));
+        tentatives++;
+
+        final statusResponse = await http.get(
+          Uri.parse('$_baseUrl/transaction/$reference/'),
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': 'Token $token',
+          },
+        );
+
+        if (statusResponse.statusCode == 200) {
+          status =
+              (jsonDecode(statusResponse.body)['status'] ?? 'PENDING').toString();
+          if (status == "SUCCESSFUL") {
+            return true;
+          } else if (status == "FAILED") {
+            throw Exception(
+                "Le transfert a échoué côté opérateur. Aucun montant n'a été débité.");
+          }
+        }
+      }
+
+      // Toujours en attente après le délai : on NE confirme PAS (le solde ne
+      // doit pas être déduit pour un transfert non confirmé).
+      throw Exception(
+          "Le transfert est encore en cours de traitement. Vérifiez votre solde Mobile Money dans quelques minutes avant de réessayer.");
     } else {
       debugPrint("Erreur de retrait Campay: ${response.body}");
       try {
