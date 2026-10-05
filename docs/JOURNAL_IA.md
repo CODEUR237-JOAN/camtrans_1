@@ -77,7 +77,11 @@ Cet écran codait le vert-marque `#12B76A` / `#0E9456` en dur (orbes, sélection
 **Fichier :** `lib/fonctionnalites/client/tableau_de_bord_client.dart`
 Déjà 100 % basé sur les tokens → déjà bleu. Changements : badge de statut de la course active via `StatutCourse.libelle` (au lieu du code brut), séparateur « → » entre adresses de l'historique, suppression de la classe morte `_BoutonServiceRapide`.
 
-**Reste à polir (UI, écrans non encore traités) :** tableau de bord transporteur (chercher le vert-marque `#12B76A`/`#00C896` codé en dur), suivi de course, chat, paiement, portefeuille, admin, notifications. Approche : l'écran utilise-t-il les tokens `CouleursApp` ? → déjà bleu ; sinon remplacer le vert-marque codé en dur (sans toucher au vert sémantique `succes`).
+### `ac45053` — style(ui) : rebrand bleu COMPLET
+**Fichiers :** `resume_expedition_bottom_sheet.dart`, `carte_estimation_remorque.dart`
+Derniers verts-marque codés en dur (flux demande) passés au bleu. **Vérifié : 0 occurrence de `#12B76A`/`#00C896`/`#06B6D4`/`#0E9456` dans tout `lib/`.** Le rebrand bleu est terminé et cohérent sur toute l'app. Le tableau de bord transporteur n'a nécessité aucun changement (déjà 100 % tokens).
+
+**Reste à polir (UI, écrans non encore relus un par un) :** suivi de course, paiement, portefeuille, admin, notifications. Ils héritent déjà du bleu via les tokens ; relire chacun pour : statuts via `StatutCourse.libelle`, overflow (`ellipsis`), empty states, code mort. Le vert sémantique `CouleursApp.succes` (#10B981) est à CONSERVER (succès/online), ne pas le confondre avec l'ancien vert-marque.
 
 ---
 
