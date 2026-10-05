@@ -45,7 +45,7 @@ class Portefeuille extends ConsumerWidget {
                   ),
                   const SizedBox(height: 10),
                   Text(
-                    "${statsRevenus['total']?.toStringAsFixed(0)} FCFA",
+                    "${solde.toStringAsFixed(0)} FCFA",
                     style: const TextStyle(
                       color: Colors.white,
                       fontSize: 34,
@@ -61,7 +61,7 @@ class Portefeuille extends ConsumerWidget {
                 Expanded(
                   child: _statistique(
                     "Cette semaine",
-                    "${statsRevenus['cetteSemaine']?.toStringAsFixed(0)} FCFA",
+                    "${(statsRevenus['cetteSemaine'] ?? 0).toStringAsFixed(0)} FCFA",
                     Icons.date_range,
                   ),
                 ),
@@ -69,7 +69,7 @@ class Portefeuille extends ConsumerWidget {
                 Expanded(
                   child: _statistique(
                     "Ce mois",
-                    "${statsRevenus['ceMois']?.toStringAsFixed(0)} FCFA",
+                    "${(statsRevenus['ceMois'] ?? 0).toStringAsFixed(0)} FCFA",
                     Icons.calendar_month,
                   ),
                 ),
@@ -371,8 +371,9 @@ class Portefeuille extends ConsumerWidget {
           backgroundColor: couleur.withValues(alpha: .15),
           child: Icon(icone, color: couleur),
         ),
-        title: Text(titre),
-        subtitle: Text(sousTitre),
+        title: Text(titre, style: const TextStyle(color: Colors.white)),
+        subtitle:
+            Text(sousTitre, style: const TextStyle(color: Colors.white54)),
         trailing: Text(
           montant,
           style: TextStyle(
