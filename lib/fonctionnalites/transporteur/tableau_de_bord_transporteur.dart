@@ -29,6 +29,14 @@ import 'package:update_camtrans/fonctionnalites/transporteur/widgets/popup_propo
 import 'page_abonnement.dart';
 import 'package:update_camtrans/coeur/widgets/loader_premium.dart';
 
+/// Salutation adaptée à l'heure (matin / après-midi / soir).
+String _salutationDuJour() {
+  final h = DateTime.now().hour;
+  if (h < 12) return 'Bonjour';
+  if (h < 18) return 'Bon après-midi';
+  return 'Bonsoir';
+}
+
 class TableauDeBordTransporteur extends ConsumerStatefulWidget {
   const TableauDeBordTransporteur({super.key});
 
@@ -243,9 +251,9 @@ class _TableauDeBordTransporteurState
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          "Bienvenue,",
+                          "${_salutationDuJour()} 👋",
                           style: GoogleFonts.inter(
-                              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6), fontSize: 14),
+                              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6), fontSize: 13, fontWeight: FontWeight.w500),
                         ),
                         const SizedBox(height: 2),
                         Text(
@@ -264,34 +272,52 @@ class _TableauDeBordTransporteurState
                       ],
                     ),
                   ),
-                  Switch(
-                    value: estDisponible,
-                    activeThumbColor: Colors.white,
-                    activeTrackColor: Colors.green,
-                    inactiveThumbColor: Colors.white,
-                    inactiveTrackColor: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.2),
-                    onChanged: _chargementDisponibilite
-                        ? null
-                        : (value) async {
-                            setState(() {
-                              estDisponible = value;
-                              _chargementDisponibilite = true;
-                            });
-                            try {
-                              await ref
-                                  .read(transporteurActionsProvider)
-                                  .changerDisponibilite(value);
-                            } catch (_) {
-                              if (mounted) {
-                                setState(() => estDisponible = !value);
-                              }
-                            } finally {
-                              if (mounted) {
-                                setState(
-                                    () => _chargementDisponibilite = false);
-                              }
-                            }
-                          },
+                  Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Switch(
+                        value: estDisponible,
+                        activeThumbColor: Colors.white,
+                        activeTrackColor: Colors.green,
+                        inactiveThumbColor: Colors.white,
+                        inactiveTrackColor: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.2),
+                        onChanged: _chargementDisponibilite
+                            ? null
+                            : (value) async {
+                                setState(() {
+                                  estDisponible = value;
+                                  _chargementDisponibilite = true;
+                                });
+                                try {
+                                  await ref
+                                      .read(transporteurActionsProvider)
+                                      .changerDisponibilite(value);
+                                } catch (_) {
+                                  if (mounted) {
+                                    setState(() => estDisponible = !value);
+                                  }
+                                } finally {
+                                  if (mounted) {
+                                    setState(() =>
+                                        _chargementDisponibilite = false);
+                                  }
+                                }
+                              },
+                      ),
+                      Text(
+                        estDisponible ? 'En ligne' : 'Hors ligne',
+                        style: GoogleFonts.inter(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w700,
+                          color: estDisponible
+                              ? Colors.green
+                              : Theme.of(context)
+                                  .colorScheme
+                                  .onSurface
+                                  .withValues(alpha: 0.4),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),
