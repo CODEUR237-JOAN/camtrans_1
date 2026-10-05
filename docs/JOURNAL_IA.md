@@ -89,6 +89,21 @@ Relecture ciblée (scans : handlers morts, stubs, statuts bruts, couleur-marque,
 
 **Reste (facultatif) :** relecture approfondie page par page de l'ADMIN (11 fichiers, ~5700 lignes dont `page_vue_ensemble.dart` 1260 l.) et de `ecran_paiement.dart` (564 l.) / panneau de suivi — non faite ligne à ligne (volumineux, non compilable ici). Ces écrans héritent déjà du bleu ; les scans n'y ont pas remonté de défaut bloquant. Point d'attention thème : plusieurs écrans codent un fond sombre en dur (`0xFF08111F`/`0xFF10192A`) avec du texte sans couleur explicite → vérifier la lisibilité en THÈME CLAIR (risque de texte sombre sur carte sombre). Le vert sémantique `CouleursApp.succes` (#10B981) est à CONSERVER.
 
+## Fonctionnalité : Portefeuille Administrateur (Admin Wallet)
+
+Revenus propres de la plateforme (frais d'abonnements + frais de plateforme sur les courses) + retraits. Commits `d92afe3` (étape 1) et `04a31d4` (étapes 2-3).
+
+**Architecture (clé) :** le solde est **DÉRIVÉ**, pas stocké-et-crédité : `soldeDisponible = (Σ abonnements.montant + Σ paiements.fraisTransaction des courses) − Σ historique_retraits.montant`. Aucune modif du flux de paiement existant → compatible gratuit (pas de Cloud Function). Une copie cache (`soldeDisponible`/`revenusTotaux`) est écrite sur `admin/{uid}` lors du retrait, mais la source de vérité reste le calcul dérivé.
+
+**Fichiers :**
+- `modeles/retrait_admin.dart` (RetraitAdmin), `modeles/portefeuille_admin.dart` (getters `revenusTotaux`, `soldeDisponible`).
+- `coeur/etat/admin_portefeuille_provider.dart` : `adminHistoriqueRetraitsProvider` (flux), `adminPortefeuilleProvider` (calcul réactif), `adminPortefeuilleActionsProvider.demanderRetrait(montant, methode, beneficiaire, statut)` — recalcule le solde, vérifie, écrit en **batch atomique** (entrée `historique_retraits` + cache `admin/{uid}`).
+- `fonctionnalites/admin/pages/page_portefeuille_admin.dart` : écran (carte maîtresse bleue, 2 compteurs, historique + empty state, BottomSheet de retrait validé).
+- Intégration : page index **10** du PageView dans `tableau_de_bord_admin.dart` + entrée « Mon Portefeuille » (section FINANCES) dans `sidebar_admin.dart`.
+- `firestore.rules` : collection `historique_retraits` → `allow read, write: if estAdmin()`. **À redéployer** dans la Console Firebase.
+
+**Limite connue :** le transfert d'argent réel (Mobile Money) passe par `servicePaiement.initierRetraitMobileMoney` **côté client** (identifiants Campay embarqués — même limite que le portefeuille transporteur). Virement bancaire = statut `en_attente` (traitement manuel). Sécurisation = Cloud Function (plan payant), reportée.
+
 ---
 
 ## 2. État de déploiement (IMPORTANT)
