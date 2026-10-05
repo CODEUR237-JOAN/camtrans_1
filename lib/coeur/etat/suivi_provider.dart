@@ -1,5 +1,7 @@
 import 'dart:async';
+import 'dart:math' as math;
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:update_camtrans/coeur/constantes/statuts.dart';
@@ -86,6 +88,17 @@ class SuiviNotifier extends StateNotifier<EtatSuivi> {
   LatLng? _dernierePositionGeocodee;
   static const double _seuilGeocodingMetres = 100.0;
   bool _itineraireDemande = false;
+
+  // --- Détection de déviation / recalcul d'itinéraire (rerouting) ---
+  // Distance au tracé au-delà de laquelle on considère le chauffeur "hors route".
+  static const double _seuilDeviationMetres = 60.0;
+  // Nombre de relevés consécutifs hors-route avant de recalculer (anti-jitter GPS).
+  static const int _relevesPourRecalcul = 3;
+  // Délai minimal entre deux recalculs (anti-spam réseau).
+  static const Duration _cooldownRecalcul = Duration(seconds: 15);
+  int _devationsConsecutives = 0;
+  DateTime? _dernierRecalcul;
+  bool _recalculEnCours = false;
 
   SuiviNotifier(this._firestore, this._gps, this._routage, this._navVocale, String courseId)
       : super(EtatSuivi()) {
@@ -174,8 +187,12 @@ class SuiviNotifier extends StateNotifier<EtatSuivi> {
           tempsRestant = distanceRestante / 8.3;
           
           // Mise à jour de la navigation vocale pour le chauffeur
-          _navVocale.mettreAJourPosition(
-              LatLng(transporteur.latitude, transporteur.longitude));
+          final positionChauffeur =
+              LatLng(transporteur.latitude, transporteur.longitude);
+          _navVocale.mettreAJourPosition(positionChauffeur);
+
+          // Détection de déviation → annonce + recalcul de l'itinéraire
+          _verifierDeviation(positionChauffeur);
         }
 
         state = state.copierAvec(
@@ -220,6 +237,114 @@ class SuiviNotifier extends StateNotifier<EtatSuivi> {
     }, onError: (e) {
       state = state.copierAvec(erreur: e.toString());
     });
+  }
+
+  // ------------------------------------------------------------------
+  // REROUTING : détection de déviation + recalcul de l'itinéraire
+  // ------------------------------------------------------------------
+
+  /// Phases où le chauffeur roule réellement (donc où une déviation a du sens).
+  static const List<String> _phasesDeConduite = [
+    StatutCourse.enRouteDepart,
+    StatutCourse.charge,
+    StatutCourse.enTransit,
+  ];
+
+  void _verifierDeviation(LatLng position) {
+    final trajet = state.infoTrajet;
+    final course = state.course;
+    if (trajet == null || course == null || _recalculEnCours) return;
+    if (trajet.points.length < 2) return;
+    if (!_phasesDeConduite.contains(course.statut)) {
+      _devationsConsecutives = 0;
+      return;
+    }
+
+    final distanceAuTrace = _distanceMinAuTrace(position, trajet.points);
+
+    if (distanceAuTrace > _seuilDeviationMetres) {
+      _devationsConsecutives++;
+    } else {
+      _devationsConsecutives = 0; // De retour sur la route.
+      return;
+    }
+
+    if (_devationsConsecutives < _relevesPourRecalcul) return;
+
+    // Anti-spam : respecter le délai minimal entre deux recalculs.
+    final maintenant = DateTime.now();
+    if (_dernierRecalcul != null &&
+        maintenant.difference(_dernierRecalcul!) < _cooldownRecalcul) {
+      return;
+    }
+    _dernierRecalcul = maintenant;
+    _devationsConsecutives = 0;
+    _recalculerItineraire(position);
+  }
+
+  Future<void> _recalculerItineraire(LatLng depuis) async {
+    final course = state.course;
+    if (course == null) return;
+    _recalculEnCours = true;
+
+    // 1. Annonce vocale calme (coupe la voix en cours).
+    _navVocale.announceRerouting();
+
+    try {
+      // 2. Cible selon la phase : point de départ (vers client) ou arrivée.
+      final versDestination = course.statut == StatutCourse.charge ||
+          course.statut == StatutCourse.enTransit;
+      final cible = versDestination
+          ? LatLng(course.latitudeArrivee, course.longitudeArrivee)
+          : LatLng(course.latitudeDepart, course.longitudeDepart);
+
+      final nouveau = await _routage.obtenirItineraire(depuis, cible);
+      if (nouveau != null && mounted) {
+        state = state.copierAvec(infoTrajet: nouveau);
+        // 3. Le guidage suit le nouveau tracé (sans ré-annoncer le démarrage).
+        _navVocale.rafraichirItineraire(nouveau);
+      }
+    } catch (e) {
+      debugPrint('[Suivi] Échec du recalcul d\'itinéraire : $e');
+    } finally {
+      _recalculEnCours = false;
+    }
+  }
+
+  /// Distance minimale (mètres) entre un point et le tracé (polyligne),
+  /// en projetant sur chaque segment — pas seulement sur les sommets.
+  double _distanceMinAuTrace(LatLng p, List<LatLng> points) {
+    double min = double.infinity;
+    for (int i = 0; i < points.length - 1; i++) {
+      final d = _distancePointSegmentMetres(p, points[i], points[i + 1]);
+      if (d < min) min = d;
+    }
+    return min;
+  }
+
+  /// Distance point→segment en mètres (projection équirectangulaire locale,
+  /// précise à l'échelle urbaine).
+  double _distancePointSegmentMetres(LatLng p, LatLng a, LatLng b) {
+    const double rayonTerre = 6371000.0;
+    double rad(double deg) => deg * math.pi / 180.0;
+    final double lat0 = rad((a.latitude + b.latitude) / 2.0);
+    double projX(LatLng q) => rayonTerre * rad(q.longitude) * math.cos(lat0);
+    double projY(LatLng q) => rayonTerre * rad(q.latitude);
+
+    final px = projX(p), py = projY(p);
+    final ax = projX(a), ay = projY(a);
+    final bx = projX(b), by = projY(b);
+
+    final dx = bx - ax, dy = by - ay;
+    final longueur2 = dx * dx + dy * dy;
+    double t =
+        longueur2 == 0 ? 0.0 : ((px - ax) * dx + (py - ay) * dy) / longueur2;
+    if (t < 0.0) t = 0.0;
+    if (t > 1.0) t = 1.0;
+
+    final cx = ax + t * dx, cy = ay + t * dy;
+    final ex = px - cx, ey = py - cy;
+    return math.sqrt(ex * ex + ey * ey);
   }
 
   @override

@@ -152,6 +152,17 @@ class ServiceNavigationVocale extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Remplace l'itinéraire suivi (après un recalcul) SANS ré-annoncer le
+  /// démarrage : réinitialise l'index d'étape et les paliers d'annonce.
+  /// À appeler juste après [announceRerouting].
+  void rafraichirItineraire(InfoTrajet trajet) {
+    _trajetEnCours = trajet;
+    _navigationActive = true;
+    _indexEtapeCourante = 0;
+    _cleEtapeSuivie = null;
+    _reinitialiserPaliers();
+  }
+
   // ------------------------------------------------------------------
   // 2a. API INTERNE : avance automatique le long des étapes du trajet
   //     (conservée pour suivi_provider — reçoit une LatLng).
