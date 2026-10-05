@@ -445,6 +445,33 @@ class _TableauDeBordTransporteurState
                   ],
                 ),
               ),
+              const SizedBox(height: 3),
+              IntrinsicHeight(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Expanded(
+                      child: CarteInformation(
+                        compacte: true,
+                        titre: "Entretien",
+                        icone: Icons.build,
+                        auClic: () =>
+                            context.push(RoutesApplication.entretien),
+                      ),
+                    ),
+                    const SizedBox(width: 15),
+                    Expanded(
+                      child: CarteInformation(
+                        compacte: true,
+                        titre: "Abonnement",
+                        icone: Icons.workspace_premium,
+                        auClic: () =>
+                            context.push(RoutesApplication.abonnement),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
 
               const SizedBox(height: 35),
 
