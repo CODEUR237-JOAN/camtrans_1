@@ -50,6 +50,15 @@
 - **Rendu accessible :** route `RoutesApplication.entretien = "/entretien"` + `GoRoute` ; carte « Entretien » (et « Abonnement ») ajoutée dans la grille d'actions de `tableau_de_bord_transporteur.dart`.
 **Pièges évités :** collision de noms (modèle vs widget) ; locale `DateFormat('dd MMM yyyy', 'fr')` retirée → `DateFormat('dd MMM yyyy')` car `initializeDateFormatting('fr')` n'est jamais appelé dans le projet (sinon crash runtime) ; `CouleursApp.primaire` vérifié `static const` (OK pour le `const Map<String,Color>`).
 
+### `631e409` — feat(chat) : envoi et affichage d'images dans le chat
+**Fichiers :** `lib/modeles/message_chat.dart`, `lib/fonctionnalites/chat/ecran_chat.dart`
+**Problème :** le chat ne gérait que le texte ; l'envoi d'image affichait « à venir » (dans le chat *legacy* `client/ecran_chat.dart`, non utilisé).
+**Fait :**
+- Modèle `MessageChat` enrichi d'un champ `imageUrl` (+ getter `estImage`).
+- Écran chat live (`chat/ecran_chat.dart`, celui routé via `/chat`) : bouton pièce jointe → bottom sheet Galerie/Appareil photo → `ImagePicker` → upload **Cloudinary** via `ServiceStockage.uploaderFichier(dossier:'chat/<courseId>')` → message `{expediteurId, texte:'', imageUrl, timestamp}`. Affichage des images dans les bulles (`CachedNetworkImage`) + visionneuse plein écran (`InteractiveViewer`), état d'envoi (spinner sur le bouton), gestion d'erreurs (SnackBar).
+- Les messages sont dans la sous-collection `courses/{courseId}/messages` — **déjà sécurisée** par le commit `6933ba9` (participants + admin). Images sur Cloudinary (preset unsigned), aucune règle Firestore supplémentaire requise.
+**NB :** `lib/fonctionnalites/client/ecran_chat.dart` (ancien chat, paramètre `transporteur`, contient encore le SnackBar « image à venir ») est **du code mort** — non importé/routé. À supprimer lors d'un nettoyage.
+
 ---
 
 ## 2. État de déploiement (IMPORTANT)
@@ -66,7 +75,8 @@
 ## 3. Ce qui RESTE (issu de l'audit complet)
 
 ### Faisable gratuitement (côté client)
-- **Envoi d'image dans le chat** : `lib/fonctionnalites/client/ecran_chat.dart:281` affiche encore « Fonctionnalité d'envoi d'images à venir » (nécessite upload Storage/Cloudinary + affichage).
+- ✅ **Envoi d'image dans le chat** — FAIT (commit `631e409`).
+- **Nettoyage code mort** : supprimer `lib/fonctionnalites/client/ecran_chat.dart` (chat legacy non utilisé).
 - **Couleurs codées en dur** (P2 UX) : plusieurs écrans utilisent `0xFF08111F` / `0xFF10192A` au lieu des tokens de thème → ne suivent pas le mode clair. (NB : le nouvel `EcranEntretien` reste en sombre codé en dur par cohérence avec ses écrans frères ; à harmoniser globalement plus tard.)
 
 ### Nécessite un serveur (plan Blaze/carte → BLOQUÉ pour l'instant)
