@@ -60,9 +60,11 @@ class ServiceGps {
 
   Stream<Position> fluxPosition() {
     return Geolocator.getPositionStream(
+      // `high` suffit pour un suivi routier et consomme bien moins de
+      // batterie que `best` ; distanceFilter 15 m réduit la fréquence.
       locationSettings: const LocationSettings(
-        accuracy: LocationAccuracy.best,
-        distanceFilter: 10,
+        accuracy: LocationAccuracy.high,
+        distanceFilter: 15,
       ),
     );
   }

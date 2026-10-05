@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
 
@@ -7,6 +6,7 @@ import 'package:update_camtrans/services/service_authentification.dart';
 import 'package:update_camtrans/services/service_firestore.dart';
 import 'package:update_camtrans/services/service_gps.dart';
 import 'transporteur_provider.dart';
+import 'package:update_camtrans/coeur/etat/utilisateur_provider.dart';
 import 'package:update_camtrans/coeur/constantes/statuts.dart';
 
 // Provider qui maintient la position actuelle en mémoire (utile pour l'UI)
@@ -22,6 +22,11 @@ final gpsTrackerProvider = Provider<GpsTracker>((ref) {
 class GpsTracker {
   final Ref _ref;
   StreamSubscription<Position>? _positionSubscription;
+
+  // Throttling des écritures Firestore (batterie + coût cloud).
+  DateTime _dernierEnvoi = DateTime.fromMillisecondsSinceEpoch(0);
+  double? _derniereLat;
+  double? _derniereLng;
 
   GpsTracker(this._ref);
 
@@ -39,6 +44,14 @@ class GpsTracker {
 
     // Arrêter le tracker existant s'il y en a un
     stopTracking();
+
+    // Déterminer le rôle UNE SEULE FOIS → on n'écrit que dans la bonne
+    // collection (évite de créer un document parasite dans l'autre).
+    String? role;
+    try {
+      role = await _ref.read(userRoleProvider.future);
+    } catch (_) {}
+    final collectionCible = role == 'transporteur' ? 'transporteurs' : 'clients';
 
     _positionSubscription =
         serviceGps.fluxPosition().listen((Position position) {
@@ -92,31 +105,32 @@ class GpsTracker {
         // Ignorer les erreurs de Geofencing
       }
 
-      // 2. Envoyer à Firebase (En supposant que le rôle est connu, ici on met à jour 'transporteurs' et 'utilisateurs')
-      // Dans une appli réelle, on optimiserait pour ne pas écrire à Firebase chaque seconde, mais par exemple toutes les 10s ou quand la distance change beaucoup.
+      // 2. Envoyer à Firebase — OPTIMISÉ : au plus une écriture toutes les
+      //    8 s ET après ~30 m de déplacement, dans la SEULE bonne collection.
+      //    Évite de vider le quota Firestore et de drainer la batterie.
+      final maintenant = DateTime.now();
+      final assezDeTemps = maintenant.difference(_dernierEnvoi).inSeconds >= 8;
+      final assezLoin = _derniereLat == null ||
+          serviceGps.calculerDistance(
+                latitudeDepart: _derniereLat!,
+                longitudeDepart: _derniereLng!,
+                latitudeArrivee: position.latitude,
+                longitudeArrivee: position.longitude,
+              ) >
+              0.03; // 30 m (calculerDistance renvoie des km)
 
-      try {
-        // Mise à jour générique dans la table des transporteurs
+      if (assezDeTemps && assezLoin) {
+        _dernierEnvoi = maintenant;
+        _derniereLat = position.latitude;
+        _derniereLng = position.longitude;
         firestore.modifierDocument(
-          collection: "transporteurs",
+          collection: collectionCible,
           id: user.uid,
           donnees: {
             "latitude": position.latitude,
             "longitude": position.longitude,
           },
         ).catchError((_) {});
-
-        // Optionnel : Mise à jour côté client si besoin de tracker les clients
-        firestore.modifierDocument(
-          collection: "clients",
-          id: user.uid,
-          donnees: {
-            "latitude": position.latitude,
-            "longitude": position.longitude,
-          },
-        ).catchError((_) {});
-      } catch (e) {
-        debugPrint("Erreur locale maj GPS: $e");
       }
     });
   }
