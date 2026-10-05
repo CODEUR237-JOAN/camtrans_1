@@ -1,0 +1,88 @@
+# Journal des modifications — Passation pour agent IA
+
+> **But de ce fichier :** permettre à un autre agent IA (ou développeur) de reprendre le travail sans contexte préalable. Tout ce qui a été fait, pourquoi, où, et ce qui reste.
+> **Dernière mise à jour :** 2026-10-05.
+> **Projet :** CamTrans — plateforme Flutter + Firebase de mise en relation client ↔ transporteur (Cameroun). Paiement Campay (Mobile Money), attribution auto (Cloud Function + OSRM), assistant IA (Claude + Gemini), chat, suivi GPS, espace admin.
+
+---
+
+## 0. Contexte & contraintes à connaître AVANT de coder
+
+- **Stack :** Flutter/Dart, Firebase (Firestore, Auth, Storage, Cloud Functions v1), Riverpod, go_router. Code et commentaires **en français** (dossiers `fonctionnalites`, `services`, `modeles`, `coeur`).
+- **CONTRAINTE FORTE — rester GRATUIT :** l'utilisateur (non-codeur) n'a **pas de carte bancaire**, donc **pas de plan payant** : ni Firebase **Blaze**, ni forfait Anthropic payant. Conséquence : **ne pas créer de nouvelles Cloud Functions** (Blaze requis). Privilégier les règles Firestore (gratuit) et le branchement d'écrans côté client. ⚠️ Les Cloud Functions existantes (`functions/index.js`) ne tournent probablement pas sans Blaze — à vérifier.
+- **Environnement de dev de cette session :** Windows, PowerShell. Git a dû être installé (winget) ; il n'est pas toujours dans le PATH → utiliser `& "C:\Program Files\Git\cmd\git.exe"`. **Flutter n'est PAS installé ici** : aucune compilation/`flutter analyze` n'a pu être lancée. L'utilisateur teste sur une autre machine déjà configurée.
+- **Git push :** l'environnement d'exécution de l'agent est non-interactif → le gestionnaire d'identifiants GitHub ne s'ouvre pas côté agent. **C'est l'utilisateur qui lance `git push`** dans son terminal. Identité de commit : `CODEUR237-JOAN` / `codeur633@gmail.com`.
+- **Règles Firestore :** les modifier dans `firestore.rules` **ne suffit pas** — il faut les **DÉPLOYER** (Console Firebase → Firestore → Règles → Publier, gratuit). Pousser sur GitHub ≠ déployer.
+- **`.env` :** gitignoré (jamais commité). Contient les clés (`CLAUDE_API_KEY`, `GEMINI_API_KEY`, Campay, Google Maps). `lib/coeur/constantes/api_keys.dart` est aussi gitignoré et nécessaire à la compilation.
+
+---
+
+## 1. Historique des commits de cette session (du plus ancien au plus récent)
+
+### `1be68e3` — fix(ia) : réparer l'assistant Claude
+**Fichiers :** `lib/services/service_ia.dart`, `.env.example`
+**Problème :** l'assistant utilisait le modèle Claude `claude-3-haiku-20240307`, **retiré par Anthropic le 19/04/2026** → chaque appel échouait, et l'erreur était **masquée silencieusement** (bascule muette vers Gemini). Symptôme utilisateur : « la clé Claude ne marche pas alors qu'elle est intégrée ».
+**Fait :**
+- Modèle → constante `_nomModeleClaude = 'claude-haiku-4-5'` (successeur actif).
+- Ajout en-tête HTTP `anthropic-dangerous-direct-browser-access: true` sur les 2 appels Claude (sinon CORS bloque sur Flutter Web).
+- Erreurs Claude désormais tracées via `debugPrint` (au lieu d'être avalées) tout en gardant le secours Gemini.
+- `CLAUDE_API_KEY` documentée dans `.env.example`.
+**Archi (connu, NON corrigé) :** clés IA lues côté client → extractibles. Correctif propre = proxy Cloud Function (payant → reporté).
+
+### `6933ba9` — fix(securite) : durcir les règles Firestore (gratuit)
+**Fichier :** `firestore.rules`
+- **Chat de course** `courses/{id}/messages` : était `allow read, write: if estConnecte()` (tout connecté pouvait lire/écrire le chat de n'importe quelle course). → restreint au client, au transporteur de la course, ou admin. (NB : l'app utilise en réalité la collection racine `messages`, pas cette sous-collection → zéro régression.)
+- **Collection `transporteurs`** : le propriétaire ne peut plus modifier les champs sensibles `soldePortefeuille`, `documentsValides`, `revenusTotaux`, `noteMoyenne` (réservés admin/serveur) → empêche l'auto-crédit du portefeuille, l'auto-validation et le trucage. À la création : `documentsValides == false` et `soldePortefeuille == 0` forcés.
+- **Laissé modifiable par le propriétaire** : `dateFinAbonnement` (l'abonnement est écrit côté client après paiement Campay ; sans serveur on ne peut pas le verrouiller — **risque résiduel assumé** : un transporteur pourrait prolonger son abonnement sans payer).
+
+### `3d275de` — feat(ui) : brancher écrans statiques (paramètres client + historique transporteur)
+**Fichiers :** `lib/fonctionnalites/client/parametres.dart`, `lib/fonctionnalites/transporteur/historique_courses.dart`
+- **Paramètres client :** 3 tuiles avaient `onTap: () {}` (liens morts). Branchées : « Modifier le mot de passe » → `context.push(RoutesApplication.changerMotDePasse)` (écran existant) ; « Sécurité » → bottom sheet `_ouvrirSecurite()` (raccourci mot de passe + bascule biométrie + infos) ; « Confidentialité » → bottom sheet `_ouvrirConfidentialite()` (usage données, lien politique, demande suppression compte via mailto). Helpers ajoutés : `_afficherFeuille`, `_ligneFeuilleAction`, `_ligneFeuilleSwitch`, `_ligneFeuilleInfo`.
+- **Historique transporteur :** le tap affichait un SnackBar « Détails bientôt disponibles ». → ouvre maintenant une bottom sheet `_FeuilleDetailsCourse` (itinéraire, statut, prix, paiement, véhicule, distance, client, note).
+
+### `b67063e` — feat(entretien) : écran Entretien dynamique branché sur Firestore
+**Fichiers :** `lib/modeles/entretien.dart` (nouveau), `lib/fonctionnalites/transporteur/entretien.dart` (réécrit), `lib/coeur/routes/routes.dart`, `lib/fonctionnalites/transporteur/tableau_de_bord_transporteur.dart`, `firestore.rules`
+**Problème :** l'écran Entretien était 100 % mock (liste `entretiens` codée en dur, boutons SnackBar) ET **non accessible** (aucune route, aucun import ailleurs = code mort).
+**Fait :**
+- Nouveau modèle `Entretien` (`modeles/entretien.dart`) : `id, transporteurId, titre, type, dateDernier, dateProchain?, note, dateCreation` + `toMap`/`fromMap`/`copyWith` + getter `bientotDu`.
+- Collection Firestore **`entretiens`** + règles : lecture/écriture limitées au transporteur propriétaire (ou admin). Ajoutées dans `firestore.rules`.
+- Écran réécrit en `ConsumerStatefulWidget` nommé **`EcranEntretien`** (⚠️ renommé car l'ancien widget `Entretien` entrait en collision avec le modèle `Entretien`). Lecture temps réel via `ServiceFirestore.fluxCollectionCondition(collection:'entretiens', champ:'transporteurId', valeur: uid)`, tri côté client (évite un index composite). CRUD : ajout/édition via `_FormulaireEntretien` (bottom sheet avec titre, catégories ChoiceChip, dates via showDatePicker, note), suppression via swipe + confirmation. États chargement (`LoaderPremium`) / vide / erreur.
+- **Rendu accessible :** route `RoutesApplication.entretien = "/entretien"` + `GoRoute` ; carte « Entretien » (et « Abonnement ») ajoutée dans la grille d'actions de `tableau_de_bord_transporteur.dart`.
+**Pièges évités :** collision de noms (modèle vs widget) ; locale `DateFormat('dd MMM yyyy', 'fr')` retirée → `DateFormat('dd MMM yyyy')` car `initializeDateFormatting('fr')` n'est jamais appelé dans le projet (sinon crash runtime) ; `CouleursApp.primaire` vérifié `static const` (OK pour le `const Map<String,Color>`).
+
+---
+
+## 2. État de déploiement (IMPORTANT)
+
+| Élément | Commité | Poussé GitHub | Déployé/Actif |
+|---|---|---|---|
+| Correctifs Dart (IA, UI, entretien) | ✅ | ⏳ (push par l'utilisateur) | effectif après rebuild de l'app |
+| `firestore.rules` (durcissement + collection `entretiens`) | ✅ | ⏳ | ❌ **à publier dans la Console Firebase** |
+
+➡️ **Tant que `firestore.rules` n'est pas publié dans la Console Firebase**, le durcissement sécurité n'est pas actif ET l'ajout d'entretien sera **refusé** (collection `entretiens` non autorisée).
+
+---
+
+## 3. Ce qui RESTE (issu de l'audit complet)
+
+### Faisable gratuitement (côté client)
+- **Envoi d'image dans le chat** : `lib/fonctionnalites/client/ecran_chat.dart:281` affiche encore « Fonctionnalité d'envoi d'images à venir » (nécessite upload Storage/Cloudinary + affichage).
+- **Couleurs codées en dur** (P2 UX) : plusieurs écrans utilisent `0xFF08111F` / `0xFF10192A` au lieu des tokens de thème → ne suivent pas le mode clair. (NB : le nouvel `EcranEntretien` reste en sombre codé en dur par cohérence avec ses écrans frères ; à harmoniser globalement plus tard.)
+
+### Nécessite un serveur (plan Blaze/carte → BLOQUÉ pour l'instant)
+- **Sécurité paiement (P0) :** aujourd'hui un client peut marquer une course « payée » sans payer (`service_paiement.dart` `_creerPaiementReussi` écrit côté client ; règles `courses`/`paiements` permissives). Identifiants Campay (`service_paiement.dart:34`) et retraits `/withdraw/` exécutés côté client → extractibles. Correctif = Cloud Functions (`onCall` + webhook Campay).
+- **Crédit du portefeuille transporteur CASSÉ :** `service_paiement.dart:476-490` tente de créditer `soldePortefeuille` depuis la session du **client** → refusé par les règles Firestore (le client n'est pas propriétaire du doc transporteur), erreur avalée. Ne peut marcher que via une Cloud Function.
+- **Proxy IA :** déplacer les clés Claude/Gemini côté serveur.
+- **Règles `courses` (2.4) :** encore trop permissives (client/transporteur propriétaires peuvent modifier presque tous les champs). Durcir nécessite de connaître précisément les champs écrits par chaque rôle à chaque transition — risqué sans serveur pour la confirmation de paiement. Laissé en l'état pour ne pas casser le flux gratuit.
+
+### Robustesse / technique
+- `functions/index.js` : utilise l'OSRM public `router.project-osrm.org` (serveur démo, non fiable en prod) dans une boucle séquentielle (N+1). À remplacer par un OSRM hébergé ou l'API Table.
+- Retrait Campay considéré réussi dès acceptation de la requête (pas de polling du statut final) : `service_paiement.dart:218`.
+
+---
+
+## 4. Références utiles pour l'agent suivant
+- Audit sécurité complet détaillé : voir les 4 volets dans l'historique de conversation (QA/statique, sécurité backend Firebase, UI/UX, matrice P0/P1/P2).
+- Modèles Claude valides (si on retouche l'IA) : `claude-haiku-4-5` (rapide/éco), `claude-sonnet-5-5`, `claude-opus-5-5`. **Ne jamais** réutiliser `claude-3-*` (retirés).
+- Service Firestore générique : `lib/services/service_firestore.dart` (`ajouterDocument`, `modifierDocument`, `supprimerDocument`, `fluxCollectionCondition`, `fluxDocument`).
+- UID utilisateur courant : `ref.read(serviceAuthentificationProvider).utilisateur?.uid`.
