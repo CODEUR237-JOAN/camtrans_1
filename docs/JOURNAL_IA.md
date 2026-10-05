@@ -69,6 +69,16 @@ Polish connexion : sous-titre humanisé, lueur logo ultra-douce, `maxLines+ellip
 Accents français corrigés (choix_profil) ; sous-titres d'accueil humanisés sous les titres ; titres centrés. Écrans déjà bleu-ready via les tokens.
 **Règle de travail UI (demande utilisateur) :** polish strictement couche présentation (`fonctionnalites/**`, `coeur/widgets`, `coeur/theme`, `coeur/constantes/couleurs.dart`) — JAMAIS services/modeles/etat/auth. `flutter analyze` à lancer par l'utilisateur (Flutter absent de la machine agent).
 
+### `d1978c8` — style(ui) : rebrand bleu du flux « Créer une demande »
+**Fichier :** `lib/fonctionnalites/client/creer_demande.dart`
+Cet écran codait le vert-marque `#12B76A` / `#0E9456` en dur (orbes, sélection de marque, labels, ombres, **CTA principal**). Remplacé par le bleu charte `#007ACC` / `#005C99`. Le vert sémantique de succès (`CouleursApp.succes`, gamme Éco) est conservé. Structure/animations (glassmorphism, radar, haptics) intactes.
+
+### `5b4a4e8` — style(ui) : polish tableau de bord client
+**Fichier :** `lib/fonctionnalites/client/tableau_de_bord_client.dart`
+Déjà 100 % basé sur les tokens → déjà bleu. Changements : badge de statut de la course active via `StatutCourse.libelle` (au lieu du code brut), séparateur « → » entre adresses de l'historique, suppression de la classe morte `_BoutonServiceRapide`.
+
+**Reste à polir (UI, écrans non encore traités) :** tableau de bord transporteur (chercher le vert-marque `#12B76A`/`#00C896` codé en dur), suivi de course, chat, paiement, portefeuille, admin, notifications. Approche : l'écran utilise-t-il les tokens `CouleursApp` ? → déjà bleu ; sinon remplacer le vert-marque codé en dur (sans toucher au vert sémantique `succes`).
+
 ---
 
 ## 2. État de déploiement (IMPORTANT)
