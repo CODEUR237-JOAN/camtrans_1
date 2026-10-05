@@ -165,7 +165,7 @@ class _ParametresState extends ConsumerState<Parametres> {
           },
         ),
         _ligneFeuilleInfo(
-          icone: Iconsax.shield_copy,
+          icone: Iconsax.shield_tick_copy,
           texte:
               'Vos données de connexion sont gérées de façon sécurisée par Firebase Authentication. '
               'CamTrans ne stocke jamais votre mot de passe en clair.',
