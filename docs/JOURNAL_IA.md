@@ -160,3 +160,32 @@ Apports : TTS fr-FR débit 0.46 / pitch 1.05, `awaitSpeakCompletion`, QUEUE_FLUS
 - **Bug 3 (Google).** `connexionGoogle()` : crée `utilisateurs/{uid}` à la 1re connexion (`additionalUserInfo.isNewUser`), gère l'annulation (retourne `null`). Code correct pour `google_sign_in 6.2.2`. **À vérifier côté config** : SHA-1/SHA-256 dans Firebase Console + OAuth client (le code ne peut pas corriger une config manquante).
 
 À redéployer : `firestore.rules` (contient maintenant `index_telephones`, `historique_retraits`, `entretiens`).
+
+---
+
+## 🗂️ RÉCAPITULATIF DE SESSION (2026-10-05) — pour reprise rapide par un autre agent
+
+Contexte transverse (à relire en priorité) :
+- Projet **Flutter + Firebase**, utilisateur **non-codeur** qui **compile sur une app mobile** (pas de PC) → changements natifs = à valider côté build.
+- **Gratuit obligatoire** : pas de plan Blaze/payant → pas de nouvelles Cloud Functions ; privilégier règles Firestore + logique client.
+- **Flutter absent de la machine agent** → impossible de lancer `flutter analyze`/`run` ici ; l'utilisateur (et une 2e session active) le font.
+- **2 sessions travaillent en parallèle** sur le même repo → toujours `git fetch`+`merge origin/main` avant de pousser.
+- `firestore.rules` **à redéployer** par l'utilisateur (Console Firebase) : contient `index_telephones`, `historique_retraits`, `entretiens`.
+- **SHA-1** : le vrai blocage de **Google Sign-In ET de la double-auth SMS** (Phone Auth) côté Android. À enregistrer dans Firebase (une app lectrice de signature sur le tel donne le SHA-1).
+
+Travaux de la session (du plus ancien au plus récent) :
+1. **IA Claude** réparée (modèle retiré `claude-3-haiku` → `claude-haiku-4-5`, erreurs rendues visibles, en-tête CORS web).
+2. **Sécurité Firestore** durcie (chat de course, champs sensibles transporteur).
+3. **Écrans statiques branchés** : paramètres client (tuiles), historique transporteur (fiche détail), **écran Entretien** (modèle + collection + CRUD), **chat image** (Cloudinary).
+4. **Rebrand bleu** complet (#007ACC/#33AFFF) via tokens + élimination du vert-marque + **nouveau logo** partout.
+5. **Portefeuille Admin** (modèles + logique dérivée + écran + règle `historique_retraits` + intégration dashboard/sidebar).
+6. **Assistant vocal turn-by-turn premium** (paliers 500/100/20, audio ducking, HTML clean) + **rerouting** (détection déviation + recalcul OSRM).
+7. **3 bugs auth** : champs conservés, unicité email + **téléphone** (`index_telephones`, transaction), Google (profil 1re connexion).
+8. **Système `LoaderPage`** unifié (chargements pleine page).
+9. **Paramètres client opérationnels** : interrupteurs notifications (FCM réel), GPS (permission_handler), puis biométrie réelle.
+10. **Moyens de paiement** (client) : écran réel (numéros Mobile Money, champ `moyensPaiement` sur le doc client). Commit `903eab0`.
+11. **Paramètres TOTALEMENT fonctionnel** (commit `762d35b`) :
+    - « À propos » → contenus **in-app** (`ecran_contenu_info.dart` + `ContenusLegaux`, markdown) au lieu des liens morts camtrans.cm ; « Noter l'app » corrigé.
+    - **Biométrie réelle** : `local_auth`, `service_biometrie.dart`, verrou au splash (SÛR : jamais de blocage). **Config native ajoutée** : `MainActivity`→`FlutterFragmentActivity`, permissions `USE_BIOMETRIC`/`USE_FINGERPRINT`, dép `local_auth ^2.3.0`. ⚠️ nécessite `flutter pub get` + rebuild ; si le build mobile ne gère pas le natif local_auth, isoler/retirer ce commit.
+
+Reste connu / pistes : unifier les 2 services vocaux (doublon `suivi_course/services`), supprimer `fix_theme.dart` (script jetable à la racine), brancher le bouton « Paramètres » du **profil transporteur** (encore `() {}`), sécuriser Campay/clés IA côté serveur (nécessite Blaze), durcir les règles `courses`/`paiements` (nécessite serveur pour la confirmation de paiement).
