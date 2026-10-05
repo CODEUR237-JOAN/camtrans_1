@@ -141,3 +141,11 @@ Revenus propres de la plateforme (frais d'abonnements + frais de plateforme sur 
 - Modèles Claude valides (si on retouche l'IA) : `claude-haiku-4-5` (rapide/éco), `claude-sonnet-5-5`, `claude-opus-5-5`. **Ne jamais** réutiliser `claude-3-*` (retirés).
 - Service Firestore générique : `lib/services/service_firestore.dart` (`ajouterDocument`, `modifierDocument`, `supprimerDocument`, `fluxCollectionCondition`, `fluxDocument`).
 - UID utilisateur courant : `ref.read(serviceAuthentificationProvider).utilisateur?.uid`.
+
+## Fonctionnalité : Assistant vocal turn-by-turn premium (commit 820d9eb)
+
+Refonte de `lib/services/service_navigation_vocale.dart` (le service défaillant utilisé par le ViewModel `coeur/etat/suivi_provider.dart`). **API publique conservée** (`demarrerNavigation`, `mettreAJourPosition`, `arreterNavigation`, `basculerMute`, `estMute`) → aucun impact sur l'UI carte ni les ViewModels ; les améliorations sont actives immédiatement.
+
+Décision : le projet n'a pas de dossier `core/services/` ; le service canonique est `lib/services/` (convention FR). J'ai refactorisé en place plutôt que créer un 3ᵉ service parallèle. NB : il existe un DOUBLON `lib/fonctionnalites/suivi_course/services/service_navigation_vocale.dart` (TTS simple, méthode `annoncer`) utilisé par `suivi_course_provider.dart` — non touché ; à unifier un jour.
+
+Apports : TTS fr-FR débit 0.46 / pitch 1.05, `awaitSpeakCompletion`, QUEUE_FLUSH (interruption), Audio Focus iOS (`duckOthers` + `voicePrompt`) ; paliers anti-spam 500/100/20 m (flags réinitialisés par étape) ; `onLocationUpdate(Position, EtapeTrajet)` pour injection VM ; `announceRerouting()` (anti-spam 8 s) ; `nettoyerInstruction()` supprime le HTML avant TTS. Modèle d'étape = `EtapeTrajet` (service_routage.dart) = le « RouteStep » du projet.
