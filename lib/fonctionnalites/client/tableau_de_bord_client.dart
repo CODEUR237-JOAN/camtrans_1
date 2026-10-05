@@ -223,6 +223,7 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
         physics: const BouncingScrollPhysics(),
         slivers: [
           SliverToBoxAdapter(child: _buildHeader()),
+          SliverToBoxAdapter(child: _buildHeroAction()),
           SliverToBoxAdapter(child: _buildServiceCategories(context)),
           coursesAsync.when(
             loading: () => SliverToBoxAdapter(child: _buildLoadingState()),
@@ -315,15 +316,25 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "Bienvenue, $nomAffichage",
+                        "${_salutation()} 👋",
                         style: TextStyle(
-                            fontSize: 22,
-                            fontWeight: FontWeight.bold,
-                            color: Theme.of(context).colorScheme.onSurface),
+                            fontSize: 13,
+                            fontWeight: FontWeight.w500,
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onSurface
+                                .withValues(alpha: 0.6)),
                       ),
+                      const SizedBox(height: 2),
                       Text(
-                        "Prêt à commencer ?",
-                        style: TextStyle(fontSize: 14, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)),
+                        nomAffichage,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TextStyle(
+                            fontSize: 21,
+                            fontWeight: FontWeight.w800,
+                            letterSpacing: -0.5,
+                            color: Theme.of(context).colorScheme.onSurface),
                       ),
                     ],
                   ),
@@ -379,6 +390,122 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
   }
 
   // ==========================================
+  // HÉROS D'ACTION — CTA principal (style ride-hailing)
+  // ==========================================
+  String _salutation() {
+    final h = DateTime.now().hour;
+    if (h < 12) return 'Bonjour';
+    if (h < 18) return 'Bon après-midi';
+    return 'Bonsoir';
+  }
+
+  Widget _buildHeroAction() {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 6, 20, 6),
+      child: Material(
+        color: Colors.transparent,
+        child: InkWell(
+          borderRadius: BorderRadius.circular(26),
+          onTap: () {
+            HapticFeedback.mediumImpact();
+            ref.read(demandeExpeditionProvider.notifier).reinitialiser();
+            ref
+                .read(demandeExpeditionProvider.notifier)
+                .setCategorieService('Autre');
+            context.push(RoutesApplication.creerDemande);
+          },
+          child: Container(
+            padding: const EdgeInsets.all(22),
+            decoration: BoxDecoration(
+              gradient: CouleursApp.degradePrincipal,
+              borderRadius: BorderRadius.circular(26),
+              boxShadow: [
+                BoxShadow(
+                  color: CouleursApp.primaire.withValues(alpha: 0.30),
+                  blurRadius: 26,
+                  offset: const Offset(0, 14),
+                ),
+              ],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      decoration: BoxDecoration(
+                        color: Colors.white.withValues(alpha: 0.18),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: const Icon(Iconsax.box_copy,
+                          color: Colors.white, size: 18),
+                    ),
+                    const SizedBox(width: 10),
+                    const Text(
+                      'Nouvelle expédition',
+                      style: TextStyle(
+                          color: Colors.white70,
+                          fontSize: 13,
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 0.3),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                const Text(
+                  'Où expédions-nous\naujourd\'hui ?',
+                  style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 25,
+                      height: 1.15,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: -0.5),
+                ),
+                const SizedBox(height: 18),
+                // Faux champ de recherche (invite à démarrer une demande)
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.search,
+                          color: Color(0xFF94A3B8), size: 20),
+                      const SizedBox(width: 10),
+                      const Expanded(
+                        child: Text(
+                          'Saisir le point de départ…',
+                          style: TextStyle(
+                              color: Color(0xFF64748B),
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500),
+                        ),
+                      ),
+                      Container(
+                        padding: const EdgeInsets.all(7),
+                        decoration: const BoxDecoration(
+                          color: CouleursApp.primaire,
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(Icons.arrow_forward_rounded,
+                            color: Colors.white, size: 18),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  // ==========================================
   // SELECTION DE SERVICES (ACCUEIL)
   // ==========================================
   Widget _buildServiceCategories(BuildContext context) {
@@ -402,10 +529,27 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            "Que souhaitez-vous transporter ?",
-            style: TextStyle(
-                fontSize: 18, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface),
+          Row(
+            children: [
+              Text(
+                "Nos services",
+                style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: -0.3,
+                    color: Theme.of(context).colorScheme.onSurface),
+              ),
+              const Spacer(),
+              Text(
+                "Choisissez & estimez",
+                style: TextStyle(
+                    fontSize: 12.5,
+                    color: Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withValues(alpha: 0.5)),
+              ),
+            ],
           ),
           const SizedBox(height: 16),
           GridView.builder(
