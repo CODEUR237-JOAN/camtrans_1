@@ -211,6 +211,19 @@ service cloud.firestore {
     }
 
     // ============================================================
+    // COLLECTION : index_telephones (unicité des numéros à l'inscription)
+    // Clé = numéro normalisé. Lecture : tout connecté (test d'existence).
+    // Création : réservée à son propre compte. Modif/suppr : propriétaire/admin.
+    // ============================================================
+    match /index_telephones/{telephone} {
+      allow read: if estConnecte();
+      allow create: if estConnecte() &&
+        request.resource.data.uid == request.auth.uid;
+      allow update, delete: if estConnecte() &&
+        (estAdmin() || resource.data.uid == request.auth.uid);
+    }
+
+    // ============================================================
     // COLLECTION : historique_retraits (retraits du portefeuille ADMIN)
     // Revenus propres de la plateforme. Lecture/écriture : ADMIN uniquement.
     // ============================================================

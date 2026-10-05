@@ -147,10 +147,12 @@ class _InscriptionTransporteurState
       final serviceAuth = ref.read(serviceAuthentificationProvider);
       final serviceDb = ref.read(serviceFirestoreProvider);
 
-      // Inscription Firebase Auth
-      final userCred = await serviceAuth.inscription(
+      // Inscription Firebase Auth (vérifie l'unicité du téléphone AVANT la
+      // création du compte et l'upload des documents, et humanise les erreurs).
+      final userCred = await serviceAuth.inscriptionAvecVerifications(
         email: _email.text,
         motDePasse: _motDePasse.text,
+        telephone: _telephone.text.trim(),
       );
 
       // Création du document Transporteur

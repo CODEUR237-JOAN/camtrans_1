@@ -58,11 +58,12 @@ class _InscriptionClientState extends ConsumerState<InscriptionClient> {
       debugPrint("1. Appel de Firebase Auth...");
       // Inscription Firebase Auth avec Timeout
       final userCred = await serviceAuth
-          .inscription(
+          .inscriptionAvecVerifications(
         email: _email.text,
         motDePasse: _motDePasse.text,
+        telephone: _telephone.text.trim(),
       )
-          .timeout(const Duration(seconds: 15), onTimeout: () {
+          .timeout(const Duration(seconds: 20), onTimeout: () {
         throw Exception(
             "Délai d'attente dépassé pour l'authentification (Problème de connexion internet ou serveur Firebase injoignable).");
       });
