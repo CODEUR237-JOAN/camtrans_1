@@ -89,6 +89,47 @@ class ServiceNotification {
     }
   }
 
+  /// Active les notifications : demande la permission système puis
+  /// enregistre le token FCM. Retourne false si la permission est refusée.
+  static Future<bool> activerNotifications(
+      String userId, String typeUtilisateur) async {
+    try {
+      final settings = await _messaging.requestPermission(
+        alert: true,
+        badge: true,
+        sound: true,
+      );
+      final autorise = settings.authorizationStatus ==
+              AuthorizationStatus.authorized ||
+          settings.authorizationStatus == AuthorizationStatus.provisional;
+      if (!autorise) return false;
+      await enregistrerTokenUtilisateur(userId, typeUtilisateur);
+      return true;
+    } catch (e) {
+      debugPrint('[Notif] Activation impossible : $e');
+      return false;
+    }
+  }
+
+  /// Désactive les notifications : supprime le token FCM côté Firestore
+  /// (le serveur ne pourra plus envoyer de push) et côté appareil.
+  static Future<void> desactiverNotifications(
+      String userId, String typeUtilisateur) async {
+    try {
+      final collection =
+          typeUtilisateur == 'client' ? 'clients' : 'transporteurs';
+      await FirebaseFirestore.instance
+          .collection(collection)
+          .doc(userId)
+          .set({'fcmToken': FieldValue.delete()}, SetOptions(merge: true));
+      try {
+        await _messaging.deleteToken();
+      } catch (_) {}
+    } catch (e) {
+      debugPrint('[Notif] Désactivation impossible : $e');
+    }
+  }
+
   static Stream<String> changementToken() => _messaging.onTokenRefresh;
 
   // ===========================

@@ -5,10 +5,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'package:update_camtrans/coeur/constantes/couleurs.dart';
+import 'package:update_camtrans/services/service_notification.dart';
 import 'package:update_camtrans/coeur/etat/utilisateur_provider.dart';
 import 'package:update_camtrans/coeur/routes/routes.dart';
 import 'package:update_camtrans/coeur/widgets/selecteur_theme.dart';
@@ -64,6 +66,85 @@ class _ParametresState extends ConsumerState<Parametres> {
   Future<void> _sauvegarderPref(String cle, bool valeur) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setBool(cle, valeur);
+  }
+
+  // -----------------------------------------------------------------
+  // Effets RÉELS des préférences (notifications, GPS, biométrie)
+  // -----------------------------------------------------------------
+  String? get _uid =>
+      ref.read(serviceAuthentificationProvider).utilisateur?.uid;
+
+  /// Active/désactive réellement les notifications push (permission + token FCM).
+  Future<void> _changerNotifications(bool v) async {
+    setState(() => _notifications = v);
+    await _sauvegarderPref(_keyNotifications, v);
+    final uid = _uid;
+    if (uid == null) return;
+
+    if (v) {
+      final ok = await ServiceNotification.activerNotifications(uid, 'client');
+      if (!mounted) return;
+      if (!ok) {
+        setState(() => _notifications = false);
+        await _sauvegarderPref(_keyNotifications, false);
+        _toast('Autorisez les notifications dans les réglages du téléphone.',
+            erreur: true);
+      } else {
+        _toast('Notifications activées.');
+      }
+    } else {
+      await ServiceNotification.desactiverNotifications(uid, 'client');
+      if (mounted) _toast('Notifications désactivées.');
+    }
+  }
+
+  /// Demande/gère réellement la permission de géolocalisation.
+  Future<void> _changerLocalisation(bool v) async {
+    if (v) {
+      final statut = await Permission.locationWhenInUse.request();
+      if (!mounted) return;
+      if (statut.isGranted || statut.isLimited) {
+        setState(() => _localisation = true);
+        await _sauvegarderPref(_keyLocalisation, true);
+        _toast('Géolocalisation activée.');
+      } else {
+        setState(() => _localisation = false);
+        await _sauvegarderPref(_keyLocalisation, false);
+        _toast('Permission de localisation refusée.', erreur: true);
+        if (statut.isPermanentlyDenied) await openAppSettings();
+      }
+    } else {
+      setState(() => _localisation = false);
+      await _sauvegarderPref(_keyLocalisation, false);
+      if (mounted) {
+        _toast(
+            'Pour couper totalement le GPS, désactivez-le dans les réglages du téléphone.');
+      }
+    }
+  }
+
+  /// La biométrie nécessite le module natif `local_auth` (non encore intégré).
+  /// On reste honnête : l'interrupteur ne prétend pas marcher.
+  Future<void> _changerBiometrie(bool v) async {
+    if (v) {
+      if (mounted) {
+        _toast('La connexion biométrique sera bientôt disponible.');
+        setState(() => _biometrie = false);
+      }
+      return;
+    }
+    setState(() => _biometrie = false);
+    await _sauvegarderPref(_keyBiometrie, false);
+  }
+
+  void _toast(String message, {bool erreur = false}) {
+    if (!mounted) return;
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+      content: Text(message, style: GoogleFonts.inter(color: Colors.white)),
+      backgroundColor: erreur ? CouleursApp.erreur : CouleursApp.succes,
+      behavior: SnackBarBehavior.floating,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+    ));
   }
 
   // -----------------------------------------------------------------
@@ -159,10 +240,7 @@ class _ParametresState extends ConsumerState<Parametres> {
           titre: 'Déverrouillage biométrique',
           sousTitre: 'Empreinte ou Face ID à l\'ouverture de l\'app.',
           valeur: _biometrie,
-          onChange: (v) {
-            setState(() => _biometrie = v);
-            _sauvegarderPref(_keyBiometrie, v);
-          },
+          onChange: _changerBiometrie,
         ),
         _ligneFeuilleInfo(
           icone: Iconsax.shield_tick_copy,
@@ -458,10 +536,7 @@ class _ParametresState extends ConsumerState<Parametres> {
             sousTitre: 'Alertes de course et mises à jour de statut',
             valeur: _notifications,
             couleur: CouleursApp.primaire,
-            onChange: (v) {
-              setState(() => _notifications = v);
-              _sauvegarderPref(_keyNotifications, v);
-            },
+            onChange: _changerNotifications,
           ),
 
           _buildSwitch(
@@ -470,10 +545,7 @@ class _ParametresState extends ConsumerState<Parametres> {
             sousTitre: 'Nécessaire pour le suivi GPS en temps réel',
             valeur: _localisation,
             couleur: CouleursApp.accentNeon,
-            onChange: (v) {
-              setState(() => _localisation = v);
-              _sauvegarderPref(_keyLocalisation, v);
-            },
+            onChange: _changerLocalisation,
           ),
 
           _buildSwitch(
@@ -482,10 +554,7 @@ class _ParametresState extends ConsumerState<Parametres> {
             sousTitre: 'Empreinte digitale ou Face ID pour vous connecter',
             valeur: _biometrie,
             couleur: CouleursApp.accentViolet,
-            onChange: (v) {
-              setState(() => _biometrie = v);
-              _sauvegarderPref(_keyBiometrie, v);
-            },
+            onChange: _changerBiometrie,
           ),
 
           const SizedBox(height: 28),
