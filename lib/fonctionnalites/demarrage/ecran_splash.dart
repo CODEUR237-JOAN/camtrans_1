@@ -118,7 +118,7 @@ class _EcranSplashState extends ConsumerState<EcranSplash>
                             ),
                           ],
                           image: const DecorationImage(
-                            image: AssetImage('assets/images/logo_splash.jpg'),
+                            image: AssetImage('assets/images/logo_camtrans.png'),
                             fit: BoxFit.contain,
                           ),
                         ),

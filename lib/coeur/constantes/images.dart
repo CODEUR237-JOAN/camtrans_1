@@ -21,13 +21,13 @@ class ImagesApp {
   // LOGOS
   // ======================================================
 
-  static const String logo = "assets/images/logo_camtrans.jpg";
+  static const String logo = "assets/images/logo_camtrans.png";
 
   // ======================================================
   // SPLASH
   // ======================================================
 
-  static const String splash = "assets/images/logo_splash.jpg";
+  static const String splash = "assets/images/logo_camtrans.png";
 
   // ======================================================
   // ONBOARDING

@@ -21,7 +21,7 @@ class TicketRecu extends StatelessWidget {
 
     // Charger le logo depuis les assets
     final ByteData logoData =
-        await rootBundle.load('assets/images/logo_camtrans.jpg');
+        await rootBundle.load('assets/images/logo_camtrans.png');
     final Uint8List logoBytes = logoData.buffer.asUint8List();
     final logoImage = pw.MemoryImage(logoBytes);
 
