@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:go_router/go_router.dart';
@@ -53,7 +54,7 @@ class _EcranEvaluationState extends ConsumerState<EcranEvaluation> {
               Text(
                 "Course terminée !",
                 style: GoogleFonts.poppins(
-                    color: Colors.white,
+                    color: Theme.of(context).colorScheme.onSurface,
                     fontSize: 28,
                     fontWeight: FontWeight.bold),
               ),
@@ -126,6 +127,9 @@ class _EcranEvaluationState extends ConsumerState<EcranEvaluation> {
                           try {
                             final firestore =
                                 ref.read(serviceFirestoreProvider);
+                            final db = FirebaseFirestore.instance;
+
+                            // 1. Note enregistrée sur la course (trace).
                             await firestore.modifierDocument(
                               collection: 'courses',
                               id: widget.courseId,
@@ -135,6 +139,34 @@ class _EcranEvaluationState extends ConsumerState<EcranEvaluation> {
                                     _commentaireController.text.trim(),
                               },
                             );
+
+                            // 2. Évaluation dédiée → permet de calculer la
+                            //    note moyenne du transporteur (lisible par
+                            //    tous), sans Cloud Function.
+                            try {
+                              final courseDoc = await db
+                                  .collection('courses')
+                                  .doc(widget.courseId)
+                                  .get();
+                              final transpId = (courseDoc.data()?[
+                                          'transporteurId'] ??
+                                      '')
+                                  .toString();
+                              final clientId =
+                                  (courseDoc.data()?['clientId'] ?? '')
+                                      .toString();
+                              if (transpId.isNotEmpty) {
+                                await db.collection('evaluations').add({
+                                  'transporteurId': transpId,
+                                  'clientId': clientId,
+                                  'courseId': widget.courseId,
+                                  'note': _note,
+                                  'commentaire':
+                                      _commentaireController.text.trim(),
+                                  'date': FieldValue.serverTimestamp(),
+                                });
+                              }
+                            } catch (_) {}
 
                             if (!context.mounted) return;
                             ScaffoldMessenger.of(context).showSnackBar(

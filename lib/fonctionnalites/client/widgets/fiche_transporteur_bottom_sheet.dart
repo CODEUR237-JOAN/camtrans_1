@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:latlong2/latlong.dart';
 
+import 'package:update_camtrans/coeur/etat/evaluation_provider.dart';
 import 'package:update_camtrans/modeles/transporteur.dart';
 import 'package:update_camtrans/services/service_gps.dart';
 
@@ -23,6 +24,18 @@ class FicheTransporteurBottomSheet extends ConsumerWidget {
       longitudeDepart: positionClient.longitude,
       latitudeArrivee: transporteur.latitude,
       longitudeArrivee: transporteur.longitude,
+    );
+
+    // Note moyenne DÉRIVÉE des avis (collection evaluations).
+    final noteAsync =
+        ref.watch(noteMoyenneTransporteurProvider(transporteur.id));
+    final noteTxt = noteAsync.maybeWhen(
+      data: (n) => n.nombre > 0
+          ? '${n.moyenne.toStringAsFixed(1)} (${n.nombre})'
+          : 'Nouveau',
+      orElse: () => transporteur.noteMoyenne > 0
+          ? transporteur.noteMoyenne.toStringAsFixed(1)
+          : 'Nouveau',
     );
 
     return Container(
@@ -61,9 +74,7 @@ class FicheTransporteurBottomSheet extends ConsumerWidget {
                         const Icon(Icons.star, color: Colors.amber, size: 18),
                         const SizedBox(width: 4),
                         Text(
-                          transporteur.noteMoyenne > 0
-                              ? transporteur.noteMoyenne.toStringAsFixed(1)
-                              : "Nouveau",
+                          noteTxt,
                           style: Theme.of(context).textTheme.bodyMedium,
                         ),
                         const SizedBox(width: 16),

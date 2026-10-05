@@ -211,6 +211,18 @@ service cloud.firestore {
     }
 
     // ============================================================
+    // COLLECTION : evaluations (notes & avis des clients sur les courses)
+    // Lecture : tout connecté (pour calculer la note moyenne d'un
+    // transporteur). Création : par le client auteur uniquement.
+    // ============================================================
+    match /evaluations/{evalId} {
+      allow read: if estConnecte();
+      allow create: if estConnecte() &&
+        request.resource.data.clientId == request.auth.uid;
+      allow update, delete: if estAdmin();
+    }
+
+    // ============================================================
     // COLLECTION : index_telephones (unicité des numéros à l'inscription)
     // Clé = numéro normalisé. Lecture : tout connecté (test d'existence).
     // Création : réservée à son propre compte. Modif/suppr : propriétaire/admin.

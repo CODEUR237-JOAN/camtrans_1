@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:update_camtrans/coeur/etat/evaluation_provider.dart';
 import 'package:go_router/go_router.dart';
 
 import 'package:update_camtrans/coeur/constantes/couleurs.dart';
@@ -237,13 +238,25 @@ class ProfilTransporteur extends ConsumerWidget {
                                 ),
                                 const SizedBox(width: 15),
                                 Expanded(
-                                  child: CarteInformation(
-                                      compacte: true,
-                                      titre: "Note",
-                                      valeur: "${transporteur.noteMoyenne} ",
-                                      icone: Icons.star,
-                                      couleurIcone: Colors.amber,
-                                      couleurValeur: Colors.amber),
+                                  child: Consumer(builder: (context, ref, _) {
+                                    final n = ref.watch(
+                                        noteMoyenneTransporteurProvider(
+                                            transporteur.id));
+                                    final v = n.maybeWhen(
+                                      data: (x) => x.nombre > 0
+                                          ? x.moyenne.toStringAsFixed(1)
+                                          : '—',
+                                      orElse: () =>
+                                          '${transporteur.noteMoyenne}',
+                                    );
+                                    return CarteInformation(
+                                        compacte: true,
+                                        titre: "Note",
+                                        valeur: v,
+                                        icone: Icons.star,
+                                        couleurIcone: Colors.amber,
+                                        couleurValeur: Colors.amber);
+                                  }),
                                 ),
                               ],
                             ),
