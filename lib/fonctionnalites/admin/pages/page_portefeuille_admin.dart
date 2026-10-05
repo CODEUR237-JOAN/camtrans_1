@@ -6,7 +6,6 @@ import 'package:intl/intl.dart';
 import 'package:update_camtrans/coeur/constantes/couleurs.dart';
 import 'package:update_camtrans/coeur/etat/admin_portefeuille_provider.dart';
 import 'package:update_camtrans/coeur/widgets/loader_premium.dart';
-import 'package:update_camtrans/modeles/portefeuille_admin.dart';
 import 'package:update_camtrans/modeles/retrait_admin.dart';
 import 'package:update_camtrans/services/service_paiement.dart';
 

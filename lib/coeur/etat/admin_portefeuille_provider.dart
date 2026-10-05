@@ -59,7 +59,7 @@ final adminPortefeuilleProvider =
   // Revenus abonnements = somme des montants.
   final revenusAbonnements = (abonnementsAsync.value ?? []).fold<double>(
     0,
-    (sum, a) => sum + ((a['montant'] as num?)?.toDouble() ?? 0),
+    (total, a) => total + ((a['montant'] as num?)?.toDouble() ?? 0),
   );
 
   // Revenus courses = somme des frais de plateforme prélevés sur les
@@ -72,7 +72,7 @@ final adminPortefeuilleProvider =
   }
 
   final totalRetire = (retraitsAsync.value ?? [])
-      .fold<double>(0, (sum, r) => sum + r.montant);
+      .fold<double>(0, (total, r) => total + r.montant);
 
   return AsyncValue.data(PortefeuilleAdmin(
     revenusAbonnements: revenusAbonnements,
