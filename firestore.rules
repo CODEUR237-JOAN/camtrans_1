@@ -211,6 +211,14 @@ service cloud.firestore {
     }
 
     // ============================================================
+    // COLLECTION : historique_retraits (retraits du portefeuille ADMIN)
+    // Revenus propres de la plateforme. Lecture/écriture : ADMIN uniquement.
+    // ============================================================
+    match /historique_retraits/{retraitId} {
+      allow read, write: if estAdmin();
+    }
+
+    // ============================================================
     // COLLECTION : entretiens (entretiens du véhicule du transporteur)
     // Chaque transporteur ne lit/gère que SES propres entretiens.
     // ============================================================

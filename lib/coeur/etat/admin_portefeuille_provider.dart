@@ -102,6 +102,7 @@ class AdminPortefeuilleActions {
     required double montant,
     required String methode,
     String beneficiaire = '',
+    String statut = 'succes',
   }) async {
     final db = FirebaseFirestore.instance;
     final uid = _ref.read(serviceAuthentificationProvider).utilisateur?.uid;
@@ -128,7 +129,7 @@ class AdminPortefeuilleActions {
       montant: montant,
       date: DateTime.now(),
       methodePaiement: methode,
-      statut: 'succes',
+      statut: statut,
       reference: 'RET-ADM-${DateTime.now().millisecondsSinceEpoch}',
       beneficiaire: beneficiaire,
     );

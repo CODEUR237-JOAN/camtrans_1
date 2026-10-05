@@ -13,6 +13,7 @@ import 'pages/page_parametres.dart';
 import 'pages/page_abonnements_admin.dart';
 import 'pages/page_litiges.dart';
 import 'pages/page_gestion_textes.dart';
+import 'pages/page_portefeuille_admin.dart';
 
 class TableauDeBordAdmin extends ConsumerStatefulWidget {
   const TableauDeBordAdmin({super.key});
@@ -88,6 +89,7 @@ class _TableauDeBordAdminState extends ConsumerState<TableauDeBordAdmin> {
                 PageAbonnementsAdmin(),
                 PageLitiges(),
                 PageGestionTextes(),
+                PagePortefeuilleAdmin(),
               ],
             ),
           ),

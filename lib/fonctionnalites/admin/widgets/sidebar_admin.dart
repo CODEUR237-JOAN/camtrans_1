@@ -157,6 +157,17 @@ class SidebarAdmin extends ConsumerWidget {
                   onTap: () =>
                       ref.read(adminMenuIndexProvider.notifier).state = 9,
                 ),
+                const SizedBox(height: 20),
+
+                const _SectionTitle(titre: "FINANCES"),
+                _MenuItem(
+                  titre: "Mon Portefeuille",
+                  icone: Icons.account_balance_wallet_outlined,
+                  index: 10,
+                  currentIndex: indexSelectionne,
+                  onTap: () =>
+                      ref.read(adminMenuIndexProvider.notifier).state = 10,
+                ),
                 const SizedBox(height: 30),
 
                 // Add more items like signalements, paiements here in the future
