@@ -629,7 +629,7 @@ class _ParametresState extends ConsumerState<Parametres> {
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
-          colors: [Color(0xFF00C896), Color(0xFF06B6D4)],
+          colors: [Color(0xFF007ACC), Color(0xFF33AFFF)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),

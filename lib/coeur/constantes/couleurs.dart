@@ -18,13 +18,13 @@ class CouleursApp {
   // Couleurs principales
   // ==========================
 
-  /// Vert Émeraude — Confiance, Succès, Logistique
-  static const Color primaire = Color(0xFF00C896);
-  static const Color primaireFonce = Color(0xFF009B74);
-  static const Color primaireClair = Color(0xFFE5FFF7);
+  /// Bleu CamTrans — Confiance, Mobilité, Logistique (charte 2026)
+  static const Color primaire = Color(0xFF007ACC);
+  static const Color primaireFonce = Color(0xFF005C99);
+  static const Color primaireClair = Color(0xFFE3F2FF);
 
-  /// Indigo/Violet Néon — Effets de lueur, Tech
-  static const Color primaireNeon = Color(0xFF818CF8);
+  /// Indigo/Bleu Néon — Effets de lueur, Tech
+  static const Color primaireNeon = Color(0xFF33AFFF);
 
   /// Orange Vif — Vitesse, Urgence, Appel à l'action secondaire
   static const Color secondaire = Color(0xFFF97316);
@@ -32,10 +32,10 @@ class CouleursApp {
   static const Color secondaireFonce = Color(0xFFEA580C);
 
   /// Couleurs d'accent (aliases et variantes)
-  static const Color accent = Color(0xFF00C896); // alias de primaire
+  static const Color accent = Color(0xFF007ACC); // alias de primaire
   static const Color accentOrange = Color(0xFFF97316); // alias de secondaire
   static const Color accentRose = Color(0xFFEC4899); // Rose vibrant
-  static const Color accentNeon = Color(0xFF06B6D4); // Cyan néon
+  static const Color accentNeon = Color(0xFF33AFFF); // Bleu clair néon
   static const Color accentViolet = Color(0xFF8B5CF6); // Violet tech
 
   // ==========================
@@ -125,13 +125,13 @@ class CouleursApp {
   static const LinearGradient degradePrincipal = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
-    colors: [Color(0xFF00C896), Color(0xFF06B6D4)],
+    colors: [Color(0xFF007ACC), Color(0xFF33AFFF)],
   );
 
   static const LinearGradient degradeSplash = LinearGradient(
     begin: Alignment.topCenter,
     end: Alignment.bottomCenter,
-    colors: [Color(0xFF00C896), Color(0xFF0F172A)],
+    colors: [Color(0xFF007ACC), Color(0xFF0F172A)],
   );
 
   static const LinearGradient degradeErreur = LinearGradient(
@@ -141,7 +141,7 @@ class CouleursApp {
   );
 
   static const LinearGradient degradeNeon = LinearGradient(
-    colors: [Color(0xFF818CF8), Color(0xFF06B6D4)],
+    colors: [Color(0xFF33AFFF), Color(0xFF007ACC)],
   );
 
   static const LinearGradient degradeOrange = LinearGradient(

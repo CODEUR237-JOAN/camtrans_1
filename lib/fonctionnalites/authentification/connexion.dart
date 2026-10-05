@@ -228,10 +228,13 @@ class _ConnexionState extends ConsumerState<Connexion> {
                         decoration: BoxDecoration(
                           borderRadius: BorderRadius.circular(20),
                           boxShadow: [
+                            // Lueur bleue ultra-douce et diffuse (charte CamTrans)
                             BoxShadow(
-                              color: CouleursApp.primaire.withValues(alpha: 0.3),
-                              blurRadius: 20,
-                              spreadRadius: 2,
+                              color:
+                                  CouleursApp.primaire.withValues(alpha: 0.25),
+                              blurRadius: 30,
+                              spreadRadius: 0,
+                              offset: const Offset(0, 8),
                             ),
                           ],
                         ),
@@ -269,12 +272,14 @@ class _ConnexionState extends ConsumerState<Connexion> {
                     AnimationSlideFade(
                       delay: const Duration(milliseconds: 300),
                       child: Text(
-                        'Connectez-vous pour continuer',
+                        'Ravis de vous revoir 👋  Connectez-vous pour continuer.',
+                        textAlign: TextAlign.center,
                         style: TextStyle(
                           color: isDark
                               ? const Color(0xFFCBD5E1)
                               : CouleursApp.texteSecondaire,
-                          fontSize: 17,
+                          fontSize: 16,
+                          height: 1.4,
                         ),
                       ),
                     ),
@@ -446,6 +451,8 @@ class _ConnexionState extends ConsumerState<Connexion> {
                                 icon: const _GoogleLogo(),
                                 label: Text(
                                   'Continuer avec Google',
+                                  maxLines: 1,
+                                  overflow: TextOverflow.ellipsis,
                                   style: TextStyle(
                                     fontWeight: FontWeight.w600,
                                     fontSize: 15,
@@ -523,6 +530,8 @@ class _ConnexionState extends ConsumerState<Connexion> {
       icon: Icon(icone, color: couleur, size: 20),
       label: Text(
         label,
+        maxLines: 1,
+        overflow: TextOverflow.ellipsis,
         style: TextStyle(
           color: isDark ? Colors.white70 : Colors.black87,
           fontWeight: FontWeight.w500,
