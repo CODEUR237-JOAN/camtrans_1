@@ -13,6 +13,7 @@ import 'package:update_camtrans/fonctionnalites/authentification/inscription_cli
 import 'package:update_camtrans/fonctionnalites/authentification/inscription_transporteur.dart';
 import 'package:update_camtrans/fonctionnalites/authentification/mot_de_passe_oublie.dart';
 import 'package:update_camtrans/fonctionnalites/authentification/verification_email.dart';
+import 'package:update_camtrans/fonctionnalites/authentification/verification_sms.dart';
 import 'package:update_camtrans/fonctionnalites/client/carte.dart';
 import 'package:update_camtrans/fonctionnalites/client/creer_demande.dart';
 import 'package:update_camtrans/fonctionnalites/client/facture.dart';
@@ -53,6 +54,7 @@ class RoutesApplication {
   static const String inscriptionTransporteur = "/inscription-transporteur";
   static const String motDePasseOublie = "/mot-de-passe-oublie";
   static const String verificationEmail = "/verification-email";
+  static const String verificationSms = "/verification-sms";
   static const String modifierProfil = "/modifier-profil";
   static const String changerMotDePasse = "/changer-mot-de-passe";
   static const String tableauBordClient = "/tableau-bord-client";
@@ -134,6 +136,19 @@ class RoutesApplication {
         path: verificationEmail,
         pageBuilder: (context, state) =>
             _page(const VerificationEmail(), state.pageKey),
+      ),
+      GoRoute(
+        path: verificationSms,
+        pageBuilder: (context, state) {
+          final args = state.extra as Map<String, String>;
+          return _page(
+            VerificationSms(
+              role: args['role']!,
+              telephone: args['telephone']!,
+            ),
+            state.pageKey,
+          );
+        },
       ),
       GoRoute(
         path: modifierProfil,

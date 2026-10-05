@@ -80,15 +80,19 @@ class _ConnexionState extends ConsumerState<Connexion> {
   // -----------------------------------------------------------------
   // Routage post-connexion selon le rôle Firestore
   // -----------------------------------------------------------------
-  Future<void> _routerSelonRole(String uid) async {
+  Future<void> _routerSelonRole(String uid, {bool estConnexionGoogle = false}) async {
     final serviceDb = ref.read(serviceFirestoreProvider);
     String? role;
+    String? telephone;
 
     // 1. Admin
     try {
       final adminDoc =
           await serviceDb.lireDocument(collection: 'admin', id: uid);
-      if (adminDoc.exists) role = 'admin';
+      if (adminDoc.exists) {
+        role = 'admin';
+        telephone = adminDoc.data()?['telephone'] as String?;
+      }
     } catch (_) {}
 
     // 2. Transporteur
@@ -96,7 +100,10 @@ class _ConnexionState extends ConsumerState<Connexion> {
       try {
         final transpDoc =
             await serviceDb.lireDocument(collection: 'transporteurs', id: uid);
-        if (transpDoc.exists) role = 'transporteur';
+        if (transpDoc.exists) {
+          role = 'transporteur';
+          telephone = transpDoc.data()?['telephone'] as String?;
+        }
       } catch (_) {}
     }
 
@@ -105,7 +112,10 @@ class _ConnexionState extends ConsumerState<Connexion> {
       try {
         final clientDoc =
             await serviceDb.lireDocument(collection: 'clients', id: uid);
-        if (clientDoc.exists) role = 'client';
+        if (clientDoc.exists) {
+          role = 'client';
+          telephone = clientDoc.data()?['telephone'] as String?;
+        }
       } catch (_) {}
     }
 
@@ -113,13 +123,30 @@ class _ConnexionState extends ConsumerState<Connexion> {
     if (!mounted) return;
 
     if (role == 'admin') {
+      if (estConnexionGoogle && telephone != null && telephone.isNotEmpty) {
+        if (mounted) {
+          context.go(RoutesApplication.verificationSms, extra: {'role': role, 'telephone': telephone});
+        }
+        return;
+      }
       context.go(RoutesApplication.admin);
     } else if (role == 'client') {
       await ServiceNotification.enregistrerTokenUtilisateur(uid, 'client');
+      if (estConnexionGoogle && telephone != null && telephone.isNotEmpty) {
+        if (mounted) {
+          context.go(RoutesApplication.verificationSms, extra: {'role': role, 'telephone': telephone});
+        }
+        return;
+      }
       if (mounted) context.go(RoutesApplication.tableauBordClient);
     } else if (role == 'transporteur') {
-      await ServiceNotification.enregistrerTokenUtilisateur(
-          uid, 'transporteur');
+      await ServiceNotification.enregistrerTokenUtilisateur(uid, 'transporteur');
+      if (estConnexionGoogle && telephone != null && telephone.isNotEmpty) {
+        if (mounted) {
+          context.go(RoutesApplication.verificationSms, extra: {'role': role, 'telephone': telephone});
+        }
+        return;
+      }
       if (mounted) context.go(RoutesApplication.tableauBordTransporteur);
     } else {
       // Nouveau compte Google → créer le profil
@@ -162,7 +189,7 @@ class _ConnexionState extends ConsumerState<Connexion> {
       if (!mounted) return;
       if (userCred?.user != null) {
         await _migrerCompteParEmailSiBesoin(userCred!.user!);
-        await _routerSelonRole(userCred.user!.uid);
+        await _routerSelonRole(userCred.user!.uid, estConnexionGoogle: true);
       }
       // Si null → l'utilisateur a annulé (pas d'erreur à afficher)
     } catch (e) {
