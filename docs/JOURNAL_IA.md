@@ -152,3 +152,11 @@ Apports : TTS fr-FR débit 0.46 / pitch 1.05, `awaitSpeakCompletion`, QUEUE_FLUS
 
 ### Rerouting câblé dans le ViewModel (commit 851793c)
 `coeur/etat/suivi_provider.dart` : à chaque position du chauffeur, `_verifierDeviation()` calcule la distance point→tracé (projection équirectangulaire, projection sur segments). Hors-route si > 60 m confirmé sur 3 relevés consécutifs (anti-jitter), uniquement en phases de conduite (enRouteDepart / charge / enTransit), cooldown 15 s. Déclenche `_navVocale.announceRerouting()` + recalcul OSRM depuis la position vers la cible (client ou destination), puis `_navVocale.rafraichirItineraire(nouveau)`. Service vocal : ajout de `rafraichirItineraire(InfoTrajet)`.
+
+## Correction des 3 bugs d'authentification (commit 071e433)
+
+- **Bug 1 (champs vidés) : déjà OK.** Aucun `.clear()` dans les `catch` des vues auth ; `coeur/widgets/champ_texte.dart` utilise le `controleur` externe → le texte survit aux rebuilds. Amélioration réelle = messages d'erreur clairs.
+- **Bug 2 (unicité).** `service_authentification.dart` : `inscriptionAvecVerifications({email, motDePasse, telephone})`. Email → FirebaseAuth + `_messageErreurAuth()` (ex: `email-already-in-use` → "Cet email est déjà utilisé"). Téléphone → réservation ATOMIQUE (transaction) dans la collection `index_telephones/{numeroNormalisé}` APRÈS création du compte (sinon les règles bloquent la lecture). Numéro pris → `AuthException` + rollback (`cred.user.delete()`). Classe `AuthException` (toString = message). Vues `inscription_client`/`inscription_transporteur` appellent cette méthode. Pas de vérif du mot de passe. **Règle Firestore ajoutée** : `index_telephones` (read si connecté ; create si `uid == auth.uid`). NB : ne détecte que les numéros enregistrés APRÈS déploiement (pas de migration des comptes existants sans Cloud Function).
+- **Bug 3 (Google).** `connexionGoogle()` : crée `utilisateurs/{uid}` à la 1re connexion (`additionalUserInfo.isNewUser`), gère l'annulation (retourne `null`). Code correct pour `google_sign_in 6.2.2`. **À vérifier côté config** : SHA-1/SHA-256 dans Firebase Console + OAuth client (le code ne peut pas corriger une config manquante).
+
+À redéployer : `firestore.rules` (contient maintenant `index_telephones`, `historique_retraits`, `entretiens`).
