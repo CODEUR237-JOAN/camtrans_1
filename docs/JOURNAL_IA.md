@@ -81,7 +81,13 @@ Déjà 100 % basé sur les tokens → déjà bleu. Changements : badge de statut
 **Fichiers :** `resume_expedition_bottom_sheet.dart`, `carte_estimation_remorque.dart`
 Derniers verts-marque codés en dur (flux demande) passés au bleu. **Vérifié : 0 occurrence de `#12B76A`/`#00C896`/`#06B6D4`/`#0E9456` dans tout `lib/`.** Le rebrand bleu est terminé et cohérent sur toute l'app. Le tableau de bord transporteur n'a nécessité aucun changement (déjà 100 % tokens).
 
-**Reste à polir (UI, écrans non encore relus un par un) :** suivi de course, paiement, portefeuille, admin, notifications. Ils héritent déjà du bleu via les tokens ; relire chacun pour : statuts via `StatutCourse.libelle`, overflow (`ellipsis`), empty states, code mort. Le vert sémantique `CouleursApp.succes` (#10B981) est à CONSERVER (succès/online), ne pas le confondre avec l'ancien vert-marque.
+### `3198844` + `86edc21` — fix(ui) : relecture écrans restants (lisibilité)
+Relecture ciblée (scans : handlers morts, stubs, statuts bruts, couleur-marque, icônes invisibles) de suivi/paiement/portefeuille/notifications/admin. Résultats :
+- **Aucun** handler mort, stub, statut brut affiché, ni vert-marque dans ces écrans (ils héritent du bleu via les tokens).
+- **Bug icône invisible corrigé** (pattern `iconTheme` = couleur du fond) : `notifications.dart` (icône « tout marquer lu ») et `client/suivi_transport.dart` (bouton retour sur écran d'erreur) → passés en blanc.
+- **Portefeuille** : solde « null FCFA » si donnée non prête → variable `solde` sécurisée + fallbacks ; cartes de transaction (fond sombre) texte sans couleur → illisible en thème clair → texte blanc.
+
+**Reste (facultatif) :** relecture approfondie page par page de l'ADMIN (11 fichiers, ~5700 lignes dont `page_vue_ensemble.dart` 1260 l.) et de `ecran_paiement.dart` (564 l.) / panneau de suivi — non faite ligne à ligne (volumineux, non compilable ici). Ces écrans héritent déjà du bleu ; les scans n'y ont pas remonté de défaut bloquant. Point d'attention thème : plusieurs écrans codent un fond sombre en dur (`0xFF08111F`/`0xFF10192A`) avec du texte sans couleur explicite → vérifier la lisibilité en THÈME CLAIR (risque de texte sombre sur carte sombre). Le vert sémantique `CouleursApp.succes` (#10B981) est à CONSERVER.
 
 ---
 
