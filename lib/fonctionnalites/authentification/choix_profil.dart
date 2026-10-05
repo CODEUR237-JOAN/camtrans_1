@@ -68,7 +68,7 @@ class ChoixProfil extends StatelessWidget {
                               Icon(Icons.auto_awesome_rounded,
                                   size: 16, color: CouleursApp.primaire),
                               Text(
-                                'Experience personnalisee',
+                                'Expérience personnalisée',
                                 style: TextStyle(
                                   color: CouleursApp.primaire,
                                   fontSize: 12,
@@ -90,7 +90,7 @@ class ChoixProfil extends StatelessWidget {
                         ),
                         const SizedBox(height: 12),
                         const Text(
-                          'Choisissez votre espace pour obtenir les bons outils, les bons indicateurs et les bonnes actions des le depart.',
+                          'Choisissez votre espace pour obtenir les bons outils, les bons indicateurs et les bonnes actions dès le départ.',
                           style: TextStyle(
                             fontSize: 15,
                             color: Colors.white70,
@@ -101,10 +101,10 @@ class ChoixProfil extends StatelessWidget {
                         const SizedBox(height: 34),
                         _creerCarteProfil(
                           context,
-                          titre: 'Client / Expediteur',
+                          titre: 'Client / Expéditeur',
                           description:
-                              'Expediez des colis, meubles ou marchandises et suivez chaque trajet en temps reel.',
-                          badge: 'Je reserve un transport',
+                              'Expédiez des colis, meubles ou marchandises, et suivez chaque trajet en temps réel.',
+                          badge: 'Je réserve un transport',
                           icone: Icons.inventory_2_outlined,
                           couleur: CouleursApp.primaire,
                           routeDest: RoutesApplication.inscriptionClient,
@@ -115,7 +115,7 @@ class ChoixProfil extends StatelessWidget {
                           context,
                           titre: 'Transporteur / Chauffeur',
                           description:
-                              'Recevez des courses, optimisez vos trajets et pilotez vos revenus depuis un espace dedie.',
+                              'Recevez des courses, optimisez vos trajets et pilotez vos revenus depuis un espace dédié.',
                           badge: 'Je trouve des courses',
                           icone: Icons.local_shipping_outlined,
                           couleur: CouleursApp.accentOrange,
@@ -128,7 +128,7 @@ class ChoixProfil extends StatelessWidget {
                             onPressed: () =>
                                 context.go(RoutesApplication.connexion),
                             child: const Text(
-                              'J\'ai deja un compte. Se connecter',
+                              'J\'ai déjà un compte · Se connecter',
                               style: TextStyle(fontWeight: FontWeight.w800),
                             ),
                           ),

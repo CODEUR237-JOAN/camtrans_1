@@ -278,10 +278,23 @@ class _InscriptionClientState extends ConsumerState<InscriptionClient> {
                   // Titre
                   const Text(
                     "Créer votre compte",
+                    textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 28,
                       fontWeight: FontWeight.w900,
                       letterSpacing: -0.5,
+                    ),
+                  ),
+
+                  const SizedBox(height: 8),
+
+                  const Text(
+                    "Rejoignez CamTrans en moins d'une minute 🚀",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 15,
+                      color: CouleursApp.texteSecondaire,
+                      height: 1.4,
                     ),
                   ),
 

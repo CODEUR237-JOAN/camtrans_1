@@ -407,10 +407,23 @@ class _InscriptionTransporteurState
                   // Titre
                   const Text(
                     "Devenez Transporteur",
+                    textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 28,
                       fontWeight: FontWeight.w900,
                       letterSpacing: -0.5,
+                    ),
+                  ),
+
+                  const SizedBox(height: 8),
+
+                  const Text(
+                    "Transportez à votre rythme et pilotez vos revenus 🚚",
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 15,
+                      color: CouleursApp.texteSecondaire,
+                      height: 1.4,
                     ),
                   ),
 
