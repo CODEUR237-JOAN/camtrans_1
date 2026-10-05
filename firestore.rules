@@ -60,13 +60,24 @@ service cloud.firestore {
     match /transporteurs/{userId} {
       // Lecture : tout le monde (connecté) peut lire les transporteurs (nécessaire pour l'attribution et l'admin)
       allow read: if estConnecte();
-      
-      allow create: if estConnecte() && estProprietaire(userId);
-      
-      // Modification : seul le transporteur peut modifier son profil, ou l'admin
-      // Important: On empêche un transporteur de modifier les statuts des autres.
-      allow update: if estConnecte() && (estProprietaire(userId) || estAdmin());
-      
+
+      // Création (inscription) : le transporteur crée son propre profil, mais ne
+      // peut pas s'auto-valider ni se créditer dès le départ.
+      allow create: if estConnecte() && estProprietaire(userId)
+        && request.resource.data.documentsValides == false
+        && request.resource.data.soldePortefeuille == 0;
+
+      // Modification : seul le transporteur peut modifier son profil, ou l'admin.
+      // ✅ FIX SÉCURITÉ : le propriétaire ne peut PAS toucher aux champs sensibles
+      // (solde, validation des documents, revenus, note) — réservés à l'admin /
+      // au serveur. Empêche l'auto-crédit du portefeuille et l'auto-validation.
+      allow update: if estConnecte() && (
+        estAdmin() ||
+        (estProprietaire(userId)
+          && !request.resource.data.diff(resource.data).affectedKeys()
+               .hasAny(['soldePortefeuille', 'documentsValides', 'revenusTotaux', 'noteMoyenne']))
+      );
+
       allow delete: if estConnecte() && (estProprietaire(userId) || estAdmin());
     }
 
@@ -110,8 +121,15 @@ service cloud.firestore {
       );
 
       // Sous-collection des messages du chat in-app
+      // ✅ FIX SÉCURITÉ : était ouverte à TOUS les connectés (n'importe qui
+      // pouvait lire/écrire le chat de n'importe quelle course).
+      // Désormais : seuls le client, le transporteur de la course, ou l'admin.
       match /messages/{messageId} {
-        allow read, write: if estConnecte();
+        allow read, write: if estConnecte() && (
+          estAdmin() ||
+          get(/databases/$(database)/documents/courses/$(courseId)).data.clientId == request.auth.uid ||
+          get(/databases/$(database)/documents/courses/$(courseId)).data.transporteurId == request.auth.uid
+        );
       }
     }
 
