@@ -286,7 +286,7 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
             ),
           ),
 
-          // Orbe lumineux vert émeraude (à la Pinterest glassmorphism)
+          // Orbe lumineux bleu CamTrans (à la Pinterest glassmorphism)
           Positioned(
             top: -80,
             left: -60,
@@ -295,7 +295,7 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
               height: 260,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: const Color(0xFF12B76A).withValues(alpha: 0.12),
+                color: const Color(0xFF007ACC).withValues(alpha: 0.12),
               ),
               child: BackdropFilter(
                 filter: ImageFilter.blur(sigmaX: 100, sigmaY: 100),
@@ -335,7 +335,7 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 color: etat.categorieService == "Remorque"
-                    ? const Color(0xFF12B76A).withValues(alpha: 0.1)
+                    ? const Color(0xFF007ACC).withValues(alpha: 0.1)
                     : const Color(0xFF3B82F6).withValues(alpha: 0.1),
               ),
               child: BackdropFilter(
@@ -457,7 +457,7 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
                       borderRadius: BorderRadius.circular(1),
                       gradient: isCompleted
                           ? const LinearGradient(
-                              colors: [Color(0xFF12B76A), Color(0xFF3B82F6)],
+                              colors: [Color(0xFF007ACC), Color(0xFF3B82F6)],
                             )
                           : null,
                       color: isCompleted ? null : const Color(0xFF10192A),
@@ -519,7 +519,7 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
                 Row(
                   children: [
                     const Icon(Icons.directions_car_outlined,
-                        color: Color(0xFF12B76A), size: 18),
+                        color: Color(0xFF007ACC), size: 18),
                     const SizedBox(width: 8),
                     Text(
                       "Marque du véhicule",
@@ -534,7 +534,7 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
                       Text(
                         etat.marqueVehiculeRemorque,
                         style: GoogleFonts.poppins(
-                          color: const Color(0xFF12B76A),
+                          color: const Color(0xFF007ACC),
                           fontWeight: FontWeight.bold,
                           fontSize: 13,
                         ),
@@ -569,20 +569,20 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
                           alignment: Alignment.center,
                           decoration: BoxDecoration(
                             color: isSelected
-                                ? const Color(0xFF12B76A)
+                                ? const Color(0xFF007ACC)
                                     .withValues(alpha: 0.18)
                                 : const Color(0xFF10192A),
                             borderRadius: BorderRadius.circular(24),
                             border: Border.all(
                               color: isSelected
-                                  ? const Color(0xFF12B76A)
+                                  ? const Color(0xFF007ACC)
                                   : Colors.white.withValues(alpha: 0.08),
                               width: isSelected ? 2 : 1,
                             ),
                             boxShadow: isSelected
                                 ? [
                                     BoxShadow(
-                                      color: const Color(0xFF12B76A)
+                                      color: const Color(0xFF007ACC)
                                           .withValues(alpha: 0.35),
                                       blurRadius: 12,
                                       spreadRadius: 0,
@@ -600,7 +600,7 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
                             marque,
                             style: GoogleFonts.inter(
                               color: isSelected
-                                  ? const Color(0xFF12B76A)
+                                  ? const Color(0xFF007ACC)
                                   : Colors.white60,
                               fontWeight: isSelected
                                   ? FontWeight.w700
@@ -666,7 +666,7 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
                           children: [
                             // Icône dépanneuse pulsante — jamais un spinner générique
                             const Icon(Icons.car_repair,
-                                    color: Color(0xFF12B76A), size: 28)
+                                    color: Color(0xFF007ACC), size: 28)
                                 .animate(onPlay: (c) => c.repeat())
                                 .shimmer(
                                     duration: 900.ms, color: Colors.white70)
@@ -1104,7 +1104,7 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
               gradient: etat.estEnAttenteIA
                   ? null
                   : const LinearGradient(
-                      colors: [Color(0xFF12B76A), Color(0xFF0E9456)],
+                      colors: [Color(0xFF007ACC), Color(0xFF005C99)],
                       begin: Alignment.centerLeft,
                       end: Alignment.centerRight,
                     ),
@@ -1112,7 +1112,7 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
                   ? []
                   : [
                       BoxShadow(
-                        color: const Color(0xFF12B76A).withValues(alpha: 0.35),
+                        color: const Color(0xFF007ACC).withValues(alpha: 0.35),
                         blurRadius: 16,
                         offset: const Offset(0, 6),
                       ),
