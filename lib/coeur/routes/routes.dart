@@ -26,6 +26,7 @@ import 'package:update_camtrans/fonctionnalites/ia/ecran_assistant_ia.dart';
 import 'package:update_camtrans/fonctionnalites/paiement/ecran_paiement.dart';
 import 'package:update_camtrans/fonctionnalites/admin/tableau_de_bord_admin.dart';
 import 'package:update_camtrans/fonctionnalites/client/adresses_favorites.dart';
+import 'package:update_camtrans/fonctionnalites/client/moyens_paiement.dart';
 import 'package:update_camtrans/fonctionnalites/chat/ecran_chat.dart';
 import 'package:update_camtrans/fonctionnalites/client/ecran_evaluation.dart';
 import 'package:update_camtrans/fonctionnalites/profil/modifier_profil.dart';
@@ -71,6 +72,7 @@ class RoutesApplication {
   static const String evaluation = "/evaluation/:courseId";
   static const String admin = "/admin";
   static const String adressesFavorites = "/adresses-favorites";
+  static const String moyensPaiement = "/moyens-paiement";
   static const String chat = "/chat";
   static const String historiqueCoursesTransporteur =
       "/historique-courses-transporteur";
@@ -263,6 +265,11 @@ class RoutesApplication {
         path: adressesFavorites,
         pageBuilder: (context, state) =>
             _page(const AdressesFavoritesPage(), state.pageKey),
+      ),
+      GoRoute(
+        path: moyensPaiement,
+        pageBuilder: (context, state) =>
+            _page(const MoyensPaiement(), state.pageKey),
       ),
       GoRoute(
         path: chat,

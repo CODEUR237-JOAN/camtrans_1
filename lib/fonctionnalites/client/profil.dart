@@ -214,13 +214,11 @@ class Profil extends ConsumerWidget {
                           height: 1,
                           indent: 60,
                           endIndent: 20),
-                      _ligneAction(context, Iconsax.wallet_2_copy,
-                          "Moyens de paiement", () {
-                        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                          content: Text("Bientôt disponible", style: TextStyle(color: Colors.white)),
-                          backgroundColor: CouleursApp.primaire,
-                        ));
-                      }),
+                      _ligneAction(
+                          context,
+                          Iconsax.wallet_2_copy,
+                          "Moyens de paiement",
+                          () => context.push(RoutesApplication.moyensPaiement)),
                       Divider(
                           color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1),
                           height: 1,
