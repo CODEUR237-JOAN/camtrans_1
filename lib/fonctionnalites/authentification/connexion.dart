@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:update_camtrans/coeur/animations/animations_avancees.dart';
 import 'package:update_camtrans/coeur/constantes/couleurs.dart';
 import 'package:update_camtrans/coeur/constantes/tailles.dart';
@@ -160,7 +161,8 @@ class _ConnexionState extends ConsumerState<Connexion> {
       final userCred = await serviceAuth.connexionGoogle();
       if (!mounted) return;
       if (userCred?.user != null) {
-        await _routerSelonRole(userCred!.user!.uid);
+        await _migrerCompteParEmailSiBesoin(userCred!.user!);
+        await _routerSelonRole(userCred.user!.uid);
       }
       // Si null → l'utilisateur a annulé (pas d'erreur à afficher)
     } catch (e) {
@@ -169,6 +171,63 @@ class _ConnexionState extends ConsumerState<Connexion> {
       if (!msg.contains('annulée')) _afficherErreur(msg);
     } finally {
       if (mounted) setState(() => _chargementGoogle = false);
+    }
+  }
+
+  // -----------------------------------------------------------------
+  // Migration de compte (si email existant avec un autre UID)
+  // -----------------------------------------------------------------
+  Future<void> _migrerCompteParEmailSiBesoin(User user) async {
+    final email = user.email;
+    if (email == null || email.isEmpty) return;
+
+    final db = FirebaseFirestore.instance;
+
+    try {
+      // 1. Chercher dans clients
+      final clientsSnap = await db.collection('clients').where('email', isEqualTo: email).limit(1).get();
+      if (clientsSnap.docs.isNotEmpty) {
+        final doc = clientsSnap.docs.first;
+        if (doc.id != user.uid) {
+          final data = doc.data();
+          data['id'] = user.uid; // Mise à jour de l'ID interne si présent
+          
+          final batch = db.batch();
+          batch.set(db.collection('clients').doc(user.uid), data);
+          batch.delete(doc.reference);
+          
+          // Mettre à jour les courses de ce client
+          final courses = await db.collection('courses').where('clientId', isEqualTo: doc.id).get();
+          for (var c in courses.docs) {
+            batch.update(c.reference, {'clientId': user.uid});
+          }
+          await batch.commit();
+        }
+        return; // Migration terminée
+      }
+
+      // 2. Chercher dans transporteurs
+      final transpSnap = await db.collection('transporteurs').where('email', isEqualTo: email).limit(1).get();
+      if (transpSnap.docs.isNotEmpty) {
+        final doc = transpSnap.docs.first;
+        if (doc.id != user.uid) {
+          final data = doc.data();
+          data['id'] = user.uid;
+          
+          final batch = db.batch();
+          batch.set(db.collection('transporteurs').doc(user.uid), data);
+          batch.delete(doc.reference);
+          
+          // Mettre à jour les courses du transporteur
+          final courses = await db.collection('courses').where('transporteurId', isEqualTo: doc.id).get();
+          for (var c in courses.docs) {
+            batch.update(c.reference, {'transporteurId': user.uid});
+          }
+          await batch.commit();
+        }
+      }
+    } catch (e) {
+      debugPrint("Erreur lors de la migration du compte: $e");
     }
   }
 
