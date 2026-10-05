@@ -125,6 +125,9 @@ class EtatDemandeExpedition {
     Transporteur? chauffeurPropose,
     double? distanceApprocheKm,
     int? tempsApprocheMin,
+    // Permet de remettre explicitement chauffeurPropose à null
+    // (impossible via `??` lorsqu'aucun chauffeur n'est trouvé).
+    bool effacerChauffeurPropose = false,
   }) {
     return EtatDemandeExpedition(
       depart: depart ?? this.depart,
@@ -152,7 +155,9 @@ class EtatDemandeExpedition {
       volumeEstime: volumeEstime ?? this.volumeEstime,
       prixEstime: prixEstime ?? this.prixEstime,
       conseilIA: conseilIA ?? this.conseilIA,
-      chauffeurPropose: chauffeurPropose ?? this.chauffeurPropose,
+      chauffeurPropose: effacerChauffeurPropose
+          ? null
+          : (chauffeurPropose ?? this.chauffeurPropose),
       distanceApprocheKm: distanceApprocheKm ?? this.distanceApprocheKm,
       tempsApprocheMin: tempsApprocheMin ?? this.tempsApprocheMin,
     );
@@ -215,7 +220,9 @@ class DemandeExpeditionNotifier extends StateNotifier<EtatDemandeExpedition> {
 
   Future<void> estimerMasseIA() async {
     if (state.marqueVehiculeRemorque.isEmpty ||
-        state.modeleVehiculeRemorque.isEmpty) return;
+        state.modeleVehiculeRemorque.isEmpty) {
+      return;
+    }
     state = state.copierAvec(estEnAttenteMasseIA: true);
     try {
       final masse = await serviceIA.estimerMasseVehicule(
@@ -357,6 +364,7 @@ class DemandeExpeditionNotifier extends StateNotifier<EtatDemandeExpedition> {
       prixEstime: estimation["prix"],
       conseilIA: estimation["conseil"],
       chauffeurPropose: chauffeur,
+      effacerChauffeurPropose: chauffeur == null,
     );
   }
 }

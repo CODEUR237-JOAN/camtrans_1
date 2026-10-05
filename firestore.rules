@@ -151,12 +151,21 @@ service cloud.firestore {
     }
 
     // ============================================================
-    // COLLECTION : notifications_push (file d'attente pour l'envoi de masse)
-    // Utilisée uniquement par l'admin depuis le tableau de bord.
+    // COLLECTION : notifications_push (file d'attente traitée par la
+    // Cloud Function `envoyerNotificationGlobale`).
+    //  - Diffusion (tous / clients / transporteurs) : admin uniquement.
+    //  - Envoi ciblé vers UNE personne (ex. cascade chauffeur) : tout
+    //    utilisateur connecté, uniquement en statut "pending".
     // ============================================================
     match /notifications_push/{notifId} {
       allow read: if estAdmin();
-      allow create: if estConnecte();
+      allow create: if estAdmin() || (
+        estConnecte()
+        && request.resource.data.cible in ['client', 'transporteur']
+        && request.resource.data.cibleId is string
+        && request.resource.data.cibleId.size() > 0
+        && request.resource.data.status == 'pending'
+      );
       allow update, delete: if estAdmin();
     }
 

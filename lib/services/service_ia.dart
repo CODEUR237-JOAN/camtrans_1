@@ -143,22 +143,6 @@ class ServiceIA {
     }
   }
 
-  Future<Map<String, dynamic>> _appelerClaudeJson({
-    required String systeme,
-    required String promptUser,
-    List<XFile>? fichiersImages,
-  }) async {
-    final text = await _appelerClaudeText(
-      systeme: systeme,
-      promptUser: promptUser + "\n\nIMPORTANT: Réponds UNIQUEMENT en JSON valide. Ne fournis aucune autre explication.",
-      fichiersImages: fichiersImages,
-      messagesExistants: [],
-    );
-    final data = _extraireJson(text);
-    if (data == null) throw Exception("Format JSON invalide depuis Claude");
-    return data;
-  }
-
   // ----------------------------------------------------------
   // MÉTHODE INTERNE : Extraire un JSON depuis une réponse texte
   //
@@ -232,7 +216,7 @@ class ServiceIA {
         final requestBody = {
           "model": "claude-3-haiku-20240307",
           "max_tokens": 1024,
-          "system": contexteSysteme + "\nIMPORTANT: Réponds UNIQUEMENT en JSON valide. Ne fournis aucune autre explication.",
+          "system": "$contexteSysteme\nIMPORTANT: Réponds UNIQUEMENT en JSON valide. Ne fournis aucune autre explication.",
           "messages": [{"role": "user", "content": claudeContentBlocs}],
         };
 
@@ -300,7 +284,7 @@ class ServiceIA {
     String prompt, {
     List<XFile>? fichiersImages,
   }) async* {
-    final systemPrompt = "Tu es l'assistant IA officiel de CamTrans, une application camerounaise qui met en relation "
+    const systemPrompt = "Tu es l'assistant IA officiel de CamTrans, une application camerounaise qui met en relation "
             "des clients avec des chauffeurs de camions (lourds et légers) sur l'ensemble du territoire camerounais. "
             "Les services proposés sont : transport de marchandises générales, déménagement, "
             "matériaux de construction, produits agricoles, transport frigorifique, convoi de véhicules, remorquage. "

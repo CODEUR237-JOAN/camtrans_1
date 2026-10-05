@@ -16,10 +16,10 @@ class EcranSuiviCourse extends ConsumerStatefulWidget {
   final bool isFullScreen;
 
   const EcranSuiviCourse({
-    Key? key,
+    super.key,
     required this.courseId,
     this.isFullScreen = true,
-  }) : super(key: key);
+  });
 
   @override
   ConsumerState<EcranSuiviCourse> createState() => _EcranSuiviCourseState();
@@ -237,10 +237,10 @@ class _EcranSuiviCourseState extends ConsumerState<EcranSuiviCourse> {
           
           // 3. Assistant Kombi Flottant (Chauffeur uniquement)
           if (isChauffeur)
-            Positioned(
+            const Positioned(
               right: 16,
               bottom: 120, // Au-dessus du bottom sheet
-              child: const BoutonAssistantVocal(),
+              child: BoutonAssistantVocal(),
             ),
 
           // 4. Panneau Rétractable avec les détails de la course
@@ -248,11 +248,11 @@ class _EcranSuiviCourseState extends ConsumerState<EcranSuiviCourse> {
             etat: etatSuivi,
             isChauffeur: isChauffeur,
             onBoutonAction: () {
-              print("CLIC BOUTON : Phase = \${etatSuivi.phase}, Chauffeur = \$isChauffeur");
+              debugPrint("CLIC BOUTON : Phase = ${etatSuivi.phase}, Chauffeur = $isChauffeur");
               if (etatSuivi.phase == PhaseSuivi.approche) {
                 notifier.commencerCourse();
               } else if (etatSuivi.phase == PhaseSuivi.trajet) {
-                print("LANCEMENT DE terminerCourse()...");
+                debugPrint("LANCEMENT DE terminerCourse()...");
                 notifier.terminerCourse();
                 // On ne fait pas pop() ici : on attend le paiement du client.
               }

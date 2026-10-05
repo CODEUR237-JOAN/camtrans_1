@@ -9,6 +9,7 @@ import 'package:update_camtrans/coeur/constantes/couleurs.dart';
 import 'package:update_camtrans/coeur/constantes/statuts.dart';
 import 'package:update_camtrans/coeur/etat/transporteur_provider.dart';
 import 'package:update_camtrans/modeles/course.dart';
+import 'package:update_camtrans/fonctionnalites/transporteur/details_course.dart';
 import 'package:update_camtrans/coeur/widgets/loader_premium.dart';
 import 'package:go_router/go_router.dart';
 
@@ -248,7 +249,7 @@ class _MarcheDemandesState extends ConsumerState<MarcheDemandes> {
       body: Stack(
         children: [
           coursesAsync.when(
-            loading: () => Center(child: LoaderPremium()),
+            loading: () => const Center(child: LoaderPremium()),
             error: (err, _) => Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -397,6 +398,19 @@ class _MarcheDemandesState extends ConsumerState<MarcheDemandes> {
     );
   }
 
+  /// Ouvre la fiche complète d'une course. L'acceptation depuis la fiche
+  /// repasse par [_accepterCourse] : même confirmation, même transaction.
+  void _ouvrirDetails(Course course) {
+    Navigator.of(context).push(
+      MaterialPageRoute<void>(
+        builder: (_) => DetailsCourse(
+          course: course,
+          onAccepter: () => _accepterCourse(course),
+        ),
+      ),
+    );
+  }
+
   Widget _buildCourseCard(Course course, int index) {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
@@ -412,7 +426,12 @@ class _MarcheDemandesState extends ConsumerState<MarcheDemandes> {
           ),
         ],
       ),
-      child: Padding(
+      child: Material(
+        type: MaterialType.transparency,
+        child: InkWell(
+        borderRadius: BorderRadius.circular(20),
+        onTap: () => _ouvrirDetails(course),
+        child: Padding(
         padding: const EdgeInsets.all(20),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -511,7 +530,7 @@ class _MarcheDemandesState extends ConsumerState<MarcheDemandes> {
                       Container(
                         width: 10,
                         height: 10,
-                        decoration: BoxDecoration(
+                        decoration: const BoxDecoration(
                           color: CouleursApp.accent,
                           shape: BoxShape.circle,
                         ),
@@ -588,6 +607,8 @@ class _MarcheDemandesState extends ConsumerState<MarcheDemandes> {
               ),
             ),
           ],
+        ),
+      ),
         ),
       ),
     )

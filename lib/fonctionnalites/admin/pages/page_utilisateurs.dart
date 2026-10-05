@@ -278,11 +278,11 @@ class _PageUtilisateursState extends ConsumerState<PageUtilisateurs>
       builder: (_) => AlertDialog(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         backgroundColor: const Color(0xFF111827),
-        title: Row(
+        title: const Row(
           children: [
             Icon(Icons.person_remove_rounded, color: CouleursApp.erreur),
-            const SizedBox(width: 10),
-            const Expanded(
+            SizedBox(width: 10),
+            Expanded(
                 child: Text("Supprimer ce compte ?",
                     style: TextStyle(
                         color: Colors.white,

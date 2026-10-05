@@ -130,7 +130,7 @@ class _VueCarteState extends ConsumerState<VueCarte>
             ),
           Expanded(
             child: etatCarte.chargement
-                ? Center(child: LoaderPremium())
+                ? const Center(child: LoaderPremium())
                 : FlutterMap(
                     mapController: _mapController,
                     options: MapOptions(

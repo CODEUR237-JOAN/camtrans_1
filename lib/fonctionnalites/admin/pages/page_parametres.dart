@@ -6,6 +6,7 @@ import 'package:update_camtrans/coeur/constantes/couleurs.dart';
 import 'package:update_camtrans/coeur/etat/admin_provider.dart';
 import 'package:update_camtrans/modeles/parametres_app.dart';
 import 'package:update_camtrans/coeur/widgets/loader_premium.dart';
+import 'package:update_camtrans/coeur/widgets/selecteur_theme.dart';
 
 class PageParametres extends ConsumerStatefulWidget {
   const PageParametres({super.key});
@@ -116,7 +117,7 @@ class _PageParametresState extends ConsumerState<PageParametres> {
     return Scaffold(
       backgroundColor: Colors.transparent,
       body: parametresAsync.when(
-        loading: () => Center(child: LoaderPremium()),
+        loading: () => const Center(child: LoaderPremium()),
         error: (err, stack) => Center(
             child: Text("Impossible de charger les paramètres : $err 🔧",
                 style: const TextStyle(color: Colors.redAccent))),
@@ -256,6 +257,16 @@ class _PageParametresState extends ConsumerState<PageParametres> {
 
                   const SizedBox(height: 40),
 
+                  // Section Apparence (thème clair/sombre/auto)
+                  _buildSectionTitre(
+                      "Apparence", Icons.palette_outlined),
+                  const SizedBox(height: 16),
+                  _buildCarte(
+                    child: const SelecteurTheme(),
+                  ),
+
+                  const SizedBox(height: 40),
+
                   // Bouton de sauvegarde
                   SizedBox(
                     width: double.infinity,
@@ -340,8 +351,9 @@ class _PageParametresState extends ConsumerState<PageParametres> {
           style: const TextStyle(color: Colors.white),
           validator: (val) {
             if (val == null || val.isEmpty) return "Ce champ est requis";
-            if (double.tryParse(val) == null)
+            if (double.tryParse(val) == null) {
               return "Valeur numérique invalide";
+            }
             return null;
           },
           decoration: InputDecoration(

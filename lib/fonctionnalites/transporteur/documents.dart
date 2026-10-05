@@ -79,7 +79,7 @@ class _DocumentsState extends ConsumerState<Documents> {
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting &&
                 !_chargement) {
-              return Center(child: LoaderPremium());
+              return const Center(child: LoaderPremium());
             }
 
             if (snapshot.hasError ||

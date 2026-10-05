@@ -62,7 +62,7 @@ class SidebarAdmin extends ConsumerWidget {
             child: ListView(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               children: [
-                _SectionTitle(titre: "GÉNÉRAL"),
+                const _SectionTitle(titre: "GÉNÉRAL"),
                 _MenuItem(
                   titre: "Vue d'ensemble",
                   icone: Icons.dashboard_outlined,
@@ -73,7 +73,7 @@ class SidebarAdmin extends ConsumerWidget {
                 ),
                 const SizedBox(height: 20),
 
-                _SectionTitle(titre: "UTILISATEURS"),
+                const _SectionTitle(titre: "UTILISATEURS"),
                 _MenuItem(
                   titre: "Tous les utilisateurs",
                   icone: Icons.people_outline,
@@ -84,7 +84,7 @@ class SidebarAdmin extends ConsumerWidget {
                 ),
                 const SizedBox(height: 20),
 
-                _SectionTitle(titre: "MODÉRATION"),
+                const _SectionTitle(titre: "MODÉRATION"),
                 _MenuItem(
                   titre: "Documents en attente",
                   icone: Icons.verified_user_outlined,
@@ -96,7 +96,7 @@ class SidebarAdmin extends ConsumerWidget {
                 ),
                 const SizedBox(height: 20),
 
-                _SectionTitle(titre: "ACTIVITÉS"),
+                const _SectionTitle(titre: "ACTIVITÉS"),
                 _MenuItem(
                   titre: "Carte Flotte (Temps réel)",
                   icone: Icons.map_outlined,
@@ -115,7 +115,7 @@ class SidebarAdmin extends ConsumerWidget {
                 ),
                 const SizedBox(height: 20),
 
-                _SectionTitle(titre: "SYSTÈME"),
+                const _SectionTitle(titre: "SYSTÈME"),
                 _MenuItem(
                   titre: "Notifications Push",
                   icone: Icons.notifications_none,
@@ -195,7 +195,7 @@ class _SectionTitle extends StatelessWidget {
       padding: const EdgeInsets.only(left: 12, bottom: 8),
       child: Text(
         titre,
-        style: TextStyle(
+        style: const TextStyle(
           color: Colors.white54,
           fontSize: 11,
           fontWeight: FontWeight.bold,

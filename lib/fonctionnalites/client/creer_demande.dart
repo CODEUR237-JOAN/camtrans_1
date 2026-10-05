@@ -168,8 +168,9 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
           message = "Veuillez remplir les détails obligatoires.";
         }
       }
-      if (_etapeCourante == 2)
+      if (_etapeCourante == 2) {
         message = "Veuillez choisir une gamme de service.";
+      }
       if (_etapeCourante == 3) message = "L'itinéraire est incomplet.";
 
       _montrerErreur(message);
@@ -588,7 +589,7 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
                                     )
                                   ]
                                 : [
-                                    BoxShadow(
+                                    const BoxShadow(
                                       color: Colors.transparent,
                                       blurRadius: 0,
                                       spreadRadius: 0,

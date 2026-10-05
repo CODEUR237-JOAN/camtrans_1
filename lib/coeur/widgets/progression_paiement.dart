@@ -54,7 +54,7 @@ class ProgressionPaiement extends StatefulWidget {
         description: "Nous attendons la confirmation de $operateur",
         couleur: CouleursApp.primaireNeon,
       ),
-      EtapePaiement(
+      const EtapePaiement(
         icone: Icons.security_rounded,
         titre: "Sécurisation du paiement",
         description: "Enregistrement de la transaction",
@@ -87,7 +87,7 @@ class ProgressionPaiement extends StatefulWidget {
             "Validation auprès de $operateur — cela peut prendre jusqu'à 2 minutes",
         couleur: CouleursApp.primaireNeon,
       ),
-      EtapePaiement(
+      const EtapePaiement(
         icone: Icons.workspace_premium_rounded,
         titre: "Activation de l'abonnement",
         description: "Bientôt prêt ! Votre accès est en cours d'activation 🚀",

@@ -72,8 +72,9 @@ class _ChangerMotDePasseState extends ConsumerState<ChangerMotDePasse> {
       if (mounted) {
         String message =
             "Erreur lors du changement. Vérifiez votre mot de passe actuel.";
-        if (e.toString().contains("wrong-password"))
+        if (e.toString().contains("wrong-password")) {
           message = "Mot de passe actuel incorrect.";
+        }
 
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(message), backgroundColor: Colors.red),

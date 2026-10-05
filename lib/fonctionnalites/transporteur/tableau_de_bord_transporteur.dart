@@ -162,7 +162,7 @@ class _TableauDeBordTransporteurState
     final utilisateur = ref.watch(serviceAuthentificationProvider).utilisateur;
 
     return transporteurAsync.when(
-      loading: () => Center(child: LoaderPremium()),
+      loading: () => const Center(child: LoaderPremium()),
       error: (err, _) => Center(
           child: Text("Oups ! Chargement impossible : $err",
               style: const TextStyle(color: Colors.white70))),
@@ -188,21 +188,21 @@ class _TableauDeBordTransporteurState
                     border:
                         Border.all(color: Colors.red.withValues(alpha: 0.4)),
                   ),
-                  child: Row(
+                  child: const Row(
                     children: [
-                      const Icon(Icons.warning_amber_rounded,
+                      Icon(Icons.warning_amber_rounded,
                           color: Colors.red, size: 32),
-                      const SizedBox(width: 12),
+                      SizedBox(width: 12),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            const Text("Compte en attente de validation",
+                            Text("Compte en attente de validation",
                                 style: TextStyle(
                                     fontWeight: FontWeight.bold,
                                     color: Colors.white)),
-                            const SizedBox(height: 4),
-                            const Text(
+                            SizedBox(height: 4),
+                            Text(
                               "Vos documents sont en cours d'examen par l'administration.",
                               style: TextStyle(
                                   fontSize: 12, color: Colors.white70),
@@ -387,35 +387,63 @@ class _TableauDeBordTransporteurState
               ),
               const SizedBox(height: 15),
 
-              GridView.count(
-                crossAxisCount: 2,
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                crossAxisSpacing: 15,
-                mainAxisSpacing: 15,
-                childAspectRatio: 1.4,
-                children: [
-                  CarteInformation(
-                    titre: "Courses\ndisponibles",
-                    icone: Icons.map,
-                    auClic: () => setState(() => indexNavigation = 1),
-                  ),
-                  CarteInformation(
-                    titre: "Revenus",
-                    icone: Icons.account_balance_wallet,
-                    auClic: () => context.push("/revenus"),
-                  ),
-                  CarteInformation(
-                    titre: "Portefeuille",
-                    icone: Icons.wallet,
-                    auClic: () => context.push("/portefeuille"),
-                  ),
-                  CarteInformation(
-                    titre: "Documents",
-                    icone: Icons.description,
-                    auClic: () => context.push("/documents"),
-                  ),
-                ],
+              // Grille 2×2 sans GridView : le childAspectRatio fixe (1.4)
+              // imposait une hauteur ~105 px, trop faible pour un titre
+              // sur 2 lignes (ou une police système agrandie) → overflow.
+              // IntrinsicHeight + stretch : la hauteur suit le contenu et
+              // les 2 cartes d'une même ligne restent alignées.
+              IntrinsicHeight(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Expanded(
+                      child: CarteInformation(
+                        compacte: true,
+                        titre: "Courses disponibles",
+                        icone: Icons.map,
+                        auClic: () => setState(() => indexNavigation = 1),
+                      ),
+                    ),
+                    const SizedBox(width: 15),
+                    Expanded(
+                      child: CarteInformation(
+                        compacte: true,
+                        titre: "Portefeuille",
+                        icone: Icons.account_balance_wallet,
+                        auClic: () =>
+                            context.push(RoutesApplication.portefeuille),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              // 3 px + marges verticales des cartes (6 + 6) = 15 px,
+              // identique à l'espacement horizontal.
+              const SizedBox(height: 3),
+              IntrinsicHeight(
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Expanded(
+                      child: CarteInformation(
+                        compacte: true,
+                        titre: "Historique",
+                        icone: Icons.history,
+                        auClic: () => context.push(
+                            RoutesApplication.historiqueCoursesTransporteur),
+                      ),
+                    ),
+                    const SizedBox(width: 15),
+                    Expanded(
+                      child: CarteInformation(
+                        compacte: true,
+                        titre: "Documents",
+                        icone: Icons.description,
+                        auClic: () => context.push("/documents"),
+                      ),
+                    ),
+                  ],
+                ),
               ),
 
               const SizedBox(height: 35),
@@ -449,11 +477,11 @@ class _TableauDeBordTransporteurState
                         children: <Widget>[
                           ...List.generate(
                               3,
-                              (index) => GlassContainer(
+                              (index) => const GlassContainer(
                                     height: 80,
-                                    margin: const EdgeInsets.only(bottom: 10),
+                                    margin: EdgeInsets.only(bottom: 10),
                                     opaciteFond: 0.05,
-                                    child: const SizedBox.shrink(),
+                                    child: SizedBox.shrink(),
                                   )
                                       .animate(
                                           onPlay: (controller) =>
@@ -623,28 +651,28 @@ class _TableauDeBordTransporteurState
 
   _ConseilJour _determinerConseil(int heure, double revenus) {
     if (heure >= 6 && heure < 9) {
-      return _ConseilJour(
+      return const _ConseilJour(
           emoji: "🌅",
           titre: "C'est l'heure de pointe matinale !",
           description:
               "Les courses vers les bureaux et marchés sont très demandées entre 7h et 9h. Restez disponible !",
           couleur: Colors.orange);
     } else if (heure >= 9 && heure < 12) {
-      return _ConseilJour(
+      return const _ConseilJour(
           emoji: "📦",
           titre: "Créneau commercial optimal",
           description:
               "Les courses B2B sont fréquentes le matin. Concentrez-vous sur les zones industrielles.",
           couleur: CouleursApp.primaire);
     } else if (heure >= 12 && heure < 14) {
-      return _ConseilJour(
+      return const _ConseilJour(
           emoji: "☕",
           titre: "Pause méritée !",
           description:
               "Moins de demandes sur le créneau déjeuner. Profitez-en pour vous reposer ou refaire le plein.",
           couleur: CouleursApp.accent);
     } else if (heure >= 14 && heure < 18) {
-      return _ConseilJour(
+      return const _ConseilJour(
           emoji: "🚛",
           titre: "L'après-midi est propice aux longues courses",
           description:

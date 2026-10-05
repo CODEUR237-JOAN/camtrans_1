@@ -138,7 +138,7 @@ class _EcranChatState extends ConsumerState<EcranChat> {
                     .fluxMessages(conversationId),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    return Center(child: LoaderPremium());
+                    return const Center(child: LoaderPremium());
                   }
 
                   if (snapshot.hasError) {
@@ -282,8 +282,8 @@ class _EcranChatState extends ConsumerState<EcranChat> {
                     },
                     child: Container(
                       padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFEEEEEE),
+                      decoration: const BoxDecoration(
+                        color: Color(0xFFEEEEEE),
                         shape: BoxShape.circle,
                       ),
                       child: const Icon(Iconsax.camera_copy,

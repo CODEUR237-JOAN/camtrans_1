@@ -1,4 +1,4 @@
-﻿import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:speech_to_text/speech_to_text.dart' as stt;
 import 'package:flutter_tts/flutter_tts.dart';
 import 'package:update_camtrans/services/service_ia.dart';
@@ -216,8 +216,8 @@ class ServiceAssistantVocal extends StateNotifier<EtatAssistant> {
         // Naviguer vers l'historique des courses
         onNavigate?.call('/historique');
       } else if (intention == "CONSULTER_REVENUS") {
-        // Naviguer vers la page des revenus (transporteur)
-        onNavigate?.call('/revenus');
+        // Revenus et solde sont regroupés dans le Portefeuille (transporteur)
+        onNavigate?.call('/portefeuille');
       } else if (intention == "INFO_SERVICE") {
         // Juste répondre vocalement, pas de navigation
       } else {

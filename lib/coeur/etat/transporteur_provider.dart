@@ -239,8 +239,9 @@ class TransporteurActions {
 
     await FirebaseFirestore.instance.runTransaction((transaction) async {
       final courseSnapshot = await transaction.get(docRef);
-      if (!courseSnapshot.exists || courseSnapshot.data() == null)
+      if (!courseSnapshot.exists || courseSnapshot.data() == null) {
         throw Exception("Course introuvable.");
+      }
 
       final data = courseSnapshot.data()!;
       // Vérifications de base
@@ -269,7 +270,9 @@ class TransporteurActions {
 
       final data = courseSnapshot.data()!;
       if (data['statut'] != StatutCourse.propose ||
-          data['transporteurId'] != _transporteurId) return;
+          data['transporteurId'] != _transporteurId) {
+        return;
+      }
 
       final List<dynamic> candidats = data['candidats'] ?? [];
       final int index = data['indexCandidatActuel'] ?? 0;
@@ -289,9 +292,9 @@ class TransporteurActions {
         final notifRef =
             FirebaseFirestore.instance.collection('notifications_push').doc();
         transaction.set(notifRef, {
-          'titre': '🚨 NOUVELLE COURSE !',
+          'titre': 'Une course vous attend',
           'message':
-              'Une course à proximité vous est proposée. Acceptez vite !',
+              'Un client près de vous a besoin d\'un chauffeur. Vous avez 30 secondes pour accepter.',
           'cible': 'transporteur',
           'cibleId': prochainId,
           'status': 'pending',

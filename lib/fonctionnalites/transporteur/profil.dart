@@ -10,6 +10,7 @@ import 'package:update_camtrans/coeur/routes/routes.dart';
 import 'package:intl/intl.dart';
 import 'package:update_camtrans/coeur/widgets/loader_premium.dart';
 import 'package:update_camtrans/coeur/widgets/carte_information.dart';
+import 'package:update_camtrans/coeur/widgets/selecteur_theme.dart';
 import 'package:update_camtrans/coeur/constantes/statuts.dart';
 
 class ProfilTransporteur extends ConsumerWidget {
@@ -30,7 +31,7 @@ class ProfilTransporteur extends ConsumerWidget {
         automaticallyImplyLeading: false,
       ),
       body: transporteurAsync.when(
-        loading: () => Center(child: LoaderPremium()),
+        loading: () => const Center(child: LoaderPremium()),
         error: (err, stack) => Center(child: Text("Erreur: $err")),
         data: (transporteur) {
           if (transporteur == null) {
@@ -194,52 +195,69 @@ class ProfilTransporteur extends ConsumerWidget {
                             ),
                           ),
                           const SizedBox(height: 15),
-                          Row(
-                            children: [
-                              Expanded(
-                                child: CarteInformation(
-                                    titre: "Courses",
-                                    valeur: "${courses.length}",
-                                    icone: Icons.local_shipping),
-                              ),
-                              const SizedBox(width: 15),
-                              Expanded(
-                                child: CarteInformation(
-                                    titre: "Livrées",
-                                    valeur: "$livrees",
-                                    icone: Icons.check_circle,
-                                    couleurIcone: Colors.green,
-                                    couleurValeur: Colors.green),
-                              ),
-                            ],
+                          // Disposition compacte : icône + valeur en haut,
+                          // titre en pleine largeur dessous (plus de « C... 0 »).
+                          IntrinsicHeight(
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                Expanded(
+                                  child: CarteInformation(
+                                      compacte: true,
+                                      titre: "Courses",
+                                      valeur: "${courses.length}",
+                                      icone: Icons.local_shipping),
+                                ),
+                                const SizedBox(width: 15),
+                                Expanded(
+                                  child: CarteInformation(
+                                      compacte: true,
+                                      titre: "Livrées",
+                                      valeur: "$livrees",
+                                      icone: Icons.check_circle,
+                                      couleurIcone: Colors.green,
+                                      couleurValeur: Colors.green),
+                                ),
+                              ],
+                            ),
                           ),
                           const SizedBox(height: 15),
-                          Row(
-                            children: [
-                              Expanded(
-                                child: CarteInformation(
-                                    titre: "En cours",
-                                    valeur: "$enAttente",
-                                    icone: Icons.schedule,
-                                    couleurIcone: Colors.orange,
-                                    couleurValeur: Colors.orange),
-                              ),
-                              const SizedBox(width: 15),
-                              Expanded(
-                                child: CarteInformation(
-                                    titre: "Note",
-                                    valeur: "${transporteur.noteMoyenne} ",
-                                    icone: Icons.star,
-                                    couleurIcone: Colors.amber,
-                                    couleurValeur: Colors.amber),
-                              ),
-                            ],
+                          IntrinsicHeight(
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                Expanded(
+                                  child: CarteInformation(
+                                      compacte: true,
+                                      titre: "En cours",
+                                      valeur: "$enAttente",
+                                      icone: Icons.schedule,
+                                      couleurIcone: Colors.orange,
+                                      couleurValeur: Colors.orange),
+                                ),
+                                const SizedBox(width: 15),
+                                Expanded(
+                                  child: CarteInformation(
+                                      compacte: true,
+                                      titre: "Note",
+                                      valeur: "${transporteur.noteMoyenne} ",
+                                      icone: Icons.star,
+                                      couleurIcone: Colors.amber,
+                                      couleurValeur: Colors.amber),
+                                ),
+                              ],
+                            ),
                           ),
                         ],
                       );
                     }),
 
                 const SizedBox(height: 30),
+
+                // === Section : Apparence ===
+                const SelecteurTheme(),
+
+                const SizedBox(height: 25),
 
                 _boutonOption(Icons.workspace_premium, "Mes abonnements",
                     () => context.push(RoutesApplication.abonnement)),
@@ -344,9 +362,9 @@ class ProfilTransporteur extends ConsumerWidget {
               Icon(estValide ? Icons.verified : Icons.warning_amber_rounded,
                   color: Colors.white, size: 28),
               const SizedBox(width: 10),
-              Text(
+              const Text(
                 "Statut de l'abonnement",
-                style: const TextStyle(
+                style: TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
                     fontSize: 18),

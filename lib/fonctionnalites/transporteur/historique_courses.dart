@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 
@@ -27,7 +27,7 @@ class _HistoriquecoursesState extends ConsumerState<HistoriqueCourses> {
   Future<void> _supprimerTout() async {
     final confirm = await showDialog<bool>(
       context: context,
-      builder: (_) => _DialogConfirmation(
+      builder: (_) => const _DialogConfirmation(
         titre: "Vider l'historique ?",
         message:
             "Toutes vos courses terminées/annulées seront supprimées définitivement.",
@@ -117,7 +117,7 @@ class _HistoriquecoursesState extends ConsumerState<HistoriqueCourses> {
             const SizedBox(height: 25),
             Expanded(
               child: coursesAsync.when(
-                loading: () => Center(child: LoaderPremium()),
+                loading: () => const Center(child: LoaderPremium()),
                 error: (error, _) => Center(
                     child:
                         Text("Impossible de charger l'historique : $error 🔧")),
@@ -220,7 +220,7 @@ class _HistoriquecoursesState extends ConsumerState<HistoriqueCourses> {
                           confirmDismiss: (_) async {
                             return await showDialog<bool>(
                               context: context,
-                              builder: (_) => _DialogConfirmation(
+                              builder: (_) => const _DialogConfirmation(
                                 titre: "Supprimer cette course ?",
                                 message: "Cette action est irréversible.",
                                 bouton: "Supprimer",

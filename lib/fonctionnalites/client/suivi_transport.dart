@@ -659,8 +659,8 @@ class _SuiviTransportState extends ConsumerState<SuiviTransport> {
                 }
               } catch (e) {
                 if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                      content: Text("Erreur lors de l'annulation : \$e", style: const TextStyle(color: Colors.white)),
+                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                      content: Text("Erreur lors de l'annulation : \$e", style: TextStyle(color: Colors.white)),
                       backgroundColor: CouleursApp.erreur));
                 }
               }

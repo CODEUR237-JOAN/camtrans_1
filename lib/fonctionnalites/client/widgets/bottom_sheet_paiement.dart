@@ -419,11 +419,13 @@ class _BottomSheetPaiementState extends ConsumerState<BottomSheetPaiement> {
         'icon': Iconsax.mobile_copy,
         'couleur': const Color(0xFFFFCC00),
       },
+      // ✅ P1-2 : Carte bancaire désactivée (non implémentée)
       {
         'id': 'carte',
-        'label': 'Carte Bancaire',
+        'label': 'Carte Bancaire (Bientôt)',
         'icon': Iconsax.card_copy,
-        'couleur': const Color(0xFF6366F1),
+        'couleur': Colors.grey,
+        'disabled': true,
       },
       {
         'id': 'especes',
@@ -446,17 +448,23 @@ class _BottomSheetPaiementState extends ConsumerState<BottomSheetPaiement> {
           final id = mode['id'] as String;
           final selected = _modeSelectionne == id;
           final couleur = mode['couleur'] as Color;
+          // ✅ P1-2 : Bloquer la sélection si le mode est désactivé
+          final isDisabled = mode['disabled'] == true;
 
           return GestureDetector(
-            onTap: () {
-              setState(() {
-                _modeSelectionne = id;
-                _phoneCtrl.clear();
-                _nomCtrl.clear();
-              });
-              HapticFeedback.selectionClick();
-            },
-            child: AnimatedContainer(
+            onTap: isDisabled
+                ? null
+                : () {
+                    setState(() {
+                      _modeSelectionne = id;
+                      _phoneCtrl.clear();
+                      _nomCtrl.clear();
+                    });
+                    HapticFeedback.selectionClick();
+                  },
+            child: Opacity(
+              opacity: isDisabled ? 0.4 : 1.0,
+              child: AnimatedContainer(
               duration: 200.ms,
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
               decoration: BoxDecoration(
@@ -486,9 +494,10 @@ class _BottomSheetPaiementState extends ConsumerState<BottomSheetPaiement> {
                     ),
                   ),
                 ],
-              ),
-            ),
-          );
+              ), // Row
+              ), // AnimatedContainer
+            ), // Opacity
+          ); // GestureDetector
         }).toList(),
       ),
     ];

@@ -119,7 +119,7 @@ class _PageAbonnementState extends ConsumerState<PageAbonnement> {
       body: _isProcessing
           ? _buildTraitement()
           : parametresAsync.when(
-              loading: () => Center(child: LoaderPremium()),
+              loading: () => const Center(child: LoaderPremium()),
               error: (err, _) => _buildContenu(const ParametresApp()),
               data: (parametres) => _buildContenu(parametres),
             ),

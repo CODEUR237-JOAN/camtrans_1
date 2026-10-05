@@ -70,7 +70,7 @@ class Facture extends ConsumerWidget {
         ),
       ),
       body: fluxPaiements.when(
-        loading: () => Center(child: LoaderPremium()),
+        loading: () => const Center(child: LoaderPremium()),
         error: (err, stack) => Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -263,18 +263,22 @@ class Facture extends ConsumerWidget {
     final bool isSucces = paiement.statut == StatutPaiement.succes;
 
     IconData getIcon() {
-      if (paiement.methodePaiement.toLowerCase().contains("orange"))
+      if (paiement.methodePaiement.toLowerCase().contains("orange")) {
         return Icons.account_balance_wallet;
-      if (paiement.methodePaiement.toLowerCase().contains("mtn"))
+      }
+      if (paiement.methodePaiement.toLowerCase().contains("mtn")) {
         return Icons.phone_android;
+      }
       return Icons.credit_card;
     }
 
     Color getColor() {
-      if (paiement.methodePaiement.toLowerCase().contains("orange"))
+      if (paiement.methodePaiement.toLowerCase().contains("orange")) {
         return Colors.orange;
-      if (paiement.methodePaiement.toLowerCase().contains("mtn"))
+      }
+      if (paiement.methodePaiement.toLowerCase().contains("mtn")) {
         return Colors.amber;
+      }
       return Colors.blue;
     }
 

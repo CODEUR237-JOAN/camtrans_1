@@ -392,7 +392,7 @@ class _InscriptionClientState extends ConsumerState<InscriptionClient> {
                           TextSpan(
                             text:
                                 "conditions d'utilisation et la politique de confidentialité",
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 14,
                               color: CouleursApp.primaire,
                               decoration: TextDecoration.underline,

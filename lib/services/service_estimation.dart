@@ -250,10 +250,10 @@ class ServiceEstimation {
     required double distanceKm,
     required double masseKg,
   }) async {
-    final double fraisBase = ConfigTarificationRemorque.fraisBase;
-    final double tarifKmBase = ConfigTarificationRemorque.tarifKmBase;
-    final double coeffMasse = ConfigTarificationRemorque.coeffMasseCarburant;
-    final double indexation =
+    const double fraisBase = ConfigTarificationRemorque.fraisBase;
+    const double tarifKmBase = ConfigTarificationRemorque.tarifKmBase;
+    const double coeffMasse = ConfigTarificationRemorque.coeffMasseCarburant;
+    const double indexation =
         ConfigTarificationRemorque.coeffIndexationCarburant;
 
     // Composantes du coût — INTERNES uniquement

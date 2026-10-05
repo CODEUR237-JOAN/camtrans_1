@@ -179,7 +179,7 @@ class _BanniereNotification extends StatelessWidget {
                 ),
               ),
               const SizedBox(width: 8),
-              Icon(Icons.close, color: Colors.white38, size: 16),
+              const Icon(Icons.close, color: Colors.white38, size: 16),
             ],
           ),
         ),

@@ -68,7 +68,7 @@ class _PageLitigesState extends ConsumerState<PageLitiges>
                                 color: Colors.white,
                                 fontSize: 24,
                                 fontWeight: FontWeight.bold)),
-                        Text('Accès complet — Courses, Paiements, Messages',
+                        const Text('Accès complet — Courses, Paiements, Messages',
                             style:
                                 TextStyle(color: Colors.white54, fontSize: 13)),
                       ],
@@ -148,7 +148,7 @@ class _OngletCourses extends ConsumerWidget {
     final coursesAsync = ref.watch(adminCoursesProvider);
 
     return coursesAsync.when(
-      loading: () => Center(child: LoaderPremium()),
+      loading: () => const Center(child: LoaderPremium()),
       error: (e, _) => Center(
           child: Text('Erreur: $e', style: const TextStyle(color: Colors.red))),
       data: (courses) {
@@ -387,7 +387,7 @@ class _OngletPaiements extends ConsumerWidget {
     final paiementsAsync = ref.watch(adminPaiementsProvider);
 
     return paiementsAsync.when(
-      loading: () => Center(child: LoaderPremium()),
+      loading: () => const Center(child: LoaderPremium()),
       error: (e, _) => Center(
           child: Text('Erreur: $e', style: const TextStyle(color: Colors.red))),
       data: (paiements) {
@@ -543,7 +543,7 @@ class _OngletConversations extends ConsumerWidget {
     final conversationsAsync = ref.watch(adminToutesConversationsProvider);
 
     return conversationsAsync.when(
-      loading: () => Center(child: LoaderPremium()),
+      loading: () => const Center(child: LoaderPremium()),
       error: (e, _) => Center(
           child: Text('Erreur: $e', style: const TextStyle(color: Colors.red))),
       data: (conversations) {
@@ -556,10 +556,10 @@ class _OngletConversations extends ConsumerWidget {
                 .toList();
 
         if (filtered.isEmpty) {
-          return Center(
+          return const Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: const [
+              children: [
                 Icon(Icons.chat_bubble_outline,
                     size: 64, color: Colors.white12),
                 SizedBox(height: 12),

@@ -43,15 +43,15 @@ class SkeletonListTile extends StatelessWidget {
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
       ),
-      child: Row(
+      child: const Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const SkeletonShimmer(width: 48, height: 48, borderRadius: 24),
-          const SizedBox(width: 16),
+          SkeletonShimmer(width: 48, height: 48, borderRadius: 24),
+          SizedBox(width: 16),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
-              children: const [
+              children: [
                 SkeletonShimmer(width: double.infinity, height: 16),
                 SizedBox(height: 8),
                 SkeletonShimmer(width: 150, height: 12),

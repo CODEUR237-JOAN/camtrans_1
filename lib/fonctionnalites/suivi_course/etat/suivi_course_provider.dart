@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
@@ -31,20 +32,40 @@ class SuiviCourseNotifier extends StateNotifier<SuiviCourseEtat> {
 
   void _initialiser() async {
     final role = await ref.read(userRoleProvider.future);
+    // Le notifier a pu être détruit pendant l'attente du rôle.
+    if (!mounted) return;
 
     // 1. Écoute du document de la course dans Firestore
     _courseSub = FirebaseFirestore.instance
         .collection('courses')
         .doc(courseId)
         .snapshots()
-        .listen((doc) {
-      if (doc.exists && doc.data() != null) {
-        final data = doc.data() as Map<String, dynamic>;
-        data['id'] = doc.id;
-        final course = Course.fromMap(data);
-        _mettreAJourCourse(course);
-      }
-    });
+        .listen(
+      (doc) {
+        if (doc.exists && doc.data() != null) {
+          final data = doc.data() as Map<String, dynamic>;
+          data['id'] = doc.id;
+          final course = Course.fromMap(data);
+          _mettreAJourCourse(course);
+        } else {
+          // Course supprimée ou inexistante
+          state = state.copyWith(
+            erreur: "Cette course n'existe plus.",
+            isLoading: false,
+          );
+        }
+      },
+      onError: (Object e) {
+        // Ex. permission-denied après suppression de la course :
+        // sans ce handler, l'erreur remonte en "Unhandled Exception".
+        debugPrint("⚠️ Flux course $courseId interrompu : $e");
+        if (!mounted) return;
+        state = state.copyWith(
+          erreur: "Cette course n'est plus accessible.",
+          isLoading: false,
+        );
+      },
+    );
 
     // 2. Écoute de la position GPS selon le rôle
     if (role == 'transporteur') {
@@ -74,16 +95,21 @@ class SuiviCourseNotifier extends StateNotifier<SuiviCourseEtat> {
         .collection('transporteurs')
         .doc(transporteurId)
         .snapshots()
-        .listen((doc) {
-      if (doc.exists && doc.data() != null) {
-        final data = doc.data() as Map<String, dynamic>;
-        final lat = data['latitude'] as double?;
-        final lng = data['longitude'] as double?;
-        if (lat != null && lng != null && lat != 0 && lng != 0) {
-          _mettreAJourPositionChauffeur(LatLng(lat, lng));
+        .listen(
+      (doc) {
+        if (doc.exists && doc.data() != null) {
+          final data = doc.data() as Map<String, dynamic>;
+          final lat = data['latitude'] as double?;
+          final lng = data['longitude'] as double?;
+          if (lat != null && lng != null && lat != 0 && lng != 0) {
+            _mettreAJourPositionChauffeur(LatLng(lat, lng));
+          }
         }
-      }
-    });
+      },
+      onError: (Object e) {
+        debugPrint("⚠️ Flux transporteur $transporteurId interrompu : $e");
+      },
+    );
   }
 
   void _mettreAJourCourse(Course course) {
@@ -146,14 +172,14 @@ class SuiviCourseNotifier extends StateNotifier<SuiviCourseEtat> {
     LatLng cible;
     try {
       if (state.phase == PhaseSuivi.approche) {
-        cible = state.positionClient ?? LatLng(0, 0);
+        cible = state.positionClient ?? const LatLng(0, 0);
       } else if (state.phase == PhaseSuivi.trajet) {
-        cible = state.positionDestination ?? LatLng(0, 0);
+        cible = state.positionDestination ?? const LatLng(0, 0);
       } else {
         return;
       }
     } catch (e) {
-      state = state.copyWith(erreur: "Erreur d'accès à la cible : \$e");
+      state = state.copyWith(erreur: "Erreur d'accès à la cible : $e");
       return;
     }
 
@@ -207,12 +233,12 @@ class SuiviCourseNotifier extends StateNotifier<SuiviCourseEtat> {
         throw Exception("Réponse OSRM vide ou invalide");
       }
     } catch (e) {
-      print("Erreur de calcul d'itinéraire : \$e");
+      debugPrint("Erreur de calcul d'itinéraire : $e");
       
       // Gestion robuste avec Retry automatique
       if (_tentativesRoutage < 3) {
         _tentativesRoutage++;
-        state = state.copyWith(erreur: "Impossible de calculer le nouvel itinéraire, nouvelle tentative (\$_tentativesRoutage/3)...");
+        state = state.copyWith(erreur: "Impossible de calculer le nouvel itinéraire, nouvelle tentative ($_tentativesRoutage/3)...");
         Future.delayed(const Duration(seconds: 3), () {
           if (mounted) _calculerItineraire();
         });
@@ -261,22 +287,22 @@ class SuiviCourseNotifier extends StateNotifier<SuiviCourseEtat> {
         'dateModification': FieldValue.serverTimestamp(),
       });
     } catch (e) {
-      state = state.copyWith(erreur: "Erreur lors du démarrage : \$e");
+      state = state.copyWith(erreur: "Erreur lors du démarrage : $e");
     }
   }
 
   Future<void> terminerCourse() async {
     if (state.course == null) return;
     try {
-      print("APPEL DE terminerCourse POUR courseId : \$courseId");
+      debugPrint("APPEL DE terminerCourse POUR courseId : $courseId");
       await FirebaseFirestore.instance.collection('courses').doc(courseId).update({
         'statut': StatutCourse.arriveDestination,
         'dateModification': FieldValue.serverTimestamp(),
       });
-      print("MISE A JOUR FIREBASE REUSSIE : arrive_destination");
+      debugPrint("MISE A JOUR FIREBASE REUSSIE : arrive_destination");
     } catch (e) {
-      print("ERREUR DANS terminerCourse : \$e");
-      state = state.copyWith(erreur: "Erreur lors de la fin de course : \$e");
+      debugPrint("ERREUR DANS terminerCourse : $e");
+      state = state.copyWith(erreur: "Erreur lors de la fin de course : $e");
     }
   }
 
@@ -288,7 +314,7 @@ class SuiviCourseNotifier extends StateNotifier<SuiviCourseEtat> {
         'dateModification': FieldValue.serverTimestamp(),
       });
     } catch (e) {
-      state = state.copyWith(erreur: "Erreur lors de l'annulation : \$e");
+      state = state.copyWith(erreur: "Erreur lors de l'annulation : $e");
     }
   }
 
@@ -300,7 +326,7 @@ class SuiviCourseNotifier extends StateNotifier<SuiviCourseEtat> {
         'dateModification': FieldValue.serverTimestamp(),
       });
     } catch (e) {
-      state = state.copyWith(erreur: "Erreur validation paiement : \$e");
+      state = state.copyWith(erreur: "Erreur validation paiement : $e");
     }
   }
 

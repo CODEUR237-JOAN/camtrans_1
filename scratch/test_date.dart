@@ -1,6 +1,9 @@
+import 'dart:io';
 
 void main() {
-  var serverTimeStr = DateTime.now().subtract(Duration(minutes: 1)).toIso8601String();
-  var serverTime = DateTime.parse(serverTimeStr);
-  print(DateTime.now().difference(serverTime).inMinutes);
+  final serverTimeStr = DateTime.now()
+      .subtract(const Duration(minutes: 1))
+      .toIso8601String();
+  final serverTime = DateTime.parse(serverTimeStr);
+  stdout.writeln(DateTime.now().difference(serverTime).inMinutes);
 }

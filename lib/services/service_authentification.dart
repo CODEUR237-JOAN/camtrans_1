@@ -18,7 +18,8 @@ class ServiceAuthentification {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final GoogleSignIn _googleSignIn = GoogleSignIn(
     scopes: ['email', 'profile'],
-    clientId: kIsWeb ? 'dummy-client-id-for-web.apps.googleusercontent.com' : null,
+    // ✅ P1-8 : Le clientId Web doit être configuré dans la console Firebase/GCP.
+    // Sur mobile (Android/iOS), il n'est pas nécessaire ici.
   );
 
   /// Utilisateur connecté

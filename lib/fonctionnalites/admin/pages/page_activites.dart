@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
@@ -34,8 +35,9 @@ class _PageActivitesState extends ConsumerState<PageActivites> {
     if (confirm != true || !mounted) return;
     setState(() => _purgerEnCours = true);
     try {
-      final nb =
-          await ref.read(serviceFirestoreProvider).purgerHistoriqueGlobal();
+      final nb = await ref.read(serviceFirestoreProvider).purgerHistoriqueGlobal(
+        adminId: FirebaseAuth.instance.currentUser?.uid,
+      );
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -192,7 +194,7 @@ class _PageActivitesState extends ConsumerState<PageActivites> {
                                       collection: 'courses', id: course.id);
                               if (context.mounted) {
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
+                                  const SnackBar(
                                       content: Text(
                                           "L'historique a été nettoyé avec succès ! ✨"),
                                       backgroundColor: CouleursApp.succes),
@@ -373,7 +375,9 @@ class _CourseCard extends StatelessWidget {
     if (statut == StatutCourse.enTransit) return Colors.indigo;
     if (statut == StatutCourse.arriveDepart) return Colors.purpleAccent;
     if (statut == StatutCourse.arriveDestination ||
-        statut == StatutCourse.terminee) return CouleursApp.succes;
+        statut == StatutCourse.terminee) {
+      return CouleursApp.succes;
+    }
     if (statut == StatutCourse.annulee) return CouleursApp.erreur;
     return Colors.grey;
   }

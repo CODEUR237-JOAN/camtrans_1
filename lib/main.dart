@@ -12,6 +12,7 @@ import 'package:update_camtrans/firebase_options.dart';
 import 'package:update_camtrans/principal.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:update_camtrans/coeur/constantes/couleurs.dart';
+import 'package:update_camtrans/coeur/etat/theme_provider.dart';
 
 // Gestionnaire des notifications Push reçues en arrière-plan.
 // Cette fonction s'exécute même lorsque l'application est fermée.
@@ -65,9 +66,18 @@ Future<void> main() async {
     debugPrint(
         "[SUCCÈS] Variables de configuration (.env) chargées avec succès.");
 
+    // Chargement du thème persisté AVANT le premier build
+    // pour éviter tout flash blanc au démarrage.
+    final themePreCharge = ThemeProvider();
+    await themePreCharge.charger();
+    debugPrint("[SUCCÈS] Thème utilisateur chargé (${themePreCharge.modeActuel}).");
+
     runApp(
-      const ProviderScope(
-        child: MonApplication(),
+      ProviderScope(
+        overrides: [
+          themeProvider.overrideWith((_) => themePreCharge),
+        ],
+        child: const MonApplication(),
       ),
     );
   } catch (e, stack) {

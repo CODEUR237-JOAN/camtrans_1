@@ -20,7 +20,7 @@ void main() {
       }
     }
     if (emojis.isNotEmpty) {
-      print('${file.path} contains: ${emojis.join(" ")}');
+      stdout.writeln('${file.path} contains: ${emojis.join(" ")}');
     }
   }
 }

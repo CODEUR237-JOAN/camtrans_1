@@ -284,7 +284,7 @@ class _ModifierProfilState extends ConsumerState<ModifierProfil> {
           if (_chargement)
             Container(
               color: Colors.white.withValues(alpha: 0.07),
-              child: Center(child: LoaderPremium()),
+              child: const Center(child: LoaderPremium()),
             )
         ],
       ),

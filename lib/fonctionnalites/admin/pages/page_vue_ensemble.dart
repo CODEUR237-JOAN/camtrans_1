@@ -455,7 +455,7 @@ class PageVueEnsemble extends ConsumerWidget {
 
   Widget _buildPendingBadge(AsyncValue<int> pendingAsync, WidgetRef ref) {
     return pendingAsync.maybeWhen(
-      data: (count) => count > 0
+      data: (nbEnAttente) => nbEnAttente > 0
           ? GestureDetector(
               onTap: () => ref.read(adminMenuIndexProvider.notifier).state = 2,
               child: Container(
@@ -478,7 +478,7 @@ class PageVueEnsemble extends ConsumerWidget {
                     const Icon(Iconsax.warning_2_copy,
                         color: Colors.redAccent, size: 20),
                     const SizedBox(width: 10),
-                    Text("$count en attente",
+                    Text("$nbEnAttente en attente",
                         style: GoogleFonts.inter(
                             color: Colors.redAccent,
                             fontWeight: FontWeight.bold)),
@@ -496,7 +496,7 @@ class PageVueEnsemble extends ConsumerWidget {
       titre: "Répartition des Courses",
       hauteur: 420,
       enfant: distributionAsync.when(
-        loading: () => Center(child: LoaderPremium()),
+        loading: () => const Center(child: LoaderPremium()),
         error: (err, _) => Center(
             child: Text("Impossible de charger les activités : $err 🔧",
                 style: const TextStyle(color: Colors.white))),
@@ -508,18 +508,19 @@ class PageVueEnsemble extends ConsumerWidget {
             String label;
             if (l.contains('termin') || l.contains('livr')) {
               label = 'Terminée';
-            } else if (l.contains('annul'))
+            } else if (l.contains('annul')) {
               label = 'Annulée';
-            else if (l.contains('cours') ||
+            } else if (l.contains('cours') ||
                 l.contains('transit') ||
-                l.contains('rout'))
+                l.contains('rout')) {
               label = 'En cours';
-            else if (l.contains('attent') || l.contains('recherch'))
+            } else if (l.contains('attent') || l.contains('recherch')) {
               label = 'En attente';
-            else if (l.contains('accept') || l.contains('attribu'))
+            } else if (l.contains('accept') || l.contains('attribu')) {
               label = 'Attribué';
-            else
+            } else {
               label = key;
+            }
 
             normalizedData[label] = (normalizedData[label] ?? 0) + value;
           });
@@ -528,16 +529,21 @@ class PageVueEnsemble extends ConsumerWidget {
 
           Color getColorForLabel(String label) {
             String l = label.toLowerCase();
-            if (l.contains('termin') || l.contains('livr'))
+            if (l.contains('termin') || l.contains('livr')) {
               return CouleursApp.succes; // Green
+            }
             if (l.contains('annul')) return CouleursApp.erreur; // Red
             if (l.contains('cours') ||
                 l.contains('transit') ||
-                l.contains('rout')) return Colors.blueAccent;
-            if (l.contains('attent') || l.contains('recherch'))
+                l.contains('rout')) {
+              return Colors.blueAccent;
+            }
+            if (l.contains('attent') || l.contains('recherch')) {
               return Colors.orange;
-            if (l.contains('accept') || l.contains('attribu'))
+            }
+            if (l.contains('accept') || l.contains('attribu')) {
               return Colors.purpleAccent;
+            }
             // Fallbacks if unknown
             final fallbackColors = [
               Colors.teal,
@@ -636,15 +642,16 @@ class PageVueEnsemble extends ConsumerWidget {
       titre: "Activités Récentes",
       hauteur: 450,
       enfant: activitiesAsync.when(
-        loading: () => Center(child: LoaderPremium()),
+        loading: () => const Center(child: LoaderPremium()),
         error: (err, _) => Center(
             child: Text("Données financières inaccessibles : $err 🔧",
                 style: const TextStyle(color: Colors.white))),
         data: (list) {
-          if (list.isEmpty)
+          if (list.isEmpty) {
             return const Center(
                 child: Text("Aucune activité",
                     style: TextStyle(color: Colors.white54)));
+          }
           return ListView.builder(
             itemCount: list.length,
             itemBuilder: (context, index) {
@@ -772,9 +779,9 @@ class PageVueEnsemble extends ConsumerWidget {
               ),
               titlesData: FlTitlesData(
                 rightTitles:
-                    AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                    const AxisTitles(sideTitles: SideTitles(showTitles: false)),
                 topTitles:
-                    AxisTitles(sideTitles: SideTitles(showTitles: false)),
+                    const AxisTitles(sideTitles: SideTitles(showTitles: false)),
                 leftTitles: AxisTitles(
                   sideTitles: SideTitles(
                     showTitles: true,
@@ -878,10 +885,11 @@ class PageVueEnsemble extends ConsumerWidget {
                 final type = t.typeVehicule.toLowerCase();
                 if (type.contains('moto')) {
                   iconData = Icons.two_wheeler;
-                } else if (type.contains('camion'))
+                } else if (type.contains('camion')) {
                   iconData = Icons.local_shipping;
-                else if (type.contains('fourgon') || type.contains('van'))
+                } else if (type.contains('fourgon') || type.contains('van')) {
                   iconData = Icons.airport_shuttle;
+                }
 
                 return Marker(
                   point: LatLng(t.latitude, t.longitude),
@@ -1080,10 +1088,10 @@ class _KpiCard extends StatelessWidget {
           Expanded(
             child: LineChart(
               LineChartData(
-                gridData: FlGridData(show: false),
-                titlesData: FlTitlesData(show: false),
+                gridData: const FlGridData(show: false),
+                titlesData: const FlTitlesData(show: false),
                 borderData: FlBorderData(show: false),
-                lineTouchData: LineTouchData(enabled: false),
+                lineTouchData: const LineTouchData(enabled: false),
                 lineBarsData: [
                   LineChartBarData(
                     spots: sparklineData
@@ -1095,7 +1103,7 @@ class _KpiCard extends StatelessWidget {
                     color: couleur,
                     barWidth: 2,
                     isStrokeCapRound: true,
-                    dotData: FlDotData(show: false),
+                    dotData: const FlDotData(show: false),
                     belowBarData: BarAreaData(
                       show: true,
                       color: couleur.withValues(alpha: 0.1),

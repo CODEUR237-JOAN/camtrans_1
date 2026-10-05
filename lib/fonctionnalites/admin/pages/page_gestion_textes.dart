@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -136,8 +136,8 @@ class _PageGestionTextesState extends ConsumerState<PageGestionTextes> {
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: const Text("Textes mis à jour avec succès ! ✨"),
+          const SnackBar(
+            content: Text("Textes mis à jour avec succès ! ✨"),
             backgroundColor: CouleursApp.succes,
           ),
         );
@@ -174,7 +174,7 @@ class _PageGestionTextesState extends ConsumerState<PageGestionTextes> {
         iconTheme: const IconThemeData(color: Colors.white),
       ),
       body: textesAsync.when(
-        loading: () => Center(child: LoaderPremium()),
+        loading: () => const Center(child: LoaderPremium()),
         error: (err, _) => Center(
           child: Text("Erreur de chargement : $err",
               style: const TextStyle(color: Colors.red)),

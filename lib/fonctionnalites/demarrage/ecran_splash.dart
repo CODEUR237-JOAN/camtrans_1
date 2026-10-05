@@ -6,9 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'package:update_camtrans/coeur/constantes/couleurs.dart';
 import 'package:update_camtrans/coeur/constantes/tailles.dart';
-import 'package:update_camtrans/coeur/constantes/textes.dart';
 import 'package:update_camtrans/coeur/routes/routes.dart';
-import 'package:update_camtrans/coeur/widgets/effets_visuels.dart';
 import 'package:update_camtrans/coeur/etat/utilisateur_provider.dart';
 import 'package:update_camtrans/services/service_authentification.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -84,7 +82,7 @@ class _EcranSplashState extends ConsumerState<EcranSplash>
       body: Container(
         width: double.infinity,
         height: double.infinity,
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           gradient: CouleursApp.degradeSplash,
         ),
         child: Stack(

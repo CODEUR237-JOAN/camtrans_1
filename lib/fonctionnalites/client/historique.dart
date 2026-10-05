@@ -32,7 +32,7 @@ class _HistoriqueState extends ConsumerState<Historique> {
   Future<void> _supprimerCourse(Course course) async {
     final confirm = await showDialog<bool>(
       context: context,
-      builder: (_) => _DialogConfirmation(
+      builder: (_) => const _DialogConfirmation(
         titre: "Supprimer cette course ?",
         message: "Cette action est irréversible.",
         bouton: "Supprimer",
@@ -229,7 +229,7 @@ class _HistoriqueState extends ConsumerState<Historique> {
                         confirmDismiss: (_) async {
                           return await showDialog<bool>(
                             context: context,
-                            builder: (_) => _DialogConfirmation(
+                            builder: (_) => const _DialogConfirmation(
                               titre: "Supprimer cette course ?",
                               message: "Cette action est irréversible.",
                               bouton: "Supprimer",

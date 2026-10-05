@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
-import 'package:latlong2/latlong.dart';
 import 'package:update_camtrans/coeur/constantes/couleurs.dart';
 import 'package:flutter_map_cancellable_tile_provider/flutter_map_cancellable_tile_provider.dart';
 
@@ -11,10 +10,10 @@ class CarteSuiviInteractive extends StatelessWidget {
   final MapController mapController;
 
   const CarteSuiviInteractive({
-    Key? key,
+    super.key,
     required this.etat,
     required this.mapController,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {

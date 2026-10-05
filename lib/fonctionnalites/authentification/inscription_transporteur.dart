@@ -76,22 +76,23 @@ class _InscriptionTransporteurState
 
   Future<void> _pickImage(String docType) async {
     final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
-    if (image != null) {
+    if (image != null && mounted) {
       setState(() {
         if (docType == 'permis') {
           _photoPermis = image;
-        } else if (docType == 'carte_grise')
+        } else if (docType == 'carte_grise') {
           _photoCarteGrise = image;
-        else if (docType == 'assurance')
+        } else if (docType == 'assurance') {
           _photoAssurance = image;
-        else if (docType == 'vehicule_avant')
+        } else if (docType == 'vehicule_avant') {
           _photoVehiculeAvant = image;
-        else if (docType == 'vehicule_arriere')
+        } else if (docType == 'vehicule_arriere') {
           _photoVehiculeArriere = image;
-        else if (docType == 'vehicule_profil')
+        } else if (docType == 'vehicule_profil') {
           _photoVehiculeProfil = image;
-        else if (docType == 'vehicule_interieur')
+        } else if (docType == 'vehicule_interieur') {
           _photoVehiculeInterieur = image;
+        }
       });
     }
   }

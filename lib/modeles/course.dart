@@ -1,4 +1,4 @@
-﻿import 'package:update_camtrans/coeur/utilitaires/parseur.dart';
+import 'package:update_camtrans/coeur/utilitaires/parseur.dart';
 import 'package:update_camtrans/coeur/constantes/statuts.dart';
 
 class Course {
@@ -384,17 +384,22 @@ class Course {
 
   static String _normalizeStatut(String rawStatut) {
     String l = rawStatut.toLowerCase();
-    if (l.contains('termin') || l.contains('livr'))
+    if (l.contains('termin') || l.contains('livr')) {
       return StatutCourse.terminee;
+    }
     if (l.contains('annul')) return StatutCourse.annulee;
     if (l.contains('cours') ||
         l.contains('transit') ||
         l.contains('rout') ||
-        l.contains('charge')) return StatutCourse.enTransit;
-    if (l.contains('attent') || l.contains('recherch'))
+        l.contains('charge')) {
+      return StatutCourse.enTransit;
+    }
+    if (l.contains('attent') || l.contains('recherch')) {
       return StatutCourse.recherche;
-    if (l.contains('accept') || l.contains('attribu'))
+    }
+    if (l.contains('accept') || l.contains('attribu')) {
       return StatutCourse.attribue;
+    }
     return rawStatut; // Fallback
   }
 }

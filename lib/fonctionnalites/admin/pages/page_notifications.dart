@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -5,7 +7,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:update_camtrans/coeur/constantes/couleurs.dart';
 import 'package:update_camtrans/coeur/widgets/loader_premium.dart';
-import 'package:update_camtrans/services/service_fcm_admin.dart';
 
 class PageNotifications extends ConsumerStatefulWidget {
   const PageNotifications({super.key});
@@ -21,13 +22,21 @@ class _PageNotificationsState extends ConsumerState<PageNotifications> {
   String _cible = "tous"; // tous, clients, transporteurs
   bool _enCours = false;
 
+  @override
+  void dispose() {
+    _titreController.dispose();
+    _messageController.dispose();
+    super.dispose();
+  }
+
   Future<void> _envoyerNotification() async {
     final titre = _titreController.text.trim();
     final message = _messageController.text.trim();
 
     if (titre.isEmpty || message.isEmpty) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Veuillez remplir tous les champs.")),
+      _afficherMessage(
+        "Ajoutez un titre et un message avant d'envoyer.",
+        CouleursApp.avertissement,
       );
       return;
     }
@@ -35,14 +44,8 @@ class _PageNotificationsState extends ConsumerState<PageNotifications> {
     setState(() => _enCours = true);
 
     try {
-      // 1. Envoyer réellement les notifications push via FCM v1
-      final resultat = await ServiceFcmAdmin.envoyerNotificationGlobale(
-        titre: titre,
-        message: message,
-        cible: _cible,
-      );
-
-      // 2. Enregistrer l'historique dans Firestore
+      // L'app ne détient plus aucune clé : on dépose une demande, et c'est
+      // la Cloud Function `envoyerNotificationGlobale` qui envoie réellement.
       final refNotif =
           FirebaseFirestore.instance.collection('notifications_push').doc();
       await refNotif.set({
@@ -50,38 +53,70 @@ class _PageNotificationsState extends ConsumerState<PageNotifications> {
         'titre': titre,
         'message': message,
         'cible': _cible,
-        'status': 'envoye',
-        'totalDestinataires': resultat.total,
-        'totalEnvoyes': resultat.succes,
-        'totalEchecs': resultat.echecs,
+        'type': 'admin_broadcast',
+        'status': 'pending',
         'dateCreation': FieldValue.serverTimestamp(),
       });
 
+      // On attend le compte rendu du serveur (max. 60 s).
+      final resultat = await refNotif
+          .snapshots()
+          .map((snap) => snap.data())
+          .firstWhere((data) => data != null && data['status'] != 'pending')
+          .timeout(const Duration(seconds: 60));
+
+      if (!mounted) return;
+
+      if (resultat?['status'] == 'erreur') {
+        _afficherMessage(
+          "L'envoi n'a pas abouti : ${resultat?['erreur'] ?? 'raison inconnue'}.",
+          CouleursApp.erreur,
+        );
+        return;
+      }
+
+      final total = (resultat?['totalDestinataires'] as num?)?.toInt() ?? 0;
+      final envoyes = (resultat?['totalEnvoyes'] as num?)?.toInt() ?? 0;
+
+      _titreController.clear();
+      _messageController.clear();
+      _afficherMessage(
+        total == 0
+            ? "Personne n'a pu être prévenu : aucun appareil n'est enregistré pour ce public."
+            : envoyes == total
+                ? "C'est parti ! Votre message a bien été reçu par $total personne${total > 1 ? 's' : ''}."
+                : "Message envoyé à $envoyes personne${envoyes > 1 ? 's' : ''} sur $total. Les autres ont sans doute désinstallé l'application.",
+        envoyes > 0 ? CouleursApp.succes : CouleursApp.avertissement,
+      );
+    } on TimeoutException {
       if (mounted) {
-        _titreController.clear();
-        _messageController.clear();
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              resultat.total == 0
-                  ? "Aucun appareil trouvé pour la cible sélectionnée."
-                  : "✅ ${resultat.succes}/${resultat.total} notification(s) envoyée(s) avec succès !",
-            ),
-            backgroundColor:
-                resultat.succes > 0 ? Colors.green : Colors.orange,
-          ),
+        _afficherMessage(
+          "Votre demande est enregistrée, mais le serveur met du temps à répondre. "
+          "Vérifiez dans quelques minutes que les Cloud Functions sont bien déployées.",
+          CouleursApp.avertissement,
         );
       }
     } catch (e) {
+      debugPrint("Erreur envoi notification : $e");
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-              content: Text("Erreur: $e"), backgroundColor: Colors.red),
+        _afficherMessage(
+          "Impossible d'envoyer le message pour le moment. Vérifiez votre connexion et réessayez.",
+          CouleursApp.erreur,
         );
       }
     } finally {
       if (mounted) setState(() => _enCours = false);
     }
+  }
+
+  void _afficherMessage(String texte, Color couleur) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(texte),
+        backgroundColor: couleur,
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
   }
 
 

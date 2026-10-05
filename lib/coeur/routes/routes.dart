@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 import 'package:update_camtrans/coeur/animations/transitions_page.dart';
 import 'package:update_camtrans/coeur/constantes/couleurs.dart';
@@ -15,7 +17,6 @@ import 'package:update_camtrans/fonctionnalites/client/carte.dart';
 import 'package:update_camtrans/fonctionnalites/client/creer_demande.dart';
 import 'package:update_camtrans/fonctionnalites/client/facture.dart';
 import 'package:update_camtrans/fonctionnalites/client/historique.dart';
-import 'package:update_camtrans/fonctionnalites/client/suivi_transport.dart';
 import 'package:update_camtrans/fonctionnalites/client/tableau_de_bord_client.dart';
 import 'package:update_camtrans/fonctionnalites/demarrage/ecran_splash.dart';
 import 'package:update_camtrans/fonctionnalites/demarrage/onboarding.dart';
@@ -29,13 +30,10 @@ import 'package:update_camtrans/fonctionnalites/client/ecran_evaluation.dart';
 import 'package:update_camtrans/fonctionnalites/profil/modifier_profil.dart';
 import 'package:update_camtrans/fonctionnalites/profil/changer_mot_de_passe.dart';
 import 'package:update_camtrans/fonctionnalites/transporteur/historique_courses.dart';
-import 'package:update_camtrans/fonctionnalites/transporteur/revenus.dart';
 import 'package:update_camtrans/fonctionnalites/transporteur/portefeuille.dart';
 import 'package:update_camtrans/fonctionnalites/transporteur/documents.dart';
-import 'package:update_camtrans/modeles/transporteur.dart';
 import 'package:update_camtrans/modeles/course.dart';
 import 'package:update_camtrans/fonctionnalites/transporteur/page_abonnement.dart';
-import 'package:update_camtrans/fonctionnalites/transporteur/suivi_transporteur.dart';
 import 'package:update_camtrans/fonctionnalites/suivi_course/ecran_suivi_course.dart';
 
 class RoutesApplication {
@@ -206,19 +204,19 @@ class RoutesApplication {
           // Si les arguments sont absents, on ne peut pas afficher l'écran de paiement
           if (args == null || args['courseId'] == null) {
             return _page(
-              Scaffold(
+              const Scaffold(
                 body: Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      const Icon(Icons.error_outline,
+                      Icon(Icons.error_outline,
                           size: 60, color: Colors.red),
-                      const SizedBox(height: 16),
-                      const Text("Impossible d'accéder au paiement",
+                      SizedBox(height: 16),
+                      Text("Impossible d'accéder au paiement",
                           style: TextStyle(
                               fontSize: 18, fontWeight: FontWeight.bold)),
-                      const SizedBox(height: 8),
-                      const Text("Veuillez relancer depuis votre course.",
+                      SizedBox(height: 8),
+                      Text("Veuillez relancer depuis votre course.",
                           textAlign: TextAlign.center),
                     ],
                   ),
@@ -284,12 +282,30 @@ class RoutesApplication {
       ),
       GoRoute(
         path: admin,
+        redirect: (context, state) async {
+          // ✅ P0-3 SÉCURITÉ : Vérification du rôle Admin avant accès
+          final user = FirebaseAuth.instance.currentUser;
+          if (user == null) return connexion;
+          try {
+            final adminDoc = await FirebaseFirestore.instance
+                .collection('admin')
+                .doc(user.uid)
+                .get();
+            if (!adminDoc.exists) return tableauBordClient;
+          } catch (_) {
+            return connexion;
+          }
+          return null; // Accès autorisé
+        },
         pageBuilder: (context, state) =>
             _page(const TableauDeBordAdmin(), state.pageKey),
       ),
+      // Ancienne page « Revenus » fusionnée dans « Portefeuille » :
+      // on conserve la route en simple redirection pour ne casser
+      // ni l'assistant vocal ni d'éventuels liens existants.
       GoRoute(
         path: revenus,
-        pageBuilder: (context, state) => _page(const Revenus(), state.pageKey),
+        redirect: (context, state) => portefeuille,
       ),
       GoRoute(
         path: portefeuille,

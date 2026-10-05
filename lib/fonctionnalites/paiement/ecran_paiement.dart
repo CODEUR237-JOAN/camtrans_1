@@ -226,13 +226,14 @@ class _EcranPaiementState extends ConsumerState<EcranPaiement> {
                                 Iconsax.mobile_copy,
                                 const Color(0xFFFFCC00)),
                             const SizedBox(height: 12),
+                            // ✅ P1-2 : Carte bancaire désactivée (non implémentée)
                             _buildMethodeCard(
                                 "carte",
                                 "Carte Bancaire",
-                                "Visa, Mastercard",
+                                "Bientôt disponible",
                                 "",
                                 Iconsax.card_copy,
-                                const Color(0xFF3B82F6)),
+                                Colors.grey),
                             const SizedBox(height: 12),
                             _buildMethodeCard(
                                 "especes",
@@ -439,8 +440,21 @@ class _EcranPaiementState extends ConsumerState<EcranPaiement> {
   Widget _buildMethodeCard(String cle, String titre, String sousTitre,
       String logoPath, IconData defaultIcon, Color brandColor) {
     final estSelectionne = _methodeSelectionnee == cle;
-    return GestureDetector(
-      onTap: () {
+    // ✅ P1-2 : Bloquer la sélection de la carte bancaire (non implémentée)
+    final isDisabled = cle == 'carte';
+    return Opacity(
+      opacity: isDisabled ? 0.4 : 1.0,
+      child: GestureDetector(
+      onTap: isDisabled
+          ? () {
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text("Le paiement par carte bancaire sera bientôt disponible."),
+                  behavior: SnackBarBehavior.floating,
+                ),
+              );
+            }
+          : () {
         HapticFeedback.lightImpact();
         setState(() {
           _methodeSelectionnee = cle;
@@ -511,7 +525,8 @@ class _EcranPaiementState extends ConsumerState<EcranPaiement> {
           ],
         ),
       ),
-    );
+    ),
+    ); // Opacity
   }
 
   Widget _buildFloatingTextField({

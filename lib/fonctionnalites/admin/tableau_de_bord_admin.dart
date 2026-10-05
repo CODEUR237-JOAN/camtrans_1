@@ -77,17 +77,17 @@ class _TableauDeBordAdminState extends ConsumerState<TableauDeBordAdmin> {
               controller: _pageController,
               physics:
                   const NeverScrollableScrollPhysics(), // Désactive le swipe manuel
-              children: [
-                const PageVueEnsemble(),
-                const PageUtilisateurs(),
-                const PageModeration(),
-                const PageCarteFlotte(),
-                const PageActivites(),
-                const PageNotifications(),
-                const PageParametres(),
-                const PageAbonnementsAdmin(),
-                const PageLitiges(),
-                const PageGestionTextes(),
+              children: const [
+                PageVueEnsemble(),
+                PageUtilisateurs(),
+                PageModeration(),
+                PageCarteFlotte(),
+                PageActivites(),
+                PageNotifications(),
+                PageParametres(),
+                PageAbonnementsAdmin(),
+                PageLitiges(),
+                PageGestionTextes(),
               ],
             ),
           ),

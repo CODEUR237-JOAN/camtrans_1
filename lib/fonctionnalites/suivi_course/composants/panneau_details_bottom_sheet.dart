@@ -14,12 +14,12 @@ class PanneauDetailsBottomSheet extends StatelessWidget {
   final bool isChauffeur;
 
   const PanneauDetailsBottomSheet({
-    Key? key,
+    super.key,
     required this.etat,
     required this.onBoutonAction,
     this.onAnnulerAction,
     this.isChauffeur = false,
-  }) : super(key: key);
+  });
 
   void _appeler(BuildContext context, String numero) async {
     if (numero.isEmpty) return;

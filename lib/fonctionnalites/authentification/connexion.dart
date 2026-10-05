@@ -317,9 +317,9 @@ class _ConnexionState extends ConsumerState<Connexion> {
                               child: TextButton(
                                 onPressed: () => context
                                     .push(RoutesApplication.motDePasseOublie),
-                                child: Text(
+                                child: const Text(
                                   TextesApp.motDePasseOublie,
-                                  style: const TextStyle(
+                                  style: TextStyle(
                                     fontWeight: FontWeight.w600,
                                     color: CouleursApp.primaire,
                                   ),

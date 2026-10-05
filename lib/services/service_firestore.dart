@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final serviceFirestoreProvider = Provider<ServiceFirestore>((ref) {
@@ -118,42 +119,74 @@ class ServiceFirestore {
   /// [ADMINISTRATION] Purge globale de la base de données.
   /// Supprime toutes les courses inactives (terminées ou annulées) de tous les utilisateurs
   /// pour libérer de l'espace de stockage. Action irréversible.
-  Future<int> purgerHistoriqueGlobal() async {
+  /// ✅ P0-4 SÉCURITÉ : Découpage en batches de 500 max (limite Firestore).
+  /// ✅ P0-4 SÉCURITÉ : Journalisation dans la collection 'audit_logs'.
+  Future<int> purgerHistoriqueGlobal({String? adminId}) async {
     final snapshot = await _db
         .collection('courses')
         .where('statut', whereIn: ['terminee', 'annulee']).get();
-    final batch = _db.batch();
-    for (final doc in snapshot.docs) {
-      batch.delete(doc.reference);
+
+    // ✅ P0-5 : Découper en batches de 500 max
+    final docs = snapshot.docs;
+    for (int i = 0; i < docs.length; i += 499) {
+      final batch = _db.batch();
+      final end = (i + 499 < docs.length) ? i + 499 : docs.length;
+      for (int j = i; j < end; j++) {
+        batch.delete(docs[j].reference);
+      }
+      await batch.commit();
     }
-    await batch.commit();
-    return snapshot.docs.length;
+
+    // ✅ P0-4 : Journalisation de l'action
+    await _db.collection('audit_logs').add({
+      'action': 'purge_historique_global',
+      'adminId': adminId ?? 'inconnu',
+      'nombreCoursesSupprimees': docs.length,
+      'date': FieldValue.serverTimestamp(),
+    });
+    debugPrint('[AUDIT] Purge globale : ${docs.length} courses supprimées par $adminId');
+
+    return docs.length;
   }
 
   /// [ADMINISTRATION] Suppression d'un compte utilisateur.
   /// Efface le profil de l'utilisateur ainsi que tout son historique de courses associé.
+  /// ✅ P0-5 : Découpage en batches de 500 max.
   Future<void> supprimerCompteUtilisateur(String userId, String role) async {
-    final batch = _db.batch();
     // Supprimer le profil
     final collection = role == 'transporteur' ? 'transporteurs' : 'clients';
-    batch.delete(_db.collection(collection).doc(userId));
-    // Supprimer ses courses (en tant que client)
+    await _db.collection(collection).doc(userId).delete();
+
+    // Récupérer toutes les courses liées
     final coursesClient = await _db
         .collection('courses')
         .where('clientId', isEqualTo: userId)
         .get();
-    for (final doc in coursesClient.docs) {
-      batch.delete(doc.reference);
-    }
-    // Supprimer ses courses (en tant que transporteur)
     final coursesTransp = await _db
         .collection('courses')
         .where('transporteurId', isEqualTo: userId)
         .get();
-    for (final doc in coursesTransp.docs) {
-      batch.delete(doc.reference);
+
+    final allDocs = [...coursesClient.docs, ...coursesTransp.docs];
+
+    // ✅ P0-5 : Découper en batches de 500 max
+    for (int i = 0; i < allDocs.length; i += 499) {
+      final batch = _db.batch();
+      final end = (i + 499 < allDocs.length) ? i + 499 : allDocs.length;
+      for (int j = i; j < end; j++) {
+        batch.delete(allDocs[j].reference);
+      }
+      await batch.commit();
     }
-    await batch.commit();
+
+    // ✅ P0-4 : Journalisation
+    await _db.collection('audit_logs').add({
+      'action': 'suppression_compte',
+      'userId': userId,
+      'role': role,
+      'date': FieldValue.serverTimestamp(),
+    });
+    debugPrint('[AUDIT] Compte $userId ($role) supprimé.');
   }
 
   // ===========================

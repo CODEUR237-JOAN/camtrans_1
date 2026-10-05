@@ -262,23 +262,23 @@ class _ResumeExpeditionBottomSheetState
                                 color:
                                     CouleursApp.succes.withValues(alpha: 0.3)),
                           ),
-                          child: Row(
+                          child: const Row(
                             children: [
-                              const Icon(Icons.verified,
+                              Icon(Icons.verified,
                                   color: CouleursApp.succes, size: 20),
-                              const SizedBox(width: 12),
+                              SizedBox(width: 12),
                               Expanded(
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    const Text(
+                                    Text(
                                       "Tarif Standardisé CamTrans",
                                       style: TextStyle(
                                           fontWeight: FontWeight.bold,
                                           fontSize: 13,
                                           color: CouleursApp.succes),
                                     ),
-                                    const SizedBox(height: 2),
+                                    SizedBox(height: 2),
                                     Text(
                                       "Calculé équitablement selon la distance et le volume. Sans négociation.",
                                       style: TextStyle(
@@ -337,8 +337,8 @@ class _ResumeExpeditionBottomSheetState
                   final courseActive = ref.read(activeCourseClientProvider);
                   if (courseActive != null) {
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: const Text(
+                      const SnackBar(
+                        content: Text(
                             "Vous avez déjà une course en cours."),
                         backgroundColor: CouleursApp.erreur,
                       ),
@@ -396,9 +396,14 @@ class _ResumeExpeditionBottomSheetState
                     final List<Map<String, dynamic>> candidatsDispo = [];
                     for (var doc in transporteursSnap.docs) {
                       final t = doc.data();
+                      // Filtrer : le transporteur doit être réellement en ligne
+                      // (même règle que le matching de DemandeExpeditionNotifier)
+                      if (t['estEnLigne'] != true) continue;
                       // Filtrer type
                       if (typeVehiculeRequis.isNotEmpty &&
-                          t['typeVehicule'] != typeVehiculeRequis) continue;
+                          t['typeVehicule'] != typeVehiculeRequis) {
+                        continue;
+                      }
 
                       final double tLat = t['latitude'] ?? 0.0;
                       final double tLng = t['longitude'] ?? 0.0;
@@ -452,27 +457,57 @@ class _ResumeExpeditionBottomSheetState
                     final List<String> candidatsFinaux =
                         candidatsDispo.map((e) => e['id'] as String).toList();
 
-                    // Si un chauffeur avait été spécifiquement proposé par le client, on le met en premier (priorité)
-                    if (etat.chauffeurPropose != null) {
-                      candidatsFinaux.remove(etat.chauffeurPropose!.id);
-                      candidatsFinaux.insert(0, etat.chauffeurPropose!.id);
+                    // Si un chauffeur avait été proposé, on le priorise — uniquement
+                    // s'il fait toujours partie des transporteurs disponibles.
+                    final chauffeurPropose = etat.chauffeurPropose;
+                    if (chauffeurPropose != null &&
+                        candidatsFinaux.remove(chauffeurPropose.id)) {
+                      candidatsFinaux.insert(0, chauffeurPropose.id);
                     }
 
-                    // 🚨 Info : Si aucun candidat n'est trouvé, la course sera quand même créée
-                    // avec le statut "recherche" pour qu'un transporteur puisse la prendre plus tard.
-
-                    // 5. Déterminer le statut initial de la course
-                    String statutInitial = StatutCourse.recherche;
-                    String premierTransporteurId = '';
-                    DateTime? expiration;
-
-                    if (candidatsFinaux.isNotEmpty) {
-                      statutInitial = StatutCourse.propose;
-                      premierTransporteurId = candidatsFinaux.first;
-                      expiration =
-                          DateTime.now().add(const Duration(seconds: 30));
-                      // (Le nom/tel du transporteur reste vide jusqu'à ce qu'il accepte vraiment)
+                    // 🚫 Règle métier : aucun véhicule disponible => AUCUNE course
+                    // n'est créée. Le client est informé et renvoyé à l'accueil.
+                    if (candidatsFinaux.isEmpty) {
+                      debugPrint(
+                          "🚫 Aucun transporteur disponible ($typeVehiculeRequis) : commande non créée.");
+                      if (context.mounted) {
+                        final messenger = ScaffoldMessenger.of(context);
+                        final routeur = GoRouter.of(context);
+                        Navigator.pop(context); // Fermer le radar
+                        Navigator.pop(context); // Fermer le bottom sheet
+                        ref
+                            .read(demandeExpeditionProvider.notifier)
+                            .reinitialiser();
+                        messenger.showSnackBar(
+                          const SnackBar(
+                            content: Row(
+                              children: [
+                                Icon(Icons.no_transfer_rounded,
+                                    color: Colors.white),
+                                SizedBox(width: 12),
+                                Expanded(
+                                  child: Text(
+                                    "Réessayez plus tard : aucun véhicule disponible pour le moment.",
+                                  ),
+                                ),
+                              ],
+                            ),
+                            backgroundColor: CouleursApp.erreur,
+                            behavior: SnackBarBehavior.floating,
+                            duration: Duration(seconds: 5),
+                          ),
+                        );
+                        routeur.go('/tableau-bord-client');
+                      }
+                      return;
                     }
+
+                    // 5. Statut initial : proposition au premier candidat (30 s)
+                    const String statutInitial = StatutCourse.propose;
+                    final String premierTransporteurId = candidatsFinaux.first;
+                    final DateTime expiration =
+                        DateTime.now().add(const Duration(seconds: 30));
+                    // (Le nom/tel du transporteur reste vide jusqu'à ce qu'il accepte vraiment)
 
                     // Générer un code PIN à 4 chiffres
                     final String pin =
@@ -546,27 +581,8 @@ class _ResumeExpeditionBottomSheetState
                           donnees: course.toMap(),
                         );
 
-                    // ✅ PHASE 4: DISPATCH - Déclencher la notification Push
-                    if (premierTransporteurId.isNotEmpty) {
-                      try {
-                        await ref
-                            .read(serviceFirestoreProvider)
-                            .ajouterDocument(
-                                collection: 'notifications_push',
-                                id: 'notif_${const Uuid().v4()}',
-                                donnees: {
-                              'titre': '🚨 NOUVELLE COURSE !',
-                              'message':
-                                  'Course à ${distanceKm.toStringAsFixed(1)} km. Acceptez vite !',
-                              'cible': 'transporteur',
-                              'cibleId': premierTransporteurId,
-                              'status': 'pending',
-                              'createdAt': FieldValue.serverTimestamp(),
-                            });
-                      } catch (e) {
-                        debugPrint("Erreur notification push ignorée : $e");
-                      }
-                    }
+                    // La notification au premier chauffeur est envoyée côté serveur
+                    // par la Cloud Function `onCourseCreated` (pas de doublon ici).
 
                     if (context.mounted) {
                       Navigator.pop(context); // Fermer le radar

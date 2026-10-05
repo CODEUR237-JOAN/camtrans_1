@@ -37,21 +37,21 @@ class _NavigationTransporteurState
     final activeCourse = ref.watch(activeCourseProvider);
 
     if (activeCourse == null) {
-      return Scaffold(
-        backgroundColor: const Color(0xFF08111F),
+      return const Scaffold(
+        backgroundColor: Color(0xFF08111F),
         body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.map_outlined, size: 80, color: Colors.white54),
-              const SizedBox(height: 20),
-              const Text("Aucune course active",
+              Icon(Icons.map_outlined, size: 80, color: Colors.white54),
+              SizedBox(height: 20),
+              Text("Aucune course active",
                   style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 18,
                       color: Colors.white)),
-              const SizedBox(height: 10),
-              const Text("Acceptez une course sur le marché pour commencer.",
+              SizedBox(height: 10),
+              Text("Acceptez une course sur le marché pour commencer.",
                   textAlign: TextAlign.center,
                   style: TextStyle(color: Colors.white54)),
             ],

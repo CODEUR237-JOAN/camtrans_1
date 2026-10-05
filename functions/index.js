@@ -1,4 +1,4 @@
-﻿const functions = require("firebase-functions");
+const functions = require("firebase-functions");
 const admin = require("firebase-admin");
 admin.initializeApp();
 
@@ -27,9 +27,10 @@ exports.onCourseCreated = functions.firestore
       }
 
       const payload = {
+        token: fcmToken,
         notification: {
-          title: "Nouvelle Course !",
-          body: `Une nouvelle course vers ${courseData.adresseArrivee || "une destination"} vous a ete assignee.`,
+          title: "Nouvelle course pour vous",
+          body: `Un client a besoin de vous pour aller vers ${courseData.adresseArrivee || "une destination"}. Ouvrez l'application pour accepter.`,
         },
         data: {
           courseId: context.params.courseId,
@@ -37,7 +38,8 @@ exports.onCourseCreated = functions.firestore
         }
       };
 
-      await admin.messaging().sendToDevice(fcmToken, payload);
+      // API FCM HTTP v1 (l'ancienne API sendToDevice a été arrêtée par Google)
+      await admin.messaging().send(payload);
       console.log(`Notification envoyee au transporteur ${transporteurId}`);
       return null;
     } catch (error) {
@@ -72,33 +74,34 @@ exports.onCourseUpdated = functions.firestore
         return null;
       }
 
-      let titre = "Mise a jour de votre course";
-      let message = "Le statut de votre course a change.";
+      let titre = "Votre course avance";
+      let message = "Il y a du nouveau sur votre course.";
 
       switch (dataAfter.statut) {
         case "attribue":
-          titre = "Chauffeur en route !";
-          message = `Le chauffeur ${dataAfter.nomTransporteur || ""} a accepte votre course et est en route.`;
+          titre = "Votre chauffeur arrive";
+          message = `${dataAfter.nomTransporteur || "Votre chauffeur"} a accepté votre course et se met en route.`;
           break;
         case "enRouteDepart":
-          titre = "Approche imminente";
-          message = "Le chauffeur est en direction de votre point de depart.";
+          titre = "Votre chauffeur approche";
+          message = "Il se dirige vers votre point de départ.";
           break;
         case "arriveDepart":
-          titre = "Le chauffeur est la !";
-          message = "Votre chauffeur vous attend au point de depart.";
+          titre = "Votre chauffeur est là";
+          message = "Il vous attend au point de départ.";
           break;
         case "enTransit":
-          titre = "En transit";
-          message = "Votre chauffeur est en route vers la destination.";
+          titre = "C'est parti";
+          message = "Votre chauffeur roule vers la destination.";
           break;
-        case "termine":
-          titre = "Course terminee";
-          message = "Votre course s'est terminee avec succes ! Merci.";
+        case "terminee":
+          titre = "Course terminée";
+          message = "Tout s'est bien passé ? Merci de votre confiance !";
           break;
       }
 
       const payload = {
+        token: fcmToken,
         notification: {
           title: titre,
           body: message,
@@ -109,7 +112,7 @@ exports.onCourseUpdated = functions.firestore
         }
       };
 
-      await admin.messaging().sendToDevice(fcmToken, payload);
+      await admin.messaging().send(payload);
       console.log(`Notification envoyee au client ${clientId} (Nouveau statut: ${dataAfter.statut})`);
       return null;
     } catch (error) {
@@ -201,75 +204,92 @@ exports.processusAttribution = functions.firestore
 
 
 // ============================================================================
-// Notifications Push Globales — declenchees par l'Admin (collection notifications_push)
+// Notifications Push — file d'attente `notifications_push`
+//
+// C'est le SEUL endroit qui envoie des notifications à la demande : l'application
+// écrit une demande (status "pending"), le serveur l'envoie avec ses propres
+// identifiants et met à jour le document. Aucune clé n'est embarquée dans l'app.
+//
+//  - Diffusion (admin uniquement, garanti par les règles Firestore) :
+//      cible = "tous" | "clients" | "transporteurs"
+//  - Envoi ciblé :
+//      cible = "client" | "transporteur", cibleId = <uid>
 // ============================================================================
 exports.envoyerNotificationGlobale = functions.firestore
   .document("notifications_push/{notifId}")
   .onCreate(async (snap, context) => {
     const data = snap.data();
-    const { titre, message, cible } = data;
+    const { titre, message, cible, cibleId } = data;
+
+    // Idempotence : on ne traite que les demandes en attente. Les anciens
+    // documents d'historique (déjà "envoye") ne sont jamais ré-expédiés.
+    if ((data.status || "pending") !== "pending") return null;
 
     if (!titre || !message) {
-      console.log("Notification invalide : titre ou message manquant.");
-      await snap.ref.update({ status: "erreur", erreur: "Champs titre/message manquants." });
+      await snap.ref.update({ status: "erreur", erreur: "Il manque le titre ou le message." });
       return null;
     }
 
     try {
-      let tokens = [];
+      const tokens = [];
 
-      const collections = [];
-      if (cible === "tous") {
-        collections.push("clients", "transporteurs");
-      } else if (cible === "clients") {
-        collections.push("clients");
-      } else if (cible === "transporteurs") {
-        collections.push("transporteurs");
-      }
+      if ((cible === "client" || cible === "transporteur") && cibleId) {
+        // Envoi ciblé vers une seule personne
+        const col = cible === "client" ? "clients" : "transporteurs";
+        const doc = await admin.firestore().collection(col).doc(cibleId).get();
+        const token = doc.exists ? doc.data().fcmToken : null;
+        if (token) tokens.push(token);
+      } else {
+        // Diffusion
+        const collections = [];
+        if (cible === "tous" || cible === "clients") collections.push("clients");
+        if (cible === "tous" || cible === "transporteurs") collections.push("transporteurs");
 
-      for (const col of collections) {
-        const snapshot = await admin.firestore().collection(col).get();
-        snapshot.forEach(doc => {
-          const token = doc.data().fcmToken;
-          if (token) tokens.push(token);
-        });
+        for (const col of collections) {
+          const snapshot = await admin.firestore().collection(col).get();
+          snapshot.forEach((doc) => {
+            const token = doc.data().fcmToken;
+            if (token) tokens.push(token);
+          });
+        }
       }
 
       if (tokens.length === 0) {
-        console.log("Aucun token FCM trouve pour la cible : " + cible);
-        await snap.ref.update({ status: "erreur", erreur: "Aucun token trouve." });
+        await snap.ref.update({
+          status: "envoye",
+          totalDestinataires: 0,
+          totalEnvoyes: 0,
+          totalEchecs: 0,
+          dateEnvoi: admin.firestore.FieldValue.serverTimestamp(),
+        });
         return null;
       }
 
-      // Envoyer en lots de 500 (limite FCM)
-      const chunks = [];
-      for (let i = 0; i < tokens.length; i += 500) {
-        chunks.push(tokens.slice(i, i + 500));
-      }
-
+      // Envoi par lots de 500 (limite FCM)
       let totalEnvoyes = 0;
-      for (const chunk of chunks) {
+      let totalEchecs = 0;
+      for (let i = 0; i < tokens.length; i += 500) {
         const response = await admin.messaging().sendEachForMulticast({
-          tokens: chunk,
+          tokens: tokens.slice(i, i + 500),
           notification: { title: titre, body: message },
-          data: { type: "admin_broadcast" },
+          data: { type: data.type || "admin_broadcast" },
         });
         totalEnvoyes += response.successCount;
-        console.log(`Lot envoye : ${response.successCount} succes, ${response.failureCount} echecs.`);
+        totalEchecs += response.failureCount;
       }
 
       await snap.ref.update({
         status: "envoye",
         totalDestinataires: tokens.length,
         totalEnvoyes: totalEnvoyes,
+        totalEchecs: totalEchecs,
         dateEnvoi: admin.firestore.FieldValue.serverTimestamp(),
       });
 
-      console.log(`Notification globale envoyee a ${totalEnvoyes}/${tokens.length} utilisateurs.`);
+      console.log(`Notification ${context.params.notifId} : ${totalEnvoyes}/${tokens.length} envoyée(s).`);
       return null;
-
     } catch (error) {
-      console.error("Erreur envoi notification globale :", error);
+      console.error("Erreur envoi notification :", error);
       await snap.ref.update({ status: "erreur", erreur: error.message });
       return null;
     }

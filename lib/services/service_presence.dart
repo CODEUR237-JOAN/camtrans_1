@@ -15,11 +15,16 @@ class ServicePresence with WidgetsBindingObserver {
 
   String? _collection; // 'clients' ou 'transporteurs'
   Timer? _heartbeatTimer;
+  bool _observateurEnregistre = false;
 
-  /// A appeler apres la connexion de l utilisateur
+  /// A appeler apres la connexion de l utilisateur.
+  /// Idempotent : plusieurs appels n'enregistrent l'observateur qu'une fois.
   void demarrer({required String role}) {
     _collection = role == 'transporteur' ? 'transporteurs' : 'clients';
-    WidgetsBinding.instance.addObserver(this);
+    if (!_observateurEnregistre) {
+      WidgetsBinding.instance.addObserver(this);
+      _observateurEnregistre = true;
+    }
     _setEnLigne(true);
     _demarrerHeartbeat();
   }
@@ -29,6 +34,7 @@ class ServicePresence with WidgetsBindingObserver {
     _arreterHeartbeat();
     await _setEnLigne(false);
     WidgetsBinding.instance.removeObserver(this);
+    _observateurEnregistre = false;
     _collection = null;
   }
 
@@ -55,8 +61,8 @@ class ServicePresence with WidgetsBindingObserver {
 
   void _demarrerHeartbeat() {
     _arreterHeartbeat();
-    // Met à jour la dernière connexion toutes les 3 minutes pour indiquer que l'app est toujours ouverte
-    _heartbeatTimer = Timer.periodic(const Duration(seconds: 30), (_) {
+    // ✅ P1-5 : Met à jour la dernière connexion toutes les 3 minutes (corrigé, était 30s)
+    _heartbeatTimer = Timer.periodic(const Duration(seconds: 180), (_) {
       _pingPresence();
     });
   }

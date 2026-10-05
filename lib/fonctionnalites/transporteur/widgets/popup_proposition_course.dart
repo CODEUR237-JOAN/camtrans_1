@@ -292,23 +292,23 @@ class _PopupPropositionCourseState
                   border: Border.all(
                       color: CouleursApp.succes.withValues(alpha: 0.3)),
                 ),
-                child: Row(
+                child: const Row(
                   children: [
-                    const Icon(Icons.verified,
+                    Icon(Icons.verified,
                         color: CouleursApp.succes, size: 20),
-                    const SizedBox(width: 12),
+                    SizedBox(width: 12),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
+                          Text(
                             "Tarif Standardisé CamTrans",
                             style: TextStyle(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 13,
                                 color: CouleursApp.succes),
                           ),
-                          const SizedBox(height: 2),
+                          SizedBox(height: 2),
                           Text(
                             "Calculé équitablement. Le prix est fixe et non négociable.",
                             style:
@@ -325,7 +325,7 @@ class _PopupPropositionCourseState
 
               // Boutons d'action
               if (_enCoursTraitement)
-                Center(child: LoaderPremium())
+                const Center(child: LoaderPremium())
               else
                 Row(
                   children: [

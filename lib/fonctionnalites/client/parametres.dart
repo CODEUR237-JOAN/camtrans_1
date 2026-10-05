@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -11,6 +11,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:update_camtrans/coeur/constantes/couleurs.dart';
 import 'package:update_camtrans/coeur/etat/utilisateur_provider.dart';
 import 'package:update_camtrans/coeur/routes/routes.dart';
+import 'package:update_camtrans/coeur/widgets/selecteur_theme.dart';
 import 'package:update_camtrans/services/service_authentification.dart';
 
 // =====================================================================
@@ -210,6 +211,11 @@ class _ParametresState extends ConsumerState<Parametres> {
               _sauvegarderPref(_keyBiometrie, v);
             },
           ),
+
+          const SizedBox(height: 28),
+
+          // === Section : Apparence ===
+          const SelecteurTheme(),
 
           const SizedBox(height: 28),
 

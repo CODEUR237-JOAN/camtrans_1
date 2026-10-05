@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:update_camtrans/coeur/routes/routes.dart';
 import 'package:update_camtrans/coeur/theme/theme_application.dart';
 import 'package:update_camtrans/coeur/etat/notification_provider.dart';
+import 'package:update_camtrans/coeur/etat/theme_provider.dart';
 import 'package:update_camtrans/coeur/widgets/banniere_notification.dart';
 
 class MonApplication extends ConsumerWidget {
@@ -27,7 +28,8 @@ class MonApplication extends ConsumerWidget {
           builder: (context, child) => EcouteurNotificationsApp(child: child!),
           theme: ThemeApplication.themeClair,
           darkTheme: ThemeApplication.themeSombre,
-          themeMode: ThemeMode.dark,
+          themeMode: ref.watch(themeProvider).modeActuel,
+          themeAnimationDuration: const Duration(milliseconds: 300),
           localizationsDelegates: const [
             GlobalMaterialLocalizations.delegate,
             GlobalWidgetsLocalizations.delegate,

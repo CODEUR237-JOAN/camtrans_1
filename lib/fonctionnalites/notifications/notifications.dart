@@ -65,7 +65,7 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
             const SizedBox(height: 20),
             Expanded(
               child: notificationsAsync.when(
-                loading: () => Center(child: LoaderPremium()),
+                loading: () => const Center(child: LoaderPremium()),
                 error: (err, stack) => Center(child: Text("Erreur: $err")),
                 data: (notifications) {
                   final notificationsFiltrees = notifications.where((n) {
@@ -163,7 +163,7 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
           children: [
             const SizedBox(height: 4),
             Text(notification.message,
-                style: TextStyle(color: Colors.white38, fontSize: 13)),
+                style: const TextStyle(color: Colors.white38, fontSize: 13)),
             const SizedBox(height: 8),
             Row(
               children: [

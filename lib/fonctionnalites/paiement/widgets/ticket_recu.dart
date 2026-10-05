@@ -20,7 +20,8 @@ class TicketRecu extends StatelessWidget {
     final pdf = pw.Document();
 
     // Charger le logo depuis les assets
-    final ByteData logoData = await rootBundle.load('assets/logos/logo.png');
+    final ByteData logoData =
+        await rootBundle.load('assets/images/logo_camtrans.jpg');
     final Uint8List logoBytes = logoData.buffer.asUint8List();
     final logoImage = pw.MemoryImage(logoBytes);
 
@@ -62,7 +63,7 @@ class TicketRecu extends StatelessWidget {
                 ),
               ),
               pw.SizedBox(height: 10),
-              pw.Text('TransConnect Cameroun - Merci de votre confiance.', style: pw.TextStyle(color: PdfColors.grey600, fontSize: 12)),
+              pw.Text('TransConnect Cameroun - Merci de votre confiance.', style: const pw.TextStyle(color: PdfColors.grey600, fontSize: 12)),
             ],
           );
         },
@@ -79,10 +80,13 @@ class TicketRecu extends StatelessWidget {
     return pw.Padding(
       padding: const pw.EdgeInsets.symmetric(vertical: 8),
       child: pw.Row(
-        mainAxisAlignment: pw.MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: pw.CrossAxisAlignment.start,
         children: [
           pw.Text(titre, style: pw.TextStyle(color: PdfColors.grey700, fontSize: isLarge ? 16 : 14)),
-          pw.Text(valeur, style: pw.TextStyle(fontWeight: isBold ? pw.FontWeight.bold : pw.FontWeight.normal, fontSize: isLarge ? 18 : 14)),
+          pw.SizedBox(width: 16),
+          pw.Expanded(
+            child: pw.Text(valeur, textAlign: pw.TextAlign.right, style: pw.TextStyle(fontWeight: isBold ? pw.FontWeight.bold : pw.FontWeight.normal, fontSize: isLarge ? 18 : 14)),
+          ),
         ],
       ),
     );
@@ -292,15 +296,22 @@ class TicketRecu extends StatelessWidget {
 
   Widget _buildLigneDetails(String titre, String valeur) {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(titre,
             style: GoogleFonts.poppins(color: Colors.white54, fontSize: 14)),
-        Text(valeur,
-            style: GoogleFonts.poppins(
-                fontWeight: FontWeight.bold,
-                fontSize: 14,
-                color: Colors.white)),
+        const SizedBox(width: 16),
+        // La valeur (n° de transaction, référence, date…) peut être longue :
+        // elle occupe l'espace restant et passe à la ligne au lieu de déborder.
+        Expanded(
+          child: Text(valeur,
+              textAlign: TextAlign.right,
+              softWrap: true,
+              style: GoogleFonts.poppins(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 14,
+                  color: Colors.white)),
+        ),
       ],
     );
   }

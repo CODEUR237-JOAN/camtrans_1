@@ -22,11 +22,11 @@ class CarteEstimationIntelligente extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisSize: MainAxisSize.min,
         children: [
-          Row(
+          const Row(
             children: [
-              const Icon(Iconsax.magic_star_copy, color: CouleursApp.primaire),
-              const SizedBox(width: 8),
-              const Text(
+              Icon(Iconsax.magic_star_copy, color: CouleursApp.primaire),
+              SizedBox(width: 8),
+              Text(
                 "Estimation Terminée",
                 style: TextStyle(
                     fontWeight: FontWeight.bold,

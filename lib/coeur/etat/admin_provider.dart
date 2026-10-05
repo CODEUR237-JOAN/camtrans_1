@@ -209,13 +209,16 @@ final adminStatsProvider = Provider.autoDispose<AsyncValue<AdminStats>>((ref) {
     return const AsyncValue.loading();
   }
 
-  if (clientsAsync is AsyncError)
+  if (clientsAsync is AsyncError) {
     return AsyncValue.error(clientsAsync.error!, clientsAsync.stackTrace!);
-  if (transporteursAsync is AsyncError)
+  }
+  if (transporteursAsync is AsyncError) {
     return AsyncValue.error(
         transporteursAsync.error!, transporteursAsync.stackTrace!);
-  if (coursesAsync is AsyncError)
+  }
+  if (coursesAsync is AsyncError) {
     return AsyncValue.error(coursesAsync.error!, coursesAsync.stackTrace!);
+  }
 
   final clients = clientsAsync.value ?? [];
   final transporteurs = transporteursAsync.value ?? [];
@@ -301,18 +304,19 @@ final adminCourseDistributionProvider =
       // Normalisation des anciens statuts ou variations
       if (raw.contains('livr') || raw.contains('termin')) {
         statutClean = StatutCourse.terminee;
-      } else if (raw.contains('accept') || raw.contains('attribu'))
+      } else if (raw.contains('accept') || raw.contains('attribu')) {
         statutClean = StatutCourse.attribue;
-      else if (raw.contains('cour') ||
+      } else if (raw.contains('cour') ||
           raw.contains('transit') ||
-          raw.contains('rout'))
+          raw.contains('rout')) {
         statutClean = StatutCourse.enTransit;
-      else if (raw.contains('attent') || raw.contains('recherch'))
+      } else if (raw.contains('attent') || raw.contains('recherch')) {
         statutClean = StatutCourse.recherche;
-      else if (raw.contains('annul'))
+      } else if (raw.contains('annul')) {
         statutClean = StatutCourse.annulee;
-      else
+      } else {
         statutClean = c.statut;
+      }
 
       String label = StatutCourse.libelle(statutClean);
       if (label == statutClean) {

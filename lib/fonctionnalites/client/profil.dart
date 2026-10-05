@@ -32,7 +32,7 @@ class Profil extends ConsumerWidget {
         automaticallyImplyLeading: false,
       ),
       body: clientAsync.when(
-        loading: () => Center(child: LoaderPremium()),
+        loading: () => const Center(child: LoaderPremium()),
         error: (err, stack) => Center(child: Text("Erreur: $err")),
         data: (client) {
           final user = auth.utilisateur;

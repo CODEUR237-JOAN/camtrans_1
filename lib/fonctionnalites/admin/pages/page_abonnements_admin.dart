@@ -27,7 +27,7 @@ class PageAbonnementsAdmin extends ConsumerWidget {
         foregroundColor: Colors.white,
       ),
       body: abonnementsAsync.when(
-        loading: () => Center(child: LoaderPremium()),
+        loading: () => const Center(child: LoaderPremium()),
         error: (err, _) => Center(
             child: Text("Oups ! Les données sont introuvables : $err 🔧",
                 style: const TextStyle(color: Colors.red))),

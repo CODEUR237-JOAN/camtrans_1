@@ -34,7 +34,7 @@ class _PageCarteFlotteState extends ConsumerState<PageCarteFlotte> {
         children: [
           // Carte
           transporteursAsync.when(
-            loading: () => Center(child: LoaderPremium()),
+            loading: () => const Center(child: LoaderPremium()),
             error: (err, _) => Center(
                 child: Text("Erreur : $err",
                     style: const TextStyle(color: Colors.white))),

@@ -70,8 +70,9 @@ class ServicePaiement {
     // 2. Lancer la demande de paiement (Push USSD sur le téléphone du client)
     // 237 est requis par l'API Campay pour le Cameroun, on s'assure du format
     String phone = telephonePayeur.replaceAll(RegExp(r'[^0-9]'), '');
-    if (phone.length == 9)
+    if (phone.length == 9) {
       phone = "237$phone"; // Ajouter l'indicatif si manquant
+    }
 
     final refExterne =
         "CAMTRANS-${courseId.substring(0, 5).toUpperCase()}-${DateTime.now().millisecondsSinceEpoch}";

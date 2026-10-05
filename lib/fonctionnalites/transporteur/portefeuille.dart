@@ -105,7 +105,7 @@ class Portefeuille extends ConsumerWidget {
             ),
             const SizedBox(height: 15),
             fluxRevenus.when(
-                loading: () => Center(child: LoaderPremium()),
+                loading: () => const Center(child: LoaderPremium()),
                 error: (err, _) => Text("Erreur: $err"),
                 data: (paiements) {
                   if (paiements.isEmpty) {
