@@ -482,7 +482,7 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
                   decoration: BoxDecoration(
                       color: CouleursApp.avertissement.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(20)),
-                  child: Text(course.statut,
+                  child: Text(StatutCourse.libelle(course.statut),
                       style: const TextStyle(
                           color: CouleursApp.avertissement,
                           fontWeight: FontWeight.bold,
@@ -783,7 +783,7 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
                                 fontWeight: FontWeight.bold, fontSize: 16)),
                         const SizedBox(height: 4),
                         Text(
-                            "${course.adresseDepart}  ${course.adresseArrivee}",
+                            "${course.adresseDepart} → ${course.adresseArrivee}",
                             style: const TextStyle(
                                 fontSize: 13, color: Colors.white70),
                             overflow: TextOverflow.ellipsis),
@@ -1026,97 +1026,6 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
               ),
             ]
           ],
-        ),
-      ),
-    );
-  }
-}
-
-class _BoutonServiceRapide extends StatefulWidget {
-  final IconData icon;
-  final String title;
-  final Color color;
-  final VoidCallback onTap;
-
-  const _BoutonServiceRapide({
-    required this.icon,
-    required this.title,
-    required this.color,
-    required this.onTap,
-  });
-
-  @override
-  State<_BoutonServiceRapide> createState() => _BoutonServiceRapideState();
-}
-
-class _BoutonServiceRapideState extends State<_BoutonServiceRapide> {
-  bool _isHovered = false;
-  bool _isPressed = false;
-
-  @override
-  Widget build(BuildContext context) {
-    final scale = _isPressed ? 0.92 : (_isHovered ? 1.05 : 1.0);
-
-    return MouseRegion(
-      onEnter: (_) => setState(() => _isHovered = true),
-      onExit: (_) => setState(() => _isHovered = false),
-      cursor: SystemMouseCursors.click,
-      child: GestureDetector(
-        onTapDown: (_) => setState(() => _isPressed = true),
-        onTapUp: (_) {
-          setState(() => _isPressed = false);
-          widget.onTap();
-        },
-        onTapCancel: () => setState(() => _isPressed = false),
-        child: AnimatedScale(
-          scale: scale,
-          duration: const Duration(milliseconds: 150),
-          curve: Curves.easeOutCubic,
-          child: Column(
-            children: [
-              AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: _isHovered ? widget.color : const Color(0xFF10192A),
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: [
-                    if (_isHovered)
-                      BoxShadow(
-                          color: widget.color.withValues(alpha: 0.4),
-                          blurRadius: 15,
-                          offset: const Offset(0, 8))
-                    else
-                      BoxShadow(
-                          color: Colors.white.withValues(alpha: 0.07),
-                          blurRadius: 10,
-                          offset: const Offset(0, 4)),
-                  ],
-                  border: Border.all(
-                    color: _isHovered
-                        ? widget.color.withValues(alpha: 0.5)
-                        : Colors.transparent,
-                    width: 1.5,
-                  ),
-                ),
-                child: Icon(
-                  widget.icon,
-                  color: _isHovered ? Colors.white : widget.color,
-                  size: 26,
-                ),
-              ),
-              const SizedBox(height: 10),
-              AnimatedDefaultTextStyle(
-                duration: const Duration(milliseconds: 200),
-                style: TextStyle(
-                  fontWeight: _isHovered ? FontWeight.w700 : FontWeight.w600,
-                  fontSize: 13,
-                  color: _isHovered ? widget.color : Colors.white70,
-                ),
-                child: Text(widget.title),
-              ),
-            ],
-          ),
         ),
       ),
     );
