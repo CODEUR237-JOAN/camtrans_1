@@ -10,6 +10,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'package:update_camtrans/coeur/constantes/couleurs.dart';
+import 'package:update_camtrans/fonctionnalites/client/ecran_contenu_info.dart';
+import 'package:update_camtrans/services/service_biometrie.dart';
 import 'package:update_camtrans/services/service_notification.dart';
 import 'package:update_camtrans/coeur/etat/utilisateur_provider.dart';
 import 'package:update_camtrans/coeur/routes/routes.dart';
@@ -123,18 +125,36 @@ class _ParametresState extends ConsumerState<Parametres> {
     }
   }
 
-  /// La biométrie nécessite le module natif `local_auth` (non encore intégré).
-  /// On reste honnête : l'interrupteur ne prétend pas marcher.
+  /// Active/désactive réellement le déverrouillage biométrique (local_auth).
+  /// À l'activation, une vraie invite biométrique confirme l'identité.
+  /// Une fois actif, la biométrie est demandée à l'ouverture de l'app (splash).
   Future<void> _changerBiometrie(bool v) async {
     if (v) {
-      if (mounted) {
-        _toast('La connexion biométrique sera bientôt disponible.');
-        setState(() => _biometrie = false);
+      final service = ServiceBiometrie();
+      if (!await service.disponible()) {
+        if (mounted) {
+          setState(() => _biometrie = false);
+          _toast('Aucune biométrie configurée sur cet appareil.', erreur: true);
+        }
+        return;
       }
-      return;
+      final ok = await service.authentifier(
+          'Confirmez votre identité pour activer le déverrouillage biométrique');
+      if (!mounted) return;
+      if (ok) {
+        setState(() => _biometrie = true);
+        await _sauvegarderPref(_keyBiometrie, true);
+        _toast('Déverrouillage biométrique activé.');
+      } else {
+        setState(() => _biometrie = false);
+        await _sauvegarderPref(_keyBiometrie, false);
+        _toast('Activation annulée.', erreur: true);
+      }
+    } else {
+      setState(() => _biometrie = false);
+      await _sauvegarderPref(_keyBiometrie, false);
+      if (mounted) _toast('Déverrouillage biométrique désactivé.');
     }
-    setState(() => _biometrie = false);
-    await _sauvegarderPref(_keyBiometrie, false);
   }
 
   void _toast(String message, {bool erreur = false}) {
@@ -214,6 +234,31 @@ class _ParametresState extends ConsumerState<Parametres> {
     final uri = Uri.parse(url);
     if (await canLaunchUrl(uri)) {
       await launchUrl(uri, mode: LaunchMode.externalApplication);
+    } else if (mounted) {
+      _toast('Impossible d\'ouvrir ce lien.', erreur: true);
+    }
+  }
+
+  /// Ouvre un contenu informatif EN LOCAL (CGU, Confidentialité, Aide).
+  void _ouvrirContenu(String titre, String contenu) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => EcranContenuInfo(titre: titre, contenuMarkdown: contenu),
+      ),
+    );
+  }
+
+  /// Ouvre la fiche Play Store de l'app (fallback web si le Store natif absent).
+  Future<void> _noterApplication() async {
+    const package = 'com.joan.update_camtrans';
+    final natif = Uri.parse('market://details?id=$package');
+    final web = Uri.parse(
+        'https://play.google.com/store/apps/details?id=$package');
+    if (await canLaunchUrl(natif)) {
+      await launchUrl(natif, mode: LaunchMode.externalApplication);
+    } else {
+      await launchUrl(web, mode: LaunchMode.externalApplication);
     }
   }
 
@@ -593,22 +638,24 @@ class _ParametresState extends ConsumerState<Parametres> {
           _buildTuile(
             icone: Iconsax.document_text_copy,
             titre: 'Conditions d\'utilisation',
-            onTap: () => _ouvrirUrl('https://camtrans.cm/cgu'),
+            onTap: () => _ouvrirContenu(
+                'Conditions d\'utilisation', ContenusLegaux.conditions),
           ),
           _buildTuile(
             icone: Iconsax.security_safe_copy,
             titre: 'Politique de confidentialité',
-            onTap: () => _ouvrirUrl('https://camtrans.cm/privacy'),
+            onTap: () => _ouvrirContenu(
+                'Politique de confidentialité', ContenusLegaux.confidentialite),
           ),
           _buildTuile(
             icone: Iconsax.message_question_copy,
             titre: 'Centre d\'aide',
-            onTap: () => _ouvrirUrl('https://camtrans.cm/aide'),
+            onTap: () => _ouvrirContenu('Centre d\'aide', ContenusLegaux.aide),
           ),
           _buildTuile(
             icone: Iconsax.star_copy,
             titre: 'Noter l\'application',
-            onTap: () => _ouvrirUrl('market://details?id=cm.camtrans.app'),
+            onTap: _noterApplication,
           ),
 
           const SizedBox(height: 16),

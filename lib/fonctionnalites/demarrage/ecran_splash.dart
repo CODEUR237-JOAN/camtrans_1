@@ -9,6 +9,8 @@ import 'package:update_camtrans/coeur/constantes/tailles.dart';
 import 'package:update_camtrans/coeur/routes/routes.dart';
 import 'package:update_camtrans/coeur/etat/utilisateur_provider.dart';
 import 'package:update_camtrans/services/service_authentification.dart';
+import 'package:update_camtrans/services/service_biometrie.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
 class EcranSplash extends ConsumerStatefulWidget {
@@ -48,6 +50,16 @@ class _EcranSplashState extends ConsumerState<EcranSplash>
       return;
     }
 
+    // Verrou biométrique (si activé par l'utilisateur) — sûr : en cas de
+    // souci, on ne bloque jamais l'accès ; en cas d'échec explicite, on
+    // renvoie vers la connexion (pas de blocage définitif).
+    final bioOk = await _verifierVerrouBiometrique();
+    if (!mounted) return;
+    if (!bioOk) {
+      context.go(RoutesApplication.connexion);
+      return;
+    }
+
     // Connecté -> Déterminer le rôle via le provider centralisé
     try {
       final role = await ref.read(userRoleProvider.future);
@@ -67,6 +79,21 @@ class _EcranSplashState extends ConsumerState<EcranSplash>
       if (!mounted) return;
       // En cas d'erreur (ex: pas d'internet), on va à la connexion par sécurité
       context.go(RoutesApplication.connexion);
+    }
+  }
+
+  /// Vérifie le verrou biométrique. Renvoie true si l'accès est autorisé.
+  /// Sûr : toute erreur ou indisponibilité => true (jamais de blocage).
+  Future<bool> _verifierVerrouBiometrique() async {
+    try {
+      final prefs = await SharedPreferences.getInstance();
+      final actif = prefs.getBool('pref_biometrie') ?? false;
+      if (!actif) return true;
+      final service = ServiceBiometrie();
+      if (!await service.disponible()) return true;
+      return await service.authentifier('Déverrouillez CamTrans');
+    } catch (_) {
+      return true;
     }
   }
 
