@@ -38,6 +38,12 @@ class ServiceIA {
   // Nom du modèle Google Gemini utilisé (confirmé actif sur ce compte)
   static const String _nomModele = 'gemini-3.1-flash-lite';
 
+  // Nom du modèle Anthropic Claude utilisé.
+  // ⚠️ IMPORTANT : l'ancien modèle "claude-3-haiku-20240307" a été RETIRÉ
+  // par Anthropic le 19/04/2026 — il ne répond plus. On utilise désormais
+  // Claude Haiku 4.5, son successeur (rapide, économique, supporte les images).
+  static const String _nomModeleClaude = 'claude-haiku-4-5';
+
   // Historique de la conversation pour l'assistant chat (format Gemini)
   final List<Content> _historique = [];
   
@@ -116,7 +122,7 @@ class ServiceIA {
     messages.add({"role": "user", "content": contentBlocs});
 
     final requestBody = {
-      "model": "claude-3-haiku-20240307",
+      "model": _nomModeleClaude,
       "max_tokens": 1024,
       "system": systeme,
       "messages": messages,
@@ -128,6 +134,9 @@ class ServiceIA {
         "x-api-key": apiKey,
         "anthropic-version": "2023-06-01",
         "content-type": "application/json",
+        // Autorise l'appel direct depuis un navigateur (Flutter Web).
+        // Sans cet en-tête, le navigateur bloque la requête (erreur CORS).
+        "anthropic-dangerous-direct-browser-access": "true",
       },
       body: jsonEncode(requestBody),
     );
@@ -214,7 +223,7 @@ class ServiceIA {
 
         final url = Uri.parse('https://api.anthropic.com/v1/messages');
         final requestBody = {
-          "model": "claude-3-haiku-20240307",
+          "model": _nomModeleClaude,
           "max_tokens": 1024,
           "system": "$contexteSysteme\nIMPORTANT: Réponds UNIQUEMENT en JSON valide. Ne fournis aucune autre explication.",
           "messages": [{"role": "user", "content": claudeContentBlocs}],
@@ -226,6 +235,8 @@ class ServiceIA {
             "x-api-key": apiKeyClaude,
             "anthropic-version": "2023-06-01",
             "content-type": "application/json",
+            // Autorise l'appel direct depuis un navigateur (Flutter Web).
+            "anthropic-dangerous-direct-browser-access": "true",
           },
           body: jsonEncode(requestBody),
         );
@@ -234,10 +245,14 @@ class ServiceIA {
           final text = jsonDecode(response.body)['content'][0]['text'];
           final data = _extraireJson(text);
           if (data != null) return data;
+        } else {
+          // On ne bloque pas l'utilisateur, mais on trace l'erreur en debug
+          // pour pouvoir diagnostiquer (clé invalide, modèle retiré, quota...).
+          debugPrint(
+              "[IA][Claude JSON] Échec ${response.statusCode} : ${response.body}. Bascule sur Gemini.");
         }
-        // Silence l'erreur et passe à Gemini
       } catch (e) {
-        // Silence l'erreur et passe à Gemini
+        debugPrint("[IA][Claude JSON] Erreur : $e. Bascule sur Gemini.");
       }
     }
 
@@ -303,13 +318,16 @@ class ServiceIA {
           messagesExistants: _historiqueClaude,
         );
         yield reponseClaude;
-        
+
         // Sync Gemini history
         _historique.add(Content.multi([TextPart(prompt)]));
         _historique.add(Content.model([TextPart(reponseClaude)]));
         return;
       } catch (e) {
-        // Silence l'erreur pour la prod, et on continue avec Gemini
+        // On continue avec Gemini pour ne pas bloquer l'utilisateur,
+        // mais on trace l'erreur en debug pour pouvoir diagnostiquer
+        // (clé invalide, modèle retiré, quota dépassé, CORS sur le Web...).
+        debugPrint("[IA][Chat Claude] Erreur : $e. Bascule sur Gemini.");
       }
     }
 
