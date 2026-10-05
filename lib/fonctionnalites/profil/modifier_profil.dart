@@ -188,7 +188,7 @@ class _ModifierProfilState extends ConsumerState<ModifierProfil> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF08111F),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         title: const Text("Modifier mon profil"),
         actions: [
@@ -241,7 +241,7 @@ class _ModifierProfilState extends ConsumerState<ModifierProfil> {
                                 color: CouleursApp.primaire,
                                 shape: BoxShape.circle,
                                 border: Border.all(
-                                    color: const Color(0xFF08111F), width: 3),
+                                    color: Theme.of(context).scaffoldBackgroundColor, width: 3),
                               ),
                               child: const Icon(Icons.camera_alt,
                                   color: Colors.white, size: 20),
@@ -283,7 +283,7 @@ class _ModifierProfilState extends ConsumerState<ModifierProfil> {
           ),
           if (_chargement)
             Container(
-              color: Colors.white.withValues(alpha: 0.07),
+              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.07),
               child: const Center(child: LoaderPremium()),
             )
         ],
@@ -305,11 +305,11 @@ class _ModifierProfilState extends ConsumerState<ModifierProfil> {
         fillColor: const Color(0xFF1A2640),
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(15),
-          borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.08)),
+          borderSide: BorderSide(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08)),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(15),
-          borderSide: BorderSide(color: Colors.white.withValues(alpha: 0.08)),
+          borderSide: BorderSide(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08)),
         ),
       ),
       validator: (v) => (v == null || v.isEmpty) ? "Ce champ est requis" : null,

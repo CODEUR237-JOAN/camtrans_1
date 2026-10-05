@@ -65,7 +65,7 @@ class CoucheTransporteurs extends ConsumerWidget {
                   context, transporteur, etatCarte.positionActuelle),
               child: Container(
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: Theme.of(context).colorScheme.onSurface,
                   shape: BoxShape.circle,
                   boxShadow: const [
                     BoxShadow(

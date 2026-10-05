@@ -68,7 +68,7 @@ class _DocumentsState extends ConsumerState<Documents> {
     final transporteurId = ref.watch(currentTransporteurIdProvider);
 
     return Scaffold(
-      backgroundColor: const Color(0xFF08111F),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         title: const Text("Mes documents"),
       ),
@@ -161,17 +161,17 @@ class _DocumentsState extends ConsumerState<Documents> {
                       gradient: CouleursApp.degradePrincipal,
                       borderRadius: BorderRadius.circular(20),
                     ),
-                    child: const Column(
+                    child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
                           "Documents du transporteur",
-                          style: TextStyle(color: Colors.white70, fontSize: 16),
+                          style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), fontSize: 16),
                         ),
-                        SizedBox(height: 10),
+                        const SizedBox(height: 10),
                         Text(
                           "Téléchargez des photos claires de vos documents afin d'être vérifié par l'administration.",
-                          style: TextStyle(color: Colors.white, fontSize: 17),
+                          style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 17),
                         ),
                       ],
                     ),

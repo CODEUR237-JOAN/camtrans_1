@@ -175,21 +175,21 @@ class TicketRecu extends StatelessWidget {
                         style: GoogleFonts.poppins(
                           fontSize: 42,
                           fontWeight: FontWeight.w900,
-                          color: Colors.white,
+                          color: Theme.of(context).colorScheme.onSurface,
                           letterSpacing: -1,
                         ),
                       ),
                       const SizedBox(height: 32),
 
-                      _buildLigneDetails(
+                      _buildLigneDetails(context, 
                           "Méthode", paiement.methodePaiement.toUpperCase()),
-                      const Divider(height: 32, color: Colors.white12),
-                      _buildLigneDetails(
+                      Divider(height: 32, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.12)),
+                      _buildLigneDetails(context, 
                           "N° Transaction", paiement.numeroTransaction),
-                      const Divider(height: 32, color: Colors.white12),
-                      _buildLigneDetails("Réf. Course", paiement.reference),
-                      const Divider(height: 32, color: Colors.white12),
-                      _buildLigneDetails("Date",
+                      Divider(height: 32, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.12)),
+                      _buildLigneDetails(context, "Réf. Course", paiement.reference),
+                      Divider(height: 32, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.12)),
+                      _buildLigneDetails(context, "Date",
                           "${paiement.datePaiement.day.toString().padLeft(2, '0')}/${paiement.datePaiement.month.toString().padLeft(2, '0')}/${paiement.datePaiement.year} à ${paiement.datePaiement.hour.toString().padLeft(2, '0')}:${paiement.datePaiement.minute.toString().padLeft(2, '0')}"),
 
                       const SizedBox(height: 40),
@@ -198,11 +198,11 @@ class TicketRecu extends StatelessWidget {
                       Container(
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: Theme.of(context).colorScheme.onSurface,
                             borderRadius: BorderRadius.circular(20),
                             boxShadow: [
                               BoxShadow(
-                                  color: Colors.white.withValues(alpha: 0.2),
+                                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.2),
                                   blurRadius: 20,
                                   offset: const Offset(0, 5))
                             ]),
@@ -210,13 +210,13 @@ class TicketRecu extends StatelessWidget {
                           data: paiement.numeroTransaction,
                           version: QrVersions.auto,
                           size: 140.0,
-                          dataModuleStyle: const QrDataModuleStyle(
+                          dataModuleStyle: QrDataModuleStyle(
                             dataModuleShape: QrDataModuleShape.square,
-                            color: Colors.white,
+                            color: Theme.of(context).colorScheme.onSurface,
                           ),
-                          eyeStyle: const QrEyeStyle(
+                          eyeStyle: QrEyeStyle(
                             eyeShape: QrEyeShape.square,
-                            color: Color(0xFF08111F),
+                            color: Theme.of(context).scaffoldBackgroundColor,
                           ),
                         ),
                       ),
@@ -224,7 +224,7 @@ class TicketRecu extends StatelessWidget {
                       Text(
                         "Scannez pour valider avec le transporteur",
                         style: GoogleFonts.poppins(
-                            color: Colors.white54,
+                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54),
                             fontSize: 11,
                             fontWeight: FontWeight.w500),
                       ),
@@ -236,16 +236,16 @@ class TicketRecu extends StatelessWidget {
                         height: 56,
                         child: OutlinedButton.icon(
                           onPressed: () => _telechargerPDF(context),
-                          icon: const Icon(Icons.picture_as_pdf, color: Colors.white),
+                          icon: Icon(Icons.picture_as_pdf, color: Theme.of(context).colorScheme.onSurface),
                           label: Text(
                             "Télécharger le reçu",
                             style: GoogleFonts.poppins(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
-                                color: Colors.white),
+                                color: Theme.of(context).colorScheme.onSurface),
                           ),
                           style: OutlinedButton.styleFrom(
-                            side: const BorderSide(color: Colors.white24, width: 1.5),
+                            side: BorderSide(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.24), width: 1.5),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(16),
                             ),
@@ -294,12 +294,12 @@ class TicketRecu extends StatelessWidget {
     );
   }
 
-  Widget _buildLigneDetails(String titre, String valeur) {
+  Widget _buildLigneDetails(BuildContext context, String titre, String valeur) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(titre,
-            style: GoogleFonts.poppins(color: Colors.white54, fontSize: 14)),
+            style: GoogleFonts.poppins(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 14)),
         const SizedBox(width: 16),
         // La valeur (n° de transaction, référence, date…) peut être longue :
         // elle occupe l'espace restant et passe à la ligne au lieu de déborder.
@@ -310,7 +310,7 @@ class TicketRecu extends StatelessWidget {
               style: GoogleFonts.poppins(
                   fontWeight: FontWeight.bold,
                   fontSize: 14,
-                  color: Colors.white)),
+                  color: Theme.of(context).colorScheme.onSurface)),
         ),
       ],
     );

@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -50,18 +50,18 @@ class _SuiviTransporteurState extends ConsumerState<SuiviTransporteur> {
   Widget build(BuildContext context) {
     if (widget.courseId.isEmpty) {
       return Scaffold(
-        backgroundColor: const Color(0xFF08111F),
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              const Icon(Icons.map_outlined, size: 80, color: Colors.white54),
+              Icon(Icons.map_outlined, size: 80, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54)),
               const SizedBox(height: 20),
               Text("Aucune course à suivre",
                   style: GoogleFonts.poppins(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
-                      color: Colors.white)),
+                      color: Theme.of(context).colorScheme.onSurface)),
             ],
           ),
         ),
@@ -71,23 +71,23 @@ class _SuiviTransporteurState extends ConsumerState<SuiviTransporteur> {
     final etatSuivi = ref.watch(suiviProvider(widget.courseId));
 
     if (etatSuivi.chargement) {
-      return const Scaffold(
-        backgroundColor: Color(0xFF08111F),
+      return Scaffold(
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         body: const LoaderPage(message: 'Chargement…'),
       );
     }
 
     if (etatSuivi.course == null) {
       return Scaffold(
-        backgroundColor: const Color(0xFF08111F),
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         appBar: AppBar(
-          backgroundColor: const Color(0xFF08111F),
+          backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           foregroundColor: Colors.white,
           elevation: 0,
         ),
-        body: const Center(
+        body: Center(
             child: Text('Course introuvable.',
-                style: TextStyle(color: Colors.white70))),
+                style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)))),
       );
     }
 
@@ -106,7 +106,7 @@ class _SuiviTransporteurState extends ConsumerState<SuiviTransporteur> {
     }
 
     return Scaffold(
-      backgroundColor: const Color(0xFF08111F),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: Stack(
         children: [
           // 1. CARTE (Abstraction avec itinéraire et ajustement automatique)
@@ -136,8 +136,8 @@ class _SuiviTransporteurState extends ConsumerState<SuiviTransporteur> {
                         blurRadius: 10)
                   ],
                 ),
-                child: const Icon(Icons.arrow_back_ios_new_rounded,
-                    color: Colors.white, size: 18),
+                child: Icon(Icons.arrow_back_ios_new_rounded,
+                    color: Theme.of(context).colorScheme.onSurface, size: 18),
               ),
             ),
           ),
@@ -208,7 +208,7 @@ class _SuiviTransporteurState extends ConsumerState<SuiviTransporteur> {
                 height: 5,
                 margin: const EdgeInsets.only(bottom: 20),
                 decoration: BoxDecoration(
-                    color: Colors.white24,
+                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.24),
                     borderRadius: BorderRadius.circular(10)),
               ),
             ),
@@ -222,10 +222,10 @@ class _SuiviTransporteurState extends ConsumerState<SuiviTransporteur> {
                   children: [
                     Text("Course en cours",
                         style: GoogleFonts.poppins(
-                            color: Colors.white54, fontSize: 12)),
+                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 12)),
                     Text(course.codeSuivi,
                         style: GoogleFonts.poppins(
-                            color: Colors.white,
+                            color: Theme.of(context).colorScheme.onSurface,
                             fontWeight: FontWeight.bold,
                             fontSize: 18)),
                   ],
@@ -250,7 +250,7 @@ class _SuiviTransporteurState extends ConsumerState<SuiviTransporteur> {
               ],
             ),
 
-            const Divider(height: 28, color: Colors.white12),
+            Divider(height: 28, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.12)),
 
             // Infos client
             Row(
@@ -271,12 +271,12 @@ class _SuiviTransporteurState extends ConsumerState<SuiviTransporteur> {
                               ? course.nomClient
                               : "Client",
                           style: GoogleFonts.poppins(
-                              color: Colors.white,
+                              color: Theme.of(context).colorScheme.onSurface,
                               fontWeight: FontWeight.bold,
                               fontSize: 15)),
                       Text("Client",
                           style: GoogleFonts.inter(
-                              color: Colors.white54, fontSize: 12)),
+                              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 12)),
                     ],
                   ),
                 ),
@@ -316,16 +316,16 @@ class _SuiviTransporteurState extends ConsumerState<SuiviTransporteur> {
             Container(
               padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.03),
+                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.03),
                 borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: Colors.white10),
+                border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1)),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text("Détails de la mission",
                       style: GoogleFonts.inter(
-                          color: Colors.white54,
+                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54),
                           fontSize: 11,
                           fontWeight: FontWeight.w700,
                           letterSpacing: 0.8)),
@@ -354,12 +354,12 @@ class _SuiviTransporteurState extends ConsumerState<SuiviTransporteur> {
                   if (course.description.isNotEmpty) ...[
                     const SizedBox(height: 8),
                     _buildInfoLigne(Icons.notes_rounded, "Description",
-                        course.description, Colors.white70),
+                        course.description, Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)),
                   ],
                   if (course.detailsSpecifiques.isNotEmpty) ...[
                     const SizedBox(height: 8),
                     _buildInfoLigne(Icons.info_outline_rounded, "Détails",
-                        course.detailsSpecifiques, Colors.white54),
+                        course.detailsSpecifiques, Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54)),
                   ],
                   if (course.aideChargement) ...[
                     const SizedBox(height: 8),
@@ -385,20 +385,20 @@ class _SuiviTransporteurState extends ConsumerState<SuiviTransporteur> {
               width: double.infinity,
               padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.04),
+                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.04),
                 borderRadius: BorderRadius.circular(14),
-                border: Border.all(color: Colors.white12),
+                border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.12)),
               ),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Text("Montant à percevoir",
                       style: GoogleFonts.inter(
-                          color: Colors.white54, fontSize: 13)),
+                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 13)),
                   Text(
                     "${(course.prixFinal > 0 ? course.prixFinal : course.prixEstime).toStringAsFixed(0)} FCFA",
                     style: GoogleFonts.poppins(
-                        color: Colors.white,
+                        color: Theme.of(context).colorScheme.onSurface,
                         fontWeight: FontWeight.bold,
                         fontSize: 16),
                   ),
@@ -479,11 +479,11 @@ class _SuiviTransporteurState extends ConsumerState<SuiviTransporteur> {
             children: [
               Text(label,
                   style: GoogleFonts.inter(
-                      color: Colors.white38,
+                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38),
                       fontSize: 11,
                       fontWeight: FontWeight.w600)),
               Text(valeur.isNotEmpty ? valeur : "—",
-                  style: GoogleFonts.inter(color: Colors.white, fontSize: 13)),
+                  style: GoogleFonts.inter(color: Theme.of(context).colorScheme.onSurface, fontSize: 13)),
             ],
           ),
         ),
@@ -524,16 +524,16 @@ class _SuiviTransporteurState extends ConsumerState<SuiviTransporteur> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: Text("Confirmer la fin de course",
             style: GoogleFonts.poppins(
-                color: Colors.white, fontWeight: FontWeight.bold)),
+                color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.bold)),
         content: Text(
           "Confirmez-vous que la course est terminée et la marchandise remise au client ?",
-          style: GoogleFonts.inter(color: Colors.white70),
+          style: GoogleFonts.inter(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
             child: Text("Non, annuler",
-                style: GoogleFonts.inter(color: Colors.white54)),
+                style: GoogleFonts.inter(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54))),
           ),
           ElevatedButton(
             onPressed: () async {
@@ -552,7 +552,7 @@ class _SuiviTransporteurState extends ConsumerState<SuiviTransporteur> {
                   SnackBar(
                     content: Text(
                         "Course terminée ! En attente du paiement client.",
-                        style: GoogleFonts.inter(color: Colors.white)),
+                        style: GoogleFonts.inter(color: Theme.of(context).colorScheme.onSurface)),
                     backgroundColor: CouleursApp.succes,
                     behavior: SnackBarBehavior.floating,
                     shape: RoundedRectangleBorder(

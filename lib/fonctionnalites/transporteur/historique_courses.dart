@@ -61,14 +61,14 @@ class _HistoriquecoursesState extends ConsumerState<HistoriqueCourses> {
     final coursesAsync = ref.watch(fluxMesCoursesProvider);
 
     return Scaffold(
-      backgroundColor: const Color(0xFF08111F),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         title: const Text("Historique des courses"),
-        backgroundColor: const Color(0xFF08111F),
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.white70),
-        titleTextStyle: const TextStyle(
-            color: Colors.white70, fontWeight: FontWeight.bold, fontSize: 18),
+        iconTheme: IconThemeData(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)),
+        titleTextStyle: TextStyle(
+            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), fontWeight: FontWeight.bold, fontSize: 18),
         actions: [
           Tooltip(
             message: "Supprimer les courses terminées/annulées",
@@ -93,20 +93,20 @@ class _HistoriquecoursesState extends ConsumerState<HistoriqueCourses> {
                 gradient: CouleursApp.degradePrincipal,
                 borderRadius: BorderRadius.circular(20),
               ),
-              child: const Row(
+              child: Row(
                 children: [
-                  Icon(Icons.history, color: Colors.white, size: 45),
-                  SizedBox(width: 15),
+                  const Icon(Icons.history, color: Colors.white, size: 45),
+                  const SizedBox(width: 15),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text("Historique",
-                            style: TextStyle(color: Colors.white70)),
-                        SizedBox(height: 6),
+                            style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7))),
+                        const SizedBox(height: 6),
                         Text(
                           "Glissez vers la gauche pour supprimer une course terminée.",
-                          style: TextStyle(color: Colors.white, fontSize: 14),
+                          style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 14),
                         ),
                       ],
                     ),
@@ -196,7 +196,7 @@ class _HistoriquecoursesState extends ConsumerState<HistoriqueCourses> {
                           onTap: () {
                             showModalBottomSheet(
                               context: context,
-                              backgroundColor: const Color(0xFF0C1524),
+                              backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
                               isScrollControlled: true,
                               shape: const RoundedRectangleBorder(
                                 borderRadius: BorderRadius.vertical(
@@ -350,7 +350,7 @@ class _FeuilleDetailsCourse extends StatelessWidget {
                 width: 44,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: Colors.white24,
+                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.24),
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -376,8 +376,8 @@ class _FeuilleDetailsCourse extends StatelessWidget {
                     children: [
                       Text(
                         "${course.adresseDepart} → ${course.adresseArrivee}",
-                        style: const TextStyle(
-                            color: Colors.white,
+                        style: TextStyle(
+                            color: Theme.of(context).colorScheme.onSurface,
                             fontWeight: FontWeight.bold,
                             fontSize: 15),
                       ),
@@ -385,8 +385,8 @@ class _FeuilleDetailsCourse extends StatelessWidget {
                       Text(
                         DateFormat('dd MMMM yyyy – HH:mm')
                             .format(course.dateCreation),
-                        style: const TextStyle(
-                            color: Colors.white54, fontSize: 12),
+                        style: TextStyle(
+                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 12),
                       ),
                     ],
                   ),
@@ -414,23 +414,23 @@ class _FeuilleDetailsCourse extends StatelessWidget {
             const SizedBox(height: 20),
 
             // Détails
-            _ligne(Icons.payments_outlined, "Prix",
+            _ligne(context, Icons.payments_outlined, "Prix",
                 "${prix.toStringAsFixed(0)} FCFA"),
-            _ligne(Icons.credit_card_outlined, "Paiement",
+            _ligne(context, Icons.credit_card_outlined, "Paiement",
                 course.modePaiement.isEmpty ? "Non renseigné" : course.modePaiement),
             if (course.typeVehicule.isNotEmpty)
-              _ligne(Icons.directions_car_outlined, "Véhicule",
+              _ligne(context, Icons.directions_car_outlined, "Véhicule",
                   course.typeVehicule),
             if (course.distanceKm > 0)
-              _ligne(Icons.straighten_outlined, "Distance",
+              _ligne(context, Icons.straighten_outlined, "Distance",
                   "${course.distanceKm.toStringAsFixed(1)} km"),
             if (course.nomClient.isNotEmpty)
-              _ligne(Icons.person_outline, "Client", course.nomClient),
+              _ligne(context, Icons.person_outline, "Client", course.nomClient),
             if (course.telephoneClient.isNotEmpty)
-              _ligne(Icons.phone_outlined, "Téléphone",
+              _ligne(context, Icons.phone_outlined, "Téléphone",
                   course.telephoneClient),
             if (course.noteClient > 0)
-              _ligne(Icons.star_outline, "Note reçue",
+              _ligne(context, Icons.star_outline, "Note reçue",
                   "${course.noteClient.toStringAsFixed(1)} / 5"),
           ],
         ),
@@ -438,22 +438,22 @@ class _FeuilleDetailsCourse extends StatelessWidget {
     );
   }
 
-  Widget _ligne(IconData icone, String libelle, String valeur) {
+  Widget _ligne(BuildContext context, IconData icone, String libelle, String valeur) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
         children: [
-          Icon(icone, color: Colors.white38, size: 18),
+          Icon(icone, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), size: 18),
           const SizedBox(width: 12),
           Text(libelle,
-              style: const TextStyle(color: Colors.white54, fontSize: 13)),
+              style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 13)),
           const Spacer(),
           Flexible(
             child: Text(
               valeur,
               textAlign: TextAlign.right,
-              style: const TextStyle(
-                  color: Colors.white,
+              style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface,
                   fontWeight: FontWeight.w600,
                   fontSize: 13),
             ),

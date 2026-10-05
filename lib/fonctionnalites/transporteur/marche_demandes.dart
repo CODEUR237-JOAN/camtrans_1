@@ -33,7 +33,7 @@ class _MarcheDemandesState extends ConsumerState<MarcheDemandes> {
     final confirmation = await showDialog<bool>(
       context: context,
       builder: (ctx) => AlertDialog(
-        backgroundColor: const Color(0xFF10192A),
+        backgroundColor: Theme.of(context).colorScheme.surface,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: Row(
           children: [
@@ -63,7 +63,7 @@ class _MarcheDemandesState extends ConsumerState<MarcheDemandes> {
           children: [
             Text(
               "Vous êtes sur le point d'accepter cette course.",
-              style: GoogleFonts.inter(color: Colors.white70, fontSize: 14),
+              style: GoogleFonts.inter(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), fontSize: 14),
             ),
             const SizedBox(height: 12),
             Container(
@@ -93,7 +93,7 @@ class _MarcheDemandesState extends ConsumerState<MarcheDemandes> {
             const SizedBox(height: 8),
             Text(
               "⚡ Cette action est immédiate et sécurisée.",
-              style: GoogleFonts.inter(color: Colors.white38, fontSize: 11),
+              style: GoogleFonts.inter(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), fontSize: 11),
             ),
           ],
         ),
@@ -101,7 +101,7 @@ class _MarcheDemandesState extends ConsumerState<MarcheDemandes> {
           TextButton(
             onPressed: () => Navigator.pop(ctx, false),
             child: Text("Annuler",
-                style: GoogleFonts.inter(color: Colors.white54)),
+                style: GoogleFonts.inter(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54))),
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(ctx, true),
@@ -164,7 +164,7 @@ class _MarcheDemandesState extends ConsumerState<MarcheDemandes> {
           SnackBar(
             content: Row(
               children: [
-                const Icon(Icons.check_circle, color: Colors.white),
+                Icon(Icons.check_circle, color: Theme.of(context).colorScheme.onSurface),
                 const SizedBox(width: 8),
                 Text("Super ! Course acceptée 🎉",
                     style: GoogleFonts.inter(fontWeight: FontWeight.bold)),
@@ -204,7 +204,7 @@ class _MarcheDemandesState extends ConsumerState<MarcheDemandes> {
     final coursesAsync = ref.watch(fluxCoursesDisponiblesProvider);
 
     return Scaffold(
-      backgroundColor: const Color(0xFF08111F),
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         // ✅ CORRECTION BUG: foregroundColor blanc (était noir sur fond noir)
         title: Text(
@@ -212,7 +212,7 @@ class _MarcheDemandesState extends ConsumerState<MarcheDemandes> {
           style: GoogleFonts.inter(
               fontWeight: FontWeight.bold, color: Colors.white),
         ),
-        backgroundColor: const Color(0xFF08111F),
+        backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         elevation: 0,
         foregroundColor: Colors.white,
         actions: [
@@ -254,13 +254,13 @@ class _MarcheDemandesState extends ConsumerState<MarcheDemandes> {
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  const Icon(Icons.wifi_off_rounded,
-                      size: 60, color: Colors.white38),
+                  Icon(Icons.wifi_off_rounded,
+                      size: 60, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38)),
                   const SizedBox(height: 16),
                   Text(
                     "Mince ! Problème réseau 📡",
                     style: GoogleFonts.inter(
-                        color: Colors.white70,
+                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                         fontSize: 16,
                         fontWeight: FontWeight.bold),
                   ),
@@ -268,7 +268,7 @@ class _MarcheDemandesState extends ConsumerState<MarcheDemandes> {
                   Text(
                     "Vérifiez votre connexion et réessayez",
                     style:
-                        GoogleFonts.inter(color: Colors.white38, fontSize: 13),
+                        GoogleFonts.inter(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), fontSize: 13),
                   ),
                 ],
               ),
@@ -303,7 +303,7 @@ class _MarcheDemandesState extends ConsumerState<MarcheDemandes> {
                         Text(
                           "Le calme avant la tempête ☕",
                           style: GoogleFonts.inter(
-                            color: Colors.white,
+                            color: Theme.of(context).colorScheme.onSurface,
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
                           ),
@@ -313,7 +313,7 @@ class _MarcheDemandesState extends ConsumerState<MarcheDemandes> {
                         Text(
                           "Aucune demande disponible pour l'instant. Restez disponible — votre prochaine course arrive bientôt !",
                           style: GoogleFonts.inter(
-                              color: Colors.white54, fontSize: 14, height: 1.5),
+                              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 14, height: 1.5),
                           textAlign: TextAlign.center,
                         ),
                         const SizedBox(height: 24),
@@ -321,21 +321,21 @@ class _MarcheDemandesState extends ConsumerState<MarcheDemandes> {
                           padding: const EdgeInsets.symmetric(
                               horizontal: 16, vertical: 10),
                           decoration: BoxDecoration(
-                            color: Colors.white.withValues(alpha: 0.05),
+                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05),
                             borderRadius: BorderRadius.circular(12),
                             border: Border.all(
-                                color: Colors.white.withValues(alpha: 0.08)),
+                                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08)),
                           ),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              const Icon(Icons.refresh_rounded,
-                                  size: 16, color: Colors.white38),
+                              Icon(Icons.refresh_rounded,
+                                  size: 16, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38)),
                               const SizedBox(width: 6),
                               Text(
                                 "Mise à jour automatique en temps réel",
                                 style: GoogleFonts.inter(
-                                    color: Colors.white38, fontSize: 11),
+                                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), fontSize: 11),
                               ),
                             ],
                           ),
@@ -363,9 +363,9 @@ class _MarcheDemandesState extends ConsumerState<MarcheDemandes> {
                 child: Container(
                   padding: const EdgeInsets.all(28),
                   decoration: BoxDecoration(
-                    color: const Color(0xFF10192A),
+                    color: Theme.of(context).colorScheme.surface,
                     borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: Colors.white12),
+                    border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.12)),
                     boxShadow: [
                       BoxShadow(
                           color: Colors.black.withValues(alpha: 0.4),
@@ -380,13 +380,13 @@ class _MarcheDemandesState extends ConsumerState<MarcheDemandes> {
                       Text(
                         "Attribution en cours...",
                         style: GoogleFonts.inter(
-                            color: Colors.white, fontWeight: FontWeight.bold),
+                            color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 4),
                       Text(
                         "Sécurisation de la course 🔐",
                         style: GoogleFonts.inter(
-                            color: Colors.white54, fontSize: 12),
+                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 12),
                       ),
                     ],
                   ),
@@ -415,9 +415,9 @@ class _MarcheDemandesState extends ConsumerState<MarcheDemandes> {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
-        color: const Color(0xFF10192A),
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.08)),
+        border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08)),
         boxShadow: [
           BoxShadow(
             color: CouleursApp.primaire.withValues(alpha: 0.05),
@@ -473,7 +473,7 @@ class _MarcheDemandesState extends ConsumerState<MarcheDemandes> {
                     Text(
                       "${course.distanceKm.toStringAsFixed(1)} km",
                       style: GoogleFonts.inter(
-                          color: Colors.white38, fontSize: 11),
+                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), fontSize: 11),
                     ),
                   ],
                 ),
@@ -486,7 +486,7 @@ class _MarcheDemandesState extends ConsumerState<MarcheDemandes> {
             Container(
               padding: const EdgeInsets.all(14),
               decoration: BoxDecoration(
-                color: Colors.white.withValues(alpha: 0.04),
+                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.04),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Column(
@@ -521,7 +521,7 @@ class _MarcheDemandesState extends ConsumerState<MarcheDemandes> {
                                 width: 2,
                                 height: 4,
                                 margin: const EdgeInsets.symmetric(vertical: 2),
-                                color: Colors.white24,
+                                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.24),
                               )),
                     ),
                   ),
@@ -592,14 +592,14 @@ class _MarcheDemandesState extends ConsumerState<MarcheDemandes> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(Icons.check_circle_outline,
-                        color: Colors.white, size: 18),
+                    Icon(Icons.check_circle_outline,
+                        color: Theme.of(context).colorScheme.onSurface, size: 18),
                     const SizedBox(width: 8),
                     Text(
                       "Accepter cette course",
                       style: GoogleFonts.inter(
                           fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                          color: Theme.of(context).colorScheme.onSurface,
                           fontSize: 15),
                     ),
                   ],
@@ -621,17 +621,17 @@ class _MarcheDemandesState extends ConsumerState<MarcheDemandes> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
-        color: Colors.white.withValues(alpha: 0.06),
+        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.06),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.1)),
+        border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 13, color: Colors.white54),
+          Icon(icon, size: 13, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54)),
           const SizedBox(width: 5),
           Text(label,
-              style: GoogleFonts.inter(fontSize: 12, color: Colors.white54)),
+              style: GoogleFonts.inter(fontSize: 12, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54))),
         ],
       ),
     );

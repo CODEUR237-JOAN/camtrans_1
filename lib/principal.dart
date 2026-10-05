@@ -24,7 +24,7 @@ class MonApplication extends ConsumerWidget {
       builder: (context, child) {
         return MaterialApp.router(
           debugShowCheckedModeBanner: false,
-          title: "Transport Intelligent",
+          title: "CamTrans",
           builder: (context, child) => EcouteurNotificationsApp(child: child!),
           theme: ThemeApplication.themeClair,
           darkTheme: ThemeApplication.themeSombre,

@@ -451,7 +451,18 @@ class _FeuilleRetraitAdminState extends ConsumerState<_FeuilleRetraitAdmin> {
     } catch (e) {
       if (!mounted) return;
       setState(() => _enCours = false);
-      final msg = e.toString().replaceFirst('Exception: ', '');
+      String msg = e.toString().replaceFirst('Exception: ', '');
+      
+      // Humanisation du message d'erreur pour éviter d'afficher des logs bruts (CORS, fetch, URI...)
+      final msgLower = msg.toLowerCase();
+      if (msgLower.contains('failed to fetch') || msgLower.contains('socketexception') || msgLower.contains('xmlhttprequest')) {
+        msg = "Problème de connexion avec le service financier. Veuillez vérifier votre connexion internet et réessayer.";
+      } else if (msgLower.contains('timeout') || msgLower.contains('délai')) {
+        msg = "Le serveur a mis trop de temps à répondre. Veuillez réessayer.";
+      } else if (msgLower.contains('corsproxy') || msgLower.contains('campay') || msgLower.contains('api/token')) {
+        msg = "Le service de paiement est temporairement indisponible ou rejette la connexion. Veuillez réessayer plus tard.";
+      }
+
       showDialog(
         context: context,
         builder: (_) => AlertDialog(
@@ -465,7 +476,7 @@ class _FeuilleRetraitAdminState extends ConsumerState<_FeuilleRetraitAdmin> {
                 style: TextStyle(color: Colors.white, fontSize: 17)),
           ]),
           content:
-              Text(msg, style: const TextStyle(color: Colors.white70)),
+              Text(msg, style: const TextStyle(color: Colors.white70, height: 1.5)),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),

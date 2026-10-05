@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:update_camtrans/coeur/animations/animations_avancees.dart';
 import 'package:update_camtrans/coeur/constantes/couleurs.dart';
 import 'package:update_camtrans/coeur/constantes/tailles.dart';
@@ -79,15 +80,19 @@ class _ConnexionState extends ConsumerState<Connexion> {
   // -----------------------------------------------------------------
   // Routage post-connexion selon le rôle Firestore
   // -----------------------------------------------------------------
-  Future<void> _routerSelonRole(String uid) async {
+  Future<void> _routerSelonRole(String uid, {bool estConnexionGoogle = false}) async {
     final serviceDb = ref.read(serviceFirestoreProvider);
     String? role;
+    String? telephone;
 
     // 1. Admin
     try {
       final adminDoc =
           await serviceDb.lireDocument(collection: 'admin', id: uid);
-      if (adminDoc.exists) role = 'admin';
+      if (adminDoc.exists) {
+        role = 'admin';
+        telephone = adminDoc.data()?['telephone'] as String?;
+      }
     } catch (_) {}
 
     // 2. Transporteur
@@ -95,7 +100,10 @@ class _ConnexionState extends ConsumerState<Connexion> {
       try {
         final transpDoc =
             await serviceDb.lireDocument(collection: 'transporteurs', id: uid);
-        if (transpDoc.exists) role = 'transporteur';
+        if (transpDoc.exists) {
+          role = 'transporteur';
+          telephone = transpDoc.data()?['telephone'] as String?;
+        }
       } catch (_) {}
     }
 
@@ -104,7 +112,10 @@ class _ConnexionState extends ConsumerState<Connexion> {
       try {
         final clientDoc =
             await serviceDb.lireDocument(collection: 'clients', id: uid);
-        if (clientDoc.exists) role = 'client';
+        if (clientDoc.exists) {
+          role = 'client';
+          telephone = clientDoc.data()?['telephone'] as String?;
+        }
       } catch (_) {}
     }
 
@@ -112,13 +123,31 @@ class _ConnexionState extends ConsumerState<Connexion> {
     if (!mounted) return;
 
     if (role == 'admin') {
+      await ServiceNotification.enregistrerTokenUtilisateur(uid, 'admin');
+      if (estConnexionGoogle && telephone != null && telephone.isNotEmpty) {
+        if (mounted) {
+          context.go(RoutesApplication.verificationSms, extra: {'role': role, 'telephone': telephone});
+        }
+        return;
+      }
       context.go(RoutesApplication.admin);
     } else if (role == 'client') {
       await ServiceNotification.enregistrerTokenUtilisateur(uid, 'client');
+      if (estConnexionGoogle && telephone != null && telephone.isNotEmpty) {
+        if (mounted) {
+          context.go(RoutesApplication.verificationSms, extra: {'role': role, 'telephone': telephone});
+        }
+        return;
+      }
       if (mounted) context.go(RoutesApplication.tableauBordClient);
     } else if (role == 'transporteur') {
-      await ServiceNotification.enregistrerTokenUtilisateur(
-          uid, 'transporteur');
+      await ServiceNotification.enregistrerTokenUtilisateur(uid, 'transporteur');
+      if (estConnexionGoogle && telephone != null && telephone.isNotEmpty) {
+        if (mounted) {
+          context.go(RoutesApplication.verificationSms, extra: {'role': role, 'telephone': telephone});
+        }
+        return;
+      }
       if (mounted) context.go(RoutesApplication.tableauBordTransporteur);
     } else {
       // Nouveau compte Google → créer le profil
@@ -160,7 +189,8 @@ class _ConnexionState extends ConsumerState<Connexion> {
       final userCred = await serviceAuth.connexionGoogle();
       if (!mounted) return;
       if (userCred?.user != null) {
-        await _routerSelonRole(userCred!.user!.uid);
+        await _migrerCompteParEmailSiBesoin(userCred!.user!);
+        await _routerSelonRole(userCred.user!.uid, estConnexionGoogle: true);
       }
       // Si null → l'utilisateur a annulé (pas d'erreur à afficher)
     } catch (e) {
@@ -169,6 +199,63 @@ class _ConnexionState extends ConsumerState<Connexion> {
       if (!msg.contains('annulée')) _afficherErreur(msg);
     } finally {
       if (mounted) setState(() => _chargementGoogle = false);
+    }
+  }
+
+  // -----------------------------------------------------------------
+  // Migration de compte (si email existant avec un autre UID)
+  // -----------------------------------------------------------------
+  Future<void> _migrerCompteParEmailSiBesoin(User user) async {
+    final email = user.email;
+    if (email == null || email.isEmpty) return;
+
+    final db = FirebaseFirestore.instance;
+
+    try {
+      // 1. Chercher dans clients
+      final clientsSnap = await db.collection('clients').where('email', isEqualTo: email).limit(1).get();
+      if (clientsSnap.docs.isNotEmpty) {
+        final doc = clientsSnap.docs.first;
+        if (doc.id != user.uid) {
+          final data = doc.data();
+          data['id'] = user.uid; // Mise à jour de l'ID interne si présent
+          
+          final batch = db.batch();
+          batch.set(db.collection('clients').doc(user.uid), data);
+          batch.delete(doc.reference);
+          
+          // Mettre à jour les courses de ce client
+          final courses = await db.collection('courses').where('clientId', isEqualTo: doc.id).get();
+          for (var c in courses.docs) {
+            batch.update(c.reference, {'clientId': user.uid});
+          }
+          await batch.commit();
+        }
+        return; // Migration terminée
+      }
+
+      // 2. Chercher dans transporteurs
+      final transpSnap = await db.collection('transporteurs').where('email', isEqualTo: email).limit(1).get();
+      if (transpSnap.docs.isNotEmpty) {
+        final doc = transpSnap.docs.first;
+        if (doc.id != user.uid) {
+          final data = doc.data();
+          data['id'] = user.uid;
+          
+          final batch = db.batch();
+          batch.set(db.collection('transporteurs').doc(user.uid), data);
+          batch.delete(doc.reference);
+          
+          // Mettre à jour les courses du transporteur
+          final courses = await db.collection('courses').where('transporteurId', isEqualTo: doc.id).get();
+          for (var c in courses.docs) {
+            batch.update(c.reference, {'transporteurId': user.uid});
+          }
+          await batch.commit();
+        }
+      }
+    } catch (e) {
+      debugPrint("Erreur lors de la migration du compte: $e");
     }
   }
 

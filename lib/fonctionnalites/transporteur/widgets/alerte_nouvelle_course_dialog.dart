@@ -43,7 +43,7 @@ class _AlerteNouvelleCourseDialogState
         decoration: BoxDecoration(
           color: Theme.of(context).brightness == Brightness.dark
               ? Colors.grey[900]
-              : Colors.white,
+              : Theme.of(context).colorScheme.onSurface,
           borderRadius: BorderRadius.circular(24),
           boxShadow: [
             BoxShadow(
@@ -100,7 +100,7 @@ class _AlerteNouvelleCourseDialogState
               style: GoogleFonts.inter(
                 fontSize: 14,
                 color: Theme.of(context).brightness == Brightness.dark
-                    ? Colors.white70
+                    ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)
                     : Colors.black87,
               ),
               textAlign: TextAlign.center,
@@ -221,7 +221,7 @@ class _AlerteNouvelleCourseDialogState
                         style: GoogleFonts.inter(
                           fontSize: 15,
                           fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                          color: Theme.of(context).colorScheme.onSurface,
                         ),
                       ),
                     ),

@@ -26,8 +26,6 @@ class DetailsCourse extends StatelessWidget {
   /// Appelé quand le transporteur choisit d'accepter. `null` = lecture seule.
   final VoidCallback? onAccepter;
 
-  static const Color _fond = Color(0xFF08111F);
-  static const Color _carte = Color(0xFF10192A);
 
   bool get _aCoordonnees =>
       course.latitudeDepart != 0 &&
@@ -55,10 +53,11 @@ class DetailsCourse extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final fond = Theme.of(context).scaffoldBackgroundColor;
     return Scaffold(
-      backgroundColor: _fond,
+      backgroundColor: fond,
       appBar: AppBar(
-        backgroundColor: _fond,
+        backgroundColor: fond,
         title: Text(
           "Détails de la course",
           style: GoogleFonts.poppins(fontWeight: FontWeight.w600),
@@ -69,18 +68,18 @@ class DetailsCourse extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            _buildCarte(),
+            _buildCarte(context),
             const SizedBox(height: 24),
-            _buildPrix(),
+            _buildPrix(context),
             const SizedBox(height: 24),
             const _TitreSection("Le trajet"),
-            _buildTrajet(),
+            _buildTrajet(context),
             const SizedBox(height: 24),
             const _TitreSection("Le client"),
-            _buildClient(),
+            _buildClient(context),
             const SizedBox(height: 24),
             const _TitreSection("La marchandise"),
-            _buildMarchandise(),
+            _buildMarchandise(context),
             if (_consignes.isNotEmpty) ...[
               const SizedBox(height: 24),
               const _TitreSection("Ce que précise le client"),
@@ -88,7 +87,7 @@ class DetailsCourse extends StatelessWidget {
                 child: Text(
                   _consignes,
                   style: GoogleFonts.inter(
-                      color: Colors.white70, fontSize: 14, height: 1.5),
+                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), fontSize: 14, height: 1.5),
                 ),
               ),
             ],
@@ -107,18 +106,18 @@ class DetailsCourse extends StatelessWidget {
   }
 
   // ─── Carte du trajet ────────────────────────────────────────────────
-  Widget _buildCarte() {
+  Widget _buildCarte(BuildContext context) {
     if (!_aCoordonnees) {
-      return const _Bloc(
+      return _Bloc(
         child: Row(
           children: [
-            Icon(Iconsax.map_copy, color: Colors.white38),
-            SizedBox(width: 12),
+            Icon(Iconsax.map_copy, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38)),
+            const SizedBox(width: 12),
             Expanded(
               child: Text(
                 "La carte n'est pas disponible pour ce trajet, "
                 "mais les adresses sont indiquées ci-dessous.",
-                style: TextStyle(color: Colors.white54),
+                style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54)),
               ),
             ),
           ],
@@ -167,7 +166,7 @@ class DetailsCourse extends StatelessWidget {
   }
 
   // ─── Prix ───────────────────────────────────────────────────────────
-  Widget _buildPrix() {
+  Widget _buildPrix(BuildContext context) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(20),
@@ -186,7 +185,7 @@ class DetailsCourse extends StatelessWidget {
         children: [
           Text(
             "Vous gagnerez",
-            style: GoogleFonts.inter(color: Colors.white60, fontSize: 13),
+            style: GoogleFonts.inter(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6), fontSize: 13),
           ),
           const SizedBox(height: 4),
           Text(
@@ -200,7 +199,7 @@ class DetailsCourse extends StatelessWidget {
           const SizedBox(height: 4),
           Text(
             "Prix fixé à l'avance, sans négociation.",
-            style: GoogleFonts.inter(color: Colors.white38, fontSize: 12),
+            style: GoogleFonts.inter(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), fontSize: 12),
           ),
         ],
       ),
@@ -208,7 +207,7 @@ class DetailsCourse extends StatelessWidget {
   }
 
   // ─── Trajet ─────────────────────────────────────────────────────────
-  Widget _buildTrajet() {
+  Widget _buildTrajet(BuildContext context) {
     return _Bloc(
       child: Column(
         children: [
@@ -233,7 +232,7 @@ class DetailsCourse extends StatelessWidget {
             const _Separateur(),
             _Ligne(
               icone: Icons.route_rounded,
-              couleur: Colors.white54,
+              couleur: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54),
               titre: "Distance",
               valeur: "${course.distanceKm.toStringAsFixed(1)} km",
             ),
@@ -242,7 +241,7 @@ class DetailsCourse extends StatelessWidget {
             const _Separateur(),
             _Ligne(
               icone: Icons.timer_outlined,
-              couleur: Colors.white54,
+              couleur: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54),
               titre: "Durée estimée",
               valeur: "environ ${course.etaMinutes} min",
             ),
@@ -253,7 +252,7 @@ class DetailsCourse extends StatelessWidget {
   }
 
   // ─── Client ─────────────────────────────────────────────────────────
-  Widget _buildClient() {
+  Widget _buildClient(BuildContext context) {
     return _Bloc(
       child: Row(
         children: [
@@ -270,7 +269,7 @@ class DetailsCourse extends StatelessWidget {
                 Text(
                   _prenomClient,
                   style: GoogleFonts.poppins(
-                    color: Colors.white,
+                    color: Theme.of(context).colorScheme.onSurface,
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
                   ),
@@ -278,7 +277,7 @@ class DetailsCourse extends StatelessWidget {
                 const SizedBox(height: 2),
                 Text(
                   "Son numéro s'affichera dès que vous aurez accepté la course.",
-                  style: GoogleFonts.inter(color: Colors.white54, fontSize: 12),
+                  style: GoogleFonts.inter(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 12),
                 ),
               ],
             ),
@@ -289,7 +288,7 @@ class DetailsCourse extends StatelessWidget {
   }
 
   // ─── Marchandise ────────────────────────────────────────────────────
-  Widget _buildMarchandise() {
+  Widget _buildMarchandise(BuildContext context) {
     final service = [
       if (course.categorieService.isNotEmpty) course.categorieService,
       if (course.optionGamme.isNotEmpty) "Gamme ${course.optionGamme}",
@@ -300,7 +299,7 @@ class DetailsCourse extends StatelessWidget {
         children: [
           _Ligne(
             icone: Iconsax.box_copy,
-            couleur: Colors.white54,
+            couleur: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54),
             titre: "Type",
             valeur: course.typeMarchandise.isNotEmpty
                 ? course.typeMarchandise
@@ -310,7 +309,7 @@ class DetailsCourse extends StatelessWidget {
             const _Separateur(),
             _Ligne(
               icone: Iconsax.category_copy,
-              couleur: Colors.white54,
+              couleur: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54),
               titre: "Service",
               valeur: service,
             ),
@@ -319,7 +318,7 @@ class DetailsCourse extends StatelessWidget {
             const _Separateur(),
             _Ligne(
               icone: Iconsax.truck_copy,
-              couleur: Colors.white54,
+              couleur: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54),
               titre: "Véhicule demandé",
               valeur: course.typeVehicule,
             ),
@@ -328,7 +327,7 @@ class DetailsCourse extends StatelessWidget {
             const _Separateur(),
             _Ligne(
               icone: Icons.scale_rounded,
-              couleur: Colors.white54,
+              couleur: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54),
               titre: "Poids",
               valeur: "${course.poidsKg.toStringAsFixed(0)} kg",
             ),
@@ -337,7 +336,7 @@ class DetailsCourse extends StatelessWidget {
             const _Separateur(),
             _Ligne(
               icone: Icons.view_in_ar_rounded,
-              couleur: Colors.white54,
+              couleur: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54),
               titre: "Volume",
               valeur: "${course.volumeM3.toStringAsFixed(1)} m³",
             ),
@@ -386,9 +385,9 @@ class DetailsCourse extends StatelessWidget {
                   child: CircularProgressIndicator(strokeWidth: 2),
                 );
               },
-              errorBuilder: (context, error, stack) => const _VignetteVide(
+              errorBuilder: (context, error, stack) => _VignetteVide(
                 child: Icon(Icons.broken_image_outlined,
-                    color: Colors.white38, size: 32),
+                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), size: 32),
               ),
             ),
           );
@@ -406,14 +405,14 @@ class DetailsCourse extends StatelessWidget {
           child: OutlinedButton(
             style: OutlinedButton.styleFrom(
               minimumSize: const Size.fromHeight(54),
-              side: const BorderSide(color: Colors.white24),
+              side: BorderSide(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.24)),
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(14)),
             ),
             onPressed: () => Navigator.of(context).pop(),
             child: Text(
               accepter == null ? "Retour" : "Pas cette fois",
-              style: GoogleFonts.inter(color: Colors.white70),
+              style: GoogleFonts.inter(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)),
             ),
           ),
         ),
@@ -461,7 +460,7 @@ class _TitreSection extends StatelessWidget {
       child: Text(
         texte,
         style: GoogleFonts.poppins(
-          color: Colors.white,
+          color: Theme.of(context).colorScheme.onSurface,
           fontSize: 18,
           fontWeight: FontWeight.w600,
         ),
@@ -480,9 +479,9 @@ class _Bloc extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: DetailsCourse._carte,
+        color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: Colors.white.withValues(alpha: 0.06)),
+        border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.06)),
       ),
       child: child,
     );
@@ -515,12 +514,12 @@ class _Ligne extends StatelessWidget {
             children: [
               Text(titre,
                   style:
-                      GoogleFonts.inter(color: Colors.white54, fontSize: 12)),
+                      GoogleFonts.inter(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 12)),
               const SizedBox(height: 2),
               Text(
                 valeur,
                 style: GoogleFonts.inter(
-                  color: Colors.white,
+                  color: Theme.of(context).colorScheme.onSurface,
                   fontSize: 14,
                   fontWeight: FontWeight.w600,
                 ),
@@ -538,7 +537,7 @@ class _Separateur extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Divider(height: 24, color: Colors.white.withValues(alpha: 0.06));
+    return Divider(height: 24, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.06));
   }
 }
 

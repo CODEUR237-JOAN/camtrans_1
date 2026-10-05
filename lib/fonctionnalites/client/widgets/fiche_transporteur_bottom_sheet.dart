@@ -27,9 +27,9 @@ class FicheTransporteurBottomSheet extends ConsumerWidget {
 
     return Container(
       padding: const EdgeInsets.all(24.0),
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24.0)),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.onSurface,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(24.0)),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,

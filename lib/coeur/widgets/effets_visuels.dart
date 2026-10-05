@@ -387,7 +387,7 @@ class _AnimatedShadowCardState extends State<AnimatedShadowCard>
               margin: widget.margin,
               decoration: BoxDecoration(
                 color: widget.backgroundColor ??
-                    (isDark ? const Color(0xFF2D2D44) : Colors.white),
+                    Theme.of(context).colorScheme.surface,
                 borderRadius: BorderRadius.circular(widget.borderRadius),
                 boxShadow: [
                   BoxShadow(
@@ -557,7 +557,7 @@ class NeoContainer extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final baseColor =
-        color ?? (isDark ? const Color(0xFF2D2D44) : Colors.white);
+        color ?? Theme.of(context).colorScheme.surface;
 
     return Container(
       margin: margin,
@@ -760,15 +760,19 @@ class _FondPremiumAnimeState extends State<FondPremiumAnime>
 
   @override
   Widget build(BuildContext context) {
+    // Le fond suit le thème actif (Clair / Sombre / Auto) :
+    // dégradé construit à partir de scaffoldBackgroundColor,
+    // légèrement teinté par la couleur primaire pour la profondeur.
+    final theme = Theme.of(context);
+    final isDark = theme.brightness == Brightness.dark;
+    final fond = theme.scaffoldBackgroundColor;
+    final fondTeinte = Color.lerp(
+        fond, theme.colorScheme.primary, isDark ? 0.07 : 0.05)!;
     final gradient = widget.gradient ??
-        const LinearGradient(
+        LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [
-            Color(0xFF08111F),
-            Color(0xFF0D1828),
-            Color(0xFF08111F),
-          ],
+          colors: [fond, fondTeinte, fond],
         );
     final content = Padding(padding: widget.padding, child: widget.child);
 
@@ -784,7 +788,7 @@ class _FondPremiumAnimeState extends State<FondPremiumAnime>
                 return CustomPaint(
                   painter: _FondPremiumPainter(
                     progress: _controller.value,
-                    isDark: true,
+                    isDark: isDark,
                     patternColor: widget.patternColor,
                   ),
                 );

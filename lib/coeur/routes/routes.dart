@@ -13,6 +13,7 @@ import 'package:update_camtrans/fonctionnalites/authentification/inscription_cli
 import 'package:update_camtrans/fonctionnalites/authentification/inscription_transporteur.dart';
 import 'package:update_camtrans/fonctionnalites/authentification/mot_de_passe_oublie.dart';
 import 'package:update_camtrans/fonctionnalites/authentification/verification_email.dart';
+import 'package:update_camtrans/fonctionnalites/authentification/verification_sms.dart';
 import 'package:update_camtrans/fonctionnalites/client/carte.dart';
 import 'package:update_camtrans/fonctionnalites/client/creer_demande.dart';
 import 'package:update_camtrans/fonctionnalites/client/facture.dart';
@@ -28,6 +29,7 @@ import 'package:update_camtrans/fonctionnalites/client/adresses_favorites.dart';
 import 'package:update_camtrans/fonctionnalites/chat/ecran_chat.dart';
 import 'package:update_camtrans/fonctionnalites/client/ecran_evaluation.dart';
 import 'package:update_camtrans/fonctionnalites/profil/modifier_profil.dart';
+import 'package:update_camtrans/fonctionnalites/client/parametres.dart';
 import 'package:update_camtrans/fonctionnalites/profil/changer_mot_de_passe.dart';
 import 'package:update_camtrans/fonctionnalites/transporteur/historique_courses.dart';
 import 'package:update_camtrans/fonctionnalites/transporteur/entretien.dart';
@@ -52,6 +54,7 @@ class RoutesApplication {
   static const String inscriptionTransporteur = "/inscription-transporteur";
   static const String motDePasseOublie = "/mot-de-passe-oublie";
   static const String verificationEmail = "/verification-email";
+  static const String verificationSms = "/verification-sms";
   static const String modifierProfil = "/modifier-profil";
   static const String changerMotDePasse = "/changer-mot-de-passe";
   static const String tableauBordClient = "/tableau-bord-client";
@@ -61,6 +64,7 @@ class RoutesApplication {
   static const String suiviAvecId = "/suivi/:courseId"; // Route paramétrée
   static const String historique = "/historique";
   static const String factures = "/factures";
+  static const String parametres = "/parametres";
   static const String tableauBordTransporteur = "/tableau-bord-transporteur";
   static const String assistantIA = "/assistant-ia";
   static const String paiement = "/paiement";
@@ -134,6 +138,19 @@ class RoutesApplication {
             _page(const VerificationEmail(), state.pageKey),
       ),
       GoRoute(
+        path: verificationSms,
+        pageBuilder: (context, state) {
+          final args = state.extra as Map<String, String>;
+          return _page(
+            VerificationSms(
+              role: args['role']!,
+              telephone: args['telephone']!,
+            ),
+            state.pageKey,
+          );
+        },
+      ),
+      GoRoute(
         path: modifierProfil,
         pageBuilder: (context, state) =>
             _page(const ModifierProfil(), state.pageKey),
@@ -142,6 +159,11 @@ class RoutesApplication {
         path: changerMotDePasse,
         pageBuilder: (context, state) =>
             _page(const ChangerMotDePasse(), state.pageKey),
+      ),
+      GoRoute(
+        path: parametres,
+        pageBuilder: (context, state) =>
+            _page(const Parametres(), state.pageKey),
       ),
       GoRoute(
         path: tableauBordClient,

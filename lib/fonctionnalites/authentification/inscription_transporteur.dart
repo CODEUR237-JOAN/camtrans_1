@@ -303,6 +303,7 @@ class _InscriptionTransporteurState
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
+        backgroundColor: Theme.of(context).colorScheme.surface,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
         titlePadding: const EdgeInsets.fromLTRB(24, 24, 24, 8),
         contentPadding: const EdgeInsets.fromLTRB(24, 8, 24, 0),
@@ -326,15 +327,17 @@ class _InscriptionTransporteurState
           child: SingleChildScrollView(
             child: Text(
               texteConditions,
-              style: const TextStyle(
-                  height: 1.6, fontSize: 14, color: Colors.black87),
+              style: TextStyle(
+                  height: 1.6, 
+                  fontSize: 14, 
+                  color: Theme.of(context).colorScheme.onSurface),
             ),
           ),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: const Text("Fermer", style: TextStyle(color: Colors.grey)),
+            child: Text("Fermer", style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6))),
           ),
           ElevatedButton.icon(
             icon: const Icon(Icons.check_circle_outline,

@@ -24,8 +24,8 @@ class EcranEntretien extends ConsumerStatefulWidget {
 }
 
 class _EntretienState extends ConsumerState<EcranEntretien> {
-  static const Color _fond = Color(0xFF08111F);
-  static const Color _carte = Color(0xFF10192A);
+  Color get _fond => Theme.of(context).scaffoldBackgroundColor;
+  Color get _carte => Theme.of(context).colorScheme.surface;
 
   // ------- Mapping catégorie -> icône / couleur -------
   static const Map<String, IconData> _icones = {
@@ -58,7 +58,7 @@ class _EntretienState extends ConsumerState<EcranEntretien> {
 
     final resultat = await showModalBottomSheet<Entretien>(
       context: context,
-      backgroundColor: const Color(0xFF0C1524),
+      backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
@@ -103,17 +103,17 @@ class _EntretienState extends ConsumerState<EcranEntretien> {
       builder: (_) => AlertDialog(
         backgroundColor: _carte,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-        title: const Text('Supprimer cet entretien ?',
-            style: TextStyle(color: Colors.white, fontSize: 17)),
+        title: Text('Supprimer cet entretien ?',
+            style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 17)),
         content: Text(
           '« ${e.titre} » sera définitivement supprimé.',
-          style: const TextStyle(color: Colors.white70),
+          style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: const Text('Annuler',
-                style: TextStyle(color: Colors.white54)),
+            child: Text('Annuler',
+                style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54))),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
@@ -162,10 +162,10 @@ class _EntretienState extends ConsumerState<EcranEntretien> {
       appBar: AppBar(
         backgroundColor: _fond,
         elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.white70),
-        title: const Text('Entretien du véhicule',
+        iconTheme: IconThemeData(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)),
+        title: Text('Entretien du véhicule',
             style: TextStyle(
-                color: Colors.white, fontWeight: FontWeight.bold)),
+                color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.bold)),
       ),
       floatingActionButton: FloatingActionButton.extended(
         backgroundColor: CouleursApp.primaire,
@@ -175,9 +175,9 @@ class _EntretienState extends ConsumerState<EcranEntretien> {
         onPressed: () => _ouvrirFormulaire(),
       ),
       body: uid == null
-          ? const Center(
+          ? Center(
               child: Text('Vous devez être connecté.',
-                  style: TextStyle(color: Colors.white70)),
+                  style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7))),
             )
           : StreamBuilder<QuerySnapshot<Map<String, dynamic>>>(
               stream: service.fluxCollectionCondition(
@@ -196,7 +196,7 @@ class _EntretienState extends ConsumerState<EcranEntretien> {
                       child: Text(
                         'Impossible de charger les entretiens.\n${snapshot.error}',
                         textAlign: TextAlign.center,
-                        style: const TextStyle(color: Colors.white54),
+                        style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54)),
                       ),
                     ),
                   );
@@ -219,9 +219,9 @@ class _EntretienState extends ConsumerState<EcranEntretien> {
                   children: [
                     _bandeauStats(entretiens.length, nbBientot),
                     const SizedBox(height: 24),
-                    const Text('Historique',
+                    Text('Historique',
                         style: TextStyle(
-                            color: Colors.white,
+                            color: Theme.of(context).colorScheme.onSurface,
                             fontSize: 18,
                             fontWeight: FontWeight.bold)),
                     const SizedBox(height: 14),
@@ -253,7 +253,7 @@ class _EntretienState extends ConsumerState<EcranEntretien> {
       decoration: BoxDecoration(
         color: _carte,
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: Colors.white10),
+        border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1)),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -266,7 +266,7 @@ class _EntretienState extends ConsumerState<EcranEntretien> {
                   fontSize: 24,
                   fontWeight: FontWeight.bold)),
           Text(titre,
-              style: const TextStyle(color: Colors.white54, fontSize: 13)),
+              style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 13)),
         ],
       ),
     );
@@ -297,7 +297,7 @@ class _EntretienState extends ConsumerState<EcranEntretien> {
         decoration: BoxDecoration(
           color: _carte,
           borderRadius: BorderRadius.circular(18),
-          border: Border.all(color: Colors.white10),
+          border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1)),
         ),
         child: ListTile(
           contentPadding: const EdgeInsets.all(14),
@@ -307,20 +307,20 @@ class _EntretienState extends ConsumerState<EcranEntretien> {
             child: Icon(_iconePour(e.type), color: couleur),
           ),
           title: Text(e.titre,
-              style: const TextStyle(
-                  color: Colors.white, fontWeight: FontWeight.bold)),
+              style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.bold)),
           subtitle: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 6),
               Text('Dernier : ${df.format(e.dateDernier)}',
-                  style: const TextStyle(color: Colors.white60, fontSize: 12.5)),
+                  style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6), fontSize: 12.5)),
               if (e.dateProchain != null)
                 Row(
                   children: [
                     Text('Prochain : ${df.format(e.dateProchain!)}',
                         style: TextStyle(
-                            color: e.bientotDu ? Colors.orange : Colors.white60,
+                            color: e.bientotDu ? Colors.orange : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                             fontSize: 12.5,
                             fontWeight:
                                 e.bientotDu ? FontWeight.bold : FontWeight.normal)),
@@ -334,8 +334,8 @@ class _EntretienState extends ConsumerState<EcranEntretien> {
               if (e.note.isNotEmpty) ...[
                 const SizedBox(height: 4),
                 Text(e.note,
-                    style: const TextStyle(
-                        color: Colors.white38, fontSize: 12),
+                    style: TextStyle(
+                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), fontSize: 12),
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis),
               ],
@@ -374,11 +374,11 @@ class _EntretienState extends ConsumerState<EcranEntretien> {
                     fontSize: 17,
                     fontWeight: FontWeight.bold)),
             const SizedBox(height: 8),
-            const Text(
+            Text(
               'Suivez les entretiens de votre véhicule pour ne rien oublier. '
               'Appuyez sur « Ajouter » pour créer le premier.',
               textAlign: TextAlign.center,
-              style: TextStyle(color: Colors.white54, height: 1.5),
+              style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), height: 1.5),
             ),
           ],
         ),
@@ -501,7 +501,7 @@ class _FormulaireEntretienState extends State<_FormulaireEntretien> {
                   width: 44,
                   height: 4,
                   decoration: BoxDecoration(
-                    color: Colors.white24,
+                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.24),
                     borderRadius: BorderRadius.circular(2),
                   ),
                 ),
@@ -511,8 +511,8 @@ class _FormulaireEntretienState extends State<_FormulaireEntretien> {
                 widget.existant == null
                     ? 'Nouvel entretien'
                     : 'Modifier l\'entretien',
-                style: const TextStyle(
-                    color: Colors.white,
+                style: TextStyle(
+                    color: Theme.of(context).colorScheme.onSurface,
                     fontSize: 18,
                     fontWeight: FontWeight.bold),
               ),
@@ -521,7 +521,7 @@ class _FormulaireEntretienState extends State<_FormulaireEntretien> {
               // Intitulé
               TextFormField(
                 controller: _titre,
-                style: const TextStyle(color: Colors.white),
+                style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
                 decoration: _deco('Intitulé', 'Ex : Vidange moteur'),
                 validator: (v) => (v == null || v.trim().isEmpty)
                     ? 'Veuillez saisir un intitulé'
@@ -530,8 +530,8 @@ class _FormulaireEntretienState extends State<_FormulaireEntretien> {
               const SizedBox(height: 16),
 
               // Catégorie
-              const Text('Catégorie',
-                  style: TextStyle(color: Colors.white54, fontSize: 13)),
+              Text('Catégorie',
+                  style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 13)),
               const SizedBox(height: 8),
               Wrap(
                 spacing: 8,
@@ -542,14 +542,14 @@ class _FormulaireEntretienState extends State<_FormulaireEntretien> {
                     label: Text(entry.value),
                     selected: selectionne,
                     onSelected: (_) => setState(() => _type = entry.key),
-                    backgroundColor: const Color(0xFF10192A),
+                    backgroundColor: Theme.of(context).colorScheme.surface,
                     selectedColor: CouleursApp.primaire,
                     labelStyle: TextStyle(
-                        color: selectionne ? Colors.white : Colors.white70,
+                        color: selectionne ? Theme.of(context).colorScheme.onSurface : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                         fontWeight: FontWeight.w600),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
-                      side: const BorderSide(color: Colors.white12),
+                      side: BorderSide(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.12)),
                     ),
                   );
                 }).toList(),
@@ -582,7 +582,7 @@ class _FormulaireEntretienState extends State<_FormulaireEntretien> {
               // Note
               TextFormField(
                 controller: _note,
-                style: const TextStyle(color: Colors.white),
+                style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
                 maxLines: 2,
                 decoration: _deco('Note (option.)',
                     'Kilométrage, garage, pièces changées...'),
@@ -617,13 +617,13 @@ class _FormulaireEntretienState extends State<_FormulaireEntretien> {
     return InputDecoration(
       labelText: label,
       hintText: hint,
-      labelStyle: const TextStyle(color: Colors.white54),
-      hintStyle: const TextStyle(color: Colors.white24),
+      labelStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54)),
+      hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.24)),
       filled: true,
-      fillColor: const Color(0xFF10192A),
+      fillColor: Theme.of(context).colorScheme.surface,
       enabledBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(14),
-        borderSide: const BorderSide(color: Colors.white12),
+        borderSide: BorderSide(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.12)),
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(14),
@@ -651,15 +651,15 @@ class _FormulaireEntretienState extends State<_FormulaireEntretien> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
         decoration: BoxDecoration(
-          color: const Color(0xFF10192A),
+          color: Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: Colors.white12),
+          border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.12)),
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(libelle,
-                style: const TextStyle(color: Colors.white54, fontSize: 11)),
+                style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 11)),
             const SizedBox(height: 4),
             Row(
               children: [

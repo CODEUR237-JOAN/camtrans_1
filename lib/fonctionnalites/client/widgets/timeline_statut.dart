@@ -53,12 +53,12 @@ class TimelineStatut extends StatelessWidget {
                     ),
                   ),
                   child: estPasse
-                      ? const Icon(Icons.check, size: 12, color: Colors.white)
+                      ? Icon(Icons.check, size: 12, color: Theme.of(context).colorScheme.onSurface)
                       : (estActuel
                           ? Container(
                               margin: const EdgeInsets.all(4),
-                              decoration: const BoxDecoration(
-                                  color: Colors.white, shape: BoxShape.circle),
+                              decoration: BoxDecoration(
+                                  color: Theme.of(context).colorScheme.onSurface, shape: BoxShape.circle),
                             )
                           : null),
                 )

@@ -30,6 +30,24 @@ class GlassContainer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final defaultRadius = borderRadius ?? BorderRadius.circular(24);
+    final theme = Theme.of(context);
+    final scheme = theme.colorScheme;
+    final isDark = theme.brightness == Brightness.dark;
+
+    // Sombre : voile blanc translucide (glassmorphism classique).
+    // Clair  : un voile blanc serait invisible sur fond clair →
+    //          surface quasi opaque + bordure et ombre douces,
+    //          ce qui garantit la lisibilité du texte foncé.
+    final couleurFond = isDark
+        ? Colors.white.withValues(alpha: opaciteFond)
+        : scheme.surface
+            .withValues(alpha: (0.72 + opaciteFond).clamp(0.0, 0.96));
+    final couleurBordure = isDark
+        ? Colors.white.withValues(alpha: 0.15)
+        : scheme.outlineVariant;
+    final ombre = isDark
+        ? Colors.black.withValues(alpha: 0.10)
+        : scheme.shadow.withValues(alpha: 0.06);
 
     return Container(
       margin: margin,
@@ -39,7 +57,7 @@ class GlassContainer extends StatelessWidget {
         borderRadius: defaultRadius,
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.1),
+            color: ombre,
             blurRadius: 20,
             offset: const Offset(0, 10),
           )
@@ -52,11 +70,11 @@ class GlassContainer extends StatelessWidget {
           child: Container(
             padding: padding ?? const EdgeInsets.all(20),
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: opaciteFond),
+              color: couleurFond,
               borderRadius: defaultRadius,
               border: customBorder ??
                   Border.all(
-                    color: Colors.white.withValues(alpha: 0.15),
+                    color: couleurBordure,
                     width: 1.0,
                   ),
             ),

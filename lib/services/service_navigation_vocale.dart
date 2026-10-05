@@ -363,11 +363,11 @@ class ServiceNavigationVocale extends ChangeNotifier {
           : '';
       switch (palier) {
         case PalierAnnonce.loin:
-          return 'tournez ${nuance}$direction$rue';
+          return 'tournez $nuance$direction$rue';
         case PalierAnnonce.approche:
-          return 'tourner ${nuance}$direction$rue';
+          return 'tourner $nuance$direction$rue';
         case PalierAnnonce.immediat:
-          return 'Tournez ${nuance}$direction$rue maintenant';
+          return 'Tournez $nuance$direction$rue maintenant';
       }
     }
 

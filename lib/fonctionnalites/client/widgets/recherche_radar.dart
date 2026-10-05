@@ -98,7 +98,7 @@ class RechercheRadar extends StatelessWidget {
             Text(
               "Recherche du meilleur transporteur...",
               style: GoogleFonts.poppins(
-                  color: Colors.white,
+                  color: Theme.of(context).colorScheme.onSurface,
                   fontSize: 18,
                   fontWeight: FontWeight.bold),
             )
@@ -112,7 +112,7 @@ class RechercheRadar extends StatelessWidget {
               "Service d'Urgence 24h/24\nDélai d'intervention estimé : 30 minutes",
               textAlign: TextAlign.center,
               style: GoogleFonts.poppins(
-                  color: Colors.white,
+                  color: Theme.of(context).colorScheme.onSurface,
                   fontSize: 14,
                   fontWeight: FontWeight.w600),
             ),
