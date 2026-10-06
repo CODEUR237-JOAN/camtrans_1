@@ -11,7 +11,7 @@ import 'package:update_camtrans/coeur/constantes/couleurs.dart';
 import 'package:update_camtrans/coeur/widgets/loader_page.dart';
 import 'package:update_camtrans/coeur/constantes/statuts.dart';
 import 'package:update_camtrans/coeur/etat/suivi_provider.dart';
-import 'package:update_camtrans/services/service_firestore.dart';
+import 'package:update_camtrans/coeur/etat/transporteur_provider.dart';
 import 'package:update_camtrans/services/service_gps.dart';
 import 'package:update_camtrans/fonctionnalites/client/widgets/carte_suivi_abstraite.dart';
 import 'package:update_camtrans/services/service_navigation_vocale.dart';
@@ -408,7 +408,7 @@ class _SuiviTransporteurState extends ConsumerState<SuiviTransporteur> {
 
             const SizedBox(height: 20),
 
-            // Bouton Terminer (sans code PIN)
+            // Bouton Terminer — demande le code PIN de livraison au client
             if (statut != StatutCourse.terminee &&
                 statut != StatutCourse.annulee)
               SizedBox(
@@ -516,61 +516,149 @@ class _SuiviTransporteurState extends ConsumerState<SuiviTransporteur> {
     }
   }
 
+  // Clôture par code PIN : preuve de remise fournie par le client.
   void _terminerCourse(BuildContext context, dynamic course) {
+    final pinController = TextEditingController();
+    bool enCours = false;
+    String? erreur;
+
     showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: const Color(0xFF0F172A),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: Text("Confirmer la fin de course",
-            style: GoogleFonts.poppins(
-                color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.bold)),
-        content: Text(
-          "Confirmez-vous que la course est terminée et la marchandise remise au client ?",
-          style: GoogleFonts.inter(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: Text("Non, annuler",
-                style: GoogleFonts.inter(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54))),
-          ),
-          ElevatedButton(
-            onPressed: () async {
-              Navigator.pop(ctx);
-              HapticFeedback.heavyImpact();
-              await ref.read(serviceFirestoreProvider).modifierDocument(
-                collection: 'courses',
-                id: course.id,
-                donnees: {
-                  'statut': StatutCourse.terminee,
-                  'fondsDebloques': true,
-                },
-              );
-              if (context.mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(
-                        "Course terminée ! En attente du paiement client.",
-                        style: GoogleFonts.inter(color: Theme.of(context).colorScheme.onSurface)),
-                    backgroundColor: CouleursApp.succes,
-                    behavior: SnackBarBehavior.floating,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12)),
+      builder: (ctx) => StatefulBuilder(
+        builder: (ctx, setStateDialog) {
+          return AlertDialog(
+            backgroundColor: const Color(0xFF0F172A),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+            title: Text("Code de livraison",
+                style: GoogleFonts.poppins(
+                    color: Theme.of(context).colorScheme.onSurface,
+                    fontWeight: FontWeight.bold)),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  "Demandez au client son code à 4 chiffres pour confirmer la remise de la marchandise.",
+                  style: GoogleFonts.inter(
+                      color: Theme.of(context)
+                          .colorScheme
+                          .onSurface
+                          .withValues(alpha: 0.7)),
+                ),
+                const SizedBox(height: 16),
+                TextField(
+                  controller: pinController,
+                  keyboardType: TextInputType.number,
+                  maxLength: 4,
+                  textAlign: TextAlign.center,
+                  enabled: !enCours,
+                  style: GoogleFonts.poppins(
+                    color: Theme.of(context).colorScheme.onSurface,
+                    fontSize: 26,
+                    fontWeight: FontWeight.bold,
+                    letterSpacing: 10,
                   ),
-                );
-              }
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: CouleursApp.succes,
-              foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12)),
+                  decoration: InputDecoration(
+                    counterText: "",
+                    hintText: "----",
+                    hintStyle: TextStyle(
+                        color: Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withValues(alpha: 0.3),
+                        letterSpacing: 10),
+                    filled: true,
+                    fillColor: CouleursApp.primaire.withValues(alpha: 0.08),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                      borderSide: BorderSide.none,
+                    ),
+                  ),
+                ),
+                if (erreur != null) ...[
+                  const SizedBox(height: 10),
+                  Row(
+                    children: [
+                      const Icon(Icons.error_outline,
+                          color: Colors.redAccent, size: 18),
+                      const SizedBox(width: 6),
+                      Expanded(
+                        child: Text(erreur!,
+                            style: GoogleFonts.inter(
+                                color: Colors.redAccent, fontSize: 13)),
+                      ),
+                    ],
+                  ),
+                ],
+              ],
             ),
-            child: Text("Oui, terminer",
-                style: GoogleFonts.poppins(fontWeight: FontWeight.bold)),
-          ),
-        ],
+            actions: [
+              TextButton(
+                onPressed: enCours ? null : () => Navigator.pop(ctx),
+                child: Text("Annuler",
+                    style: GoogleFonts.inter(
+                        color: Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withValues(alpha: 0.54))),
+              ),
+              ElevatedButton(
+                onPressed: enCours
+                    ? null
+                    : () async {
+                        setStateDialog(() {
+                          enCours = true;
+                          erreur = null;
+                        });
+                        try {
+                          await ref
+                              .read(transporteurActionsProvider)
+                              .cloturerCourseAvecPin(
+                                  course.id, pinController.text);
+                          HapticFeedback.heavyImpact();
+                          if (ctx.mounted) Navigator.pop(ctx);
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                    "Livraison confirmée ! Course clôturée.",
+                                    style: GoogleFonts.inter(
+                                        color: Colors.white)),
+                                backgroundColor: CouleursApp.succes,
+                                behavior: SnackBarBehavior.floating,
+                                shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12)),
+                              ),
+                            );
+                          }
+                        } catch (e) {
+                          setStateDialog(() {
+                            enCours = false;
+                            erreur =
+                                e.toString().replaceAll('Exception: ', '');
+                          });
+                        }
+                      },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: CouleursApp.succes,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12)),
+                ),
+                child: enCours
+                    ? const SizedBox(
+                        width: 18,
+                        height: 18,
+                        child: CircularProgressIndicator(
+                            strokeWidth: 2, color: Colors.white),
+                      )
+                    : Text("Valider",
+                        style:
+                            GoogleFonts.poppins(fontWeight: FontWeight.bold)),
+              ),
+            ],
+          );
+        },
       ),
     );
   }

@@ -564,6 +564,55 @@ class _SuiviTransportState extends ConsumerState<SuiviTransport> {
             const SizedBox(height: 16),
           ],
 
+          // Code PIN de livraison — à communiquer au chauffeur à la remise.
+          if (course.codePinCourse.isNotEmpty &&
+              StatutCourse.estActive(course.statut)) ...[
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                gradient: CouleursApp.degradePrincipal,
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.lock_outline, color: Colors.white),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          "Code de livraison",
+                          style: TextStyle(
+                              color: Colors.white70,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          "À donner au chauffeur à la remise",
+                          style: TextStyle(
+                              color: Colors.white.withValues(alpha: 0.85),
+                              fontSize: 11),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Text(
+                    course.codePinCourse,
+                    style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 4),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 16),
+          ],
+
           // ETA & Distance
           if (distanceMetres > 0) ...[
             _buildInfosTrajet(distanceMetres, tempsSecondes),

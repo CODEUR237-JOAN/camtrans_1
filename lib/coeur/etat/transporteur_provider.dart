@@ -343,6 +343,51 @@ class TransporteurActions {
     );
   }
 
+  /// Clôture SÉCURISÉE d'une course par code PIN de livraison (escrow).
+  ///
+  /// Le transporteur saisit le code à 4 chiffres fourni par le client à la
+  /// remise de la marchandise. Si le code correspond à `codePinCourse`, la
+  /// course passe à `terminee` ET les fonds sont débloqués — de façon
+  /// ATOMIQUE (transaction). Lève une exception explicite si le code est
+  /// incorrect, la course introuvable, déjà clôturée, ou appartient à un
+  /// autre transporteur.
+  Future<void> cloturerCourseAvecPin(String courseId, String pinSaisi) async {
+    final docRef =
+        FirebaseFirestore.instance.collection('courses').doc(courseId);
+
+    await FirebaseFirestore.instance.runTransaction((transaction) async {
+      final snap = await transaction.get(docRef);
+      if (!snap.exists || snap.data() == null) {
+        throw Exception("Course introuvable.");
+      }
+      final data = snap.data()!;
+
+      if (data['transporteurId'] != _transporteurId) {
+        throw Exception("Vous n'êtes pas le transporteur de cette course.");
+      }
+      final statut = data['statut'] as String? ?? '';
+      if (statut == StatutCourse.terminee || statut == StatutCourse.annulee) {
+        throw Exception("Cette course est déjà clôturée.");
+      }
+
+      final pinAttendu = (data['codePinCourse'] ?? '').toString().trim();
+      if (pinAttendu.isEmpty) {
+        throw Exception(
+            "Aucun code de livraison n'est défini pour cette course.");
+      }
+      if (pinSaisi.trim() != pinAttendu) {
+        throw Exception("Code incorrect. Demandez le bon code au client.");
+      }
+
+      transaction.update(docRef, {
+        'statut': StatutCourse.terminee,
+        'fondsDebloques': true,
+        'dateFin': DateTime.now().toIso8601String(),
+        'dateModification': DateTime.now().toIso8601String(),
+      });
+    });
+  }
+
   /// Met à jour la disponibilité du transporteur dans Firestore
   Future<void> changerDisponibilite(bool estDisponible) async {
     if (_transporteurId.isEmpty) return;
