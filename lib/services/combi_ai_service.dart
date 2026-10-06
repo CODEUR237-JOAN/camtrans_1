@@ -80,7 +80,7 @@ class CombiAIService extends StateNotifier<EtatCombi> {
   // [role] attendu : 'client', 'transporteur' (ou 'admin' / null).
   // Le prompt change radicalement de périmètre selon le profil.
   // ===================================================================
-  String genererSystemPrompt(String? role) {
+  static String genererSystemPrompt(String? role) {
     final socle = '''
 Tu es « Combi », l'assistant vocal de l'application CamTrans.
 
@@ -165,7 +165,7 @@ courses (transporteur), puis aide-la dans ce cadre.
     state = EtatCombi.reflexion;
 
     // 1) Easter egg : court-circuit LLM pour garantir la phrase exacte.
-    if (_demandeLeCreateur(texte)) {
+    if (estQuestionCreateur(texte)) {
       _ajouterHistorique('user', texte);
       _ajouterHistorique('assistant', reponseCreateur);
       await parler(reponseCreateur);
@@ -203,8 +203,9 @@ courses (transporteur), puis aide-la dans ce cadre.
 
   // -------------------------------------------------------------------
   // DÉTECTION DE LA QUESTION « QUI T'A CRÉÉ ? »
+  // Statique et pure → testable sans initialiser TTS/STT.
   // -------------------------------------------------------------------
-  bool _demandeLeCreateur(String message) {
+  static bool estQuestionCreateur(String message) {
     final m = message.toLowerCase();
     // On cherche la présence d'un verbe de création associé à "toi/t'".
     final parleDeCreation = m.contains('créé') ||
@@ -236,7 +237,7 @@ courses (transporteur), puis aide-la dans ce cadre.
   // Supprime markdown (**, *, `, #, _, >) et émojis : la TTS ne doit
   // JAMAIS prononcer « astérisque astérisque » ni des symboles.
   // -------------------------------------------------------------------
-  String nettoyerPourVoix(String texte) {
+  static String nettoyerPourVoix(String texte) {
     var t = texte;
 
     // Markdown de mise en forme.
@@ -312,8 +313,7 @@ courses (transporteur), puis aide-la dans ce cadre.
       listenOptions: stt.SpeechListenOptions(
         localeId: 'fr_FR',
         cancelOnError: true,
-        listenMode: stt.ListenMode.confirmation,
-        partialResults: false,
+        listenMode: stt.ListenMode.dictation,
       ),
     );
 
