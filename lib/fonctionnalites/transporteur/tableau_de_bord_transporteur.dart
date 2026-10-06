@@ -77,7 +77,7 @@ class _TableauDeBordTransporteurState
     if (joursRestants <= 0) {
       // Abonnement expiré
       ServiceNotification.afficherNotification(
-        titre: '⚠️ Abonnement expiré',
+        titre: 'Abonnement expiré',
         message:
             'Votre abonnement est terminé. Renouvelez-le pour continuer à recevoir des courses.',
         type: 'alerte',
@@ -85,7 +85,7 @@ class _TableauDeBordTransporteurState
     } else if (joursRestants <= 3) {
       // Expire bientôt
       ServiceNotification.afficherNotification(
-        titre: '🕔 Abonnement bientôt expiré',
+        titre: 'Abonnement bientôt expiré',
         message:
             'Votre abonnement expire dans $joursRestants jour(s). Pensez à le renouveler.',
         type: 'alerte',
@@ -110,7 +110,7 @@ class _TableauDeBordTransporteurState
         if (previous?.value?.id != courseProposee.id) {
           // Déclencher une alerte sonore/système
           ServiceNotification.afficherNotification(
-            titre: '🚨 NOUVELLE COURSE !',
+            titre: 'Nouvelle course !',
             message:
                 'Une nouvelle demande vous a été affectée. Acceptez vite !',
             type: 'succes',
@@ -251,7 +251,7 @@ class _TableauDeBordTransporteurState
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          "${_salutationDuJour()} 👋",
+                          _salutationDuJour(),
                           style: GoogleFonts.inter(
                               color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6), fontSize: 13, fontWeight: FontWeight.w500),
                         ),
@@ -545,14 +545,63 @@ class _TableauDeBordTransporteurState
                                           duration: 1.5.seconds)),
                         ],
                       ),
-                  error: (err, _) =>
-                      Text("Hmm, petit souci de chargement : $err 🔧"),
+                  error: (err, _) => Padding(
+                    padding: const EdgeInsets.all(20.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.cloud_off_outlined,
+                            size: 20,
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onSurface
+                                .withValues(alpha: 0.6)),
+                        const SizedBox(width: 8),
+                        Flexible(
+                          child: Text(
+                            "Le chargement a échoué. Vérifiez votre connexion, puis réessayez.",
+                            style: TextStyle(
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onSurface
+                                    .withValues(alpha: 0.6)),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                   data: (courses) {
                     if (courses.isEmpty) {
                       return Padding(
-                        padding: const EdgeInsets.all(20.0),
-                        child: Text("Aucune course assignée.",
-                            style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54))),
+                        padding: const EdgeInsets.all(24.0),
+                        child: Column(
+                          children: [
+                            Icon(Icons.inbox_outlined,
+                                size: 40,
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onSurface
+                                    .withValues(alpha: 0.4)),
+                            const SizedBox(height: 12),
+                            Text(
+                              "Aucune course pour le moment.",
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                  color: Theme.of(context).colorScheme.onSurface,
+                                  fontWeight: FontWeight.w600),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              "Vos prochaines courses apparaîtront ici.",
+                              textAlign: TextAlign.center,
+                              style: TextStyle(
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onSurface
+                                      .withValues(alpha: 0.6)),
+                            ),
+                          ],
+                        ),
                       );
                     }
 
@@ -643,7 +692,7 @@ class _TableauDeBordTransporteurState
               color: conseil.couleur.withValues(alpha: 0.15),
               shape: BoxShape.circle,
             ),
-            child: Text(conseil.emoji, style: const TextStyle(fontSize: 22)),
+            child: Icon(conseil.icone, color: conseil.couleur, size: 22),
           ),
           const SizedBox(width: 14),
           Expanded(
@@ -705,37 +754,37 @@ class _TableauDeBordTransporteurState
   _ConseilJour _determinerConseil(int heure, double revenus) {
     if (heure >= 6 && heure < 9) {
       return const _ConseilJour(
-          emoji: "🌅",
+          icone: Icons.wb_twilight,
           titre: "C'est l'heure de pointe matinale !",
           description:
               "Les courses vers les bureaux et marchés sont très demandées entre 7h et 9h. Restez disponible !",
           couleur: Colors.orange);
     } else if (heure >= 9 && heure < 12) {
       return const _ConseilJour(
-          emoji: "📦",
+          icone: Icons.inventory_2_outlined,
           titre: "Créneau commercial optimal",
           description:
               "Les courses B2B sont fréquentes le matin. Concentrez-vous sur les zones industrielles.",
           couleur: CouleursApp.primaire);
     } else if (heure >= 12 && heure < 14) {
       return const _ConseilJour(
-          emoji: "☕",
+          icone: Icons.local_cafe_outlined,
           titre: "Pause méritée !",
           description:
               "Moins de demandes sur le créneau déjeuner. Profitez-en pour vous reposer ou refaire le plein.",
           couleur: CouleursApp.accent);
     } else if (heure >= 14 && heure < 18) {
       return const _ConseilJour(
-          emoji: "🚛",
+          icone: Icons.local_shipping_outlined,
           titre: "L'après-midi est propice aux longues courses",
           description:
               "Les trajets interurbains et courses commerciales sont fréquents entre 14h-18h.",
           couleur: CouleursApp.primaireNeon);
     } else if (heure >= 18 && heure < 22) {
       return _ConseilJour(
-        emoji: "🌆",
+        icone: Icons.nights_stay_outlined,
         titre: revenus > 10000
-            ? "Excellente journée ! 🔥"
+            ? "Excellente journée !"
             : "Pointe du soir — forte demande",
         description: revenus > 10000
             ? "Vous avez gagné ${revenus.toInt()} FCFA aujourd'hui ! Continuez sur cette lancée."
@@ -744,7 +793,7 @@ class _TableauDeBordTransporteurState
       );
     } else {
       return _ConseilJour(
-        emoji: revenus > 5000 ? "🌟" : "💤",
+        icone: revenus > 5000 ? Icons.auto_awesome : Icons.bedtime_outlined,
         titre: revenus > 5000
             ? "Belle journée : ${(revenus / 1000).toStringAsFixed(0)}k FCFA !"
             : "Temps calme",
@@ -819,13 +868,13 @@ class _TableauDeBordTransporteurState
 
 /// Modèle de données pour la carte "Conseil du jour"
 class _ConseilJour {
-  final String emoji;
+  final IconData icone;
   final String titre;
   final String description;
   final Color couleur;
 
   const _ConseilJour({
-    required this.emoji,
+    required this.icone,
     required this.titre,
     required this.description,
     required this.couleur,
