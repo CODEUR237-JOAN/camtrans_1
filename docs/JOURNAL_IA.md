@@ -208,5 +208,10 @@ Travaux de la session (du plus ancien au plus récent) :
       - `suivi_transporteur.dart` : le bouton « Terminer » ouvre une saisie de PIN (était « sans code PIN »).
       - `suivi_transport.dart` (client) : carte affichant le code de livraison pendant la course active.
     - ⚠️ Deux flux de clôture coexistent : `suivi_transporteur.dart` (sécurisé par PIN ✅) et `suivi_course/` (flux paiement, inchangé). À unifier un jour.
+15. **Suivi temps réel premium « Yango »** (commit `dfc0650`) — sur `flutter_map`/OSRM (GRATUIT, **pas** Google Maps, qui exigerait une carte bancaire + réécriture) :
+    - `carte_suivi_interactive.dart` : passé en `StatefulWidget`. **Animation** du marqueur véhicule (AnimationController + interpolation lat/lon → plus de saut) + **rotation** selon le cap `atan2`. **Auto-cadrage** `fitCamera(CameraFit.bounds(..., padding: 100))` pour garder véhicule+cible visibles. Polyligne premium (primaire + `borderStrokeWidth`).
+    - `panneau_details_bottom_sheet.dart` : **ETA humanisé** « Votre transporteur arrive dans environ X min » (vue client) + **bouton `BoutonCombi`** intégré.
+    - Déjà présent (conservé) : routage 2 phases `approche`/`trajet` + OSRM dans `suivi_course_provider.dart`.
+    - ⏳ Reste : photo chauffeur + plaque dans le bottom sheet (absents du modèle `Course`, sur le doc `Transporteur` → nécessite de les câbler).
 
 Reste connu / pistes : unifier les 2 services vocaux (doublon `suivi_course/services`), supprimer `fix_theme.dart` (script jetable à la racine), brancher le bouton « Paramètres » du **profil transporteur** (encore `() {}`), sécuriser Campay/clés IA côté serveur (nécessite Blaze), durcir les règles `courses`/`paiements` (nécessite serveur pour la confirmation de paiement).
