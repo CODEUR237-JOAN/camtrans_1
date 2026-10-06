@@ -212,6 +212,7 @@ Travaux de la session (du plus ancien au plus récent) :
     - `carte_suivi_interactive.dart` : passé en `StatefulWidget`. **Animation** du marqueur véhicule (AnimationController + interpolation lat/lon → plus de saut) + **rotation** selon le cap `atan2`. **Auto-cadrage** `fitCamera(CameraFit.bounds(..., padding: 100))` pour garder véhicule+cible visibles. Polyligne premium (primaire + `borderStrokeWidth`).
     - `panneau_details_bottom_sheet.dart` : **ETA humanisé** « Votre transporteur arrive dans environ X min » (vue client) + **bouton `BoutonCombi`** intégré.
     - Déjà présent (conservé) : routage 2 phases `approche`/`trajet` + OSRM dans `suivi_course_provider.dart`.
-    - ⏳ Reste : photo chauffeur + plaque dans le bottom sheet (absents du modèle `Course`, sur le doc `Transporteur` → nécessite de les câbler).
+    - ✅ **Photo + plaque chauffeur** câblées (commit `f54bfaa`) : `transporteurParIdProvider` (`FutureProvider.family` dans `transporteurs_provider.dart`) ; `panneau_details_bottom_sheet` passé en `ConsumerWidget`, affiche la photo réelle dans l'avatar + l'immatriculation sous le nom (vue client).
+    - ℹ️ `ServiceLieux` a reçu l'injection d'un `http.Client` (session parallèle, pour tests) — rétro-compatible, `ServiceLieux()` inchangé.
 
 Reste connu / pistes : unifier les 2 services vocaux (doublon `suivi_course/services`), supprimer `fix_theme.dart` (script jetable à la racine), brancher le bouton « Paramètres » du **profil transporteur** (encore `() {}`), sécuriser Campay/clés IA côté serveur (nécessite Blaze), durcir les règles `courses`/`paiements` (nécessite serveur pour la confirmation de paiement).
