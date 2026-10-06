@@ -495,6 +495,23 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
     );
   }
 
+  // Icône adaptée au type de service d'une course (historique, listes…).
+  IconData _iconeService(String categorie) {
+    final c = categorie.toLowerCase();
+    if (c.contains('remorqu')) return Iconsax.car_copy;
+    if (c.contains('ménag') || c.contains('menag')) return Iconsax.home_2_copy;
+    if (c.contains('marchand')) return Iconsax.box_copy;
+    if (c.contains('autre')) return Iconsax.category_copy;
+    return Iconsax.box_copy;
+  }
+
+  // Libellé lisible du service (fallback de titre quand pas de description).
+  String _libelleService(String categorie) {
+    if (categorie.trim().isEmpty) return "Course";
+    if (categorie.toLowerCase().contains('remorqu')) return "Remorquage";
+    return categorie;
+  }
+
   // ==========================================
   // SELECTION DE SERVICES (ACCUEIL)
   // ==========================================
@@ -902,7 +919,11 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
                     decoration: BoxDecoration(
                         color: const Color(0xFF1E293B),
                         borderRadius: BorderRadius.circular(15)),
-                    child: Icon(Iconsax.box_copy, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)),
+                    child: Icon(_iconeService(course.categorieService),
+                        color: Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withValues(alpha: 0.7)),
                   ),
                   const SizedBox(width: 15),
                   Expanded(
@@ -912,7 +933,7 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
                         Text(
                             course.description.isNotEmpty
                                 ? course.description
-                                : "Marchandise",
+                                : _libelleService(course.categorieService),
                             style: const TextStyle(
                                 fontWeight: FontWeight.bold, fontSize: 16)),
                         const SizedBox(height: 4),
