@@ -453,16 +453,6 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
                   ],
                 ),
                 const SizedBox(height: 16),
-                const Text(
-                  'Où expédions-nous\naujourd\'hui ?',
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 25,
-                      height: 1.15,
-                      fontWeight: FontWeight.w800,
-                      letterSpacing: -0.5),
-                ),
-                const SizedBox(height: 18),
                 // Faux champ de recherche (invite à démarrer une demande)
                 Container(
                   padding:
