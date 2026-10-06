@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:update_camtrans/coeur/constantes/couleurs.dart';
 
 import 'package:go_router/go_router.dart';
 import 'package:update_camtrans/coeur/constantes/statuts.dart';
+import 'package:update_camtrans/coeur/etat/transporteurs_provider.dart';
 import 'package:update_camtrans/coeur/widgets/combi_widget.dart';
 import '../etat/suivi_course_etat.dart';
 
-class PanneauDetailsBottomSheet extends StatelessWidget {
+class PanneauDetailsBottomSheet extends ConsumerWidget {
   final SuiviCourseEtat etat;
   final VoidCallback onBoutonAction;
   final VoidCallback? onAnnulerAction;
@@ -55,10 +57,19 @@ class PanneauDetailsBottomSheet extends StatelessWidget {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     if (etat.course == null) return const SizedBox.shrink();
-    
+
     final course = etat.course!;
+
+    // Chauffeur (photo + plaque) : récupéré par ID, vue client uniquement.
+    final transporteurAsync = (!isChauffeur && course.transporteurId.isNotEmpty)
+        ? ref.watch(transporteurParIdProvider(course.transporteurId))
+        : null;
+    final photoChauffeur =
+        transporteurAsync?.valueOrNull?.photo ?? '';
+    final plaqueChauffeur =
+        transporteurAsync?.valueOrNull?.immatriculation ?? '';
     
     String titre = "";
     if (etat.phase == PhaseSuivi.recherche) {
@@ -158,11 +169,20 @@ class PanneauDetailsBottomSheet extends StatelessWidget {
                     children: [
                       CircleAvatar(
                         radius: 24,
-                        backgroundColor: CouleursApp.primaire.withValues(alpha: 0.2),
-                        child: Icon(
-                          isChauffeur ? Icons.person : Icons.local_shipping,
-                          color: CouleursApp.primaire,
-                        ),
+                        backgroundColor:
+                            CouleursApp.primaire.withValues(alpha: 0.2),
+                        backgroundImage:
+                            (!isChauffeur && photoChauffeur.isNotEmpty)
+                                ? NetworkImage(photoChauffeur)
+                                : null,
+                        child: (isChauffeur || photoChauffeur.isEmpty)
+                            ? Icon(
+                                isChauffeur
+                                    ? Icons.person
+                                    : Icons.local_shipping,
+                                color: CouleursApp.primaire,
+                              )
+                            : null,
                       ),
                       const SizedBox(width: 16),
                       Expanded(
@@ -178,7 +198,11 @@ class PanneauDetailsBottomSheet extends StatelessWidget {
                               ),
                             ),
                             Text(
-                              isChauffeur ? "Client" : "${course.typeVehicule} - ${course.prixFinal} FCFA",
+                              isChauffeur
+                                  ? "Client"
+                                  : (plaqueChauffeur.isNotEmpty
+                                      ? "${course.typeVehicule} • $plaqueChauffeur"
+                                      : "${course.typeVehicule} - ${course.prixFinal} FCFA"),
                               style: const TextStyle(
                                 color: Colors.white54,
                                 fontSize: 14,

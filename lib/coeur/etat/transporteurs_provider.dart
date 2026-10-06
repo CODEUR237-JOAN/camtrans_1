@@ -3,6 +3,19 @@ import 'package:update_camtrans/modeles/transporteur.dart';
 import 'package:update_camtrans/services/service_firestore.dart';
 import 'package:update_camtrans/coeur/etat/demande_expedition_provider.dart';
 
+/// Récupère un transporteur par son ID (photo, plaque, véhicule…).
+/// Utilisé notamment par le bottom sheet de suivi pour afficher le chauffeur.
+final transporteurParIdProvider =
+    FutureProvider.autoDispose.family<Transporteur?, String>((ref, id) async {
+  if (id.isEmpty) return null;
+  final firestore = ref.watch(serviceFirestoreProvider);
+  final doc = await firestore.lireDocument(collection: 'transporteurs', id: id);
+  if (!doc.exists || doc.data() == null) return null;
+  final data = doc.data()!;
+  data['id'] = doc.id;
+  return Transporteur.fromMap(data);
+});
+
 final transporteursDisponiblesProvider =
     StreamProvider.autoDispose<List<Transporteur>>((ref) {
   final firestoreService = ref.watch(serviceFirestoreProvider);
