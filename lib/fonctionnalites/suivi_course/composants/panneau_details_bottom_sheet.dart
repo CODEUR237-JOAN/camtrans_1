@@ -5,6 +5,7 @@ import 'package:update_camtrans/coeur/constantes/couleurs.dart';
 
 import 'package:go_router/go_router.dart';
 import 'package:update_camtrans/coeur/constantes/statuts.dart';
+import 'package:update_camtrans/coeur/widgets/combi_widget.dart';
 import '../etat/suivi_course_etat.dart';
 
 class PanneauDetailsBottomSheet extends StatelessWidget {
@@ -42,6 +43,15 @@ class PanneauDetailsBottomSheet extends StatelessWidget {
         );
       }
     }
+  }
+
+  // ETA humanisé pour le client (au lieu d'un froid « 5m »).
+  String _etaHumanise(int secondes) {
+    final min = (secondes / 60).ceil();
+    if (min <= 1) {
+      return "Votre transporteur arrive dans moins d'une minute";
+    }
+    return "Votre transporteur arrive dans environ $min min";
   }
 
   @override
@@ -129,8 +139,20 @@ class PanneauDetailsBottomSheet extends StatelessWidget {
                         ),
                     ],
                   ),
+
+                  // ETA humanisé (vue client)
+                  if (!isChauffeur && etat.tempsRestantSecondes > 0) ...[
+                    const SizedBox(height: 6),
+                    Text(
+                      _etaHumanise(etat.tempsRestantSecondes),
+                      style: GoogleFonts.inter(
+                        color: Colors.white70,
+                        fontSize: 13,
+                      ),
+                    ),
+                  ],
                   const SizedBox(height: 24),
-                  
+
                   // Informations sur le contact
                   Row(
                     children: [
@@ -183,6 +205,11 @@ class PanneauDetailsBottomSheet extends StatelessWidget {
                           backgroundColor: const Color(0xFF145C43), // Vert charte
                         ),
                       ),
+                      // Assistant vocal Combi (vue client)
+                      if (!isChauffeur) ...[
+                        const SizedBox(width: 8),
+                        const BoutonCombi(compact: true),
+                      ],
                     ],
                   ),
                   const Divider(color: Colors.white10, height: 32),
