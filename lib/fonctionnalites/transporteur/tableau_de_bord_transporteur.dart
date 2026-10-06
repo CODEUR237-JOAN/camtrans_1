@@ -21,7 +21,7 @@ import 'package:update_camtrans/modeles/course.dart';
 import 'package:update_camtrans/fonctionnalites/transporteur/marche_demandes.dart';
 import 'package:update_camtrans/fonctionnalites/transporteur/navigation.dart';
 import 'package:update_camtrans/fonctionnalites/notifications/notifications.dart';
-import 'package:update_camtrans/coeur/widgets/assistant_vocal_widget.dart';
+import 'package:update_camtrans/coeur/widgets/combi_widget.dart';
 import 'package:update_camtrans/services/service_notification.dart';
 import 'profil.dart';
 import 'package:update_camtrans/coeur/widgets/page_responsive.dart';
@@ -132,7 +132,7 @@ class _TableauDeBordTransporteurState
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-      floatingActionButton: const BoutonAssistantVocal(),
+      floatingActionButton: const BoutonCombi(),
       bottomNavigationBar: _buildBottomNav(),
       body: FondPremiumAnime(
         safeArea: true,

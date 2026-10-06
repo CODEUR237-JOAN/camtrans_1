@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:update_camtrans/coeur/widgets/assistant_vocal_widget.dart';
+import 'package:update_camtrans/coeur/widgets/combi_widget.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:go_router/go_router.dart';
@@ -1103,7 +1103,7 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
                   // Bouton IA central — mode compact, intégré dans la navbar
                   const Padding(
                     padding: EdgeInsets.symmetric(horizontal: 4),
-                    child: BoutonAssistantVocal(compact: true),
+                    child: BoutonCombi(compact: true),
                   ),
                   _buildNavItem(3, Iconsax.notification_copy,
                       Iconsax.notification, "Alerte"),
