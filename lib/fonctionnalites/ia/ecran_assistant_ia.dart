@@ -6,6 +6,7 @@ import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:go_router/go_router.dart';
 import 'package:update_camtrans/coeur/widgets/page_responsive.dart';
+import 'package:update_camtrans/coeur/constantes/images.dart';
 import 'package:update_camtrans/services/service_ia.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 
@@ -310,15 +311,16 @@ class _MessageBubble extends StatelessWidget {
           if (!isUser) ...[
             Container(
               margin: const EdgeInsets.only(right: 12),
-              padding: const EdgeInsets.all(8),
+              width: 34,
+              height: 34,
+              padding: const EdgeInsets.all(4),
               decoration: BoxDecoration(
-                color: const Color(0xFF3B82F6).withValues(alpha: 0.15),
+                color: Colors.white,
                 shape: BoxShape.circle,
                 border: Border.all(
                     color: const Color(0xFF3B82F6).withValues(alpha: 0.3)),
               ),
-              child: const Icon(Iconsax.magic_star_copy,
-                  color: Color(0xFF60A5FA), size: 16),
+              child: Image.asset(ImagesApp.logo, fit: BoxFit.contain),
             ),
           ],
           Flexible(
