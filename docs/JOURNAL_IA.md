@@ -201,5 +201,12 @@ Travaux de la session (du plus ancien au plus récent) :
     - `lib/coeur/widgets/champ_recherche_lieu.dart` : champ prédictif (debounce 500 ms, résultats inline + icône lieu, état vide). Utilisé pour la **destination** dans `creer_demande.dart` (renseigne aussi `latitudeArrivee`/`longitudeArrivee`).
     - `creer_demande.dart` : champ **Modèle** désormais en cascade (grisé tant qu'aucune marque ; chips des modèles de la marque ; saisie libre conservée pour `estimerMasseIA`). `_buildFloatingTextField` a un param `enabled`. Ancienne liste statique `_quartiersCameroun` supprimée.
     - ⚠️ Nominatim : politique d'usage ~1 req/s + User-Agent (OK pour mono-utilisateur mobile avec debounce). Nécessite permission INTERNET (déjà présente).
+14. **Core Loop — clôture sécurisée par PIN** (commit `765231c`) :
+    - Audit : étapes 1-3 du cahier des charges **déjà en place** (modèle `Course` complet avec `clientId`/`transporteurId`/`codePinCourse`/`fondsDebloques` ; machine `StatutCourse` + `peutTransitionnerVers` ; création client (PIN 4 chiffres généré dans `resume_expedition_bottom_sheet`) ; acceptation transactionnelle + transitions dans `TransporteurActions` ; suivi client/transporteur en Streams). **Pas de renommage de statuts** (le brief proposait `en_recherche/acceptee/...`, l'app a un vocabulaire plus riche — conservé).
+    - Manque comblé (ÉTAPE 4) : le PIN était généré mais jamais vérifié.
+      - `transporteur_provider.dart` → `TransporteurActions.cloturerCourseAvecPin(courseId, pin)` : transaction atomique, valide le PIN, passe à `terminee` + `fondsDebloques` + `dateFin`.
+      - `suivi_transporteur.dart` : le bouton « Terminer » ouvre une saisie de PIN (était « sans code PIN »).
+      - `suivi_transport.dart` (client) : carte affichant le code de livraison pendant la course active.
+    - ⚠️ Deux flux de clôture coexistent : `suivi_transporteur.dart` (sécurisé par PIN ✅) et `suivi_course/` (flux paiement, inchangé). À unifier un jour.
 
 Reste connu / pistes : unifier les 2 services vocaux (doublon `suivi_course/services`), supprimer `fix_theme.dart` (script jetable à la racine), brancher le bouton « Paramètres » du **profil transporteur** (encore `() {}`), sécuriser Campay/clés IA côté serveur (nécessite Blaze), durcir les règles `courses`/`paiements` (nécessite serveur pour la confirmation de paiement).
