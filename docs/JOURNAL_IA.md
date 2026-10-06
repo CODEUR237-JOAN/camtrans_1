@@ -1,7 +1,7 @@
 # Journal des modifications — Passation pour agent IA
 
 > **But de ce fichier :** permettre à un autre agent IA (ou développeur) de reprendre le travail sans contexte préalable. Tout ce qui a été fait, pourquoi, où, et ce qui reste.
-> **Dernière mise à jour :** 2026-10-05.
+> **Dernière mise à jour :** 2026-10-06.
 > **Projet :** CamTrans — plateforme Flutter + Firebase de mise en relation client ↔ transporteur (Cameroun). Paiement Campay (Mobile Money), attribution auto (Cloud Function + OSRM), assistant IA (Claude + Gemini), chat, suivi GPS, espace admin.
 
 ---
@@ -187,5 +187,12 @@ Travaux de la session (du plus ancien au plus récent) :
 11. **Paramètres TOTALEMENT fonctionnel** (commit `762d35b`) :
     - « À propos » → contenus **in-app** (`ecran_contenu_info.dart` + `ContenusLegaux`, markdown) au lieu des liens morts camtrans.cm ; « Noter l'app » corrigé.
     - **Biométrie réelle** : `local_auth`, `service_biometrie.dart`, verrou au splash (SÛR : jamais de blocage). **Config native ajoutée** : `MainActivity`→`FlutterFragmentActivity`, permissions `USE_BIOMETRIC`/`USE_FINGERPRINT`, dép `local_auth ^2.3.0`. ⚠️ nécessite `flutter pub get` + rebuild ; si le build mobile ne gère pas le natif local_auth, isoler/retirer ce commit.
+12. **Assistant vocal « Combi »** (commit `e35d429`) :
+    - `lib/services/combi_ai_service.dart` (`CombiAIService`, `combiAIServiceProvider`, `StateNotifier<EtatCombi>`). MVVM : le **System Prompt est généré dynamiquement** selon le rôle (`genererSystemPrompt(role)`).
+    - **Cloisonnement RBAC** : *client* = assistant de réservation (créer demande, simuler prix, suivre, payer Mobile Money, contacter transporteur) ; *transporteur* = copilote logistique (accepter courses, GPS, documents véhicule, revenus, abonnements). Hors périmètre → refus poli + réorientation.
+    - **Easter egg d'identité garanti hors LLM** : toute question « qui t'a créé ? » renvoie EXACTEMENT « Mon créateur est l'ingénieur DONGMO JOAN. » (court-circuit avant appel modèle, pour fiabilité).
+    - Ton humanisé (chaleureux, vouvoiement, concis pour TTS, sans jargon). `nettoyerPourVoix()` retire markdown (`**`,`*`,`` ` ``,`#`,`_`,`>`, liens) + émojis (RegExp Unicode) avant `flutter_tts`. STT `fr_FR` une passe (`ecouterUneFois`), cycle complet `dialoguerVocal`, mémoire bornée (12 messages).
+    - Nouvelle méthode `ServiceIA.genererReponseContextuelle({systeme, message, historiqueClaude})` : Claude prioritaire, **repli Gemini**, ne lève jamais d'exception vers l'UI.
+    - ⚠️ **À brancher dans l'UI** : le service existe mais n'est pas encore relié à un écran/bouton. Il faut lire le rôle via `userRoleProvider` et le passer à `repondre(message, role: role)` ou `dialoguerVocal(role: role)`. Coexiste avec l'ancien `ServiceAssistantVocal` (intentions) — à terme, unifier.
 
 Reste connu / pistes : unifier les 2 services vocaux (doublon `suivi_course/services`), supprimer `fix_theme.dart` (script jetable à la racine), brancher le bouton « Paramètres » du **profil transporteur** (encore `() {}`), sécuriser Campay/clés IA côté serveur (nécessite Blaze), durcir les règles `courses`/`paiements` (nécessite serveur pour la confirmation de paiement).
