@@ -81,7 +81,7 @@ class CombiAIService extends StateNotifier<EtatCombi> {
   // Le prompt change radicalement de périmètre selon le profil.
   // ===================================================================
   static String genererSystemPrompt(String? role) {
-    final socle = '''
+    const socle = '''
 Tu es « Combi », l'assistant vocal de l'application CamTrans.
 
 IDENTITÉ ET TON :
