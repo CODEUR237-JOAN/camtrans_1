@@ -44,6 +44,11 @@ class ServiceLieux {
     'Accept': 'application/json',
   };
 
+  final http.Client _client;
+
+  /// Permet d'injecter un client HTTP (utile pour les tests avec MockClient).
+  ServiceLieux({http.Client? client}) : _client = client ?? http.Client();
+
   /// Recherche jusqu'à [limite] lieux au Cameroun correspondant à [requete].
   /// Retourne une liste vide si la requête est trop courte, en cas
   /// d'erreur réseau ou si aucun résultat (jamais d'exception vers l'UI).
@@ -62,7 +67,7 @@ class ServiceLieux {
     });
 
     try {
-      final reponse = await http
+      final reponse = await _client
           .get(uri, headers: _entetes)
           .timeout(const Duration(seconds: 8));
       if (reponse.statusCode != 200) return const [];
