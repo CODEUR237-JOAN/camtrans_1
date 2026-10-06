@@ -14,6 +14,8 @@ import 'package:update_camtrans/coeur/constantes/couleurs.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'dart:math' as math;
 import 'package:update_camtrans/coeur/widgets/loader_premium.dart';
+import 'package:update_camtrans/coeur/widgets/champ_recherche_lieu.dart';
+import 'package:update_camtrans/services/service_donnees_vehicules.dart';
 
 /// =================================================================
 /// NEO PREMIUM GLASS DARK - TUNNEL DE COMMANDE SPRINT 10
@@ -51,66 +53,6 @@ const List<String> _marquesVehicules = [
   'Scania',
   'DAF',
   'Autre',
-];
-
-// Liste exhaustive de quartiers de Yaoundé pour l'autocomplétion
-const List<String> _quartiersCameroun = [
-  'Bastos, Yaoundé',
-  'Centre-ville, Yaoundé',
-  'Melen, Yaoundé',
-  'Nlongkak, Yaoundé',
-  'Tsinga, Yaoundé',
-  'Elig-Essono, Yaoundé',
-  'Mballa 2, Yaoundé',
-  'Hippodrome, Yaoundé',
-  'Quartier du Lac, Yaoundé',
-  'Messa, Yaoundé',
-  'Omnisport, Yaoundé',
-  'Mfandena, Yaoundé',
-  'Essos, Yaoundé',
-  'Mimboman, Yaoundé',
-  'Kondengui, Yaoundé',
-  'Ekounou, Yaoundé',
-  'Awae, Yaoundé',
-  'Mvog-Mbi, Yaoundé',
-  'Mvog-Ada, Yaoundé',
-  'Nkoldongo, Yaoundé',
-  'Anguissa, Yaoundé',
-  'Nkomo, Yaoundé',
-  'Odza, Yaoundé',
-  'Mvan, Yaoundé',
-  'Ahala, Yaoundé',
-  'Meyo, Yaoundé',
-  'Nsimalen, Yaoundé',
-  'Tropicana, Yaoundé',
-  'Biyem-Assi, Yaoundé',
-  'Obili, Yaoundé',
-  'Ngoa-Ekélé, Yaoundé',
-  'Etoug-Ebe, Yaoundé',
-  'Mendong, Yaoundé',
-  'Simbock, Yaoundé',
-  'Jouvence, Yaoundé',
-  'Mokolo, Yaoundé',
-  'Madagascar, Yaoundé',
-  'Cité Verte, Yaoundé',
-  'Nkolbisson, Yaoundé',
-  'Oyom-Abang, Yaoundé',
-  'Carrière, Yaoundé',
-  'Etoudi, Yaoundé',
-  'Emana, Yaoundé',
-  'Messassi, Yaoundé',
-  'Olembe, Yaoundé',
-  'Nkolmesseng, Yaoundé',
-  'Ngousso, Yaoundé',
-  'Biteng, Yaoundé',
-  'Ndamvout, Yaoundé',
-  'Ekoumdoum, Yaoundé',
-  'Damase, Yaoundé',
-  'Briqueterie, Yaoundé',
-  'Mbankolo, Yaoundé',
-  'Febe, Yaoundé',
-  'Tonga, Yaoundé',
-  'Nsimeyong, Yaoundé'
 ];
 
 class CreerDemande extends ConsumerStatefulWidget {
@@ -638,9 +580,10 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
                 const SizedBox(height: 8),
                 _buildFloatingTextField(
                   controller: _modeleController,
+                  enabled: etat.marqueVehiculeRemorque.isNotEmpty,
                   hint: etat.marqueVehiculeRemorque.isNotEmpty
-                      ? "Ex: Prado, Yaris, Canter..."
-                      : "Saisissez d'abord la marque",
+                      ? "Et son modèle ?"
+                      : "Choisissez d'abord une marque ci-dessus",
                   icon: Iconsax.car_copy,
                   onChanged: (val) {
                     notifier.setModeleRemorque(val);
@@ -654,6 +597,70 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
                     });
                   },
                 ),
+                // ── Suggestions de modèles (cascade) ─────────────────
+                // N'affiche QUE les modèles de la marque sélectionnée.
+                // La saisie libre reste possible (ex. marque « Autre »).
+                Builder(builder: (context) {
+                  final marque = etat.marqueVehiculeRemorque;
+                  if (marque.isEmpty) return const SizedBox.shrink();
+                  final modeles = ref
+                      .read(serviceDonneesVehiculesProvider)
+                      .modelesPour(marque);
+                  if (modeles.isEmpty) return const SizedBox.shrink();
+                  return Padding(
+                    padding: const EdgeInsets.only(top: 12),
+                    child: Wrap(
+                      spacing: 8,
+                      runSpacing: 8,
+                      children: modeles.map((m) {
+                        final selected = etat.modeleVehiculeRemorque == m;
+                        return GestureDetector(
+                          onTap: () {
+                            HapticFeedback.lightImpact();
+                            _modeleController.text = m;
+                            notifier.setModeleRemorque(m);
+                            notifier.estimerMasseIA();
+                          },
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 14, vertical: 8),
+                            decoration: BoxDecoration(
+                              color: selected
+                                  ? const Color(0xFF007ACC)
+                                      .withValues(alpha: 0.18)
+                                  : Theme.of(context).colorScheme.surface,
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(
+                                color: selected
+                                    ? const Color(0xFF007ACC)
+                                    : Theme.of(context)
+                                        .colorScheme
+                                        .onSurface
+                                        .withValues(alpha: 0.1),
+                                width: selected ? 2 : 1,
+                              ),
+                            ),
+                            child: Text(
+                              m,
+                              style: GoogleFonts.inter(
+                                color: selected
+                                    ? const Color(0xFF007ACC)
+                                    : Theme.of(context)
+                                        .colorScheme
+                                        .onSurface
+                                        .withValues(alpha: 0.7),
+                                fontWeight: selected
+                                    ? FontWeight.w700
+                                    : FontWeight.w400,
+                                fontSize: 13,
+                              ),
+                            ),
+                          ),
+                        );
+                      }).toList(),
+                    ),
+                  );
+                }),
                 const SizedBox(height: 16),
                 // ── État loader / badge masse ─────────────────────
                 if (etat.estEnAttenteMasseIA)
@@ -962,92 +969,17 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
               ),
               const SizedBox(height: 8),
 
-              Autocomplete<String>(
-                optionsBuilder: (TextEditingValue textEditingValue) {
-                  if (textEditingValue.text.isEmpty) {
-                    return const Iterable<String>.empty();
-                  }
-                  return _quartiersCameroun.where((String option) {
-                    return option
-                        .toLowerCase()
-                        .contains(textEditingValue.text.toLowerCase());
-                  });
-                },
-                onSelected: (String selection) {
-                  notifier.setDestination(selection);
-                  _destinationController.text = selection;
-                },
-                fieldViewBuilder:
-                    (context, controller, focusNode, onFieldSubmitted) {
-                  // Synchroniser le controller de l'autocomplete avec le state
-                  if (controller.text.isEmpty &&
-                      _destinationController.text.isNotEmpty) {
-                    controller.text = _destinationController.text;
-                  }
-                  controller.addListener(() {
-                    if (controller.text != _destinationController.text) {
-                      _destinationController.text = controller.text;
-                      notifier.setDestination(controller.text);
-                    }
-                  });
-                  return TextField(
-                    controller: controller,
-                    focusNode: focusNode,
-                    style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
-                    decoration: InputDecoration(
-                      hintText: "Entrez un nom de quartier",
-                      hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54)),
-                      prefixIcon: Icon(Iconsax.location_add_copy,
-                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)),
-                      filled: true,
-                      fillColor: Theme.of(context).colorScheme.surface,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(16),
-                        borderSide: BorderSide(
-                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1)),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(16),
-                        borderSide: BorderSide(
-                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.07)),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(16),
-                        borderSide: BorderSide(
-                            color: CouleursApp.primaire.withValues(alpha: 0.5)),
-                      ),
-                    ),
-                  );
-                },
-                optionsViewBuilder: (context, onSelected, options) {
-                  return Align(
-                    alignment: Alignment.topLeft,
-                    child: Material(
-                      elevation: 4.0,
-                      borderRadius: BorderRadius.circular(16),
-                      color: Theme.of(context).colorScheme.surface,
-                      child: Container(
-                        width: MediaQuery.of(context).size.width -
-                            64, // Ajustement largeur
-                        constraints: const BoxConstraints(maxHeight: 200),
-                        child: ListView.builder(
-                          padding: EdgeInsets.zero,
-                          shrinkWrap: true,
-                          itemCount: options.length,
-                          itemBuilder: (BuildContext context, int index) {
-                            final option = options.elementAt(index);
-                            return ListTile(
-                              leading: Icon(Icons.location_city,
-                                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), size: 20),
-                              title: Text(option,
-                                  style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
-                              onTap: () => onSelected(option),
-                            );
-                          },
-                        ),
-                      ),
-                    ),
-                  );
+              // Recherche prédictive Nominatim (restreinte au Cameroun).
+              ChampRechercheLieu(
+                hint: "Où allez-vous ? (quartier, ville…)",
+                valeurInitiale: etat.destination,
+                iconePrefixe: Icons.location_on,
+                couleurIcone: CouleursApp.erreur,
+                onLieuChoisi: (lieu) {
+                  notifier.setDestination(lieu.libelle);
+                  notifier.setLatitudeArrivee(lieu.latitude);
+                  notifier.setLongitudeArrivee(lieu.longitude);
+                  _destinationController.text = lieu.libelle;
                 },
               ),
             ],
@@ -1180,10 +1112,12 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
     int maxLines = 1,
     VoidCallback? onSuffixTap,
     bool isLoadingSuffix = false,
+    bool enabled = true,
   }) {
     return TextFormField(
       controller: controller,
       onChanged: onChanged,
+      enabled: enabled,
       maxLines: maxLines,
       style:
           GoogleFonts.poppins(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.w500),
