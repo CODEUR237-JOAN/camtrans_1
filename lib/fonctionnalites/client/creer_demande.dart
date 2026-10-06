@@ -962,7 +962,7 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
                   const SizedBox(width: 6),
                   Text("Destination",
                       style: GoogleFonts.poppins(
-                          color: Colors.white,
+                          color: Theme.of(context).colorScheme.onSurface,
                           fontWeight: FontWeight.w600,
                           fontSize: 14)),
                 ],
