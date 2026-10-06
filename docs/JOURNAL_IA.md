@@ -214,5 +214,10 @@ Travaux de la session (du plus ancien au plus récent) :
     - Déjà présent (conservé) : routage 2 phases `approche`/`trajet` + OSRM dans `suivi_course_provider.dart`.
     - ✅ **Photo + plaque chauffeur** câblées (commit `f54bfaa`) : `transporteurParIdProvider` (`FutureProvider.family` dans `transporteurs_provider.dart`) ; `panneau_details_bottom_sheet` passé en `ConsumerWidget`, affiche la photo réelle dans l'avatar + l'immatriculation sous le nom (vue client).
     - ℹ️ `ServiceLieux` a reçu l'injection d'un `http.Client` (session parallèle, pour tests) — rétro-compatible, `ServiceLieux()` inchangé.
+16. **Retrait de la fonctionnalité « Entretien du véhicule »** (décision produit, hors MVP) :
+    - Supprimés : `lib/fonctionnalites/transporteur/entretien.dart` (écran `EcranEntretien`), `lib/modeles/entretien.dart` (modèle `Entretien`).
+    - `routes.dart` : import + constante `/entretien` + `GoRoute` retirés. `tableau_de_bord_transporteur.dart` : carte « Entretien » retirée (ligne Abonnement conservée). `textes.dart` : constante `entretien` retirée. `combi_ai_service.dart` : mention « entretien » retirée du périmètre transporteur.
+    - `firestore.rules` : bloc `match /entretiens/{...}` **supprimé** → ⚠️ à **redéployer** (Console Firebase). La collection `entretiens` restante en base devient inaccessible (plus de règle) — supprimable manuellement si besoin.
+    - Pas de provider dédié (l'écran utilisait `serviceFirestore` directement) ; pas de MultiProvider (projet Riverpod) → rien d'autre à nettoyer. Le `.xmi` (UML) garde la trace historique, non bloquant.
 
 Reste connu / pistes : unifier les 2 services vocaux (doublon `suivi_course/services`), supprimer `fix_theme.dart` (script jetable à la racine), brancher le bouton « Paramètres » du **profil transporteur** (encore `() {}`), sécuriser Campay/clés IA côté serveur (nécessite Blaze), durcir les règles `courses`/`paiements` (nécessite serveur pour la confirmation de paiement).

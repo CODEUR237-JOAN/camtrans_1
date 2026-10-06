@@ -89,7 +89,6 @@ class TextesApp {
   static const String revenus = "Revenus";
   static const String portefeuille = "Portefeuille";
   static const String documents = "Documents";
-  static const String entretien = "Entretien du véhicule";
 
   // ==========================
   // Administrateur

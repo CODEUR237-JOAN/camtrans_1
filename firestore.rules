@@ -244,23 +244,6 @@ service cloud.firestore {
     }
 
     // ============================================================
-    // COLLECTION : entretiens (entretiens du véhicule du transporteur)
-    // Chaque transporteur ne lit/gère que SES propres entretiens.
-    // ============================================================
-    match /entretiens/{entretienId} {
-      allow read: if estConnecte() && (
-        estAdmin() ||
-        resource.data.transporteurId == request.auth.uid
-      );
-      allow create: if estConnecte() &&
-        request.resource.data.transporteurId == request.auth.uid;
-      allow update, delete: if estConnecte() && (
-        estAdmin() ||
-        resource.data.transporteurId == request.auth.uid
-      );
-    }
-
-    // ============================================================
     // COLLECTION : abonnements (Abonnements des transporteurs)
     // ============================================================
     match /abonnements/{abonnementId} {

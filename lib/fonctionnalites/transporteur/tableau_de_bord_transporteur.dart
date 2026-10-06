@@ -479,16 +479,6 @@ class _TableauDeBordTransporteurState
                     Expanded(
                       child: CarteInformation(
                         compacte: true,
-                        titre: "Entretien",
-                        icone: Icons.build,
-                        auClic: () =>
-                            context.push(RoutesApplication.entretien),
-                      ),
-                    ),
-                    const SizedBox(width: 15),
-                    Expanded(
-                      child: CarteInformation(
-                        compacte: true,
                         titre: "Abonnement",
                         icone: Icons.workspace_premium,
                         auClic: () =>

@@ -33,7 +33,6 @@ import 'package:update_camtrans/fonctionnalites/profil/modifier_profil.dart';
 import 'package:update_camtrans/fonctionnalites/client/parametres.dart';
 import 'package:update_camtrans/fonctionnalites/profil/changer_mot_de_passe.dart';
 import 'package:update_camtrans/fonctionnalites/transporteur/historique_courses.dart';
-import 'package:update_camtrans/fonctionnalites/transporteur/entretien.dart';
 import 'package:update_camtrans/fonctionnalites/transporteur/portefeuille.dart';
 import 'package:update_camtrans/fonctionnalites/transporteur/documents.dart';
 import 'package:update_camtrans/modeles/course.dart';
@@ -79,7 +78,6 @@ class RoutesApplication {
   static const String revenus = "/revenus";
   static const String portefeuille = "/portefeuille";
   static const String documents = "/documents";
-  static const String entretien = "/entretien";
   static const String facture = "/facture";
   static const String abonnement = "/abonnement";
   static const String suiviTransporteur = "/suivi-transporteur/:courseId";
@@ -347,11 +345,6 @@ class RoutesApplication {
         path: documents,
         pageBuilder: (context, state) =>
             _page(const Documents(), state.pageKey),
-      ),
-      GoRoute(
-        path: entretien,
-        pageBuilder: (context, state) =>
-            _page(const EcranEntretien(), state.pageKey),
       ),
       GoRoute(
         path: facture,
