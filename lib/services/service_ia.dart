@@ -153,6 +153,53 @@ class ServiceIA {
   }
 
   // ----------------------------------------------------------
+  // RÉPONSE CONVERSATIONNELLE CONTEXTUELLE (texte libre)
+  //
+  // Point d'entrée utilisé par l'assistant « Combi ». On fournit :
+  //   - [systeme]  : le System Prompt dynamique (identité + périmètre
+  //                  métier selon le rôle de l'utilisateur) ;
+  //   - [message]  : la phrase de l'utilisateur ;
+  //   - [historiqueClaude] : l'historique au format Claude
+  //                  ([{role, content}]) pour garder le fil.
+  //
+  // Priorité à Claude (ton plus naturel). En cas d'échec (clé absente,
+  // réseau, quota), on bascule automatiquement sur Gemini pour que
+  // l'assistant réponde toujours quelque chose.
+  // ----------------------------------------------------------
+  Future<String> genererReponseContextuelle({
+    required String systeme,
+    required String message,
+    List<Map<String, dynamic>>? historiqueClaude,
+  }) async {
+    // 1) Tentative via Claude (réponse plus humaine).
+    try {
+      final reponse = await _appelerClaudeText(
+        systeme: systeme,
+        promptUser: message,
+        messagesExistants: historiqueClaude,
+      );
+      final texte = reponse.trim();
+      if (texte.isNotEmpty) return texte;
+    } catch (e) {
+      debugPrint("Combi/Claude indisponible, bascule Gemini : $e");
+    }
+
+    // 2) Repli sur Gemini.
+    try {
+      final modele = _getModele(contexteSysteme: systeme);
+      final resultat = await modele.generateContent([Content.text(message)]);
+      final texte = (resultat.text ?? '').trim();
+      if (texte.isNotEmpty) return texte;
+    } catch (e) {
+      debugPrint("Combi/Gemini indisponible : $e");
+    }
+
+    // 3) Dernier recours : message neutre (jamais d'exception vers l'UI).
+    return "Je suis désolé, je n'arrive pas à répondre pour le moment. "
+        "Pouvez-vous reformuler votre demande ?";
+  }
+
+  // ----------------------------------------------------------
   // MÉTHODE INTERNE : Extraire un JSON depuis une réponse texte
   //
   // Certains modèles entourent le JSON de texte ou de backticks.
