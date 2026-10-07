@@ -48,8 +48,8 @@ class _HistoriqueState extends ConsumerState<Historique> {
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text("Course archivée avec succès"),
-          backgroundColor: Colors.green,
+          content: Text("Course retirée de votre historique"),
+          backgroundColor: CouleursApp.succes,
         ),
       );
     }
@@ -60,7 +60,7 @@ class _HistoriqueState extends ConsumerState<Historique> {
     if (terminees.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-            content: Text("Aucune course terminée/annulée à supprimer.")),
+            content: Text("Aucune course à retirer de l'historique.")),
       );
       return;
     }
@@ -85,7 +85,7 @@ class _HistoriqueState extends ConsumerState<Historique> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Text("$nb course(s) supprimée(s)"),
-            backgroundColor: Colors.green,
+            backgroundColor: CouleursApp.succes,
           ),
         );
       }
@@ -247,8 +247,8 @@ class _HistoriqueState extends ConsumerState<Historique> {
                           if (context.mounted) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
-                                content: Text("Course archivée"),
-                                backgroundColor: Colors.green,
+                                content: Text("Course retirée"),
+                                backgroundColor: CouleursApp.succes,
                               ),
                             );
                           }
@@ -264,7 +264,7 @@ class _HistoriqueState extends ConsumerState<Historique> {
                   const Center(child: IndicateurChargement(taille: 30)),
               error: (err, stack) => Center(
                   child: Text(
-                      "Oups ! Impossible de charger l'historique : $err 🔧")),
+                      "Oups, impossible de charger l'historique : $err")),
             ),
           ),
         ],
@@ -306,17 +306,17 @@ class _HistoriqueState extends ConsumerState<Historique> {
   }
 
   Widget _creerCarteCourse(Course course) {
-    Color couleur = Colors.blue;
+    Color couleur = CouleursApp.primaire;
     IconData icone = Icons.local_shipping_outlined;
 
     if (course.statut == StatutCourse.terminee) {
-      couleur = Colors.green;
+      couleur = CouleursApp.succes;
       icone = Icons.check_circle_outline;
     } else if (course.statut == StatutCourse.annulee) {
-      couleur = Colors.red;
+      couleur = CouleursApp.erreur;
       icone = Icons.cancel_outlined;
     } else if (StatutCourse.estActive(course.statut)) {
-      couleur = Colors.orange;
+      couleur = CouleursApp.avertissement;
       icone = Icons.local_shipping_outlined;
     }
 

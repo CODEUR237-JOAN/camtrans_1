@@ -1,0 +1,14 @@
+{
+  "@@locale": "en",
+  "appTitle": "CamTrans",
+  "welcomeMessage": "Welcome to CamTrans",
+  "searchTransport": "Search for a driver",
+  "settings": "Settings",
+  "language": "Language",
+  "course": "Ride",
+  "client": "Client",
+  "driver": "Driver",
+  "pending": "Pending",
+  "cancel": "Cancel",
+  "confirm": "Confirm"
+}

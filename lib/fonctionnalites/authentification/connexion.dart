@@ -130,7 +130,7 @@ class _ConnexionState extends ConsumerState<Connexion> {
         }
         return;
       }
-      context.go(RoutesApplication.admin);
+      if (mounted) context.go(RoutesApplication.admin);
     } else if (role == 'client') {
       await ServiceNotification.enregistrerTokenUtilisateur(uid, 'client');
       if (estConnexionGoogle && telephone != null && telephone.isNotEmpty) {

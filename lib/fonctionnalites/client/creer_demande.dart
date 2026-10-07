@@ -98,22 +98,22 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
   void _etapeSuivante(
       EtatDemandeExpedition etat, DemandeExpeditionNotifier notifier) {
     if (!etat.estEtapeValide(_etapeCourante)) {
-      String message = "Veuillez remplir les informations requises.";
+      String message = "Oups, il manque quelques informations pour continuer.";
       if (_etapeCourante == 1) {
         if (etat.categorieService == "Remorque") {
           if (etat.marqueVehiculeRemorque.isEmpty) {
-            message = "Veuillez sélectionner la marque du véhicule.";
+            message = "Il nous faut la marque de votre véhicule pour avancer.";
           } else {
-            message = "Veuillez saisir le modèle du véhicule.";
+            message = "Pourriez-vous préciser le modèle du véhicule ?";
           }
         } else {
-          message = "Veuillez remplir les détails obligatoires.";
+          message = "N'oubliez pas de préciser les détails de votre besoin.";
         }
       }
       if (_etapeCourante == 2) {
-        message = "Veuillez choisir une gamme de service.";
+        message = "Quelle gamme de service vous conviendrait le mieux ?";
       }
-      if (_etapeCourante == 3) message = "L'itinéraire est incomplet.";
+      if (_etapeCourante == 3) message = "L'itinéraire semble incomplet. Précisez votre destination.";
 
       _montrerErreur(message);
       return;
@@ -122,9 +122,9 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
     if (_etapeCourante == 3) {
       if (etat.depart.isEmpty) {
         if (_isLoadingGps) {
-          _montrerErreur("Localisation GPS en cours... Veuillez patienter quelques secondes.");
+          _montrerErreur("Nous cherchons votre position... Merci de patienter un instant.");
         } else {
-          _montrerErreur("Position de départ introuvable. Tentative de récupération...");
+          _montrerErreur("Nous avons du mal à vous localiser. Nouvelle tentative en cours...");
           _fetchGPSLocation(notifier);
         }
         return;
@@ -165,11 +165,11 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
         notifier.setLongitudeDepart(position.longitude);
       } else {
         _montrerErreur(
-            "Impossible de trouver l'adresse exacte. Entrez-la manuellement.");
+            "Nous n'avons pas pu trouver votre adresse exacte. Pourriez-vous la saisir manuellement ?");
       }
     } else {
       _montrerErreur(
-          "Localisation non disponible. Veuillez vérifier vos permissions GPS.");
+          "Accès GPS refusé. Veuillez vérifier vos permissions pour une meilleure expérience.");
     }
     if (mounted) setState(() => _isLoadingGps = false);
   }
@@ -237,7 +237,7 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
               height: 260,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: const Color(0xFF007ACC).withValues(alpha: 0.12),
+                color: CouleursApp.primaire.withValues(alpha: 0.12),
               ),
               child: BackdropFilter(
                 filter: ImageFilter.blur(sigmaX: 100, sigmaY: 100),
@@ -254,7 +254,7 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
               height: 300,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: const Color(0xFFF5A623).withValues(alpha: 0.08),
+                color: CouleursApp.avertissement.withValues(alpha: 0.08),
               ),
               child: BackdropFilter(
                 filter: ImageFilter.blur(sigmaX: 120, sigmaY: 120),
@@ -277,8 +277,8 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 color: etat.categorieService == "Remorque"
-                    ? const Color(0xFF007ACC).withValues(alpha: 0.1)
-                    : const Color(0xFF3B82F6).withValues(alpha: 0.1),
+                    ? CouleursApp.primaire.withValues(alpha: 0.1)
+                    : CouleursApp.primaire.withValues(alpha: 0.1),
               ),
               child: BackdropFilter(
                 filter: ImageFilter.blur(sigmaX: 60, sigmaY: 60),
@@ -399,7 +399,7 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
                       borderRadius: BorderRadius.circular(1),
                       gradient: isCompleted
                           ? const LinearGradient(
-                              colors: [Color(0xFF007ACC), Color(0xFF3B82F6)],
+                              colors: [CouleursApp.primaire, CouleursApp.primaire],
                             )
                           : null,
                       color: isCompleted ? null : Theme.of(context).colorScheme.surface,
@@ -461,7 +461,7 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
                 Row(
                   children: [
                     const Icon(Icons.directions_car_outlined,
-                        color: Color(0xFF007ACC), size: 18),
+                        color: CouleursApp.primaire, size: 18),
                     const SizedBox(width: 8),
                     Text(
                       "Marque du véhicule",
@@ -476,7 +476,7 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
                       Text(
                         etat.marqueVehiculeRemorque,
                         style: GoogleFonts.poppins(
-                          color: const Color(0xFF007ACC),
+                          color: CouleursApp.primaire,
                           fontWeight: FontWeight.bold,
                           fontSize: 13,
                         ),
@@ -511,20 +511,20 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
                           alignment: Alignment.center,
                           decoration: BoxDecoration(
                             color: isSelected
-                                ? const Color(0xFF007ACC)
+                                ? CouleursApp.primaire
                                     .withValues(alpha: 0.18)
                                 : Theme.of(context).colorScheme.surface,
                             borderRadius: BorderRadius.circular(24),
                             border: Border.all(
                               color: isSelected
-                                  ? const Color(0xFF007ACC)
+                                  ? CouleursApp.primaire
                                   : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08),
                               width: isSelected ? 2 : 1,
                             ),
                             boxShadow: isSelected
                                 ? [
                                     BoxShadow(
-                                      color: const Color(0xFF007ACC)
+                                      color: CouleursApp.primaire
                                           .withValues(alpha: 0.35),
                                       blurRadius: 12,
                                       spreadRadius: 0,
@@ -542,7 +542,7 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
                             marque,
                             style: GoogleFonts.inter(
                               color: isSelected
-                                  ? const Color(0xFF007ACC)
+                                  ? CouleursApp.primaire
                                   : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
                               fontWeight: isSelected
                                   ? FontWeight.w700
@@ -626,13 +626,13 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
                                 horizontal: 14, vertical: 8),
                             decoration: BoxDecoration(
                               color: selected
-                                  ? const Color(0xFF007ACC)
+                                  ? CouleursApp.primaire
                                       .withValues(alpha: 0.18)
                                   : Theme.of(context).colorScheme.surface,
                               borderRadius: BorderRadius.circular(20),
                               border: Border.all(
                                 color: selected
-                                    ? const Color(0xFF007ACC)
+                                    ? CouleursApp.primaire
                                     : Theme.of(context)
                                         .colorScheme
                                         .onSurface
@@ -644,7 +644,7 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
                               m,
                               style: GoogleFonts.inter(
                                 color: selected
-                                    ? const Color(0xFF007ACC)
+                                    ? CouleursApp.primaire
                                     : Theme.of(context)
                                         .colorScheme
                                         .onSurface
@@ -673,7 +673,7 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
                           children: [
                             // Icône dépanneuse pulsante — jamais un spinner générique
                             const Icon(Icons.car_repair,
-                                    color: Color(0xFF007ACC), size: 28)
+                                    color: CouleursApp.primaire, size: 28)
                                 .animate(onPlay: (c) => c.repeat())
                                 .shimmer(
                                     duration: 900.ms, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7))
@@ -709,17 +709,17 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
                     padding: const EdgeInsets.symmetric(
                         horizontal: 18, vertical: 14),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFF5A623).withValues(alpha: 0.1),
+                      color: CouleursApp.avertissement.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(16),
                       border: Border.all(
-                        color: const Color(0xFFF5A623).withValues(alpha: 0.35),
+                        color: CouleursApp.avertissement.withValues(alpha: 0.35),
                       ),
                     ),
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         const Icon(Icons.scale_outlined,
-                            color: Color(0xFFF5A623), size: 20),
+                            color: CouleursApp.avertissement, size: 20),
                         const SizedBox(width: 10),
                         Text(
                           "Masse estimée : ~",
@@ -736,7 +736,7 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
                             return Text(
                               "${value.toInt()} kg",
                               style: GoogleFonts.poppins(
-                                color: const Color(0xFFF5A623),
+                                color: CouleursApp.avertissement,
                                 fontWeight: FontWeight.w800,
                                 fontSize: 17,
                               ),
@@ -759,7 +759,7 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
                 _buildFloatingTextField(
                   controller: _detailsController,
                   hint:
-                      "Décrivez précisément ce que vous souhaitez transporter...",
+                      "Dites-nous en plus sur ce que vous souhaitez transporter...",
                   icon: Iconsax.textalign_left_copy,
                   onChanged: (val) => notifier.setDetailsSpecifiques(val),
                   maxLines: 4,
@@ -769,7 +769,7 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
               OutlinedButton.icon(
                 onPressed: notifier.ajouterPhotos,
                 icon: const Icon(Iconsax.camera_copy),
-                label: const Text("Ajouter des photos (Optionnel)"),
+                label: const Text("Une petite photo pour aider le Transporteur ? (Optionnel)"),
                 style: OutlinedButton.styleFrom(
                   foregroundColor: Colors.white,
                   side: BorderSide(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.2)),
@@ -949,7 +949,7 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         _buildSectionTitle("Où voulez-vous aller ?",
-            "Votre position de départ sera automatiquement transmise au dépanneur."),
+            "Votre position de départ sera automatiquement transmise au Transporteur."),
         _GlassCard(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
@@ -1036,7 +1036,7 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
               gradient: etat.estEnAttenteIA
                   ? null
                   : const LinearGradient(
-                      colors: [Color(0xFF007ACC), Color(0xFF005C99)],
+                      colors: [CouleursApp.primaire, Color(0xFF005C99)],
                       begin: Alignment.centerLeft,
                       end: Alignment.centerRight,
                     ),
@@ -1044,7 +1044,7 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
                   ? []
                   : [
                       BoxShadow(
-                        color: const Color(0xFF007ACC).withValues(alpha: 0.35),
+                        color: CouleursApp.primaire.withValues(alpha: 0.35),
                         blurRadius: 16,
                         offset: const Offset(0, 6),
                       ),
@@ -1086,8 +1086,8 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
                     _etapeCourante < 3
                         ? "Continuer"
                         : _etapeCourante == 4
-                            ? "Rechercher un chauffeur"
-                            : "Valider la Commande",
+                            ? "Rechercher un Transporteur"
+                            : "Confirmer la mise en relation",
                     style: GoogleFonts.poppins(
                         fontSize: 16, fontWeight: FontWeight.w600),
                   ),
@@ -1139,7 +1139,7 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
                       ? const SizedBox(
                           width: 20, height: 20, child: LoaderPremium(size: 20))
                       : const Icon(Icons.my_location,
-                          color: Color(0xFF3B82F6), size: 22),
+                          color: CouleursApp.primaire, size: 22),
                 ),
               )
             : null,
@@ -1157,7 +1157,7 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
                 BorderSide(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.07))),
         focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),
-            borderSide: const BorderSide(color: Color(0xFF3B82F6), width: 1.5)),
+            borderSide: const BorderSide(color: CouleursApp.primaire, width: 1.5)),
       ),
     );
   }
@@ -1235,9 +1235,9 @@ class _AnimatedRadarSearchState extends State<AnimatedRadarSearch> {
   final List<String> _messages = [
     "Recherche de transporteurs à proximité...",
     "Analyse du trafic en temps réel...",
-    "Contact des chauffeurs les mieux notés...",
+    "Identification des transporteurs disponibles...",
     "Négociation du meilleur tarif...",
-    "Chauffeur trouvé ! Finalisation...",
+    "Transporteur trouvé ! Mise en relation en cours...",
   ];
 
   @override
@@ -1377,7 +1377,7 @@ class _AnimatedRadarSearchState extends State<AnimatedRadarSearch> {
         const SizedBox(height: 12),
         if (!isFinished)
           Text(
-            "Un instant, nous trouvons le meilleur chauffeur pour votre trajet.",
+            "Patientez, nous identifions le Transporteur idéal pour votre course.",
             textAlign: TextAlign.center,
             style: GoogleFonts.poppins(
               color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),

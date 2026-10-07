@@ -21,7 +21,7 @@ class MarcheDemandes extends ConsumerStatefulWidget {
 }
 
 class _MarcheDemandesState extends ConsumerState<MarcheDemandes> {
-  bool _isProcessing = false;
+  final bool _isProcessing = false;
 
   /// Accepte une course via une transaction Firestore atomique.
   /// Cela garantit qu'un seul transporteur peut accepter la course,
@@ -30,173 +30,189 @@ class _MarcheDemandesState extends ConsumerState<MarcheDemandes> {
     final transporteur = ref.read(currentTransporteurProvider).valueOrNull;
     if (transporteur == null) return;
 
-    final confirmation = await showDialog<bool>(
+    await showDialog(
       context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: Theme.of(context).colorScheme.surface,
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: CouleursApp.primaire.withValues(alpha: 0.15),
-                shape: BoxShape.circle,
-              ),
-              child: const Icon(Iconsax.truck_copy,
-                  color: CouleursApp.primaire, size: 20),
-            ),
-            const SizedBox(width: 12),
-            Text(
-              "Accepter la course",
-              style: GoogleFonts.inter(
-                fontWeight: FontWeight.bold,
-                color: Colors.white,
-                fontSize: 16,
-              ),
-            ),
-          ],
-        ),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              "Vous êtes sur le point d'accepter cette course.",
-              style: GoogleFonts.inter(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), fontSize: 14),
-            ),
-            const SizedBox(height: 12),
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: CouleursApp.primaire.withValues(alpha: 0.08),
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(
-                    color: CouleursApp.primaire.withValues(alpha: 0.2)),
-              ),
-              child: Row(
+      barrierDismissible: false,
+      builder: (ctx) {
+        bool isProcessingDialog = false;
+        return StatefulBuilder(
+          builder: (context, setStateDialog) {
+            return AlertDialog(
+              backgroundColor: Theme.of(context).colorScheme.surface,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+              title: Row(
                 children: [
-                  const Icon(Icons.attach_money,
-                      color: CouleursApp.accent, size: 20),
-                  const SizedBox(width: 8),
-                  Text(
-                    "${course.prixEstime.toInt()} FCFA",
-                    style: GoogleFonts.inter(
-                      color: CouleursApp.accent,
-                      fontWeight: FontWeight.w800,
-                      fontSize: 18,
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: CouleursApp.primaire.withValues(alpha: 0.15),
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(Iconsax.truck_copy,
+                        color: CouleursApp.primaire, size: 20),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      "Nouvelle opportunité de course",
+                      style: GoogleFonts.inter(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        fontSize: 16,
+                      ),
                     ),
                   ),
                 ],
               ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              "⚡ Cette action est immédiate et sécurisée.",
-              style: GoogleFonts.inter(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), fontSize: 11),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx, false),
-            child: Text("Annuler",
-                style: GoogleFonts.inter(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54))),
-          ),
-          ElevatedButton(
-            onPressed: () => Navigator.pop(ctx, true),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: CouleursApp.primaire,
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10)),
-            ),
-            child: Text(
-              "Oui, j'accepte !",
-              style: GoogleFonts.inter(
-                  color: Colors.white, fontWeight: FontWeight.bold),
-            ),
-          ),
-        ],
-      ),
-    );
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    "Une nouvelle course est disponible près de vous.",
+                    style: GoogleFonts.inter(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), fontSize: 14),
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    children: [
+                      const Icon(Icons.map_rounded, color: CouleursApp.primaire, size: 20),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          "${course.distanceKm.toStringAsFixed(1)} km au total",
+                          style: GoogleFonts.inter(color: Theme.of(context).colorScheme.onSurface, fontSize: 14),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 12),
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: CouleursApp.primaire.withValues(alpha: 0.08),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                          color: CouleursApp.primaire.withValues(alpha: 0.2)),
+                    ),
+                    child: Row(
+                      children: [
+                        const Icon(Icons.attach_money_rounded,
+                            color: CouleursApp.accent, size: 20),
+                        const SizedBox(width: 8),
+                        Text(
+                          "${course.prixEstime.toInt()} FCFA",
+                          style: GoogleFonts.inter(
+                            color: CouleursApp.accent,
+                            fontWeight: FontWeight.w800,
+                            fontSize: 18,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              actions: [
+                TextButton(
+                  onPressed: isProcessingDialog ? null : () => Navigator.pop(ctx),
+                  child: Text("Décliner",
+                      style: GoogleFonts.inter(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54))),
+                ),
+                ElevatedButton(
+                  onPressed: isProcessingDialog
+                      ? null
+                      : () async {
+                          setStateDialog(() => isProcessingDialog = true);
+                          HapticFeedback.mediumImpact();
 
-    if (confirmation != true) return;
+                          try {
+                            final docRef = FirebaseFirestore.instance.collection('courses').doc(course.id);
 
-    setState(() => _isProcessing = true);
-    HapticFeedback.mediumImpact();
+                            await FirebaseFirestore.instance.runTransaction((transaction) async {
+                              final snapshot = await transaction.get(docRef);
 
-    try {
-      // ✅ CORRECTION BUG 1.1: Utilisation d'une transaction atomique Firestore
-      // pour éviter la double-acceptation simultanée par deux transporteurs.
-      final docRef =
-          FirebaseFirestore.instance.collection('courses').doc(course.id);
+                              if (!snapshot.exists || snapshot.data() == null) {
+                                throw Exception("Course introuvable.");
+                              }
 
-      await FirebaseFirestore.instance.runTransaction((transaction) async {
-        final snapshot = await transaction.get(docRef);
+                              final data = snapshot.data()!;
+                              if ((data['statut'] != StatutCourse.recherche && data['statut'] != StatutCourse.enAttente) ||
+                                  (data['transporteurId'] != null &&
+                                      (data['transporteurId'] as String).isNotEmpty)) {
+                                throw Exception(
+                                    "Nous sommes désolés, un autre transporteur vient juste d'accepter cette course. Une nouvelle opportunité se présentera très vite !");
+                              }
 
-        if (!snapshot.exists || snapshot.data() == null) {
-          throw Exception("Course introuvable.");
-        }
+                              transaction.update(docRef, {
+                                'transporteurId': transporteur.id,
+                                'nomTransporteur': '${transporteur.prenom} ${transporteur.nom}',
+                                'telephoneTransporteur': transporteur.telephone,
+                                'statut': StatutCourse.attribue,
+                              });
+                            });
 
-        final data = snapshot.data()!;
-        // Vérification atomique : la course doit encore être en recherche
-        // et ne pas avoir de transporteur assigné
-        if (data['statut'] != StatutCourse.recherche ||
-            (data['transporteurId'] != null &&
-                (data['transporteurId'] as String).isNotEmpty)) {
-          throw Exception(
-              "Cette course vient d'être acceptée par quelqu'un d'autre. 😅");
-        }
+                            HapticFeedback.heavyImpact();
 
-        // Attribution atomique
-        transaction.update(docRef, {
-          'transporteurId': transporteur.id,
-          'nomTransporteur': '${transporteur.prenom} ${transporteur.nom}',
-          'telephoneTransporteur': transporteur.telephone,
-          'statut': StatutCourse.attribue,
-        });
-      });
-
-      HapticFeedback.heavyImpact();
-
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Row(
-              children: [
-                Icon(Icons.check_circle, color: Theme.of(context).colorScheme.onSurface),
-                const SizedBox(width: 8),
-                Text("Super ! Course acceptée 🎉",
-                    style: GoogleFonts.inter(fontWeight: FontWeight.bold)),
+                            if (ctx.mounted) {
+                              Navigator.pop(ctx);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Row(
+                                    children: [
+                                      Icon(Icons.check_circle_outline, color: Theme.of(context).colorScheme.onSurface),
+                                      const SizedBox(width: 8),
+                                      Text("Parfait, la course vous a été attribuée !",
+                                          style: GoogleFonts.inter(fontWeight: FontWeight.bold)),
+                                    ],
+                                  ),
+                                  backgroundColor: CouleursApp.succes,
+                                  behavior: SnackBarBehavior.floating,
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                ),
+                              );
+                              context.push('/suivi/${course.id}');
+                            }
+                          } catch (e) {
+                            if (ctx.mounted) {
+                              setStateDialog(() => isProcessingDialog = false);
+                              Navigator.pop(ctx);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(e.toString().replaceAll('Exception: ', 'Oups — ')),
+                                  backgroundColor: CouleursApp.erreur,
+                                  behavior: SnackBarBehavior.floating,
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                ),
+                              );
+                            }
+                          }
+                        },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: CouleursApp.primaire,
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10)),
+                  ),
+                  child: isProcessingDialog
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                          ),
+                        )
+                      : Text(
+                          "Accepter la course",
+                          style: GoogleFonts.inter(
+                              color: Colors.white, fontWeight: FontWeight.bold),
+                        ),
+                ),
               ],
-            ),
-            backgroundColor: CouleursApp.succes,
-            behavior: SnackBarBehavior.floating,
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          ),
+            );
+          },
         );
-        // Redirection automatique vers l'écran de suivi
-        context.push('/suivi/${course.id}');
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content:
-                Text("Oups ! ${e.toString().replaceAll('Exception: ', '')} 🔧"),
-            backgroundColor: CouleursApp.erreur,
-            behavior: SnackBarBehavior.floating,
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          ),
-        );
-      }
-    } finally {
-      if (mounted) {
-        setState(() => _isProcessing = false);
-      }
-    }
+      },
+    );
   }
 
   @override
@@ -258,7 +274,7 @@ class _MarcheDemandesState extends ConsumerState<MarcheDemandes> {
                       size: 60, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38)),
                   const SizedBox(height: 16),
                   Text(
-                    "Mince ! Problème réseau 📡",
+                    "Mince, nous avons du mal à joindre le serveur.",
                     style: GoogleFonts.inter(
                         color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                         fontSize: 16,
@@ -301,7 +317,7 @@ class _MarcheDemandesState extends ConsumerState<MarcheDemandes> {
                             duration: 2.seconds),
                         const SizedBox(height: 24),
                         Text(
-                          "Le calme avant la tempête ☕",
+                          "Aucune course disponible pour l’instant",
                           style: GoogleFonts.inter(
                             color: Theme.of(context).colorScheme.onSurface,
                             fontSize: 20,
@@ -384,7 +400,7 @@ class _MarcheDemandesState extends ConsumerState<MarcheDemandes> {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        "Sécurisation de la course 🔐",
+                        "Vérification et sécurisation en cours...",
                         style: GoogleFonts.inter(
                             color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 12),
                       ),
@@ -567,11 +583,11 @@ class _MarcheDemandesState extends ConsumerState<MarcheDemandes> {
                   _buildInfoChip(Icons.scale_rounded,
                       "${course.poidsKg.toStringAsFixed(0)} kg"),
                 if (course.fragile)
-                  _buildOptionChip("⚠️ Fragile", Colors.orange),
+                  _buildOptionChip(Icons.warning_amber_rounded, "Fragile", CouleursApp.avertissement),
                 if (course.aideChargement)
-                  _buildOptionChip("🤝 Aide chargement", Colors.blue),
+                  _buildOptionChip(Icons.people_alt_outlined, "Aide au chargement", CouleursApp.primaire),
                 if (course.aideDechargement)
-                  _buildOptionChip("🤝 Aide déchargement", Colors.blue),
+                  _buildOptionChip(Icons.people_alt_outlined, "Aide au déchargement", CouleursApp.primaire),
               ],
             ),
 
@@ -637,7 +653,7 @@ class _MarcheDemandesState extends ConsumerState<MarcheDemandes> {
     );
   }
 
-  Widget _buildOptionChip(String label, Color color) {
+  Widget _buildOptionChip(IconData icon, String label, Color color) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
       decoration: BoxDecoration(
@@ -645,10 +661,17 @@ class _MarcheDemandesState extends ConsumerState<MarcheDemandes> {
         borderRadius: BorderRadius.circular(20),
         border: Border.all(color: color.withValues(alpha: 0.3)),
       ),
-      child: Text(
-        label,
-        style: GoogleFonts.inter(
-            fontSize: 12, color: color, fontWeight: FontWeight.bold),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 12, color: color),
+          const SizedBox(width: 5),
+          Text(
+            label,
+            style: GoogleFonts.inter(
+                fontSize: 12, color: color, fontWeight: FontWeight.bold),
+          ),
+        ],
       ),
     );
   }

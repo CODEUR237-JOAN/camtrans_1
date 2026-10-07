@@ -454,7 +454,9 @@ class ServicePaiement {
     required String operateur,
     required String telephone,
   }) async {
-    final id = "PAY-${DateTime.now().millisecondsSinceEpoch}";
+    // ✅ FIX: Idempotence. L'ID du paiement est basé sur l'ID de la course
+    // pour éviter les doublons de paiement en cas de retry réseau.
+    final id = "PAY-$courseId";
     final transaction = "TXN-${DateTime.now().microsecondsSinceEpoch}";
 
     final paiement = Paiement(
@@ -511,21 +513,10 @@ class ServicePaiement {
       }
     }
     
-    // Si paiement digital (pas d'espèces), créditer le portefeuille du transporteur
+    // Si paiement digital (pas d'espèces), le portefeuille du transporteur sera crédité
+    // automatiquement par une Cloud Function sécurisée pour éviter toute fraude.
     if (methode != "Espèces" && transporteurId.isNotEmpty && !courseId.startsWith('SUB-')) {
-      final montantNet = montant * 0.98; // ex: 2% de frais
-      try {
-        final refTransp = FirebaseFirestore.instance.collection('transporteurs').doc(transporteurId);
-        await FirebaseFirestore.instance.runTransaction((transaction) async {
-          final snapshot = await transaction.get(refTransp);
-          if (snapshot.exists) {
-            final double soldeActuel = (snapshot.data()?['soldePortefeuille'] ?? 0).toDouble();
-            transaction.update(refTransp, {'soldePortefeuille': soldeActuel + montantNet});
-          }
-        });
-      } catch (e) {
-        debugPrint("Erreur lors de la mise à jour du portefeuille du transporteur : $e");
-      }
+      debugPrint("Paiement digital validé. Le crédit du portefeuille sera effectué par le serveur.");
     }
 
     return paiement;

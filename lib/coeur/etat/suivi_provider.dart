@@ -82,6 +82,7 @@ class SuiviNotifier extends StateNotifier<EtatSuivi> {
   final ServiceNavigationVocale _navVocale;
   StreamSubscription? _courseSubscription;
   StreamSubscription? _transporteurSubscription;
+  String? _transporteurIdActuel;
   Timer? _simulateurTimer;
 
   // ✅ AMÉLIORATION 2.3: Dernier point de géocodage — évite les appels redondants
@@ -115,9 +116,16 @@ class SuiviNotifier extends StateNotifier<EtatSuivi> {
         state = state.copierAvec(course: course, chargement: false);
 
         // Si le transporteur est défini, on écoute sa position
-        if (course.transporteurId.isNotEmpty &&
-            _transporteurSubscription == null) {
-          _ecouterTransporteur(course.transporteurId);
+        if (course.transporteurId.isNotEmpty) {
+          if (_transporteurIdActuel != course.transporteurId) {
+            _transporteurSubscription?.cancel();
+            _transporteurIdActuel = course.transporteurId;
+            _ecouterTransporteur(course.transporteurId);
+          }
+        } else {
+          _transporteurSubscription?.cancel();
+          _transporteurSubscription = null;
+          _transporteurIdActuel = null;
         }
         
         // Charger l'itinéraire s'il n'est pas encore fait et qu'on a le départ/arrivée

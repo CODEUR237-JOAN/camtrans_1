@@ -21,6 +21,7 @@ import 'widgets/timeline_statut.dart';
 import 'widgets/carte_suivi_abstraite.dart';
 import 'widgets/bottom_sheet_paiement.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'widgets/recherche_radar.dart';
 
@@ -37,6 +38,7 @@ class SuiviTransport extends ConsumerStatefulWidget {
 
 class _SuiviTransportState extends ConsumerState<SuiviTransport> {
   MapController? _mapController;
+  bool _enCoursDeRedirection = false;
 
   @override
   void initState() {
@@ -49,7 +51,7 @@ class _SuiviTransportState extends ConsumerState<SuiviTransport> {
             const SnackBar(
               content:
                   Text("Le GPS est nécessaire pour le suivi en temps réel."),
-              backgroundColor: Colors.orange,
+              backgroundColor: CouleursApp.avertissement,
             ),
           );
         }
@@ -79,7 +81,7 @@ class _SuiviTransportState extends ConsumerState<SuiviTransport> {
               const SizedBox(height: 20),
               Text(
                   textes.get('vide_course_client',
-                      "Aucune course active à suivre. Où allons-nous aujourd'hui ? 🚀"),
+                      "Aucune course active à suivre. Où allons-nous aujourd'hui ?"),
                   style: TextStyle(fontSize: 16, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)),
                   textAlign: TextAlign.center),
             ],
@@ -129,7 +131,7 @@ class _SuiviTransportState extends ConsumerState<SuiviTransport> {
               etatSuivi.erreur != null
                   ? 'DÉTAIL ERREUR: ${etatSuivi.erreur}'
                   : 'Course introuvable ou inaccessible.',
-              style: const TextStyle(color: Colors.redAccent, fontSize: 16),
+              style: const TextStyle(color: CouleursApp.erreur, fontSize: 16),
               textAlign: TextAlign.center,
             ),
           ),
@@ -139,14 +141,18 @@ class _SuiviTransportState extends ConsumerState<SuiviTransport> {
 
     final course = etatSuivi.course!;
 
-    // ✅ PHASE 4: DISPATCH - Logique de Timeout côté Client (Zéro Coût Cloud Functions)
-    if (estClient &&
-        course.statut == StatutCourse.propose &&
-        course.expirationProposition != null) {
-      if (DateTime.now().isAfter(course.expirationProposition!)) {
-        // Le délai est dépassé, on passe au transporteur suivant
+    // ✅ PILIER 1 & 2: Moteur d'Auto-Dispatch côté Client
+    if (estClient && course.statut == StatutCourse.recherche) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _executerAutoDispatch(course);
+      });
+    }
+
+    // ✅ PILIER 3: Timeout Global de 5 minutes
+    if (estClient && (course.statut == StatutCourse.recherche || course.statut == StatutCourse.enAttente)) {
+      if (DateTime.now().difference(course.dateCreation).inMinutes >= 5) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
-          _passerAuTransporteurSuivant(course);
+          _afficherTimeoutGlobal(course);
         });
       }
     }
@@ -170,8 +176,12 @@ class _SuiviTransportState extends ConsumerState<SuiviTransport> {
               right: 0,
               child: Column(
                 children: [
+                  const CircularProgressIndicator(
+                    valueColor: AlwaysStoppedAnimation<Color>(CouleursApp.primaire),
+                  ),
+                  const SizedBox(height: 20),
                   Text(
-                    "Recherche du meilleur transporteur...",
+                    "Recherche du transporteur idéal en cours...",
                     style: TextStyle(
                         color: Theme.of(context).colorScheme.onSurface,
                         fontSize: 18,
@@ -179,9 +189,7 @@ class _SuiviTransportState extends ConsumerState<SuiviTransport> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    course.statut == StatutCourse.propose
-                        ? "En attente de la réponse du candidat idéal..."
-                        : "Analyse des transporteurs disponibles...",
+                    "Notre algorithme sélectionne le meilleur véhicule à proximité.",
                     style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), fontSize: 14),
                   ),
                   const SizedBox(height: 20),
@@ -498,13 +506,13 @@ class _SuiviTransportState extends ConsumerState<SuiviTransport> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const Text("Course",
-                      style: TextStyle(color: Colors.black54, fontSize: 13)),
+                  Text("Course",
+                      style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 13)),
                   Text(course.codeSuivi,
-                      style: const TextStyle(
+                      style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 18,
-                          color: Colors.black)),
+                          color: Theme.of(context).colorScheme.onSurface)),
                 ],
               ),
               Container(
@@ -529,28 +537,28 @@ class _SuiviTransportState extends ConsumerState<SuiviTransport> {
           // Adresses de la course
           Row(
             children: [
-              const Icon(Icons.location_on, color: Colors.redAccent, size: 20),
+              const Icon(Icons.location_on, color: CouleursApp.erreur, size: 20),
               const SizedBox(width: 8),
               Expanded(
                   child: Text(course.adresseDepart,
-                      style: const TextStyle(
-                          color: Colors.black87,
+                      style: TextStyle(
+                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.87),
                           fontSize: 13,
                           fontWeight: FontWeight.w500))),
             ],
           ),
           Padding(
             padding: const EdgeInsets.only(left: 9.0, top: 2, bottom: 2),
-            child: Container(width: 2, height: 12, color: Colors.grey.shade300),
+            child: Container(width: 2, height: 12, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.12)),
           ),
           Row(
             children: [
-              const Icon(Icons.flag, color: Colors.green, size: 20),
+              const Icon(Icons.flag, color: CouleursApp.succes, size: 20),
               const SizedBox(width: 8),
               Expanded(
                   child: Text(course.adresseArrivee,
-                      style: const TextStyle(
-                          color: Colors.black87,
+                      style: TextStyle(
+                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.87),
                           fontSize: 13,
                           fontWeight: FontWeight.w500))),
             ],
@@ -710,57 +718,162 @@ class _SuiviTransportState extends ConsumerState<SuiviTransport> {
     );
   }
 
-  bool _enCoursDeRedirection = false;
-  Future<void> _passerAuTransporteurSuivant(Course course) async {
-    if (_enCoursDeRedirection) return;
-    _enCoursDeRedirection = true;
+  bool _rechercheEnCours = false;
+
+  Future<void> _executerAutoDispatch(Course course) async {
+    if (_rechercheEnCours || course.statut != StatutCourse.recherche) return;
+    _rechercheEnCours = true;
+
     try {
       final docRef = FirebaseFirestore.instance.collection('courses').doc(course.id);
-      
-      await FirebaseFirestore.instance.runTransaction((transaction) async {
-        final snapshot = await transaction.get(docRef);
-        if (!snapshot.exists || snapshot.data() == null) return;
-        
-        final data = snapshot.data()!;
-        
-        // SECURITE CRITIQUE : Vérifier si la course a déjà été acceptée !
-        if (data['statut'] != StatutCourse.propose && data['statut'] != StatutCourse.recherche) {
-          // Si le statut est "attribue" ou plus, on abandonne l'affectation automatique.
-          return; 
+      final courseSnapshot = await docRef.get();
+      if (!courseSnapshot.exists) return;
+
+      final data = courseSnapshot.data()!;
+      if (data['statut'] != StatutCourse.recherche) return;
+
+      final List<dynamic> declinesDyn = data['transporteursDeclines'] ?? [];
+      final Set<String> declines = declinesDyn.map((e) => e.toString()).toSet();
+
+      // 1. Récupérer les transporteurs en ligne
+      final transporteursSnap = await FirebaseFirestore.instance
+          .collection('transporteurs')
+          .where('disponible', isEqualTo: true)
+          .where('documentsValides', isEqualTo: true)
+          .get();
+
+      final serviceGps = ref.read(serviceGpsProvider);
+      final List<Map<String, dynamic>> candidats = [];
+
+      // 2. Filtrer
+      for (var doc in transporteursSnap.docs) {
+        if (declines.contains(doc.id)) continue;
+        final t = doc.data();
+        if (t['estEnLigne'] != true) continue;
+        if (course.typeVehicule.isNotEmpty && t['typeVehicule'] != course.typeVehicule) continue;
+
+        final double tLat = t['latitude'] ?? 0.0;
+        final double tLng = t['longitude'] ?? 0.0;
+
+        double dist = 999.0;
+        if (tLat != 0.0) {
+          dist = serviceGps.calculerDistance(
+            latitudeDepart: course.latitudeDepart,
+            longitudeDepart: course.longitudeDepart,
+            latitudeArrivee: tLat,
+            longitudeArrivee: tLng,
+          );
         }
 
-        final List<dynamic> candidats = data['candidats'] ?? [];
-        final int index = data['indexCandidatActuel'] ?? 0;
-        final int nextIndex = index + 1;
+        candidats.add({
+          'id': doc.id,
+          'distance': dist,
+          'nom': t['prenom'],
+          'telephone': t['telephone'],
+          'doc': t,
+        });
+      }
 
-        if (nextIndex < candidats.length) {
-          final prochainId = candidats[nextIndex] as String;
-          transaction.update(docRef, {
-            'indexCandidatActuel': nextIndex,
-            'transporteurId': prochainId,
-            'statut': StatutCourse.propose,
-            'expirationProposition':
-                DateTime.now().add(const Duration(seconds: 30)).toIso8601String(),
+      if (candidats.isEmpty) {
+        // Personne trouvé. Le timeout global finira par annuler la course.
+        return;
+      }
+
+      // 3. Trier par distance
+      candidats.sort((a, b) => (a['distance'] as double).compareTo(b['distance'] as double));
+
+      // 4. Exécuter l'attribution transactionnelle stricte (Pilier 2)
+      for (final candidat in candidats) {
+        final transporteurId = candidat['id'] as String;
+        final transporteurRef = FirebaseFirestore.instance.collection('transporteurs').doc(transporteurId);
+
+        try {
+          await FirebaseFirestore.instance.runTransaction((transaction) async {
+            // Lecture
+            final tSnap = await transaction.get(transporteurRef);
+            final cSnap = await transaction.get(docRef);
+
+            if (!tSnap.exists || !cSnap.exists) throw Exception("Doc manquant");
+            final cData = cSnap.data()!;
+            if (cData['statut'] != StatutCourse.recherche) throw Exception("Course plus dispo");
+
+            final tData = tSnap.data()!;
+            if (tData['disponible'] != true || tData['estEnLigne'] != true) {
+              throw Exception("Transporteur occupé");
+            }
+
+            // Écriture : verrouiller le chauffeur et attribuer la course
+            transaction.update(transporteurRef, {'disponible': false});
+            transaction.update(docRef, {
+              'statut': StatutCourse.attribue,
+              'transporteurId': transporteurId,
+              'nomTransporteur': "${tData['prenom']} ${tData['nom']}",
+              'telephoneTransporteur': tData['telephone'] ?? "",
+            });
           });
           
-          // Note : La notification Push devrait être idéalement envoyée par une Cloud Function
-          // sur écoute du changement de transporteurId.
-        } else {
-          // Plus aucun candidat : on passe au marché public
-          transaction.update(docRef, {
-            'statut': StatutCourse.recherche,
-            'transporteurId': '',
-            'indexCandidatActuel': nextIndex,
-          });
+          // Match réussi ! L'UI se mettra à jour automatiquement
+          break;
+        } catch (e) {
+          // Transaction échouée (chauffeur a pris une autre course à cette milliseconde)
+          debugPrint("Collision Auto-Dispatch : candidat \$transporteurId déjà pris.");
+          continue;
         }
-      });
-      
+      }
     } catch (e) {
-      debugPrint("Erreur lors du passage au transporteur suivant: \$e");
+      debugPrint("Erreur Auto-Dispatch : \$e");
     } finally {
-      // Petite pause avant de permettre un autre appel (debouncing)
-      await Future.delayed(const Duration(seconds: 2));
-      _enCoursDeRedirection = false;
+      // Pause de 5 secondes avant la prochaine tentative (Cascade)
+      await Future.delayed(const Duration(seconds: 5));
+      _rechercheEnCours = false;
     }
   }
+
+  void _afficherTimeoutGlobal(Course course) {
+    if (_enCoursDeRedirection) return;
+    _enCoursDeRedirection = true;
+
+    // Met à jour la course en expiré côté client (pour ne plus afficher le radar)
+    FirebaseFirestore.instance.collection('courses').doc(course.id).update({
+      'statut': StatutCourse.annulee,
+    });
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => AlertDialog(
+        backgroundColor: Theme.of(context).colorScheme.surface,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        title: Row(
+          children: [
+            const Icon(Icons.info_outline_rounded, color: CouleursApp.erreur, size: 28),
+            const SizedBox(width: 10),
+            Expanded(
+              child: Text(
+                "Aucun véhicule disponible",
+                style: GoogleFonts.inter(fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface),
+              ),
+            ),
+          ],
+        ),
+        content: Text(
+          "Malheureusement, aucun transporteur n'a pu accepter votre course dans le temps imparti. Vous pouvez relancer votre recherche.",
+          style: GoogleFonts.inter(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)),
+        ),
+        actions: [
+          ElevatedButton(
+            onPressed: () {
+              Navigator.pop(ctx);
+              context.go('/');
+            },
+            style: ElevatedButton.styleFrom(
+              backgroundColor: CouleursApp.primaire,
+            ),
+            child: Text("Compris", style: GoogleFonts.inter(color: Colors.white, fontWeight: FontWeight.bold)),
+          ),
+        ],
+      ),
+    );
+  }
+
 }

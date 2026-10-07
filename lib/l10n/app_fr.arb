@@ -1,0 +1,14 @@
+{
+  "@@locale": "fr",
+  "appTitle": "CamTrans",
+  "welcomeMessage": "Bienvenue sur CamTrans",
+  "searchTransport": "Rechercher un transporteur",
+  "settings": "Paramètres",
+  "language": "Langue",
+  "course": "Course",
+  "client": "Client",
+  "driver": "Transporteur",
+  "pending": "En attente",
+  "cancel": "Annuler",
+  "confirm": "Confirmer"
+}

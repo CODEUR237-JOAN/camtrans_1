@@ -15,7 +15,10 @@ class StatutCourse {
   // Statuts du cycle de vie (Sprint 13)
   // ============================
 
-  /// Commande créée, recherche en cours
+  /// Course créée, en attente (Phase 1)
+  static const String enAttente = 'en_attente';
+
+  /// Recherche en cours
   static const String recherche = 'recherche';
 
   /// ✅ NOUVEAU (Phase 4.4) : La course est proposée en exclusivité à un chauffeur spécifique
@@ -67,6 +70,7 @@ class StatutCourse {
   /// Retourne true si le transporteur peut modifier le statut
   static bool peutTransitionnerVers(String actuel, String suivant) {
     const transitions = {
+      enAttente: [recherche, propose, annulee],
       recherche: [propose, attribue, annulee],
       propose: [attribue, recherche, annulee],
       attribue: [enRouteDepart, annulee],
@@ -82,6 +86,8 @@ class StatutCourse {
   /// Libellé lisible par l'humain
   static String libelle(String statut) {
     switch (statut) {
+      case enAttente:
+        return 'En attente';
       case recherche:
         return 'Recherche...';
       case propose:

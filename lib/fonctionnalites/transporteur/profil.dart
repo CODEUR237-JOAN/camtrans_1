@@ -33,7 +33,7 @@ class ProfilTransporteur extends ConsumerWidget {
       ),
       body: transporteurAsync.when(
         loading: () => const Center(child: LoaderPremium()),
-        error: (err, stack) => Center(child: Text("Erreur: $err")),
+        error: (err, stack) => Center(child: Text("Oups, impossible de charger votre profil. ($err)")),
         data: (transporteur) {
           if (transporteur == null) {
             return const Center(child: Text("Profil introuvable"));
@@ -71,8 +71,8 @@ class ProfilTransporteur extends ConsumerWidget {
                       : "En attente de vérification",
                   style: TextStyle(
                     color: transporteur.documentsValides
-                        ? Colors.green
-                        : Colors.orange,
+                        ? CouleursApp.succes
+                        : CouleursApp.avertissement,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -216,8 +216,8 @@ class ProfilTransporteur extends ConsumerWidget {
                                       titre: "Livrées",
                                       valeur: "$livrees",
                                       icone: Icons.check_circle,
-                                      couleurIcone: Colors.green,
-                                      couleurValeur: Colors.green),
+                                      couleurIcone: CouleursApp.succes,
+                                      couleurValeur: CouleursApp.succes),
                                 ),
                               ],
                             ),
@@ -233,8 +233,8 @@ class ProfilTransporteur extends ConsumerWidget {
                                       titre: "En cours",
                                       valeur: "$enAttente",
                                       icone: Icons.schedule,
-                                      couleurIcone: Colors.orange,
-                                      couleurValeur: Colors.orange),
+                                      couleurIcone: CouleursApp.avertissement,
+                                      couleurValeur: CouleursApp.avertissement),
                                 ),
                                 const SizedBox(width: 15),
                                 Expanded(
@@ -254,8 +254,8 @@ class ProfilTransporteur extends ConsumerWidget {
                                         titre: "Note",
                                         valeur: v,
                                         icone: Icons.star,
-                                        couleurIcone: Colors.amber,
-                                        couleurValeur: Colors.amber);
+                                        couleurIcone: CouleursApp.avertissement,
+                                        couleurValeur: CouleursApp.avertissement);
                                   }),
                                 ),
                               ],
@@ -287,14 +287,14 @@ class ProfilTransporteur extends ConsumerWidget {
                   width: double.infinity,
                   child: ElevatedButton.icon(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.red.withValues(alpha: 0.15),
-                      foregroundColor: Colors.red,
+                      backgroundColor: CouleursApp.erreur.withValues(alpha: 0.15),
+                      foregroundColor: CouleursApp.erreur,
                       minimumSize: const Size(double.infinity, 55),
                       elevation: 0,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(15),
                         side: BorderSide(
-                            color: Colors.red.withValues(alpha: 0.3)),
+                            color: CouleursApp.erreur.withValues(alpha: 0.3)),
                       ),
                     ),
                     onPressed: () async {
@@ -353,14 +353,14 @@ class ProfilTransporteur extends ConsumerWidget {
                   CouleursApp.primaire.withValues(alpha: 0.8),
                   CouleursApp.primaire
                 ]
-              : [Colors.orange.shade400, Colors.red.shade400],
+              : [CouleursApp.avertissement, CouleursApp.erreur],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: (estValide ? CouleursApp.primaire : Colors.red)
+            color: (estValide ? CouleursApp.primaire : CouleursApp.erreur)
                 .withValues(alpha: 0.3),
             blurRadius: 10,
             offset: const Offset(0, 5),
@@ -417,7 +417,7 @@ class ProfilTransporteur extends ConsumerWidget {
             onPressed: () => context.push(RoutesApplication.abonnement),
             style: ElevatedButton.styleFrom(
               backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-              foregroundColor: estValide ? CouleursApp.primaire : Colors.red,
+              foregroundColor: estValide ? CouleursApp.primaire : CouleursApp.erreur,
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10)),
             ),

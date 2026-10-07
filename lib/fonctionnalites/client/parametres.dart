@@ -16,6 +16,7 @@ import 'package:update_camtrans/services/service_notification.dart';
 import 'package:update_camtrans/coeur/etat/utilisateur_provider.dart';
 import 'package:update_camtrans/coeur/routes/routes.dart';
 import 'package:update_camtrans/coeur/widgets/selecteur_theme.dart';
+import 'package:update_camtrans/coeur/etat/locale_provider.dart';
 import 'package:update_camtrans/services/service_authentification.dart';
 
 // =====================================================================
@@ -604,8 +605,12 @@ class _ParametresState extends ConsumerState<Parametres> {
 
           const SizedBox(height: 28),
 
-          // === Section : Apparence ===
+          // === Section : Apparence & Langue ===
+          _buildSectionTitre('Interface'),
+          const SizedBox(height: 12),
           const SelecteurTheme(),
+          const SizedBox(height: 12),
+          _buildSelecteurLangue(),
 
           const SizedBox(height: 28),
 
@@ -739,6 +744,66 @@ class _ParametresState extends ConsumerState<Parametres> {
   // -----------------------------------------------------------------
   // Widgets helpers
   // -----------------------------------------------------------------
+
+  Widget _buildSelecteurLangue() {
+    final locale = ref.watch(localeProvider);
+    final isFr = locale.languageCode == 'fr';
+    
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      decoration: BoxDecoration(
+        color: Theme.of(context).colorScheme.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: CouleursApp.bordureSombre),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(9),
+                decoration: BoxDecoration(
+                  color: CouleursApp.primaire.withValues(alpha: 0.12),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: const Icon(Icons.language, color: CouleursApp.primaire, size: 18),
+              ),
+              const SizedBox(width: 12),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text("Langue",
+                      style: GoogleFonts.inter(
+                          color: Theme.of(context).colorScheme.onSurface,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 14)),
+                  Text(isFr ? "Français" : "English",
+                      style: GoogleFonts.inter(
+                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5), fontSize: 12)),
+                ],
+              ),
+            ],
+          ),
+          SegmentedButton<String>(
+            segments: const [
+              ButtonSegment(value: 'fr', label: Text('FR')),
+              ButtonSegment(value: 'en', label: Text('EN')),
+            ],
+            selected: {locale.languageCode},
+            onSelectionChanged: (Set<String> newSelection) {
+              ref.read(localeProvider.notifier).setLocale(Locale(newSelection.first));
+            },
+            style: SegmentedButton.styleFrom(
+              backgroundColor: Theme.of(context).colorScheme.surface,
+              selectedForegroundColor: Colors.white,
+              selectedBackgroundColor: CouleursApp.primaire,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
   Widget _buildProfilBandeau(String nom, String email) {
     return Container(

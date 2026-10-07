@@ -7,9 +7,7 @@ import 'package:flutter_animate/flutter_animate.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 
 import 'package:update_camtrans/coeur/constantes/couleurs.dart';
-import 'package:update_camtrans/coeur/etat/transporteur_provider.dart';
 import 'package:update_camtrans/modeles/course.dart';
-import 'package:update_camtrans/coeur/widgets/loader_premium.dart';
 import 'package:go_router/go_router.dart';
 
 class PopupPropositionCourse extends ConsumerStatefulWidget {
@@ -24,132 +22,24 @@ class PopupPropositionCourse extends ConsumerStatefulWidget {
 
 class _PopupPropositionCourseState
     extends ConsumerState<PopupPropositionCourse> {
-  Timer? _timer;
-  int _secondesRestantes = 30;
-  bool _enCoursTraitement = false;
 
   @override
   void initState() {
     super.initState();
-    _calculerTempsRestant();
-    _demarrerMinuteur();
     HapticFeedback.heavyImpact(); // Attirer l'attention
   }
 
-  void _calculerTempsRestant() {
-    if (widget.course.expirationProposition != null) {
-      final diff = widget.course.expirationProposition!
-          .difference(DateTime.now())
-          .inSeconds;
-      _secondesRestantes = diff > 0 ? diff : 0;
-    }
-  }
-
-  void _demarrerMinuteur() {
-    _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
-      if (!mounted) {
-        timer.cancel();
-        return;
-      }
-      setState(() {
-        if (_secondesRestantes > 0) {
-          _secondesRestantes--;
-        } else {
-          timer.cancel();
-          if (!_enCoursTraitement) {
-            _refuserCourse(expiration: true);
-          }
-        }
-      });
-    });
-  }
-
-  @override
-  void dispose() {
-    _timer?.cancel();
-    super.dispose();
-  }
-
   Future<void> _accepterCourse() async {
-    if (_enCoursTraitement) return;
-    setState(() => _enCoursTraitement = true);
-    _timer?.cancel();
-
-    try {
-      await ref
-          .read(transporteurActionsProvider)
-          .accepterPropositionCourse(widget.course.id);
-      HapticFeedback.heavyImpact();
-      if (mounted) {
-        Navigator.pop(context); // Fermer le popup
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-          content: Text("Course acceptée ! 🎉",
-              style: GoogleFonts.inter(
-                  color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.bold)),
-          backgroundColor: CouleursApp.succes,
-        ));
-        // Rediriger le transporteur vers SA page de suivi spécifique
-        context.push('/suivi/${widget.course.id}');
-      }
-    } catch (e) {
-      if (mounted) {
-        setState(() => _enCoursTraitement = false);
-        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content:
-                Text("Erreur: ${e.toString().replaceAll('Exception: ', '')}"),
-            backgroundColor: CouleursApp.erreur));
-      }
-    }
-  }
-
-  Future<void> _refuserCourse({bool expiration = false}) async {
-    if (_enCoursTraitement) return;
-    setState(() => _enCoursTraitement = true);
-    _timer?.cancel();
-
-    try {
-      await ref
-          .read(transporteurActionsProvider)
-          .refuserPropositionCourse(widget.course.id);
-      if (mounted) {
-        Navigator.pop(context); // Fermer le popup
-        if (!expiration) {
-          ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-            content: Text("Course refusée.",
-                style: GoogleFonts.inter(color: Theme.of(context).colorScheme.onSurface)),
-            backgroundColor: Colors.grey.shade800,
-          ));
-        }
-      }
-    } catch (e) {
-      if (mounted) {
-        setState(() => _enCoursTraitement = false);
-        Navigator.pop(context); // Force close
-      }
+    HapticFeedback.heavyImpact();
+    if (mounted) {
+      Navigator.pop(context); // Fermer le popup
+      // Rediriger le transporteur vers SA page de suivi spécifique
+      context.push('/suivi/${widget.course.id}');
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    // Écouter le flux de la proposition. Si elle disparaît (annulée, expirée ou transférée), on ferme le popup.
-    ref.listen<AsyncValue<Course?>>(fluxCourseProposeeProvider,
-        (previous, next) {
-      if (next.hasValue && next.value == null) {
-        if (mounted && !_enCoursTraitement) {
-          Navigator.of(context).pop();
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text("Temps écoulé ou course non disponible."),
-              backgroundColor: Colors.grey,
-            ),
-          );
-        }
-      }
-    });
-
-    // Calcul de la progression du cercle
-    final double progression = _secondesRestantes / 30.0;
-
     return PopScope(
       canPop: false, // Empêche de fermer avec le bouton retour sans refuser
       child: Dialog(
@@ -173,43 +63,13 @@ class _PopupPropositionCourseState
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // Indicateur de temps (Cercle avec compte à rebours)
-              SizedBox(
-                height: 100,
-                width: 100,
-                child: Stack(
-                  fit: StackFit.expand,
-                  children: [
-                    CircularProgressIndicator(
-                      value: progression,
-                      strokeWidth: 8,
-                      backgroundColor: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1),
-                      valueColor: AlwaysStoppedAnimation<Color>(
-                          _secondesRestantes > 10
-                              ? CouleursApp.primaire
-                              : CouleursApp.erreur),
-                    ),
-                    Center(
-                      child: Text(
-                        "$_secondesRestantes",
-                        style: GoogleFonts.inter(
-                          color: _secondesRestantes > 10
-                              ? Theme.of(context).colorScheme.onSurface
-                              : CouleursApp.erreur,
-                          fontSize: 32,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-              ).animate().scale(
-                  delay: 200.ms, duration: 400.ms, curve: Curves.elasticOut),
-
+              const SizedBox(height: 10),
+              const Icon(Icons.route_rounded, color: CouleursApp.primaire, size: 48)
+                  .animate(onPlay: (c) => c.repeat(reverse: true))
+                  .scale(begin: const Offset(1, 1), end: const Offset(1.2, 1.2), duration: 800.ms),
               const SizedBox(height: 24),
-
               Text(
-                "NOUVELLE COURSE !",
+                "NOUVELLE COURSE ATTRIBUÉE",
                 style: GoogleFonts.inter(
                   color: CouleursApp.primaire,
                   fontWeight: FontWeight.w900,
@@ -323,48 +183,33 @@ class _PopupPropositionCourseState
 
               const SizedBox(height: 32),
 
-              // Boutons d'action
-              if (_enCoursTraitement)
-                const Center(child: LoaderPremium())
-              else
-                Row(
-                  children: [
-                    Expanded(
-                      child: OutlinedButton(
-                        onPressed: () => _refuserCourse(),
-                        style: OutlinedButton.styleFrom(
-                          foregroundColor: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
-                          side: BorderSide(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.24)),
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12)),
-                        ),
-                        child: Text("Refuser",
-                            style:
-                                GoogleFonts.inter(fontWeight: FontWeight.bold)),
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: ElevatedButton(
-                        onPressed: () => _accepterCourse(),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: CouleursApp.primaire,
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12)),
-                          elevation: 10,
-                          shadowColor:
-                              CouleursApp.primaire.withValues(alpha: 0.5),
-                        ),
-                        child: Text("ACCEPTER",
-                            style: GoogleFonts.inter(
-                                fontWeight: FontWeight.bold, fontSize: 16)),
-                      ),
-                    ),
-                  ],
+              // Bouton d'action unique (Subit l'attribution)
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () => _accepterCourse(),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: CouleursApp.primaire,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12)),
+                    elevation: 10,
+                    shadowColor:
+                        CouleursApp.primaire.withValues(alpha: 0.5),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Icon(Icons.navigation_rounded),
+                      const SizedBox(width: 8),
+                      Text("PRENDRE LA ROUTE",
+                          style: GoogleFonts.inter(
+                              fontWeight: FontWeight.bold, fontSize: 16)),
+                    ],
+                  ),
                 ),
+              ),
             ],
           ),
         ),

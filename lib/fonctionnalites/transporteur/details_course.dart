@@ -350,11 +350,11 @@ class DetailsCourse extends StatelessWidget {
                 children: [
                   if (course.fragile)
                     const _Pastille("Fragile, à manipuler avec soin",
-                        Colors.orange),
+                        CouleursApp.avertissement),
                   if (course.aideChargement)
-                    const _Pastille("Aide au chargement", Colors.lightBlue),
+                    const _Pastille("Aide au chargement", CouleursApp.primaire),
                   if (course.aideDechargement)
-                    const _Pastille("Aide au déchargement", Colors.lightBlue),
+                    const _Pastille("Aide au déchargement", CouleursApp.primaire),
                 ],
               ),
             ),

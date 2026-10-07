@@ -106,7 +106,7 @@ class Portefeuille extends ConsumerWidget {
             const SizedBox(height: 15),
             fluxRevenus.when(
                 loading: () => const Center(child: LoaderPremium()),
-                error: (err, _) => Text("Erreur: $err"),
+                error: (err, _) => Text("Oups, impossible de charger vos transactions. ($err)"),
                 data: (paiements) {
                   if (paiements.isEmpty) {
                     return Padding(
@@ -126,7 +126,7 @@ class Portefeuille extends ConsumerWidget {
                         paiement.courseId == 'RETRAIT' ? "Retrait de fonds" : "Paiement course",
                         paiement.courseId == 'RETRAIT' ? paiement.reference : "Via ${paiement.methodePaiement}",
                         paiement.montantNet > 0 ? "+${paiement.montantNet.toStringAsFixed(0)} FCFA" : "${paiement.montantNet.toStringAsFixed(0)} FCFA",
-                        paiement.montantNet > 0 ? Colors.green : Colors.redAccent,
+                        paiement.montantNet > 0 ? CouleursApp.succes : CouleursApp.erreur,
                         paiement.montantNet > 0 ? Icons.arrow_downward : Icons.arrow_upward,
                       );
                     },
@@ -221,18 +221,18 @@ class Portefeuille extends ConsumerWidget {
                           final mdp = mdpController.text;
                           
                           if (montantText.isEmpty || compte.isEmpty || mdp.isEmpty) {
-                            ScaffoldMessenger.of(ctx).showSnackBar(const SnackBar(content: Text("Veuillez remplir tous les champs")));
+                            ScaffoldMessenger.of(ctx).showSnackBar(const SnackBar(content: Text("N'oubliez pas de remplir tous les champs pour continuer.")));
                             return;
                           }
                           
                           final double? montant = double.tryParse(montantText);
                           if (montant == null || montant <= 0) {
-                            ScaffoldMessenger.of(ctx).showSnackBar(const SnackBar(content: Text("Montant invalide")));
+                            ScaffoldMessenger.of(ctx).showSnackBar(const SnackBar(content: Text("Ce montant ne semble pas correct.")));
                             return;
                           }
                           
                           if (montant > soldeDisponible) {
-                            ScaffoldMessenger.of(ctx).showSnackBar(const SnackBar(content: Text("Solde insuffisant")));
+                            ScaffoldMessenger.of(ctx).showSnackBar(const SnackBar(content: Text("Vous ne pouvez pas retirer plus que votre solde disponible.")));
                             return;
                           }
                           
@@ -243,7 +243,7 @@ class Portefeuille extends ConsumerWidget {
                             final currentUser = authService.utilisateur;
                             
                             if (currentUser == null || currentUser.email == null) {
-                               throw Exception("Utilisateur non connecté ou e-mail introuvable.");
+                               throw Exception("Nous avons perdu votre connexion. Veuillez vous reconnecter.");
                             }
                             
                             // Reauthentifier (lance une erreur si mdp incorrect)
@@ -298,16 +298,16 @@ class Portefeuille extends ConsumerWidget {
                                   return AlertDialog(
                                     title: const Row(
                                       children: [
-                                        Icon(Icons.error_outline, color: Colors.red),
+                                        Icon(Icons.error_outline, color: CouleursApp.erreur),
                                         SizedBox(width: 8),
-                                        Text("Échec du retrait", style: TextStyle(color: Colors.red, fontSize: 18)),
+                                        Text("Oups, le retrait a échoué", style: TextStyle(color: CouleursApp.erreur, fontSize: 18)),
                                       ],
                                     ),
                                     content: Text(messageErreur, style: const TextStyle(color: Colors.white)),
                                     actions: [
                                       TextButton(
                                         onPressed: () => Navigator.pop(dialogCtx),
-                                        child: Text("COMPRIS", style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.bold)),
+                                        child: Text("C'est noté", style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.bold)),
                                       ),
                                     ],
                                     backgroundColor: const Color(0xFF1A2235),

@@ -44,6 +44,41 @@ exports.onCourseCreated = functions.firestore
       return null;
     } catch (error) {
       console.error("Erreur lors de l'envoi de la notification :", error);
+// ============================================================================
+// Credit automatique du portefeuille du transporteur a la creation d'un paiement digital
+// ============================================================================
+exports.crediterPortefeuille = functions.firestore
+  .document("paiements/{paiementId}")
+  .onCreate(async (snap, context) => {
+    const paiementData = snap.data();
+
+    // On ne traite que les paiements réussis et non en espèces
+    if (paiementData.statut !== "succes") return null;
+    if (paiementData.methodePaiement === "Espèces") return null;
+    if (!paiementData.transporteurId) return null;
+    if ((paiementData.courseId || "").startsWith('SUB-')) return null;
+
+    const transporteurId = paiementData.transporteurId;
+    const montant = paiementData.montant || 0;
+    const montantNet = montant * 0.98; // 2% de frais plateforme
+
+    try {
+      const transporteurRef = admin.firestore().collection("transporteurs").doc(transporteurId);
+
+      await admin.firestore().runTransaction(async (transaction) => {
+        const doc = await transaction.get(transporteurRef);
+        if (!doc.exists) {
+          throw new Error("Transporteur introuvable !");
+        }
+        const soldeActuel = doc.data().soldePortefeuille || 0;
+        transaction.update(transporteurRef, {
+          soldePortefeuille: soldeActuel + montantNet
+        });
+      });
+      console.log(`Portefeuille de ${transporteurId} crédité de ${montantNet} FCFA (Course: ${paiementData.courseId}).`);
+      return null;
+    } catch (error) {
+      console.error(`Erreur lors du crédit du portefeuille pour ${transporteurId} :`, error);
       return null;
     }
   });
@@ -117,6 +152,41 @@ exports.onCourseUpdated = functions.firestore
       return null;
     } catch (error) {
       console.error("Erreur lors de l'envoi de la notification client :", error);
+// ============================================================================
+// Credit automatique du portefeuille du transporteur a la creation d'un paiement digital
+// ============================================================================
+exports.crediterPortefeuille = functions.firestore
+  .document("paiements/{paiementId}")
+  .onCreate(async (snap, context) => {
+    const paiementData = snap.data();
+
+    // On ne traite que les paiements réussis et non en espèces
+    if (paiementData.statut !== "succes") return null;
+    if (paiementData.methodePaiement === "Espèces") return null;
+    if (!paiementData.transporteurId) return null;
+    if ((paiementData.courseId || "").startsWith('SUB-')) return null;
+
+    const transporteurId = paiementData.transporteurId;
+    const montant = paiementData.montant || 0;
+    const montantNet = montant * 0.98; // 2% de frais plateforme
+
+    try {
+      const transporteurRef = admin.firestore().collection("transporteurs").doc(transporteurId);
+
+      await admin.firestore().runTransaction(async (transaction) => {
+        const doc = await transaction.get(transporteurRef);
+        if (!doc.exists) {
+          throw new Error("Transporteur introuvable !");
+        }
+        const soldeActuel = doc.data().soldePortefeuille || 0;
+        transaction.update(transporteurRef, {
+          soldePortefeuille: soldeActuel + montantNet
+        });
+      });
+      console.log(`Portefeuille de ${transporteurId} crédité de ${montantNet} FCFA (Course: ${paiementData.courseId}).`);
+      return null;
+    } catch (error) {
+      console.error(`Erreur lors du crédit du portefeuille pour ${transporteurId} :`, error);
       return null;
     }
   });
@@ -292,6 +362,41 @@ exports.envoyerNotificationGlobale = functions.firestore
     } catch (error) {
       console.error("Erreur envoi notification :", error);
       await snap.ref.update({ status: "erreur", erreur: error.message });
+// ============================================================================
+// Credit automatique du portefeuille du transporteur a la creation d'un paiement digital
+// ============================================================================
+exports.crediterPortefeuille = functions.firestore
+  .document("paiements/{paiementId}")
+  .onCreate(async (snap, context) => {
+    const paiementData = snap.data();
+
+    // On ne traite que les paiements réussis et non en espèces
+    if (paiementData.statut !== "succes") return null;
+    if (paiementData.methodePaiement === "Espèces") return null;
+    if (!paiementData.transporteurId) return null;
+    if ((paiementData.courseId || "").startsWith('SUB-')) return null;
+
+    const transporteurId = paiementData.transporteurId;
+    const montant = paiementData.montant || 0;
+    const montantNet = montant * 0.98; // 2% de frais plateforme
+
+    try {
+      const transporteurRef = admin.firestore().collection("transporteurs").doc(transporteurId);
+
+      await admin.firestore().runTransaction(async (transaction) => {
+        const doc = await transaction.get(transporteurRef);
+        if (!doc.exists) {
+          throw new Error("Transporteur introuvable !");
+        }
+        const soldeActuel = doc.data().soldePortefeuille || 0;
+        transaction.update(transporteurRef, {
+          soldePortefeuille: soldeActuel + montantNet
+        });
+      });
+      console.log(`Portefeuille de ${transporteurId} crédité de ${montantNet} FCFA (Course: ${paiementData.courseId}).`);
+      return null;
+    } catch (error) {
+      console.error(`Erreur lors du crédit du portefeuille pour ${transporteurId} :`, error);
       return null;
     }
   });

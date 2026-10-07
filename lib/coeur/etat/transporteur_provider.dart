@@ -1,3 +1,4 @@
+import 'package:latlong2/latlong.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:update_camtrans/services/service_firestore.dart';
@@ -93,6 +94,20 @@ final fluxCoursesDisponiblesProvider =
           if (c.typeVehicule.isNotEmpty &&
               transporteur.typeVehicule.isNotEmpty) {
             if (c.typeVehicule != transporteur.typeVehicule) return false;
+          }
+
+          // Filtrage géographique (Max 50 km de rayon)
+          if (transporteur.latitude != 0 && transporteur.longitude != 0 && c.latitudeDepart != 0) {
+            final distanceReelle = const Distance().as(
+                LengthUnit.Kilometer,
+                LatLng(transporteur.latitude, transporteur.longitude),
+                LatLng(c.latitudeDepart, c.longitudeDepart));
+            if (distanceReelle > 50) return false;
+          }
+
+          // Timeout : Si la course est en attente depuis plus de 5 minutes, elle est expirée
+          if (DateTime.now().difference(c.dateCreation).inMinutes >= 5) {
+            return false;
           }
 
           return true;

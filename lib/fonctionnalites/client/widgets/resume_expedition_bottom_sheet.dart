@@ -230,7 +230,7 @@ class _ResumeExpeditionBottomSheetState
                     ))
                   else if (etatEstimation.erreur != null)
                     Text(
-                        "Oups ! Un petit imprévu : ${etatEstimation.erreur} 🔧",
+                        "Oups, un petit imprévu : ${etatEstimation.erreur}",
                         style: const TextStyle(color: Colors.red))
                   else if (etatEstimation.resultat != null)
                     Column(
@@ -329,7 +329,7 @@ class _ResumeExpeditionBottomSheetState
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
                           content: Text(
-                              "Hmm, il semblerait que vous ne soyez pas connecté. 🤔")),
+                              "Il semblerait que vous ne soyez pas connecté. Veuillez vous connecter.")),
                     );
                     return;
                   }
@@ -469,7 +469,7 @@ class _ResumeExpeditionBottomSheetState
                     // n'est créée. Le client est informé et renvoyé à l'accueil.
                     if (candidatsFinaux.isEmpty) {
                       debugPrint(
-                          "🚫 Aucun transporteur disponible ($typeVehiculeRequis) : commande non créée.");
+                          "🚫 Aucun transporteur disponible ($typeVehiculeRequis) : course non créée.");
                       if (context.mounted) {
                         final messenger = ScaffoldMessenger.of(context);
                         final routeur = GoRouter.of(context);
@@ -501,15 +501,10 @@ class _ResumeExpeditionBottomSheetState
                       }
                       return;
                     }
+                    // 5. Statut initial : 'recherche' (Déclenche l'Auto-Dispatch côté Client)
+                    const String statutInitial = StatutCourse.recherche;
 
-                    // 5. Statut initial : proposition au premier candidat (30 s)
-                    const String statutInitial = StatutCourse.propose;
-                    final String premierTransporteurId = candidatsFinaux.first;
-                    final DateTime expiration =
-                        DateTime.now().add(const Duration(seconds: 30));
-                    // (Le nom/tel du transporteur reste vide jusqu'à ce qu'il accepte vraiment)
-
-                    // Générer un code PIN à 4 chiffres
+                    // Générer un code PIN à 4 chiffres (pour le suivi interne si besoin)
                     final String pin =
                         (1000 + (DateTime.now().millisecondsSinceEpoch % 9000))
                             .toString();
@@ -521,8 +516,7 @@ class _ResumeExpeditionBottomSheetState
                     final course = Course(
                       id: courseId,
                       clientId: user.uid,
-                      transporteurId:
-                          premierTransporteurId, // Attribué provisoirement
+                      transporteurId: '',
                       nomClient: user.displayName ?? "Client Anonyme",
                       nomTransporteur: '',
                       telephoneClient: '',
@@ -568,9 +562,8 @@ class _ResumeExpeditionBottomSheetState
                       detailsSpecifiques: etat.detailsSpecifiques,
                       distanceApprocheKm: etat.distanceApprocheKm,
                       tempsApprocheMin: etat.tempsApprocheMin,
-                      candidats: candidatsFinaux,
+                      candidats: const [],
                       indexCandidatActuel: 0,
-                      expirationProposition: expiration,
                       codePinCourse: pin,
                       fondsDebloques: false,
                     );
@@ -580,9 +573,6 @@ class _ResumeExpeditionBottomSheetState
                           id: course.id,
                           donnees: course.toMap(),
                         );
-
-                    // La notification au premier chauffeur est envoyée côté serveur
-                    // par la Cloud Function `onCourseCreated` (pas de doublon ici).
 
                     if (context.mounted) {
                       Navigator.pop(context); // Fermer le radar
@@ -600,7 +590,7 @@ class _ResumeExpeditionBottomSheetState
                               const SizedBox(width: 12),
                               Expanded(
                                   child: Text(
-                                      "Commande créée ! Code: $codeSuivi")),
+                                      "Course validée ! Code: $codeSuivi")),
                             ],
                           ),
                           backgroundColor: CouleursApp.succes,
@@ -617,7 +607,7 @@ class _ResumeExpeditionBottomSheetState
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                           content: Text(
-                              "Hmm, quelque chose s'est mal passé : ${e.toString()} 🔧"),
+                              "Nous avons rencontré un souci : ${e.toString()}"),
                           backgroundColor: CouleursApp.erreur,
                         ),
                       );
@@ -633,7 +623,7 @@ class _ResumeExpeditionBottomSheetState
                   elevation: 0,
                 ),
                 child: const Text(
-                  "Confirmer la commande",
+                  "Confirmer la course",
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
               ),

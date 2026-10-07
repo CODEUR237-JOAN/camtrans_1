@@ -52,8 +52,8 @@ class _EcranEvaluationState extends ConsumerState<EcranEvaluation> {
 
               const SizedBox(height: 24),
               Text(
-                "Course terminée !",
-                style: GoogleFonts.poppins(
+                "Mission accomplie",
+                style: GoogleFonts.inter(
                     color: Theme.of(context).colorScheme.onSurface,
                     fontSize: 28,
                     fontWeight: FontWeight.bold),
@@ -61,9 +61,9 @@ class _EcranEvaluationState extends ConsumerState<EcranEvaluation> {
 
               const SizedBox(height: 8),
               Text(
-                "Comment s'est passée votre course ?",
+                "Votre avis nous aide à maintenir notre niveau d'excellence. Comment évaluez-vous le service de votre transporteur ?",
                 textAlign: TextAlign.center,
-                style: GoogleFonts.poppins(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 16),
+                style: GoogleFonts.inter(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 16),
               ),
 
               const SizedBox(height: 40),
@@ -102,10 +102,10 @@ class _EcranEvaluationState extends ConsumerState<EcranEvaluation> {
                 TextField(
                   controller: _commentaireController,
                   maxLines: 3,
-                  style: GoogleFonts.poppins(color: Theme.of(context).colorScheme.onSurface),
+                  style: GoogleFonts.inter(color: Theme.of(context).colorScheme.onSurface),
                   decoration: InputDecoration(
                     hintText: "Laissez un commentaire (optionnel)",
-                    hintStyle: GoogleFonts.poppins(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38)),
+                    hintStyle: GoogleFonts.inter(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38)),
                     filled: true,
                     fillColor: const Color(0xFF1A2640).withValues(alpha: 0.05),
                     border: OutlineInputBorder(
@@ -197,7 +197,7 @@ class _EcranEvaluationState extends ConsumerState<EcranEvaluation> {
                   child: _chargement
                       ? const LoaderPremium(size: 24)
                       : Text("Envoyer mon avis",
-                          style: GoogleFonts.poppins(
+                          style: GoogleFonts.inter(
                               fontSize: 16, fontWeight: FontWeight.bold)),
                 ),
               ),

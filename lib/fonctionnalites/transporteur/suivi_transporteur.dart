@@ -38,7 +38,7 @@ class _SuiviTransporteurState extends ConsumerState<SuiviTransporteur> {
             const SnackBar(
               content:
                   Text("Le GPS est nécessaire pour le suivi en temps réel."),
-              backgroundColor: Colors.orange,
+              backgroundColor: CouleursApp.avertissement,
             ),
           );
         }
@@ -286,7 +286,7 @@ class _SuiviTransporteurState extends ConsumerState<SuiviTransporteur> {
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
                             content:
-                                Text("Appel de ${course.telephoneClient}...")),
+                                Text("Nous appelons le client au ${course.telephoneClient}...")),
                       );
                     },
                     icon: const Icon(Iconsax.call_copy,
@@ -305,10 +305,10 @@ class _SuiviTransporteurState extends ConsumerState<SuiviTransporteur> {
 
             // Adresses
             _buildInfoLigne(Icons.location_on, "Départ", course.adresseDepart,
-                Colors.redAccent),
+                CouleursApp.erreur),
             const SizedBox(height: 10),
             _buildInfoLigne(Icons.flag_rounded, "Destination",
-                course.adresseArrivee, Colors.greenAccent),
+                course.adresseArrivee, CouleursApp.succes),
 
             const SizedBox(height: 16),
 
@@ -336,7 +336,7 @@ class _SuiviTransporteurState extends ConsumerState<SuiviTransporteur> {
                   if (course.optionGamme.isNotEmpty) ...[
                     const SizedBox(height: 8),
                     _buildInfoLigne(Icons.star_rounded, "Gamme",
-                        course.optionGamme, Colors.amberAccent),
+                        course.optionGamme, CouleursApp.avertissement),
                   ],
                   if (course.typeVehicule.isNotEmpty) ...[
                     const SizedBox(height: 8),
@@ -344,12 +344,12 @@ class _SuiviTransporteurState extends ConsumerState<SuiviTransporteur> {
                         Icons.local_shipping_rounded,
                         "Véhicule requis",
                         course.typeVehicule,
-                        Colors.blueAccent),
+                        CouleursApp.primaire),
                   ],
                   if (course.typeMarchandise.isNotEmpty) ...[
                     const SizedBox(height: 8),
                     _buildInfoLigne(Icons.inventory_2_rounded, "Marchandise",
-                        course.typeMarchandise, Colors.orangeAccent),
+                        course.typeMarchandise, CouleursApp.avertissement),
                   ],
                   if (course.description.isNotEmpty) ...[
                     const SizedBox(height: 8),
@@ -508,70 +508,35 @@ class _SuiviTransporteurState extends ConsumerState<SuiviTransporteur> {
       case StatutCourse.arriveDestination:
         return "Arrivé destination";
       case StatutCourse.terminee:
-        return "Terminée ✅";
+        return "Terminée";
       case StatutCourse.annulee:
-        return "Annulée ❌";
+        return "Annulée";
       default:
         return statut;
     }
   }
 
-  void _terminerCourse(BuildContext context, dynamic course) {
-    showDialog(
-      context: context,
-      builder: (ctx) => AlertDialog(
-        backgroundColor: const Color(0xFF0F172A),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: Text("Confirmer la fin de course",
-            style: GoogleFonts.poppins(
-                color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.bold)),
-        content: Text(
-          "Confirmez-vous que la course est terminée et la marchandise remise au client ?",
-          style: GoogleFonts.inter(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(ctx),
-            child: Text("Non, annuler",
-                style: GoogleFonts.inter(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54))),
-          ),
-          ElevatedButton(
-            onPressed: () async {
-              Navigator.pop(ctx);
-              HapticFeedback.heavyImpact();
-              await ref.read(serviceFirestoreProvider).modifierDocument(
-                collection: 'courses',
-                id: course.id,
-                donnees: {
-                  'statut': StatutCourse.terminee,
-                  'fondsDebloques': true,
-                },
-              );
-              if (context.mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text(
-                        "Course terminée ! En attente du paiement client.",
-                        style: GoogleFonts.inter(color: Theme.of(context).colorScheme.onSurface)),
-                    backgroundColor: CouleursApp.succes,
-                    behavior: SnackBarBehavior.floating,
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12)),
-                  ),
-                );
-              }
-            },
-            style: ElevatedButton.styleFrom(
-              backgroundColor: CouleursApp.succes,
-              foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12)),
-            ),
-            child: Text("Oui, terminer",
-                style: GoogleFonts.poppins(fontWeight: FontWeight.bold)),
-          ),
-        ],
-      ),
+  void _terminerCourse(BuildContext context, dynamic course) async {
+    HapticFeedback.heavyImpact();
+    await ref.read(serviceFirestoreProvider).modifierDocument(
+      collection: 'courses',
+      id: course.id,
+      donnees: {
+        'statut': StatutCourse.terminee,
+      },
     );
+    if (context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+              "Course terminée ! Le client a été notifié.",
+              style: GoogleFonts.inter(color: Colors.white)),
+          backgroundColor: CouleursApp.succes,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12)),
+        ),
+      );
+    }
   }
 }

@@ -60,7 +60,7 @@ class _EcranAssistantIAState extends ConsumerState<EcranAssistantIA> {
     } catch (e) {
       if (mounted) {
         setState(() {
-          _messages[iaIndex]["text"] = "Désolé, une erreur est survenue : $e";
+          _messages[iaIndex]["text"] = "Mince, j'ai rencontré un léger souci technique : $e. Pourriez-vous réessayer ?";
         });
       }
     }
@@ -249,7 +249,7 @@ class _EcranAssistantIAState extends ConsumerState<EcranAssistantIA> {
                     style:
                         GoogleFonts.poppins(color: Theme.of(context).colorScheme.onSurface, fontSize: 14),
                     decoration: InputDecoration(
-                      hintText: "Décrivez vos objets...",
+                      hintText: "Que souhaitez-vous transporter ?",
                       hintStyle: GoogleFonts.poppins(
                           color: const Color(0xFF64748B), fontSize: 14),
                       border: InputBorder.none,

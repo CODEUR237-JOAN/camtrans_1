@@ -76,7 +76,7 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
                     SizedBox(width: 10),
                     Expanded(
                         child: Text(
-                            "Un transporteur a accepté votre course ! 🎉")),
+                            "Excellente nouvelle, un transporteur a pris en charge votre course.")),
                   ],
                 ),
                 backgroundColor: CouleursApp.succes,
@@ -161,12 +161,18 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
                                   const Icon(Iconsax.location_copy,
                                       size: 80, color: CouleursApp.primaire),
                                   const SizedBox(height: 20),
-                                  Text("Aucune course en cours à suivre",
+                                  Text("Vous n'avez aucune course en cours",
                                       style: TextStyle(
                                           fontWeight: FontWeight.bold,
                                           fontSize: 16,
                                           color: Theme.of(context).colorScheme.onSurface)),
                                   const SizedBox(height: 10),
+                                  Text("Vos futures mises en relation apparaîtront ici.",
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                          fontSize: 14,
+                                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6))),
+                                  const SizedBox(height: 20),
                                   ElevatedButton(
                                     onPressed: () =>
                                         setState(() => _bottomNavIndex = 0),
@@ -316,7 +322,7 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        "${_salutation()} 👋",
+                        _salutation(),
                         style: TextStyle(
                             fontSize: 13,
                             fontWeight: FontWeight.w500,
@@ -443,7 +449,7 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
                     ),
                     const SizedBox(width: 10),
                     const Text(
-                      'Nouvelle expédition',
+                      'Nouvelle mise en relation',
                       style: TextStyle(
                           color: Colors.white70,
                           fontSize: 13,
@@ -525,7 +531,7 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
       {"titre": "Remorque", "desc": "Objets lourds", "icon": Iconsax.car_copy},
       {
         "titre": "Marchandises",
-        "desc": "Colis & palettes",
+        "desc": "Fret & palettes",
         "icon": Iconsax.box_copy
       },
       {"titre": "Autre", "desc": "Sur mesure", "icon": Iconsax.category_copy},
@@ -619,7 +625,7 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
               children: [
                 Expanded(
                   child: Text(
-                    "Course Active",
+                    "Votre course en cours",
                     style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -724,7 +730,7 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
       builder: (ctx) => AlertDialog(
         title: const Text("Annuler la course"),
         content:
-            const Text("Êtes-vous sûr de vouloir annuler cette course ?"),
+            const Text("Souhaitez-vous vraiment annuler cette course ?"),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
@@ -1068,7 +1074,7 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
                   color: Theme.of(context).colorScheme.onSurface)),
           const SizedBox(height: 12),
           Text(
-              "Passez votre première commande en sélectionnant un service ci-dessus.",
+              "Vos prochaines mises en relation apparaîtront ici. Sélectionnez un service pour commencer.",
               textAlign: TextAlign.center,
               style: TextStyle(
                   color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5), fontSize: 14, height: 1.5)),
@@ -1110,7 +1116,7 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
                 children: [
                   _buildNavItem(
                       0, Iconsax.home_2_copy, Iconsax.home_2, "Accueil"),
-                  _buildNavItem(1, Iconsax.truck_copy, Iconsax.truck, "Commandes"),
+                  _buildNavItem(1, Iconsax.truck_copy, Iconsax.truck, "Courses"),
                   // Bouton IA central — mode compact, intégré dans la navbar
                   const Padding(
                     padding: EdgeInsets.symmetric(horizontal: 4),

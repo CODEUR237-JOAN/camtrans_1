@@ -17,6 +17,7 @@ import 'package:update_camtrans/coeur/routes/routes.dart';
 import 'package:update_camtrans/coeur/etat/gps_provider.dart';
 import 'package:update_camtrans/services/service_authentification.dart';
 import 'package:update_camtrans/modeles/course.dart';
+import 'package:update_camtrans/coeur/constantes/statuts.dart';
 
 import 'package:update_camtrans/fonctionnalites/transporteur/marche_demandes.dart';
 import 'package:update_camtrans/fonctionnalites/transporteur/navigation.dart';
@@ -101,27 +102,22 @@ class _TableauDeBordTransporteurState
     final transporteur = transporteurAsync.valueOrNull;
     final documentsValides = transporteur?.documentsValides ?? false;
 
-    // ✅ PHASE 4: DISPATCH AUTOMATIQUE - Écoute des propositions de courses
-    ref.listen<AsyncValue<Course?>>(fluxCourseProposeeProvider,
-        (previous, next) {
-      if (next.hasValue && next.value != null) {
-        final courseProposee = next.value!;
-        // Éviter d'afficher plusieurs fois la même proposition
-        if (previous?.value?.id != courseProposee.id) {
-          // Déclencher une alerte sonore/système
-          ServiceNotification.afficherNotification(
-            titre: 'Nouvelle course !',
-            message:
-                'Une nouvelle demande vous a été affectée. Acceptez vite !',
-            type: 'succes',
-          );
+    // ✅ PILIER 4: DISPATCH AUTOMATIQUE - Écoute de l'attribution (Subit l'attribution)
+    ref.listen<Course?>(activeCourseProvider, (previous, next) {
+      if (next != null && previous?.id != next.id && next.statut == StatutCourse.attribue) {
+        // Déclencher une alerte sonore/système
+        ServiceNotification.afficherNotification(
+          titre: 'Nouvelle course attribuée !',
+          message:
+              'Le système vous a sélectionné pour une nouvelle mission. Prenez la route !',
+          type: 'succes',
+        );
 
-          showDialog(
-            context: context,
-            barrierDismissible: false,
-            builder: (ctx) => PopupPropositionCourse(course: courseProposee),
-          );
-        }
+        showDialog(
+          context: context,
+          barrierDismissible: false,
+          builder: (ctx) => PopupPropositionCourse(course: next),
+        );
       }
     });
 
@@ -236,12 +232,12 @@ class _TableauDeBordTransporteurState
                     ]),
                     child: CircleAvatar(
                       radius: 28,
-                      backgroundColor: Colors.orange.withValues(alpha: 0.1),
+                      backgroundColor: CouleursApp.secondaire.withValues(alpha: 0.5),
                       backgroundImage:
                           photoUrl.isNotEmpty ? NetworkImage(photoUrl) : null,
                       child: photoUrl.isEmpty
                           ? const Icon(Iconsax.truck_fast_copy,
-                              color: Colors.orange, size: 28)
+                              color: CouleursApp.accent, size: 28)
                           : null,
                     ),
                   ),
@@ -278,7 +274,7 @@ class _TableauDeBordTransporteurState
                       Switch(
                         value: estDisponible,
                         activeThumbColor: Colors.white,
-                        activeTrackColor: Colors.green,
+                        activeTrackColor: CouleursApp.succes,
                         inactiveThumbColor: Colors.white,
                         inactiveTrackColor: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.2),
                         onChanged: _chargementDisponibilite
@@ -305,12 +301,12 @@ class _TableauDeBordTransporteurState
                               },
                       ),
                       Text(
-                        estDisponible ? 'En ligne' : 'Hors ligne',
+                        estDisponible ? 'Disponible' : 'Indisponible',
                         style: GoogleFonts.inter(
                           fontSize: 11,
                           fontWeight: FontWeight.w700,
                           color: estDisponible
-                              ? Colors.green
+                              ? CouleursApp.succes
                               : Theme.of(context)
                                   .colorScheme
                                   .onSurface
@@ -381,8 +377,8 @@ class _TableauDeBordTransporteurState
                           const SizedBox(width: 8),
                           Text(
                             estDisponible
-                                ? "En ligne et disponible"
-                                : "Hors ligne",
+                                ? "Disponible pour une course"
+                                : "Actuellement indisponible",
                             style: GoogleFonts.inter(
                                 color: Theme.of(context).colorScheme.onSurface,
                                 fontWeight: FontWeight.w600,
@@ -603,7 +599,7 @@ class _TableauDeBordTransporteurState
                               course.typeMarchandise,
                               "${course.prixEstime.toStringAsFixed(0)} FCFA",
                               Icons.local_shipping,
-                              Colors.blue);
+                              CouleursApp.primaire);
                         }),
                       ],
                     );

@@ -274,12 +274,12 @@ class Facture extends ConsumerWidget {
 
     Color getColor() {
       if (paiement.methodePaiement.toLowerCase().contains("orange")) {
-        return Colors.orange;
+        return CouleursApp.avertissement;
       }
       if (paiement.methodePaiement.toLowerCase().contains("mtn")) {
-        return Colors.amber;
+        return CouleursApp.avertissement;
       }
-      return Colors.blue;
+      return CouleursApp.primaire;
     }
 
     return GestureDetector(

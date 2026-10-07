@@ -62,9 +62,12 @@ Future<void> main() async {
     ServiceNotification.ecouterOuverture();
 
     // Chargement des variables d'environnement (ex: clés d'API).
-    await dotenv.load(fileName: ".env");
-    debugPrint(
-        "[SUCCÈS] Variables de configuration (.env) chargées avec succès.");
+    try {
+      await dotenv.load(fileName: ".env");
+      debugPrint("[SUCCÈS] Variables de configuration (.env) chargées avec succès.");
+    } catch (e) {
+      debugPrint("[AVERTISSEMENT] Fichier .env non trouvé. Les fonctionnalités IA et Campay seront indisponibles.");
+    }
 
     // Chargement du thème persisté AVANT le premier build
     // pour éviter tout flash blanc au démarrage.

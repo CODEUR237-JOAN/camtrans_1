@@ -26,34 +26,14 @@ class BoutonCombi extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final double size = compact ? 44 : 58;
-    final double iconSize = compact ? 20 : 28;
-
-    return GestureDetector(
-      onTap: () => _ouvrir(context),
-      child: Container(
-        width: size,
-        height: size,
-        decoration: BoxDecoration(
-          gradient: CouleursApp.degradePrincipal,
-          shape: BoxShape.circle,
-          boxShadow: [
-            BoxShadow(
-              color: CouleursApp.primaire.withValues(alpha: 0.45),
-              blurRadius: compact ? 12 : 18,
-              spreadRadius: compact ? 1 : 3,
-            ),
-          ],
-        ),
-        child: Icon(Iconsax.microphone_2_copy,
-            color: Colors.white, size: iconSize),
+    return IconButton(
+      onPressed: () => _ouvrir(context),
+      icon: const Icon(
+        Icons.speaker_notes_rounded,
+        color: CouleursApp.primaire,
+        size: 28,
       ),
-    )
-        .animate(onPlay: (c) => c.repeat(reverse: true))
-        .scale(
-            begin: const Offset(1, 1),
-            end: const Offset(1.06, 1.06),
-            duration: 1500.ms);
+    );
   }
 
   void _ouvrir(BuildContext context) {
@@ -109,7 +89,7 @@ class _CombiSheetState extends ConsumerState<CombiSheet> {
           "vos documents, vos revenus ou vos abonnements.";
     } else if (role == 'client') {
       accueil = "Bonjour, je suis Combi, votre assistant. "
-          "Je peux organiser une expédition, estimer un prix, "
+          "Je peux organiser une mise en relation, estimer un prix, "
           "suivre votre course ou vous aider à payer.";
     } else {
       accueil = "Bonjour, je suis Combi, l'assistant de CamTrans. "
@@ -294,7 +274,7 @@ class _CombiSheetState extends ConsumerState<CombiSheet> {
         break;
       case EtatCombi.erreur:
         txt = "Un souci est survenu, réessayez.";
-        couleur = Colors.redAccent;
+        couleur = CouleursApp.erreur;
         break;
       case EtatCombi.repos:
         txt = null;

@@ -33,7 +33,7 @@ class Profil extends ConsumerWidget {
       ),
       body: clientAsync.when(
         loading: () => const Center(child: LoaderPremium()),
-        error: (err, stack) => Center(child: Text("Erreur: $err")),
+        error: (err, stack) => Center(child: Text("Oups, impossible de charger votre profil. ($err)")),
         data: (client) {
           final user = auth.utilisateur;
           final userName = client != null

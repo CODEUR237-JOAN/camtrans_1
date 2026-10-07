@@ -7,7 +7,9 @@ import 'package:update_camtrans/coeur/routes/routes.dart';
 import 'package:update_camtrans/coeur/theme/theme_application.dart';
 import 'package:update_camtrans/coeur/etat/notification_provider.dart';
 import 'package:update_camtrans/coeur/etat/theme_provider.dart';
+import 'package:update_camtrans/coeur/etat/locale_provider.dart';
 import 'package:update_camtrans/coeur/widgets/banniere_notification.dart';
+import 'package:update_camtrans/l10n/app_localizations.dart';
 
 class MonApplication extends ConsumerWidget {
   const MonApplication({super.key});
@@ -30,14 +32,14 @@ class MonApplication extends ConsumerWidget {
           darkTheme: ThemeApplication.themeSombre,
           themeMode: ref.watch(themeProvider).modeActuel,
           themeAnimationDuration: const Duration(milliseconds: 300),
+          locale: ref.watch(localeProvider),
           localizationsDelegates: const [
+            AppLocalizations.delegate,
             GlobalMaterialLocalizations.delegate,
             GlobalWidgetsLocalizations.delegate,
             GlobalCupertinoLocalizations.delegate,
           ],
-          supportedLocales: const [
-            Locale('fr', ''),
-          ],
+          supportedLocales: AppLocalizations.supportedLocales,
           routerConfig: RoutesApplication.routeur,
         );
       },

@@ -10,6 +10,7 @@ class TimelineStatut extends StatelessWidget {
 
   // Liste ordonnée des statuts possibles (correspond aux constantes StatutCourse)
   final List<String> _etapes = const [
+    StatutCourse.enAttente,
     StatutCourse.recherche,
     StatutCourse.attribue,
     StatutCourse.enRouteDepart,
