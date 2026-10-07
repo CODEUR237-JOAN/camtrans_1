@@ -312,7 +312,7 @@ class RoutesApplication {
       GoRoute(
         path: admin,
         redirect: (context, state) async {
-          // ✅ P0-3 SÉCURITÉ : Vérification du rôle Admin avant accès
+          //  P0-3 SÉCURITÉ : Vérification du rôle Admin avant accès
           final user = FirebaseAuth.instance.currentUser;
           if (user == null) return connexion;
           try {

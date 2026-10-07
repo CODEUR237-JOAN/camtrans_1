@@ -55,7 +55,7 @@ class Facture extends ConsumerWidget {
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        // ✅ CORRECTION 1.3: foregroundColor blanc (était Colors.black87 invisible sur fond sombre)
+        //  CORRECTION 1.3: foregroundColor blanc (était Colors.black87 invisible sur fond sombre)
         title: Text(
           "Mes Transactions",
           style: GoogleFonts.inter(
@@ -78,7 +78,7 @@ class Facture extends ConsumerWidget {
               Icon(Icons.wifi_off_rounded,
                   size: 60, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38)),
               const SizedBox(height: 16),
-              Text("Problème de connexion 📡",
+              Text("Problème de connexion ",
                   style: GoogleFonts.inter(
                       color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                       fontSize: 16,
@@ -92,7 +92,7 @@ class Facture extends ConsumerWidget {
         ),
         data: (paiements) {
           if (paiements.isEmpty) {
-            // ✅ HUMANISATION 3.3: État vide enrichi et chaleureux
+            //  HUMANISATION 3.3: État vide enrichi et chaleureux
             return Center(
               child: Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 32),
@@ -117,7 +117,7 @@ class Facture extends ConsumerWidget {
                         duration: 2.seconds),
                     const SizedBox(height: 24),
                     Text(
-                      "Votre historique est vierge ✨",
+                      "Votre historique est vierge ",
                       style: GoogleFonts.inter(
                         color: Theme.of(context).colorScheme.onSurface,
                         fontSize: 20,
@@ -127,7 +127,7 @@ class Facture extends ConsumerWidget {
                     ),
                     const SizedBox(height: 12),
                     Text(
-                      "Vos transactions apparaîtront ici après votre première course. Lancez-vous ! 🚀",
+                      "Vos transactions apparaîtront ici après votre première course. Lancez-vous ! ",
                       style: GoogleFonts.inter(
                           color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 14, height: 1.5),
                       textAlign: TextAlign.center,
@@ -156,7 +156,7 @@ class Facture extends ConsumerWidget {
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        // ✅ CORRECTION 1.3: foregroundColor blanc
+        //  CORRECTION 1.3: foregroundColor blanc
         title: Text("Détail de la course",
             style: GoogleFonts.inter(
                 fontWeight: FontWeight.bold, color: Colors.white)),
@@ -258,7 +258,7 @@ class Facture extends ConsumerWidget {
 
   Widget _buildTransactionCard(
       BuildContext context, Paiement paiement, int index) {
-    // ✅ CORRECTION 1.2: Utilise StatutPaiement.succes au lieu de chaînes littérales
+    //  CORRECTION 1.2: Utilise StatutPaiement.succes au lieu de chaînes littérales
     // (le statut réel en DB est "succes", pas "Succès" ou "Confirmé")
     final bool isSucces = paiement.statut == StatutPaiement.succes;
 
@@ -343,7 +343,7 @@ class Facture extends ConsumerWidget {
                   style: GoogleFonts.inter(
                     fontWeight: FontWeight.w900,
                     fontSize: 16,
-                    // ✅ Couleur correcte : vert si succes, orange sinon (plus de Colors.black87 invisible)
+                    //  Couleur correcte : vert si succes, orange sinon (plus de Colors.black87 invisible)
                     color: isSucces
                         ? CouleursApp.succes
                         : CouleursApp.avertissement,

@@ -347,7 +347,7 @@ class ServicePaiement {
         donnees: {
           'id': notifTransporteurId,
           'utilisateurId': transporteurId,
-          'titre': '🎉 Abonnement activé !',
+          'titre': 'Abonnement activé',
           'message':
               'Votre abonnement de $dureeJours jour(s) est actif. Bonne route !',
           'type': 'succes',
@@ -377,7 +377,7 @@ class ServicePaiement {
         donnees: {
           'id': notifAdminId,
           'utilisateurId': 'ADMIN',
-          'titre': '💳 Nouveau paiement abonnement',
+          'titre': 'Nouveau paiement abonnement',
           'message':
               '$nomTransporteur a souscrit un abonnement de ${montant.toInt()} FCFA ($dureeJours jours).',
           'type': 'paiement',
@@ -407,7 +407,7 @@ class ServicePaiement {
 
   /// Traitement d'un paiement par Carte Bancaire
   ///
-  /// ⚠️  FIX SÉCURITÉ : Cette méthode était une simulation qui marquait toujours
+  /// ️  FIX SÉCURITÉ : Cette méthode était une simulation qui marquait toujours
   /// le paiement comme réussi sans aucune vraie transaction.
   /// Elle lève maintenant une exception claire pour éviter toute fausse validation.
   ///
@@ -454,7 +454,7 @@ class ServicePaiement {
     required String operateur,
     required String telephone,
   }) async {
-    // ✅ FIX: Idempotence. L'ID du paiement est basé sur l'ID de la course
+    //  FIX: Idempotence. L'ID du paiement est basé sur l'ID de la course
     // pour éviter les doublons de paiement en cas de retry réseau.
     final id = "PAY-$courseId";
     final transaction = "TXN-${DateTime.now().microsecondsSinceEpoch}";

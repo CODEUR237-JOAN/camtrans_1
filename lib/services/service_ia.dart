@@ -39,7 +39,7 @@ class ServiceIA {
   static const String _nomModele = 'gemini-3.1-flash-lite';
 
   // Nom du modèle Anthropic Claude utilisé.
-  // ⚠️ IMPORTANT : l'ancien modèle "claude-3-haiku-20240307" a été RETIRÉ
+  // ️ IMPORTANT : l'ancien modèle "claude-3-haiku-20240307" a été RETIRÉ
   // par Anthropic le 19/04/2026 — il ne répond plus. On utilise désormais
   // Claude Haiku 4.5, son successeur (rapide, économique, supporte les images).
   static const String _nomModeleClaude = 'claude-haiku-4-5';
@@ -304,7 +304,13 @@ class ServiceIA {
     }
 
     // 2. Basculement (Fallback) sur Gemini
-    final modele = _getModele(modeJson: true, contexteSysteme: contexteSysteme);
+    GenerativeModel modele;
+    try {
+      modele = _getModele(modeJson: true, contexteSysteme: contexteSysteme);
+    } catch (e) {
+      debugPrint("[IA] Gemini indisponible : $e. Retour de la réponse par défaut.");
+      return reponseParDefaut;
+    }
 
     for (int tentative = 1; tentative <= _maxTentatives; tentative++) {
       try {
@@ -380,7 +386,7 @@ class ServiceIA {
 
     final apiKey = dotenv.env['GEMINI_API_KEY'] ?? '';
     if (apiKey.isEmpty) {
-      yield "L'assistant est indisponible : clés API manquantes dans le fichier .env.";
+      yield "L'assistant est actuellement en maintenance. Veuillez réessayer ultérieurement.";
       return;
     }
 

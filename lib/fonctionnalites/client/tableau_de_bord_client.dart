@@ -54,7 +54,7 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
   Widget build(BuildContext context) {
     final coursesAsync = ref.watch(coursesClientProvider);
 
-    // ✅ Redirection automatique : dès que le transporteur accepte, le client est envoyé vers sa page de suivi
+    //  Redirection automatique : dès que le transporteur accepte, le client est envoyé vers sa page de suivi
     ref.listen<Course?>(activeCourseClientProvider, (previous, current) {
       if (current == null) return;
       final oldStatut = previous?.statut;
@@ -70,9 +70,9 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
           if (mounted) {
             ScaffoldMessenger.of(context).showSnackBar(
               SnackBar(
-                content: const Row(
+                content: Row(
                   children: [
-                    Icon(Icons.check_circle, color: Colors.white),
+                    Icon(Icons.check_circle, color: Theme.of(context).colorScheme.onSurface),
                     SizedBox(width: 10),
                     Expanded(
                         child: Text(
@@ -158,28 +158,28 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  const Icon(Iconsax.location_copy,
+                                  Icon(Iconsax.location_copy,
                                       size: 80, color: CouleursApp.primaire),
-                                  const SizedBox(height: 20),
+                                  SizedBox(height: 20),
                                   Text("Vous n'avez aucune course en cours",
                                       style: TextStyle(
                                           fontWeight: FontWeight.bold,
                                           fontSize: 16,
                                           color: Theme.of(context).colorScheme.onSurface)),
-                                  const SizedBox(height: 10),
+                                  SizedBox(height: 10),
                                   Text("Vos futures mises en relation apparaîtront ici.",
                                       textAlign: TextAlign.center,
                                       style: TextStyle(
                                           fontSize: 14,
                                           color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6))),
-                                  const SizedBox(height: 20),
+                                  SizedBox(height: 20),
                                   ElevatedButton(
                                     onPressed: () =>
                                         setState(() => _bottomNavIndex = 0),
                                     style: ElevatedButton.styleFrom(
                                         backgroundColor: CouleursApp.primaire,
-                                        foregroundColor: Colors.white),
-                                    child: const Text("Retour à l'accueil"),
+                                        foregroundColor: Theme.of(context).colorScheme.onSurface),
+                                    child: Text("Retour à l'accueil"),
                                   )
                                 ],
                               ),
@@ -189,7 +189,7 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
                         return EcranSuiviCourse(
                             courseId: enCours.first.id, isFullScreen: false);
                       },
-                      loading: () => const Scaffold(
+                      loading: () => Scaffold(
                           body: Center(child: LoaderPremium(size: 24))),
                       error: (err, stack) =>
                           Scaffold(body: Center(child: Text("Erreur: $err"))),
@@ -264,7 +264,7 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
                     _buildHistoryList(courses
                         .where((c) => StatutCourse.estTerminee(c.statut))
                         .toList()),
-                  const SizedBox(height: 100),
+                  SizedBox(height: 100),
                 ]),
               );
             },
@@ -282,8 +282,8 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
     final utilisateur = ref.watch(serviceAuthentificationProvider).utilisateur;
 
     return clientAsync.when(
-      loading: () => const SizedBox.shrink(),
-      error: (err, stack) => const SizedBox.shrink(),
+      loading: () => SizedBox.shrink(),
+      error: (err, stack) => SizedBox.shrink(),
       data: (client) {
         final String nomAffichage = client != null
             ? client.prenom
@@ -291,7 +291,7 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
         final String photoUrl = client?.photo ?? utilisateur?.photoURL ?? "";
 
         return Padding(
-          padding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
+          padding: EdgeInsets.fromLTRB(20, 20, 20, 10),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -313,11 +313,11 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
                       backgroundImage:
                           photoUrl.isNotEmpty ? NetworkImage(photoUrl) : null,
                       child: photoUrl.isEmpty
-                          ? const Icon(Iconsax.user_copy, color: Colors.white)
+                          ? Icon(Iconsax.user_copy, color: Theme.of(context).colorScheme.onSurface)
                           : null,
                     ),
                   ),
-                  const SizedBox(width: 15),
+                  SizedBox(width: 15),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -331,7 +331,7 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
                                 .onSurface
                                 .withValues(alpha: 0.6)),
                       ),
-                      const SizedBox(height: 2),
+                      SizedBox(height: 2),
                       Text(
                         nomAffichage,
                         maxLines: 1,
@@ -354,7 +354,7 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
                     clipBehavior: Clip.none,
                     children: [
                       Container(
-                        padding: const EdgeInsets.all(10),
+                        padding: EdgeInsets.all(10),
                         decoration: BoxDecoration(
                           color: Theme.of(context).colorScheme.surface,
                           borderRadius: BorderRadius.circular(15),
@@ -372,13 +372,13 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
                           top: -5,
                           right: -5,
                           child: Container(
-                            padding: const EdgeInsets.all(5),
-                            decoration: const BoxDecoration(
+                            padding: EdgeInsets.all(5),
+                            decoration: BoxDecoration(
                                 color: Colors.red, shape: BoxShape.circle),
                             child: Text(
                               badgeCount > 9 ? "9+" : badgeCount.toString(),
-                              style: const TextStyle(
-                                  color: Colors.white,
+                              style: TextStyle(
+                                  color: Theme.of(context).colorScheme.onSurface,
                                   fontSize: 10,
                                   fontWeight: FontWeight.bold),
                             ),
@@ -407,7 +407,7 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
 
   Widget _buildHeroAction() {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 6, 20, 6),
+      padding: EdgeInsets.fromLTRB(20, 6, 20, 6),
       child: Material(
         color: Colors.transparent,
         child: InkWell(
@@ -421,7 +421,7 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
             context.push(RoutesApplication.creerDemande);
           },
           child: Container(
-            padding: const EdgeInsets.all(22),
+            padding: EdgeInsets.all(22),
             decoration: BoxDecoration(
               gradient: CouleursApp.degradePrincipal,
               borderRadius: BorderRadius.circular(26),
@@ -439,40 +439,40 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
                 Row(
                   children: [
                     Container(
-                      padding: const EdgeInsets.all(8),
+                      padding: EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: Colors.white.withValues(alpha: 0.18),
+                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.18),
                         borderRadius: BorderRadius.circular(10),
                       ),
-                      child: const Icon(Iconsax.box_copy,
-                          color: Colors.white, size: 18),
+                      child: Icon(Iconsax.box_copy,
+                          color: Theme.of(context).colorScheme.onSurface, size: 18),
                     ),
-                    const SizedBox(width: 10),
-                    const Text(
+                    SizedBox(width: 10),
+                    Text(
                       'Nouvelle mise en relation',
                       style: TextStyle(
-                          color: Colors.white70,
+                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
                           fontSize: 13,
                           fontWeight: FontWeight.w600,
                           letterSpacing: 0.3),
                     ),
                   ],
                 ),
-                const SizedBox(height: 16),
+                SizedBox(height: 16),
                 // Faux champ de recherche (invite à démarrer une demande)
                 Container(
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
+                      EdgeInsets.symmetric(horizontal: 14, vertical: 13),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: Theme.of(context).colorScheme.onSurface,
                     borderRadius: BorderRadius.circular(16),
                   ),
                   child: Row(
                     children: [
-                      const Icon(Icons.search,
+                      Icon(Icons.search,
                           color: Color(0xFF94A3B8), size: 20),
-                      const SizedBox(width: 10),
-                      const Expanded(
+                      SizedBox(width: 10),
+                      Expanded(
                         child: Text(
                           'Saisir le point de départ…',
                           style: TextStyle(
@@ -482,13 +482,13 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
                         ),
                       ),
                       Container(
-                        padding: const EdgeInsets.all(7),
-                        decoration: const BoxDecoration(
+                        padding: EdgeInsets.all(7),
+                        decoration: BoxDecoration(
                           color: CouleursApp.primaire,
                           shape: BoxShape.circle,
                         ),
-                        child: const Icon(Icons.arrow_forward_rounded,
-                            color: Colors.white, size: 18),
+                        child: Icon(Icons.arrow_forward_rounded,
+                            color: Theme.of(context).colorScheme.onSurface, size: 18),
                       ),
                     ],
                   ),
@@ -538,7 +538,7 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
     ];
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+      padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -564,7 +564,7 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
               ),
             ],
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: 16),
           GridView.builder(
             shrinkWrap: true,
             physics: const NeverScrollableScrollPhysics(),
@@ -603,9 +603,9 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
   Widget _buildActiveShipment(Course course) {
     bool isTransit = StatutCourse.estActive(course.statut);
     return Padding(
-      padding: const EdgeInsets.all(20),
+      padding: EdgeInsets.all(20),
       child: Container(
-        padding: const EdgeInsets.all(20),
+        padding: EdgeInsets.all(20),
         decoration: BoxDecoration(
           color: Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(24),
@@ -632,22 +632,22 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
                         color: Theme.of(context).colorScheme.onSurface),
                   ),
                 ),
-                const SizedBox(width: 8),
+                SizedBox(width: 8),
                 Container(
                   padding:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                      EdgeInsets.symmetric(horizontal: 10, vertical: 6),
                   decoration: BoxDecoration(
                       color: CouleursApp.avertissement.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(20)),
                   child: Text(StatutCourse.libelle(course.statut),
-                      style: const TextStyle(
+                      style: TextStyle(
                           color: CouleursApp.avertissement,
                           fontWeight: FontWeight.bold,
                           fontSize: 12)),
                 )
               ],
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: 20),
             Row(
               children: [
                 _buildTimelineDot(true),
@@ -659,7 +659,7 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
                 _buildTimelineDot(false),
               ],
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: 20),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -674,12 +674,12 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
                               ? course.adresseDepart
                               : "Inconnu",
                           overflow: TextOverflow.ellipsis,
-                          style: const TextStyle(
+                          style: TextStyle(
                               fontWeight: FontWeight.bold, fontSize: 15)),
                     ],
                   ),
                 ),
-                const SizedBox(width: 16),
+                SizedBox(width: 16),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.end,
@@ -692,7 +692,7 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
                               : "Inconnu",
                           overflow: TextOverflow.ellipsis,
                           textAlign: TextAlign.right,
-                          style: const TextStyle(
+                          style: TextStyle(
                               fontWeight: FontWeight.bold, fontSize: 15)),
                     ],
                   ),
@@ -702,7 +702,7 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
             if (course.statut == StatutCourse.recherche ||
                 course.statut == StatutCourse.attribue ||
                 course.statut == StatutCourse.enRouteDepart) ...[
-              const SizedBox(height: 15),
+              SizedBox(height: 15),
               SizedBox(
                 width: double.infinity,
                 child: OutlinedButton(
@@ -713,7 +713,7 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10)),
                   ),
-                  child: const Text("Annuler la course"),
+                  child: Text("Annuler la course"),
                 ),
               ),
             ],
@@ -728,13 +728,13 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
-        title: const Text("Annuler la course"),
+        title: Text("Annuler la course"),
         content:
-            const Text("Souhaitez-vous vraiment annuler cette course ?"),
+            Text("Souhaitez-vous vraiment annuler cette course ?"),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
-            child: const Text("Non, garder"),
+            child: Text("Non, garder"),
           ),
           ElevatedButton(
             onPressed: () async {
@@ -751,9 +751,9 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
                 );
                 debugPrint("MISE A JOUR REUSSIE !");
                 if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                       content: Text("La course a été annulée.",
-                          style: TextStyle(color: Colors.white)),
+                          style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
                       backgroundColor: CouleursApp.succes));
                 }
               } catch (e) {
@@ -761,15 +761,15 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                       content: Text("Erreur : $e",
-                          style: const TextStyle(color: Colors.white)),
+                          style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
                       backgroundColor: CouleursApp.erreur));
                 }
               }
             },
             style: ElevatedButton.styleFrom(
                 backgroundColor: CouleursApp.erreur,
-                foregroundColor: Colors.white),
-            child: const Text("Oui, annuler"),
+                foregroundColor: Theme.of(context).colorScheme.onSurface),
+            child: Text("Oui, annuler"),
           ),
         ],
       ),
@@ -791,7 +791,7 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
             width: 2),
       ),
       child: active && !isCurrent
-          ? const Icon(Icons.check, size: 8, color: Colors.white)
+          ? Icon(Icons.check, size: 8, color: Theme.of(context).colorScheme.onSurface)
           : null,
     );
   }
@@ -811,7 +811,7 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
   // ==========================================
   Widget _buildMiniMap(Course course) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
+      padding: EdgeInsets.symmetric(horizontal: 20),
       child: Container(
         height: 150,
         decoration: BoxDecoration(
@@ -861,7 +861,7 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
                 heroTag: "btn_map",
                 backgroundColor: Theme.of(context).colorScheme.surface,
                 onPressed: () => setState(() => _bottomNavIndex = 2),
-                child: const Icon(Iconsax.maximize_circle_copy,
+                child: Icon(Iconsax.maximize_circle_copy,
                     color: CouleursApp.primaireFonce),
               ),
             )
@@ -876,7 +876,7 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
   // ==========================================
   Widget _buildHistoryList(List<Course> courses) {
     return Padding(
-      padding: const EdgeInsets.all(20),
+      padding: EdgeInsets.all(20),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -892,7 +892,7 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
                   onPressed: () {
                     context.push(RoutesApplication.historique);
                   },
-                  child: const Text("Voir tout",
+                  child: Text("Voir tout",
                       style: TextStyle(
                           color: CouleursApp.primaire, fontSize: 14))),
             ],
@@ -906,8 +906,8 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
                         ? CouleursApp.erreur
                         : CouleursApp.avertissement;
             return Container(
-              margin: const EdgeInsets.only(bottom: 15),
-              padding: const EdgeInsets.all(15),
+              margin: EdgeInsets.only(bottom: 15),
+              padding: EdgeInsets.all(15),
               decoration: BoxDecoration(
                 color: Theme.of(context).colorScheme.surface,
                 borderRadius: BorderRadius.circular(20),
@@ -921,7 +921,7 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
               child: Row(
                 children: [
                   Container(
-                    padding: const EdgeInsets.all(12),
+                    padding: EdgeInsets.all(12),
                     decoration: BoxDecoration(
                         color: const Color(0xFF1E293B),
                         borderRadius: BorderRadius.circular(15)),
@@ -931,7 +931,7 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
                             .onSurface
                             .withValues(alpha: 0.7)),
                   ),
-                  const SizedBox(width: 15),
+                  SizedBox(width: 15),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -940,9 +940,9 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
                             course.description.isNotEmpty
                                 ? course.description
                                 : _libelleService(course.categorieService),
-                            style: const TextStyle(
+                            style: TextStyle(
                                 fontWeight: FontWeight.bold, fontSize: 16)),
-                        const SizedBox(height: 4),
+                        SizedBox(height: 4),
                         Text(
                             "${course.adresseDepart} → ${course.adresseArrivee}",
                             style: TextStyle(
@@ -959,9 +959,9 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
                               fontWeight: FontWeight.bold,
                               color: Theme.of(context).colorScheme.onSurface,
                               fontSize: 14)),
-                      const SizedBox(height: 5),
+                      SizedBox(height: 5),
                       Container(
-                        padding: const EdgeInsets.symmetric(
+                        padding: EdgeInsets.symmetric(
                             horizontal: 8, vertical: 3),
                         decoration: BoxDecoration(
                             color: statusColor.withValues(alpha: 0.1),
@@ -988,13 +988,13 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
   // ==========================================
   Widget _buildLoadingState() {
     return Padding(
-      padding: const EdgeInsets.all(20),
+      padding: EdgeInsets.all(20),
       child: Column(
         children: List.generate(
             3,
             (index) => Container(
                   height: 100,
-                  margin: const EdgeInsets.only(bottom: 15),
+                  margin: EdgeInsets.only(bottom: 15),
                   decoration: BoxDecoration(
                       color: Theme.of(context).colorScheme.surface,
                       borderRadius: BorderRadius.circular(20)),
@@ -1008,9 +1008,9 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
 
   Widget _buildErrorState(String error) {
     return Padding(
-      padding: const EdgeInsets.all(20),
+      padding: EdgeInsets.all(20),
       child: Container(
-        padding: const EdgeInsets.all(20),
+        padding: EdgeInsets.all(20),
         decoration: BoxDecoration(
           color: CouleursApp.erreur.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(24),
@@ -1018,26 +1018,26 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
         ),
         child: Column(
           children: [
-            const Icon(Iconsax.warning_2_copy,
+            Icon(Iconsax.warning_2_copy,
                 color: CouleursApp.erreur, size: 40),
-            const SizedBox(height: 15),
-            const Text("Impossible de charger vos données",
+            SizedBox(height: 15),
+            Text("Impossible de charger vos données",
                 style: TextStyle(
                     fontWeight: FontWeight.bold,
                     color: CouleursApp.erreur,
                     fontSize: 16)),
-            const SizedBox(height: 10),
+            SizedBox(height: 10),
             Text(error,
-                style: const TextStyle(color: CouleursApp.erreur, fontSize: 12),
+                style: TextStyle(color: CouleursApp.erreur, fontSize: 12),
                 textAlign: TextAlign.center),
-            const SizedBox(height: 15),
+            SizedBox(height: 15),
             ElevatedButton.icon(
               onPressed: () => ref.invalidate(coursesClientProvider),
-              icon: const Icon(Icons.refresh),
-              label: const Text("Réessayer"),
+              icon: Icon(Icons.refresh),
+              label: Text("Réessayer"),
               style: ElevatedButton.styleFrom(
                   backgroundColor: CouleursApp.erreur,
-                  foregroundColor: Colors.white,
+                  foregroundColor: Theme.of(context).colorScheme.onSurface,
                   shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(15))),
             )
@@ -1049,12 +1049,12 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
 
   Widget _buildEmptyState() {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 60),
+      padding: EdgeInsets.symmetric(horizontal: 40, vertical: 60),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Container(
-            padding: const EdgeInsets.all(25),
+            padding: EdgeInsets.all(25),
             decoration: BoxDecoration(
               color: CouleursApp.primaire.withValues(alpha: 0.1),
               shape: BoxShape.circle,
@@ -1063,16 +1063,16 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
                 width: 1.5,
               ),
             ),
-            child: const Icon(Iconsax.box_add_copy,
+            child: Icon(Iconsax.box_add_copy,
                 size: 50, color: CouleursApp.primaire),
           ),
-          const SizedBox(height: 24),
+          SizedBox(height: 24),
           Text("Aucune course active",
               style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                   color: Theme.of(context).colorScheme.onSurface)),
-          const SizedBox(height: 12),
+          SizedBox(height: 12),
           Text(
               "Vos prochaines mises en relation apparaîtront ici. Sélectionnez un service pour commencer.",
               textAlign: TextAlign.center,
@@ -1090,11 +1090,11 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
   Widget _buildBottomNav() {
     return SafeArea(
       child: Padding(
-        padding: const EdgeInsets.only(bottom: 24),
+        padding: EdgeInsets.only(bottom: 24),
         child: Align(
           alignment: Alignment.bottomCenter,
           child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+            padding: EdgeInsets.symmetric(horizontal: 12, vertical: 12),
             decoration: BoxDecoration(
               color: Theme.of(context).colorScheme.surface,
               borderRadius: BorderRadius.circular(40),
@@ -1118,7 +1118,7 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
                       0, Iconsax.home_2_copy, Iconsax.home_2, "Accueil"),
                   _buildNavItem(1, Iconsax.truck_copy, Iconsax.truck, "Courses"),
                   // Bouton IA central — mode compact, intégré dans la navbar
-                  const Padding(
+                  Padding(
                     padding: EdgeInsets.symmetric(horizontal: 4),
                     child: BoutonCombi(compact: true),
                   ),
@@ -1144,7 +1144,7 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
         duration: const Duration(milliseconds: 400),
         curve: Curves.easeOutCubic,
         margin:
-            const EdgeInsets.symmetric(horizontal: 2), // Reduced from 4 to 2
+            EdgeInsets.symmetric(horizontal: 2), // Reduced from 4 to 2
         padding: EdgeInsets.symmetric(
             horizontal: isSelected ? 16 : 8,
             vertical: 12), // Reduced from 20/12 to 16/8
@@ -1171,16 +1171,16 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
               child: Icon(
                 isSelected ? activeIcon : icon,
                 key: ValueKey<bool>(isSelected),
-                color: isSelected ? Colors.white : Theme.of(context).colorScheme.onSurfaceVariant,
+                color: isSelected ? Theme.of(context).colorScheme.onSurface : Theme.of(context).colorScheme.onSurfaceVariant,
                 size: 24,
               ),
             ),
             if (isSelected) ...[
-              const SizedBox(width: 10),
+              SizedBox(width: 10),
               Text(
                 label,
-                style: const TextStyle(
-                  color: Colors.white,
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.onSurface,
                   fontWeight: FontWeight.bold,
                   fontSize: 14,
                 ),
@@ -1235,7 +1235,7 @@ class _ServiceCategoryCardState extends State<_ServiceCategoryCard> {
           curve: Curves.easeOutCubic,
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 200),
-            padding: const EdgeInsets.all(16),
+            padding: EdgeInsets.all(16),
             decoration: BoxDecoration(
               color: _isHovered
                   ? CouleursApp.primaire.withValues(alpha: 0.1)
@@ -1264,7 +1264,7 @@ class _ServiceCategoryCardState extends State<_ServiceCategoryCard> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Container(
-                  padding: const EdgeInsets.all(12),
+                  padding: EdgeInsets.all(12),
                   decoration: BoxDecoration(
                     color: _isHovered
                         ? CouleursApp.primaire.withValues(alpha: 0.15)
@@ -1279,7 +1279,7 @@ class _ServiceCategoryCardState extends State<_ServiceCategoryCard> {
                     size: 28,
                   ),
                 ),
-                const SizedBox(height: 16),
+                SizedBox(height: 16),
                 Text(
                   widget.titre,
                   style: TextStyle(
@@ -1288,7 +1288,7 @@ class _ServiceCategoryCardState extends State<_ServiceCategoryCard> {
                     color: _isHovered ? CouleursApp.primaire : Theme.of(context).colorScheme.onSurface,
                   ),
                 ),
-                const SizedBox(height: 4),
+                SizedBox(height: 4),
                 Text(
                   widget.desc,
                   textAlign: TextAlign.center,

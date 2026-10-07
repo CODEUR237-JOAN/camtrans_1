@@ -302,10 +302,10 @@ class Course {
       "expirationProposition": expirationProposition?.toIso8601String(),
       "codePinCourse": codePinCourse,
       "fondsDebloques": fondsDebloques,
-      // ✅ FIX : Champs d'archivage logique — étaient absents, causant une perte de données
+      //  FIX : Champs d'archivage logique — étaient absents, causant une perte de données
       "archivePourTransporteur": archivePourTransporteur,
       "archivePourClient": archivePourClient,
-      // ✅ Traçabilité & ETA (Sprint 14)
+      //  Traçabilité & ETA (Sprint 14)
       "dateModification": dateModification?.toIso8601String(),
       "etaMinutes": etaMinutes,
     };

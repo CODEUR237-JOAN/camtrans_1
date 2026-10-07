@@ -226,7 +226,7 @@ class _EcranPaiementState extends ConsumerState<EcranPaiement> {
                                 Iconsax.mobile_copy,
                                 const Color(0xFFFFCC00)),
                             const SizedBox(height: 12),
-                            // ✅ P1-2 : Carte bancaire désactivée (non implémentée)
+                            //  P1-2 : Carte bancaire désactivée (non implémentée)
                             _buildMethodeCard(
                                 "carte",
                                 "Carte Bancaire",
@@ -440,7 +440,7 @@ class _EcranPaiementState extends ConsumerState<EcranPaiement> {
   Widget _buildMethodeCard(String cle, String titre, String sousTitre,
       String logoPath, IconData defaultIcon, Color brandColor) {
     final estSelectionne = _methodeSelectionnee == cle;
-    // ✅ P1-2 : Bloquer la sélection de la carte bancaire (non implémentée)
+    //  P1-2 : Bloquer la sélection de la carte bancaire (non implémentée)
     final isDisabled = cle == 'carte';
     return Opacity(
       opacity: isDisabled ? 0.4 : 1.0,

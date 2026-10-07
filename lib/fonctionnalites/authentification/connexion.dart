@@ -21,12 +21,12 @@ import 'package:update_camtrans/coeur/etat/utilisateur_provider.dart';
 // =====================================================================
 // Page : Connexion
 // 100% opérationnelle :
-//  ✅ Email / Mot de passe → Firebase Auth
-//  ✅ Connexion Google → Google Sign-In + Firebase credential
-//  ✅ Mot de passe oublié → route dédiée
-//  ✅ S'inscrire → route choix profil
-//  ✅ Messages d'erreur humanisés (codes Firebase traduits)
-//  ✅ Indicateur de chargement par action
+//   Email / Mot de passe → Firebase Auth
+//   Connexion Google → Google Sign-In + Firebase credential
+//   Mot de passe oublié → route dédiée
+//   S'inscrire → route choix profil
+//   Messages d'erreur humanisés (codes Firebase traduits)
+//   Indicateur de chargement par action
 // =====================================================================
 
 class Connexion extends ConsumerStatefulWidget {
@@ -359,7 +359,7 @@ class _ConnexionState extends ConsumerState<Connexion> {
                     AnimationSlideFade(
                       delay: const Duration(milliseconds: 300),
                       child: Text(
-                        'Ravis de vous revoir 👋  Connectez-vous pour continuer.',
+                        'Ravis de vous revoir   Connectez-vous pour continuer.',
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           color: isDark
@@ -403,7 +403,7 @@ class _ConnexionState extends ConsumerState<Connexion> {
 
                             const SizedBox(height: 12),
 
-                            // ✅ Mot de passe oublié → route dédiée
+                            //  Mot de passe oublié → route dédiée
                             Align(
                               alignment: Alignment.centerRight,
                               child: TextButton(
@@ -421,7 +421,7 @@ class _ConnexionState extends ConsumerState<Connexion> {
 
                             const SizedBox(height: 8),
 
-                            // ✅ Bouton connexion email
+                            //  Bouton connexion email
                             BoutonPrincipal(
                               texte: TextesApp.connexion,
                               icone: Icons.login,
@@ -453,7 +453,7 @@ class _ConnexionState extends ConsumerState<Connexion> {
                               fontSize: 15,
                             ),
                           ),
-                          // ✅ S'inscrire → choix du profil
+                          //  S'inscrire → choix du profil
                           TextButton(
                             onPressed: () =>
                                 context.push(RoutesApplication.choixProfil),

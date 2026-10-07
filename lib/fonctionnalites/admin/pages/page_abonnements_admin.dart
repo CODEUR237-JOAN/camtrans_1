@@ -29,7 +29,7 @@ class PageAbonnementsAdmin extends ConsumerWidget {
       body: abonnementsAsync.when(
         loading: () => const Center(child: LoaderPremium()),
         error: (err, _) => Center(
-            child: Text("Oups ! Les données sont introuvables : $err 🔧",
+            child: Text("Oups ! Les données sont introuvables : $err ",
                 style: const TextStyle(color: Colors.red))),
         data: (abonnements) {
           // ===== CALCUL DES STATISTIQUES =====
@@ -107,7 +107,7 @@ class PageAbonnementsAdmin extends ConsumerWidget {
                             size: 70, color: Colors.grey.shade400),
                         const SizedBox(height: 12),
                         Text(
-                            'Aucun abonnement pour le moment. Laissons le temps aux transporteurs de nous rejoindre ! 🌱',
+                            'Aucun abonnement pour le moment. Laissons le temps aux transporteurs de nous rejoindre ! ',
                             style: TextStyle(
                                 color: Colors.grey.shade500, fontSize: 16)),
                       ],

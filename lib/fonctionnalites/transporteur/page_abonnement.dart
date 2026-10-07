@@ -30,7 +30,7 @@ class _PageAbonnementState extends ConsumerState<PageAbonnement> {
     setState(() => _isProcessing = true);
 
     try {
-      // ✅ CORRECTION 1.4: Dialog extrait dans un StatefulWidget dédié (_DialogPaiementAbonnement)
+      //  CORRECTION 1.4: Dialog extrait dans un StatefulWidget dédié (_DialogPaiementAbonnement)
       // pour garantir la gestion correcte du dispose() du TextEditingController.
       final result = await showDialog<_ResultatDialogPaiement?>(
         context: context,
@@ -66,7 +66,7 @@ class _PageAbonnementState extends ConsumerState<PageAbonnement> {
                 Icon(Icons.check_circle, color: Theme.of(context).colorScheme.onSurface),
                 const SizedBox(width: 8),
                 Text(
-                  "Abonnement $type activé ! Bonne route 🚛",
+                  "Abonnement $type activé ! Bonne route ",
                   style: GoogleFonts.inter(fontWeight: FontWeight.bold),
                 ),
               ],
@@ -126,7 +126,7 @@ class _PageAbonnementState extends ConsumerState<PageAbonnement> {
     );
   }
 
-  /// ✅ HUMANISATION: Écran de traitement animé avec étapes progressives
+  ///  HUMANISATION: Écran de traitement animé avec étapes progressives
   Widget _buildTraitement() {
     return Center(
       child: Column(
@@ -149,7 +149,7 @@ class _PageAbonnementState extends ConsumerState<PageAbonnement> {
           ),
           const SizedBox(height: 8),
           Text(
-            "Patientez, votre abonnement est en cours d'activation 🔐",
+            "Patientez, votre abonnement est en cours d'activation ",
             style: GoogleFonts.inter(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 13),
             textAlign: TextAlign.center,
           ),
@@ -189,7 +189,7 @@ class _PageAbonnementState extends ConsumerState<PageAbonnement> {
 
           const SizedBox(height: 20),
           Text(
-            "Passez à la vitesse supérieure 🚀",
+            "Passez à la vitesse supérieure ",
             style: GoogleFonts.inter(
                 fontSize: 24, fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface),
             textAlign: TextAlign.center,
@@ -412,7 +412,7 @@ class _PageAbonnementState extends ConsumerState<PageAbonnement> {
 }
 
 // ============================================================
-// ✅ CORRECTION 1.4: Dialog extrait dans un StatefulWidget dédié
+//  CORRECTION 1.4: Dialog extrait dans un StatefulWidget dédié
 // Garantit que le TextEditingController est correctement disposé
 // ============================================================
 class _ResultatDialogPaiement {
@@ -440,7 +440,7 @@ class _DialogPaiementAbonnement extends StatefulWidget {
 }
 
 class _DialogPaiementAbonnementState extends State<_DialogPaiementAbonnement> {
-  // ✅ Controller correctement géré avec dispose()
+  //  Controller correctement géré avec dispose()
   late final TextEditingController _phoneCtrl;
   String _operateur = "Orange";
 
@@ -452,7 +452,7 @@ class _DialogPaiementAbonnementState extends State<_DialogPaiementAbonnement> {
 
   @override
   void dispose() {
-    // ✅ Dispose garanti même si le dialog est fermé brutalement
+    //  Dispose garanti même si le dialog est fermé brutalement
     _phoneCtrl.dispose();
     super.dispose();
   }
@@ -576,7 +576,7 @@ class _DialogPaiementAbonnementState extends State<_DialogPaiementAbonnement> {
           ),
           const SizedBox(height: 12),
           Text(
-            "💡 Un pop-up s'affichera sur ce numéro pour confirmer le paiement.",
+            " Un pop-up s'affichera sur ce numéro pour confirmer le paiement.",
             style: GoogleFonts.inter(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), fontSize: 11),
           ),
         ],

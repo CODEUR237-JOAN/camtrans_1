@@ -51,7 +51,7 @@ class _PageActivitesState extends ConsumerState<PageActivites> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-              content: Text("Aïe, impossible de purger l'historique : $e 🧹"),
+              content: Text("Aïe, impossible de purger l'historique : $e "),
               backgroundColor: Colors.red),
         );
       }
@@ -98,7 +98,7 @@ class _PageActivitesState extends ConsumerState<PageActivites> {
                       message: "Chargement de l'historique..."),
                   error: (err, _) => EtatErreur(
                       erreur:
-                          "Impossible de charger les activités : ${err.toString()} 🔧",
+                          "Impossible de charger les activités : ${err.toString()} ",
                       onRetry: () => ref.refresh(adminCoursesProvider)),
                   data: (toutesCourses) {
                     final courses = toutesCourses.where((c) {
@@ -196,7 +196,7 @@ class _PageActivitesState extends ConsumerState<PageActivites> {
                                 ScaffoldMessenger.of(context).showSnackBar(
                                   const SnackBar(
                                       content: Text(
-                                          "L'historique a été nettoyé avec succès ! ✨"),
+                                          "L'historique a été nettoyé avec succès ! "),
                                       backgroundColor: CouleursApp.succes),
                                 );
                               }

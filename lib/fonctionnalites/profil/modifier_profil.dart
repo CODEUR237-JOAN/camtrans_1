@@ -166,7 +166,7 @@ class _ModifierProfilState extends ConsumerState<ModifierProfil> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-              content: Text("Oups ! Échec de la mise à jour : $e 🔧"),
+              content: Text("Oups ! Échec de la mise à jour : $e "),
               backgroundColor: Colors.red),
         );
       }

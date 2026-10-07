@@ -122,7 +122,7 @@ final fluxCoursesDisponiblesProvider =
   );
 });
 
-// ✅ PHASE 4: DISPATCH AUTOMATIQUE - Écoute de la course proposée
+//  PHASE 4: DISPATCH AUTOMATIQUE - Écoute de la course proposée
 final fluxCourseProposeeProvider = StreamProvider.autoDispose<Course?>((ref) {
   final firestore = ref.watch(serviceFirestoreProvider);
   final transporteurId = ref.watch(currentTransporteurIdProvider);
@@ -240,7 +240,7 @@ class TransporteurActions {
     });
   }
 
-  // ✅ PHASE 4: DISPATCH AUTOMATIQUE - Accepter une proposition
+  //  PHASE 4: DISPATCH AUTOMATIQUE - Accepter une proposition
   Future<void> accepterPropositionCourse(String courseId) async {
     final docRef =
         FirebaseFirestore.instance.collection('courses').doc(courseId);
@@ -274,7 +274,7 @@ class TransporteurActions {
     });
   }
 
-  // ✅ PHASE 4: DISPATCH AUTOMATIQUE - Refuser une proposition (Fallback au suivant ou marché)
+  //  PHASE 4: DISPATCH AUTOMATIQUE - Refuser une proposition (Fallback au suivant ou marché)
   Future<void> refuserPropositionCourse(String courseId) async {
     final docRef =
         FirebaseFirestore.instance.collection('courses').doc(courseId);

@@ -94,7 +94,7 @@ class _SuiviTransportState extends ConsumerState<SuiviTransport> {
     final roleAsync = ref.watch(userRoleProvider);
     final estClient = roleAsync.valueOrNull == 'client';
 
-    // ✅ Paiement automatique : dès que la course passe à 'terminee', ouvrir le volet de paiement (client uniquement)
+    //  Paiement automatique : dès que la course passe à 'terminee', ouvrir le volet de paiement (client uniquement)
     ref.listen<EtatSuivi>(suiviProvider(courseId), (previous, next) {
       if (!estClient) return;
       final ancienStatut = previous?.course?.statut;
@@ -126,13 +126,33 @@ class _SuiviTransportState extends ConsumerState<SuiviTransport> {
         ),
         body: Center(
           child: Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: Text(
-              etatSuivi.erreur != null
-                  ? 'DÉTAIL ERREUR: ${etatSuivi.erreur}'
-                  : 'Course introuvable ou inaccessible.',
-              style: const TextStyle(color: CouleursApp.erreur, fontSize: 16),
-              textAlign: TextAlign.center,
+            padding: const EdgeInsets.all(32.0),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Iconsax.radar_2_copy, size: 80, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.2)),
+                const SizedBox(height: 24),
+                Text(
+                  'Oups, nous avons perdu le signal',
+                  style: GoogleFonts.poppins(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).colorScheme.onSurface,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  'La connexion est momentanément interrompue. Nous tentons de rétablir le suivi de votre course...',
+                  style: GoogleFonts.inter(
+                    fontSize: 14,
+                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 32),
+                const CircularProgressIndicator(color: CouleursApp.primaire),
+              ],
             ),
           ),
         ),
@@ -141,14 +161,14 @@ class _SuiviTransportState extends ConsumerState<SuiviTransport> {
 
     final course = etatSuivi.course!;
 
-    // ✅ PILIER 1 & 2: Moteur d'Auto-Dispatch côté Client
+    //  PILIER 1 & 2: Moteur d'Auto-Dispatch côté Client
     if (estClient && course.statut == StatutCourse.recherche) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         _executerAutoDispatch(course);
       });
     }
 
-    // ✅ PILIER 3: Timeout Global de 5 minutes
+    //  PILIER 3: Timeout Global de 5 minutes
     if (estClient && (course.statut == StatutCourse.recherche || course.statut == StatutCourse.enAttente)) {
       if (DateTime.now().difference(course.dateCreation).inMinutes >= 5) {
         WidgetsBinding.instance.addPostFrameCallback((_) {

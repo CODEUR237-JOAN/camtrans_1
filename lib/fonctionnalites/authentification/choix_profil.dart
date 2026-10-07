@@ -103,7 +103,7 @@ class ChoixProfil extends StatelessWidget {
                           context,
                           titre: 'Client / Expéditeur',
                           description:
-                              'Expédiez des colis, meubles ou marchandises, et suivez chaque trajet en temps réel.',
+                              'Faites transporter vos meubles ou marchandises, et suivez chaque trajet en temps réel.',
                           badge: 'Je réserve un transport',
                           icone: Icons.inventory_2_outlined,
                           couleur: CouleursApp.primaire,

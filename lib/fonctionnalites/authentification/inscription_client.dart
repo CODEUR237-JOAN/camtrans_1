@@ -140,7 +140,7 @@ class _InscriptionClientState extends ConsumerState<InscriptionClient> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-              "Oups ! L'inscription a échoué : ${e.toString().replaceAll('Exception:', '')} 🛠️"),
+              "Oups ! L'inscription a échoué : ${e.toString().replaceAll('Exception:', '')} ️"),
           backgroundColor: Colors.red,
         ),
       );
@@ -293,7 +293,7 @@ class _InscriptionClientState extends ConsumerState<InscriptionClient> {
                   const SizedBox(height: 8),
 
                   const Text(
-                    "Rejoignez CamTrans en moins d'une minute 🚀",
+                    "Rejoignez CamTrans en moins d'une minute ",
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 15,

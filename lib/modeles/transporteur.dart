@@ -317,7 +317,7 @@ class Transporteur extends Utilisateur {
   /// Si le nombre de signalements atteint ou dépasse 2, le transporteur perd son statut "Confort".
   Transporteur traiterSignalementClient() {
     final int nouveauxSignalements = signalementsEtatVehicule + 1;
-    // ✅ CORRECTION 1.6: gamme est déjà non-nullable (String), ?? était superflu
+    //  CORRECTION 1.6: gamme est déjà non-nullable (String), ?? était superflu
     String nouvelleGamme = gamme;
 
     if (nouveauxSignalements >= 2 && nouvelleGamme == "Confort") {

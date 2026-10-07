@@ -379,7 +379,7 @@ class _ResumeExpeditionBottomSheetState
                       );
                     }
 
-                    // ✅ PHASE 4: ALGORTIHME DE DISPATCH - Recherche des transporteurs à proximité
+                    //  PHASE 4: ALGORTIHME DE DISPATCH - Recherche des transporteurs à proximité
                     final typeVehiculeRequis = etat.categorieService == 'Remorque'
                         ? 'Dépanneuse'
                         : (etatEstimation.resultat?.vehiculeRecommande ??
@@ -465,11 +465,11 @@ class _ResumeExpeditionBottomSheetState
                       candidatsFinaux.insert(0, chauffeurPropose.id);
                     }
 
-                    // 🚫 Règle métier : aucun véhicule disponible => AUCUNE course
+                    //  Règle métier : aucun véhicule disponible => AUCUNE course
                     // n'est créée. Le client est informé et renvoyé à l'accueil.
                     if (candidatsFinaux.isEmpty) {
                       debugPrint(
-                          "🚫 Aucun transporteur disponible ($typeVehiculeRequis) : course non créée.");
+                          " Aucun transporteur disponible ($typeVehiculeRequis) : course non créée.");
                       if (context.mounted) {
                         final messenger = ScaffoldMessenger.of(context);
                         final routeur = GoRouter.of(context);
@@ -600,7 +600,7 @@ class _ResumeExpeditionBottomSheetState
                       context.go('/tableau-bord-client');
                     }
                   } catch (e, stacktrace) {
-                    debugPrint("❌ ERREUR CREATION COURSE: $e");
+                    debugPrint(" ERREUR CREATION COURSE: $e");
                     debugPrint("Stacktrace: $stacktrace");
                     if (context.mounted) {
                       Navigator.pop(context); // Fermer le radar

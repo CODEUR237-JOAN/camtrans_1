@@ -106,7 +106,7 @@ class _BottomSheetPaiementState extends ConsumerState<BottomSheetPaiement> {
 
       // Notification au transporteur
       await ServiceNotification.afficherNotification(
-        titre: '💰 Paiement reçu !',
+        titre: ' Paiement reçu !',
         message: '${widget.montant.toStringAsFixed(0)} FCFA ont été réglés.',
         type: 'paiement',
       );
@@ -148,7 +148,7 @@ class _BottomSheetPaiementState extends ConsumerState<BottomSheetPaiement> {
         padding: EdgeInsets.fromLTRB(
             24, 16, 24, MediaQuery.of(context).viewInsets.bottom + 24),
         child: SingleChildScrollView(
-          // ✅ HUMANISATION 3.2: Affiche la progression animée pendant le chargement
+          //  HUMANISATION 3.2: Affiche la progression animée pendant le chargement
           child: _paiementReussi
               ? _buildSucces()
               : _enChargement
@@ -159,7 +159,7 @@ class _BottomSheetPaiementState extends ConsumerState<BottomSheetPaiement> {
     );
   }
 
-  /// ✅ HUMANISATION 3.2: Écran de succès animé avec célébration
+  ///  HUMANISATION 3.2: Écran de succès animé avec célébration
   Widget _buildSucces() {
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -212,7 +212,7 @@ class _BottomSheetPaiementState extends ConsumerState<BottomSheetPaiement> {
         ),
         const SizedBox(height: 28),
         Text(
-          'Paiement confirmé ! 🎉',
+          'Paiement confirmé ! ',
           style: GoogleFonts.poppins(
             color: Theme.of(context).colorScheme.onSurface,
             fontWeight: FontWeight.bold,
@@ -233,7 +233,7 @@ class _BottomSheetPaiementState extends ConsumerState<BottomSheetPaiement> {
             .scale(begin: const Offset(0.8, 0.8), end: const Offset(1, 1)),
         const SizedBox(height: 8),
         Text(
-          'Merci pour votre confiance ✨',
+          'Merci pour votre confiance ',
           style: GoogleFonts.inter(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 14),
         ).animate().fadeIn(delay: 600.ms),
         const SizedBox(height: 20),
@@ -255,7 +255,7 @@ class _BottomSheetPaiementState extends ConsumerState<BottomSheetPaiement> {
     );
   }
 
-  /// ✅ HUMANISATION 3.1: Écran de chargement avec étapes progressives
+  ///  HUMANISATION 3.1: Écran de chargement avec étapes progressives
   Widget _buildChargementAvecProgression() {
     final operateur =
         _modeSelectionne == 'orange' ? 'Orange Money' : 'MTN Mobile Money';
@@ -389,7 +389,7 @@ class _BottomSheetPaiementState extends ConsumerState<BottomSheetPaiement> {
                   borderRadius: BorderRadius.circular(16)),
               elevation: 0,
             ),
-            // ✅ Plus de spinner générique — la progression est dans _buildChargementAvecProgression()
+            //  Plus de spinner générique — la progression est dans _buildChargementAvecProgression()
             child: Text(
               _modeSelectionne == null
                   ? 'Choisir un mode de paiement'
@@ -419,7 +419,7 @@ class _BottomSheetPaiementState extends ConsumerState<BottomSheetPaiement> {
         'icon': Iconsax.mobile_copy,
         'couleur': const Color(0xFFFFCC00),
       },
-      // ✅ P1-2 : Carte bancaire désactivée (non implémentée)
+      //  P1-2 : Carte bancaire désactivée (non implémentée)
       {
         'id': 'carte',
         'label': 'Carte Bancaire (Bientôt)',
@@ -448,7 +448,7 @@ class _BottomSheetPaiementState extends ConsumerState<BottomSheetPaiement> {
           final id = mode['id'] as String;
           final selected = _modeSelectionne == id;
           final couleur = mode['couleur'] as Color;
-          // ✅ P1-2 : Bloquer la sélection si le mode est désactivé
+          //  P1-2 : Bloquer la sélection si le mode est désactivé
           final isDisabled = mode['disabled'] == true;
 
           return GestureDetector(

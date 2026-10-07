@@ -53,7 +53,7 @@ class PagePortefeuilleAdmin extends ConsumerWidget {
                         fontWeight: FontWeight.w800,
                         letterSpacing: -0.5)),
                 const SizedBox(height: 6),
-                const Text('Vos revenus générés par CamTrans 💙',
+                const Text('Vos revenus générés par CamTrans ',
                     style: TextStyle(color: Colors.white54, fontSize: 15)),
                 const SizedBox(height: 24),
 

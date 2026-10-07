@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -8,7 +8,7 @@ import 'package:update_camtrans/coeur/constantes/couleurs.dart';
 /// ============================================================
 /// WIDGET: QrSuivi
 /// ============================================================
-/// ✅ INNOVATION 4.1: QR Code de suivi de course partageable.
+///  INNOVATION 4.1: QR Code de suivi de course partageable.
 /// Utilise le package qr_flutter (déjà installé dans pubspec.yaml).
 ///
 /// Le client peut afficher ce QR Code pour permettre au destinataire

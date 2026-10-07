@@ -11,7 +11,7 @@ import 'package:update_camtrans/coeur/constantes/couleurs.dart';
 /// avec animations fluides pour rassurer l'utilisateur pendant
 /// le processus (qui peut durer jusqu'à 2 minutes avec CamPay).
 ///
-/// ✅ HUMANISATION 3.1: Remplace le simple "Traitement en cours..."
+///  HUMANISATION 3.1: Remplace le simple "Traitement en cours..."
 /// par une expérience guidée, étape par étape, avec feedback visuel.
 /// ============================================================
 class ProgressionPaiement extends StatefulWidget {
@@ -90,7 +90,7 @@ class ProgressionPaiement extends StatefulWidget {
       const EtapePaiement(
         icone: Icons.workspace_premium_rounded,
         titre: "Activation de l'abonnement",
-        description: "Bientôt prêt ! Votre accès est en cours d'activation 🚀",
+        description: "Bientôt prêt ! Votre accès est en cours d'activation ",
         couleur: Colors.amber,
       ),
     ];

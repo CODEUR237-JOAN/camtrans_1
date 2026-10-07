@@ -120,7 +120,7 @@ class _HistoriquecoursesState extends ConsumerState<HistoriqueCourses> {
                 loading: () => const Center(child: LoaderPremium()),
                 error: (error, _) => Center(
                     child:
-                        Text("Impossible de charger l'historique : $error 🔧")),
+                        Text("Impossible de charger l'historique : $error ")),
                 data: (courses) {
                   // Exclure les courses archivées côté transporteur (swipe suppression logique)
                   final coursesVisibles = courses
@@ -129,7 +129,7 @@ class _HistoriquecoursesState extends ConsumerState<HistoriqueCourses> {
                   if (coursesVisibles.isEmpty) {
                     return const Center(
                         child: Text(
-                            "Aucune course complétée. C'est le moment de prendre la route ! 🚚"));
+                            "Aucune course complétée. C'est le moment de prendre la route ! "));
                   }
 
                   return ListView.builder(

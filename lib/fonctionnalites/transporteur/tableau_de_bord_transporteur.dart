@@ -102,7 +102,7 @@ class _TableauDeBordTransporteurState
     final transporteur = transporteurAsync.valueOrNull;
     final documentsValides = transporteur?.documentsValides ?? false;
 
-    // ✅ PILIER 4: DISPATCH AUTOMATIQUE - Écoute de l'attribution (Subit l'attribution)
+    //  PILIER 4: DISPATCH AUTOMATIQUE - Écoute de l'attribution (Subit l'attribution)
     ref.listen<Course?>(activeCourseProvider, (previous, next) {
       if (next != null && previous?.id != next.id && next.statut == StatutCourse.attribue) {
         // Déclencher une alerte sonore/système
@@ -391,7 +391,7 @@ class _TableauDeBordTransporteurState
                 ),
               ),
 
-              // ✅ INNOVATION 4.3: CARTE "CONSEIL DU JOUR" - Astuces prédictives
+              //  INNOVATION 4.3: CARTE "CONSEIL DU JOUR" - Astuces prédictives
               _buildConseilDuJour(statsRevenus),
 
               const SizedBox(height: 35),
@@ -656,7 +656,7 @@ class _TableauDeBordTransporteurState
   }
 
   // ==========================================
-  // ✅ INNOVATION 4.3: CONSEIL DU JOUR
+  //  INNOVATION 4.3: CONSEIL DU JOUR
   // Carte de conseil prédictif basée sur les stats du transporteur.
   // Adapte le message selon l'heure et les revenus de la journée.
   // ==========================================

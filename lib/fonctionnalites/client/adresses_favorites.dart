@@ -66,12 +66,12 @@ class _AdressesFavoritesPageState extends ConsumerState<AdressesFavoritesPage> {
         _labelController.clear();
         _adresseController.clear();
         _afficherSnackbar(
-            '✅ Adresse enregistrée avec succès !', CouleursApp.succes);
+            ' Adresse enregistrée avec succès !', CouleursApp.succes);
       }
     } catch (e) {
       if (mounted) {
         _afficherSnackbar(
-            '❌ Erreur lors de l\'enregistrement.', CouleursApp.erreur);
+            ' Erreur lors de l\'enregistrement.', CouleursApp.erreur);
       }
     } finally {
       if (mounted) setState(() => _isSaving = false);

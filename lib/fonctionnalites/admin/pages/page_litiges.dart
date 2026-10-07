@@ -110,9 +110,9 @@ class _PageLitigesState extends ConsumerState<PageLitiges>
                   unselectedLabelColor: Colors.white38,
                   labelStyle: GoogleFonts.inter(fontWeight: FontWeight.bold),
                   tabs: const [
-                    Tab(text: '🚚 Courses'),
-                    Tab(text: '💳 Paiements'),
-                    Tab(text: '💬 Conversations'),
+                    Tab(text: ' Courses'),
+                    Tab(text: ' Paiements'),
+                    Tab(text: ' Conversations'),
                   ],
                 ),
               ],
@@ -166,7 +166,7 @@ class _OngletCourses extends ConsumerWidget {
         if (filtered.isEmpty) {
           return const Center(
               child: Text(
-                  'Aucune course correspondante, c\'est très calme par ici ! 🌴',
+                  'Aucune course correspondante, c\'est très calme par ici ! ',
                   style: TextStyle(color: Colors.white38)));
         }
 
@@ -342,7 +342,7 @@ class _CarteCourse extends ConsumerWidget {
         id: 'NOTIF-LITIGE-${uid.substring(0, 5)}-${DateTime.now().millisecondsSinceEpoch}',
         donnees: {
           'utilisateurId': uid,
-          'titre': '⚠️ Course annulée par l\'admin',
+          'titre': '️ Course annulée par l\'admin',
           'message':
               'La course #${course.id.substring(0, 8).toUpperCase()} a été annulée suite à un litige.',
           'type': 'alerte',
@@ -404,7 +404,7 @@ class _OngletPaiements extends ConsumerWidget {
         if (filtered.isEmpty) {
           return const Center(
               child: Text(
-                  'Aucun paiement trouvé, espérons que les affaires reprennent vite ! 💸',
+                  'Aucun paiement trouvé, espérons que les affaires reprennent vite ! ',
                   style: TextStyle(color: Colors.white38)));
         }
 
@@ -563,7 +563,7 @@ class _OngletConversations extends ConsumerWidget {
                 Icon(Icons.chat_bubble_outline,
                     size: 64, color: Colors.white12),
                 SizedBox(height: 12),
-                Text('Aucune conversation pour le moment. 🕊️',
+                Text('Aucune conversation pour le moment. ️',
                     style: TextStyle(color: Colors.white38, fontSize: 16)),
               ],
             ),

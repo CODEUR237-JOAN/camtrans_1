@@ -58,7 +58,7 @@ class SuiviCourseNotifier extends StateNotifier<SuiviCourseEtat> {
       onError: (Object e) {
         // Ex. permission-denied après suppression de la course :
         // sans ce handler, l'erreur remonte en "Unhandled Exception".
-        debugPrint("⚠️ Flux course $courseId interrompu : $e");
+        debugPrint("️ Flux course $courseId interrompu : $e");
         if (!mounted) return;
         state = state.copyWith(
           erreur: "Cette course n'est plus accessible.",
@@ -107,7 +107,7 @@ class SuiviCourseNotifier extends StateNotifier<SuiviCourseEtat> {
         }
       },
       onError: (Object e) {
-        debugPrint("⚠️ Flux transporteur $transporteurId interrompu : $e");
+        debugPrint("️ Flux transporteur $transporteurId interrompu : $e");
       },
     );
   }

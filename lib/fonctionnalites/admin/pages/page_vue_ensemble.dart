@@ -78,7 +78,7 @@ class PageVueEnsemble extends ConsumerWidget {
               loading: () => const _SkeletonVueEnsemble(),
               error: (err, _) => Center(
                   child: Text(
-                      "Oups ! Chargement des stats impossible : $err 🔧",
+                      "Oups ! Chargement des stats impossible : $err ",
                       style: const TextStyle(color: Colors.white))),
               data: (stats) {
                 return SingleChildScrollView(
@@ -498,7 +498,7 @@ class PageVueEnsemble extends ConsumerWidget {
       enfant: distributionAsync.when(
         loading: () => const Center(child: LoaderPremium()),
         error: (err, _) => Center(
-            child: Text("Impossible de charger les activités : $err 🔧",
+            child: Text("Impossible de charger les activités : $err ",
                 style: const TextStyle(color: Colors.white))),
         data: (data) {
           // Normalisation des données pour regrouper les statuts similaires
@@ -644,7 +644,7 @@ class PageVueEnsemble extends ConsumerWidget {
       enfant: activitiesAsync.when(
         loading: () => const Center(child: LoaderPremium()),
         error: (err, _) => Center(
-            child: Text("Données financières inaccessibles : $err 🔧",
+            child: Text("Données financières inaccessibles : $err ",
                 style: const TextStyle(color: Colors.white))),
         data: (list) {
           if (list.isEmpty) {
@@ -759,7 +759,7 @@ class PageVueEnsemble extends ConsumerWidget {
                 color: Colors.white.withValues(alpha: 0.1),
                 duration: 1.5.seconds),
         error: (err, _) => Center(
-            child: Text("Oups ! Graphe indisponible : $err 📊",
+            child: Text("Oups ! Graphe indisponible : $err ",
                 style: const TextStyle(color: Colors.white))),
         data: (data) {
           final spots = data
@@ -875,7 +875,7 @@ class PageVueEnsemble extends ConsumerWidget {
                         color: Colors.white.withValues(alpha: 0.1),
                         duration: 1.5.seconds),
             error: (err, _) => Center(
-                child: Text("Oups ! Carte indisponible : $err 🗺️",
+                child: Text("Oups ! Carte indisponible : $err ️",
                     style: const TextStyle(color: Colors.white))),
             data: (transporteurs) {
               final markers = transporteurs

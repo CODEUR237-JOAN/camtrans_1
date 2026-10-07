@@ -423,7 +423,7 @@ class _InscriptionTransporteurState
                   const SizedBox(height: 8),
 
                   const Text(
-                    "Transportez à votre rythme et pilotez vos revenus 🚚",
+                    "Transportez à votre rythme et pilotez vos revenus ",
                     textAlign: TextAlign.center,
                     style: TextStyle(
                       fontSize: 15,

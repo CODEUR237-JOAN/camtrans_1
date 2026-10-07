@@ -11,7 +11,7 @@ import 'package:update_camtrans/modeles/parametres_app.dart';
 
 final adminClientsProvider = StreamProvider.autoDispose<List<Client>>((ref) {
   final firestore = ref.watch(serviceFirestoreProvider);
-  // ✅ AMÉLIORATION 2.1: Limité à 200 entrées pour éviter les surcharges mémoire
+  //  AMÉLIORATION 2.1: Limité à 200 entrées pour éviter les surcharges mémoire
   return firestore.fluxCollection(collection: 'clients').map((snapshot) {
     return snapshot.docs.take(200).map((doc) {
       final data = doc.data();
@@ -24,7 +24,7 @@ final adminClientsProvider = StreamProvider.autoDispose<List<Client>>((ref) {
 final adminTransporteursProvider =
     StreamProvider.autoDispose<List<Transporteur>>((ref) {
   final firestore = ref.watch(serviceFirestoreProvider);
-  // ✅ AMÉLIORATION 2.1: Limité à 200 entrées
+  //  AMÉLIORATION 2.1: Limité à 200 entrées
   return firestore.fluxCollection(collection: 'transporteurs').map((snapshot) {
     return snapshot.docs.take(200).map((doc) {
       final data = doc.data();
@@ -36,7 +36,7 @@ final adminTransporteursProvider =
 
 final adminCoursesProvider = StreamProvider.autoDispose<List<Course>>((ref) {
   final firestore = ref.watch(serviceFirestoreProvider);
-  // ✅ AMÉLIORATION 2.1: Limité à 500 courses (les plus récentes)
+  //  AMÉLIORATION 2.1: Limité à 500 courses (les plus récentes)
   return firestore.fluxCollection(collection: 'courses').map((snapshot) {
     final courses = snapshot.docs.map((doc) {
       final data = doc.data();
@@ -270,7 +270,7 @@ final adminStatsProvider = Provider.autoDispose<AsyncValue<AdminStats>>((ref) {
   // Si on veut des courbes "cumulatives" plutôt que par jour, on peut faire :
   // Mais par jour c'est mieux pour des sparklines !
 
-  // ✅ CORRECTION 1.5: Suppression des données fictives injectées quand tout = 0
+  //  CORRECTION 1.5: Suppression des données fictives injectées quand tout = 0
   // Ces données étaient trompeuses pour l'admin (il voyait de faux graphiques).
   // Désormais, si aucune donnée réelle, les historiques restent à 0 (honnête).
   // Cela permet à l'admin de voir le vrai état du système au démarrage.

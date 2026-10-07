@@ -119,14 +119,14 @@ class ServiceFirestore {
   /// [ADMINISTRATION] Purge globale de la base de données.
   /// Supprime toutes les courses inactives (terminées ou annulées) de tous les utilisateurs
   /// pour libérer de l'espace de stockage. Action irréversible.
-  /// ✅ P0-4 SÉCURITÉ : Découpage en batches de 500 max (limite Firestore).
-  /// ✅ P0-4 SÉCURITÉ : Journalisation dans la collection 'audit_logs'.
+  ///  P0-4 SÉCURITÉ : Découpage en batches de 500 max (limite Firestore).
+  ///  P0-4 SÉCURITÉ : Journalisation dans la collection 'audit_logs'.
   Future<int> purgerHistoriqueGlobal({String? adminId}) async {
     final snapshot = await _db
         .collection('courses')
         .where('statut', whereIn: ['terminee', 'annulee']).get();
 
-    // ✅ P0-5 : Découper en batches de 500 max
+    //  P0-5 : Découper en batches de 500 max
     final docs = snapshot.docs;
     for (int i = 0; i < docs.length; i += 499) {
       final batch = _db.batch();
@@ -137,7 +137,7 @@ class ServiceFirestore {
       await batch.commit();
     }
 
-    // ✅ P0-4 : Journalisation de l'action
+    //  P0-4 : Journalisation de l'action
     await _db.collection('audit_logs').add({
       'action': 'purge_historique_global',
       'adminId': adminId ?? 'inconnu',
@@ -151,7 +151,7 @@ class ServiceFirestore {
 
   /// [ADMINISTRATION] Suppression d'un compte utilisateur.
   /// Efface le profil de l'utilisateur ainsi que tout son historique de courses associé.
-  /// ✅ P0-5 : Découpage en batches de 500 max.
+  ///  P0-5 : Découpage en batches de 500 max.
   Future<void> supprimerCompteUtilisateur(String userId, String role) async {
     // Supprimer le profil
     final collection = role == 'transporteur' ? 'transporteurs' : 'clients';
@@ -169,7 +169,7 @@ class ServiceFirestore {
 
     final allDocs = [...coursesClient.docs, ...coursesTransp.docs];
 
-    // ✅ P0-5 : Découper en batches de 500 max
+    //  P0-5 : Découper en batches de 500 max
     for (int i = 0; i < allDocs.length; i += 499) {
       final batch = _db.batch();
       final end = (i + 499 < allDocs.length) ? i + 499 : allDocs.length;
@@ -179,7 +179,7 @@ class ServiceFirestore {
       await batch.commit();
     }
 
-    // ✅ P0-4 : Journalisation
+    //  P0-4 : Journalisation
     await _db.collection('audit_logs').add({
       'action': 'suppression_compte',
       'userId': userId,

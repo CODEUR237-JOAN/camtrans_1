@@ -22,8 +22,8 @@ class _PageGestionTextesState extends ConsumerState<PageGestionTextes> {
   // Descriptions affichées dans l'UI pour chaque clé
   final Map<String, String> _descriptions = {
     // === Documents Légaux ===
-    'conditions_transporteur': "📋 Conditions d'utilisation (transporteurs)",
-    'conditions_client': "📋 Conditions d'utilisation (clients)",
+    'conditions_transporteur': " Conditions d'utilisation (transporteurs)",
+    'conditions_client': " Conditions d'utilisation (clients)",
 
     // Succès
     'succes_parametres': "Succès : Mise à jour des paramètres",
@@ -137,7 +137,7 @@ class _PageGestionTextesState extends ConsumerState<PageGestionTextes> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text("Textes mis à jour avec succès ! ✨"),
+            content: Text("Textes mis à jour avec succès ! "),
             backgroundColor: CouleursApp.succes,
           ),
         );
@@ -146,7 +146,7 @@ class _PageGestionTextesState extends ConsumerState<PageGestionTextes> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text("Erreur lors de la sauvegarde : $e 🔧"),
+            content: Text("Erreur lors de la sauvegarde : $e "),
             backgroundColor: Colors.red,
           ),
         );
@@ -208,7 +208,7 @@ class _PageGestionTextesState extends ConsumerState<PageGestionTextes> {
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
-                          "💡 Videz un champ et sauvegardez pour revenir à la valeur par défaut codée en dur.",
+                          " Videz un champ et sauvegardez pour revenir à la valeur par défaut codée en dur.",
                           style: GoogleFonts.inter(
                               color: CouleursApp.primaire, fontSize: 12),
                         ),

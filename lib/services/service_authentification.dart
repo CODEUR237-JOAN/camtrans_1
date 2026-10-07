@@ -28,7 +28,7 @@ class ServiceAuthentification {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final GoogleSignIn _googleSignIn = GoogleSignIn(
     scopes: ['email', 'profile'],
-    // ✅ P1-8 : Le clientId Web doit être configuré dans la console Firebase/GCP.
+    //  P1-8 : Le clientId Web doit être configuré dans la console Firebase/GCP.
     // Sur mobile (Android/iOS), il n'est pas nécessaire ici.
   );
 
@@ -163,7 +163,7 @@ class ServiceAuthentification {
     try {
       await ServicePresence().arreter();
     } catch (e) {
-      // ✅ FIX : Erreur loggée — ne doit pas bloquer la déconnexion
+      //  FIX : Erreur loggée — ne doit pas bloquer la déconnexion
       debugPrint('[Auth] Avertissement lors de l\'arrêt de présence : $e');
     }
     // 2. Se deconnecter

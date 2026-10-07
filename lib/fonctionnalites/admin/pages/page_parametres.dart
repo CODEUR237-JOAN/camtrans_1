@@ -95,13 +95,13 @@ class _PageParametresState extends ConsumerState<PageParametres> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
             content: Text(
-                "Parfait ! Les paramètres ont été mis à jour avec succès. ✨"),
+                "Parfait ! Les paramètres ont été mis à jour avec succès. "),
             backgroundColor: CouleursApp.succes));
       }
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text("Oups ! Échec de la sauvegarde : $e 🔧")));
+            SnackBar(content: Text("Oups ! Échec de la sauvegarde : $e ")));
       }
     } finally {
       if (mounted) {
@@ -119,7 +119,7 @@ class _PageParametresState extends ConsumerState<PageParametres> {
       body: parametresAsync.when(
         loading: () => const Center(child: LoaderPremium()),
         error: (err, stack) => Center(
-            child: Text("Impossible de charger les paramètres : $err 🔧",
+            child: Text("Impossible de charger les paramètres : $err ",
                 style: const TextStyle(color: Colors.redAccent))),
         data: (parametres) {
           // On initialise une seule fois (pour ne pas écraser la saisie en cours de route si un update arrive)

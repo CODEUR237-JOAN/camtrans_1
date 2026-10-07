@@ -222,7 +222,7 @@ class _MarcheDemandesState extends ConsumerState<MarcheDemandes> {
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
-        // ✅ CORRECTION BUG: foregroundColor blanc (était noir sur fond noir)
+        //  CORRECTION BUG: foregroundColor blanc (était noir sur fond noir)
         title: Text(
           "Marché des demandes",
           style: GoogleFonts.inter(
@@ -291,7 +291,7 @@ class _MarcheDemandesState extends ConsumerState<MarcheDemandes> {
             ),
             data: (courses) {
               if (courses.isEmpty) {
-                // ✅ HUMANISATION 3.3: État vide chaleureux et motivant
+                //  HUMANISATION 3.3: État vide chaleureux et motivant
                 return Center(
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 32),

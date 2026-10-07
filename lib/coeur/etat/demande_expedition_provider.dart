@@ -318,14 +318,14 @@ class DemandeExpeditionNotifier extends StateNotifier<EtatDemandeExpedition> {
 
       List<Transporteur> candidats = [];
       debugPrint(
-          "🔍 RECHERCHE DE CHAUFFEUR : ${query.docs.length} transporteur(s) en ligne trouvé(s). Véhicule requis = '$vehiculeRequis'");
+          " RECHERCHE DE CHAUFFEUR : ${query.docs.length} transporteur(s) en ligne trouvé(s). Véhicule requis = '$vehiculeRequis'");
 
       for (var doc in query.docs) {
         final data = doc.data();
         data['id'] = doc.id;
         final t = Transporteur.fromMap(data);
 
-        debugPrint("   👉 Analyse de ${t.prenom} ${t.nom} (ID: ${t.id}) :");
+        debugPrint("    Analyse de ${t.prenom} ${t.nom} (ID: ${t.id}) :");
         debugPrint("      - estEnLigne: ${t.estEnLigne}");
         debugPrint("      - disponible: ${t.disponible}");
         debugPrint("      - documentsValides: ${t.documentsValides}");
@@ -338,9 +338,9 @@ class DemandeExpeditionNotifier extends StateNotifier<EtatDemandeExpedition> {
             t.documentsValides &&
             t.typeVehicule == vehiculeRequis) {
           candidats.add(t);
-          debugPrint("      ✅ ACCEPTE comme candidat !");
+          debugPrint("       ACCEPTE comme candidat !");
         } else {
-          debugPrint("      ❌ REJETE.");
+          debugPrint("       REJETE.");
         }
       }
 
@@ -349,9 +349,9 @@ class DemandeExpeditionNotifier extends StateNotifier<EtatDemandeExpedition> {
         candidats.sort((a, b) => a.nombreCourses.compareTo(b.nombreCourses));
         chauffeur = candidats.first;
         debugPrint(
-            "🏆 Chauffeur sélectionné : ${chauffeur.prenom} ${chauffeur.nom}");
+            " Chauffeur sélectionné : ${chauffeur.prenom} ${chauffeur.nom}");
       } else {
-        debugPrint("⚠️ Aucun candidat n'a passé tous les filtres.");
+        debugPrint("️ Aucun candidat n'a passé tous les filtres.");
       }
     } catch (e) {
       debugPrint("Erreur lors de la recherche du chauffeur: $e");

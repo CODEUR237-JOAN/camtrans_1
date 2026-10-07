@@ -161,7 +161,7 @@ class _ParametresState extends ConsumerState<Parametres> {
   void _toast(String message, {bool erreur = false}) {
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Text(message, style: GoogleFonts.inter(color: Colors.white)),
+      content: Text(message, style: GoogleFonts.inter(color: Theme.of(context).colorScheme.onSurface)),
       backgroundColor: erreur ? CouleursApp.erreur : CouleursApp.succes,
       behavior: SnackBarBehavior.floating,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -180,7 +180,7 @@ class _ParametresState extends ConsumerState<Parametres> {
         title: Text(
           'Déconnexion',
           style: GoogleFonts.inter(
-              color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18),
+              color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.bold, fontSize: 18),
         ),
         content: Text(
           'Êtes-vous sûr de vouloir vous déconnecter de CamTrans ?',
@@ -378,18 +378,18 @@ class _ParametresState extends ConsumerState<Parametres> {
                 ),
               ),
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: 20),
             Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.all(10),
+                  padding: EdgeInsets.all(10),
                   decoration: BoxDecoration(
                     color: CouleursApp.primaire.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Icon(icone, color: CouleursApp.primaire, size: 22),
                 ),
-                const SizedBox(width: 14),
+                SizedBox(width: 14),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -407,7 +407,7 @@ class _ParametresState extends ConsumerState<Parametres> {
                 ),
               ],
             ),
-            const SizedBox(height: 20),
+            SizedBox(height: 20),
             ...enfants,
           ],
         ),
@@ -424,16 +424,16 @@ class _ParametresState extends ConsumerState<Parametres> {
   }) {
     final c = couleur ?? CouleursApp.primaire;
     return Container(
-      margin: const EdgeInsets.only(bottom: 10),
+      margin: EdgeInsets.only(bottom: 10),
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: CouleursApp.bordureSombre),
       ),
       child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 14, vertical: 4),
+        contentPadding: EdgeInsets.symmetric(horizontal: 14, vertical: 4),
         leading: Container(
-          padding: const EdgeInsets.all(9),
+          padding: EdgeInsets.all(9),
           decoration: BoxDecoration(
             color: c.withValues(alpha: 0.12),
             borderRadius: BorderRadius.circular(12),
@@ -464,8 +464,8 @@ class _ParametresState extends ConsumerState<Parametres> {
   }) {
     return StatefulBuilder(
       builder: (context, setSheetState) => Container(
-        margin: const EdgeInsets.only(bottom: 10),
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+        margin: EdgeInsets.only(bottom: 10),
+        padding: EdgeInsets.symmetric(horizontal: 14, vertical: 10),
         decoration: BoxDecoration(
           color: Theme.of(context).colorScheme.surface,
           borderRadius: BorderRadius.circular(16),
@@ -474,14 +474,14 @@ class _ParametresState extends ConsumerState<Parametres> {
         child: Row(
           children: [
             Container(
-              padding: const EdgeInsets.all(9),
+              padding: EdgeInsets.all(9),
               decoration: BoxDecoration(
                 color: CouleursApp.accentViolet.withValues(alpha: 0.12),
                 borderRadius: BorderRadius.circular(12),
               ),
               child: Icon(icone, color: CouleursApp.accentViolet, size: 18),
             ),
-            const SizedBox(width: 12),
+            SizedBox(width: 12),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -514,8 +514,8 @@ class _ParametresState extends ConsumerState<Parametres> {
 
   Widget _ligneFeuilleInfo({required IconData icone, required String texte}) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 10),
-      padding: const EdgeInsets.all(14),
+      margin: EdgeInsets.only(bottom: 10),
+      padding: EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: CouleursApp.primaire.withValues(alpha: 0.06),
         borderRadius: BorderRadius.circular(16),
@@ -525,7 +525,7 @@ class _ParametresState extends ConsumerState<Parametres> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Icon(icone, color: CouleursApp.primaire, size: 18),
-          const SizedBox(width: 12),
+          SizedBox(width: 12),
           Expanded(
             child: Text(texte,
                 style: GoogleFonts.inter(
@@ -564,17 +564,17 @@ class _ParametresState extends ConsumerState<Parametres> {
         ),
       ),
       body: ListView(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+        padding: EdgeInsets.symmetric(horizontal: 20, vertical: 16),
         physics: const BouncingScrollPhysics(),
         children: [
           // --- Profil compact ---
           _buildProfilBandeau(nomUtilisateur, clientAsync.value?.email ?? ''),
 
-          const SizedBox(height: 28),
+          SizedBox(height: 28),
 
           // === Section : Préférences ===
           _buildSectionTitre('Préférences'),
-          const SizedBox(height: 12),
+          SizedBox(height: 12),
 
           _buildSwitch(
             icone: Iconsax.notification_copy,
@@ -603,20 +603,20 @@ class _ParametresState extends ConsumerState<Parametres> {
             onChange: _changerBiometrie,
           ),
 
-          const SizedBox(height: 28),
+          SizedBox(height: 28),
 
           // === Section : Apparence & Langue ===
           _buildSectionTitre('Interface'),
-          const SizedBox(height: 12),
+          SizedBox(height: 12),
           const SelecteurTheme(),
-          const SizedBox(height: 12),
+          SizedBox(height: 12),
           _buildSelecteurLangue(),
 
-          const SizedBox(height: 28),
+          SizedBox(height: 28),
 
           // === Section : Compte ===
           _buildSectionTitre('Compte'),
-          const SizedBox(height: 12),
+          SizedBox(height: 12),
 
           _buildTuile(
             icone: Iconsax.lock_1_copy,
@@ -634,11 +634,11 @@ class _ParametresState extends ConsumerState<Parametres> {
             onTap: _ouvrirConfidentialite,
           ),
 
-          const SizedBox(height: 28),
+          SizedBox(height: 28),
 
           // === Section : À propos ===
           _buildSectionTitre('À propos'),
-          const SizedBox(height: 12),
+          SizedBox(height: 12),
 
           _buildTuile(
             icone: Iconsax.document_text_copy,
@@ -663,11 +663,11 @@ class _ParametresState extends ConsumerState<Parametres> {
             onTap: _noterApplication,
           ),
 
-          const SizedBox(height: 16),
+          SizedBox(height: 16),
 
           // Badge version
           Container(
-            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+            padding: EdgeInsets.symmetric(horizontal: 20, vertical: 14),
             decoration: BoxDecoration(
               color: Theme.of(context).colorScheme.surface,
               borderRadius: BorderRadius.circular(16),
@@ -676,15 +676,15 @@ class _ParametresState extends ConsumerState<Parametres> {
             child: Row(
               children: [
                 Container(
-                  padding: const EdgeInsets.all(8),
+                  padding: EdgeInsets.all(8),
                   decoration: BoxDecoration(
                     color: CouleursApp.succes.withValues(alpha: 0.12),
                     borderRadius: BorderRadius.circular(10),
                   ),
-                  child: const Icon(Iconsax.verify_copy,
+                  child: Icon(Iconsax.verify_copy,
                       color: CouleursApp.succes, size: 18),
                 ),
-                const SizedBox(width: 14),
+                SizedBox(width: 14),
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -702,7 +702,7 @@ class _ParametresState extends ConsumerState<Parametres> {
             ),
           ).animate().fadeIn(duration: 400.ms),
 
-          const SizedBox(height: 28),
+          SizedBox(height: 28),
 
           // === Bouton Déconnexion — FONCTIONNEL ===
           SizedBox(
@@ -714,19 +714,19 @@ class _ParametresState extends ConsumerState<Parametres> {
                 backgroundColor: CouleursApp.erreur,
                 disabledBackgroundColor:
                     CouleursApp.erreur.withValues(alpha: 0.4),
-                foregroundColor: Colors.white,
+                foregroundColor: Theme.of(context).colorScheme.onSurface,
                 shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(16)),
                 elevation: 0,
               ),
               icon: _isLoggingOut
-                  ? const SizedBox(
+                  ? SizedBox(
                       width: 18,
                       height: 18,
                       child: CircularProgressIndicator(
-                          color: Colors.white, strokeWidth: 2.5),
+                          color: Theme.of(context).colorScheme.onSurface, strokeWidth: 2.5),
                     )
-                  : const Icon(Iconsax.logout_copy),
+                  : Icon(Iconsax.logout_copy),
               label: Text(
                 _isLoggingOut ? 'Déconnexion...' : 'Se déconnecter',
                 style: GoogleFonts.inter(
@@ -735,7 +735,7 @@ class _ParametresState extends ConsumerState<Parametres> {
             ),
           ).animate().slideY(begin: 0.2, duration: 400.ms),
 
-          const SizedBox(height: 40),
+          SizedBox(height: 40),
         ],
       ),
     );
@@ -750,7 +750,7 @@ class _ParametresState extends ConsumerState<Parametres> {
     final isFr = locale.languageCode == 'fr';
     
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+      padding: EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
@@ -762,14 +762,14 @@ class _ParametresState extends ConsumerState<Parametres> {
           Row(
             children: [
               Container(
-                padding: const EdgeInsets.all(9),
+                padding: EdgeInsets.all(9),
                 decoration: BoxDecoration(
                   color: CouleursApp.primaire.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: const Icon(Icons.language, color: CouleursApp.primaire, size: 18),
+                child: Icon(Icons.language, color: CouleursApp.primaire, size: 18),
               ),
-              const SizedBox(width: 12),
+              SizedBox(width: 12),
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -786,7 +786,7 @@ class _ParametresState extends ConsumerState<Parametres> {
             ],
           ),
           SegmentedButton<String>(
-            segments: const [
+            segments: [
               ButtonSegment(value: 'fr', label: Text('FR')),
               ButtonSegment(value: 'en', label: Text('EN')),
             ],
@@ -796,7 +796,7 @@ class _ParametresState extends ConsumerState<Parametres> {
             },
             style: SegmentedButton.styleFrom(
               backgroundColor: Theme.of(context).colorScheme.surface,
-              selectedForegroundColor: Colors.white,
+              selectedForegroundColor: Theme.of(context).colorScheme.onSurface,
               selectedBackgroundColor: CouleursApp.primaire,
             ),
           ),
@@ -807,7 +807,7 @@ class _ParametresState extends ConsumerState<Parametres> {
 
   Widget _buildProfilBandeau(String nom, String email) {
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: EdgeInsets.all(20),
       decoration: BoxDecoration(
         gradient: const LinearGradient(
           colors: [Color(0xFF007ACC), Color(0xFF33AFFF)],
@@ -829,7 +829,7 @@ class _ParametresState extends ConsumerState<Parametres> {
                   color: Theme.of(context).colorScheme.onSurface),
             ),
           ),
-          const SizedBox(width: 16),
+          SizedBox(width: 16),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -842,7 +842,7 @@ class _ParametresState extends ConsumerState<Parametres> {
                       fontSize: 16),
                   overflow: TextOverflow.ellipsis,
                 ),
-                const SizedBox(height: 2),
+                SizedBox(height: 2),
                 Text(
                   email,
                   style: GoogleFonts.inter(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), fontSize: 13),
@@ -876,8 +876,8 @@ class _ParametresState extends ConsumerState<Parametres> {
     required ValueChanged<bool> onChange,
   }) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      margin: EdgeInsets.only(bottom: 12),
+      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
@@ -886,14 +886,14 @@ class _ParametresState extends ConsumerState<Parametres> {
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.all(10),
+            padding: EdgeInsets.all(10),
             decoration: BoxDecoration(
               color: couleur.withValues(alpha: 0.12),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Icon(icone, color: couleur, size: 20),
           ),
-          const SizedBox(width: 14),
+          SizedBox(width: 14),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -926,16 +926,16 @@ class _ParametresState extends ConsumerState<Parametres> {
     required VoidCallback onTap,
   }) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 10),
+      margin: EdgeInsets.only(bottom: 10),
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: CouleursApp.bordureSombre),
       ),
       child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+        contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
         leading: Container(
-          padding: const EdgeInsets.all(10),
+          padding: EdgeInsets.all(10),
           decoration: BoxDecoration(
             color: CouleursApp.primaire.withValues(alpha: 0.1),
             borderRadius: BorderRadius.circular(12),

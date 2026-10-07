@@ -85,7 +85,7 @@ class SuiviNotifier extends StateNotifier<EtatSuivi> {
   String? _transporteurIdActuel;
   Timer? _simulateurTimer;
 
-  // ✅ AMÉLIORATION 2.3: Dernier point de géocodage — évite les appels redondants
+  //  AMÉLIORATION 2.3: Dernier point de géocodage — évite les appels redondants
   LatLng? _dernierePositionGeocodee;
   static const double _seuilGeocodingMetres = 100.0;
   bool _itineraireDemande = false;
@@ -209,7 +209,7 @@ class SuiviNotifier extends StateNotifier<EtatSuivi> {
           tempsRestantSeconds: tempsRestant,
         );
 
-        // ✅ AMÉLIORATION 2.3: Ne géocoder que si la position a changé de >100m
+        //  AMÉLIORATION 2.3: Ne géocoder que si la position a changé de >100m
         // Cela réduit massivement les appels API inutiles à chaque update Firestore
         if (transporteur.latitude != 0 && transporteur.longitude != 0) {
           final positionNavVocale =
