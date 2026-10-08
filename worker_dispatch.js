@@ -103,7 +103,7 @@ db.collection('courses')
           // 3. Déclencher une notification Push via la collection que `worker_notifications.js` écoute
           await db.collection('notifications_push').add({
             titre: "🚚 Nouvelle course !",
-            message: `Vous avez été assigné à une course de ${distanceMin.toFixed(1)}km. Récupérez le colis à ${course.adresseDepart}`,
+            message: `Vous avez été assigné à une course de ${distanceMin.toFixed(1)}km. Récupérez la marchandise à ${course.adresseDepart}`,
             cible: "transporteurs", // Idéalement on ciblera spécifiquement ce transporteur par son FCM si implémenté dans le worker
             status: "pending",
             createdAt: new Date()

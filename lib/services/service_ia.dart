@@ -206,7 +206,8 @@ class ServiceIA {
   // Cette méthode extrait proprement l'objet JSON pur, même si
   // la réponse contient des blocs ```json ... ```.
   // ----------------------------------------------------------
-  Map<String, dynamic>? _extraireJson(String? texte) {
+  @visibleForTesting
+  Map<String, dynamic>? extraireJson(String? texte) {
     if (texte == null || texte.isEmpty) return null;
 
     // Tentative directe : si le texte est déjà un JSON valide
@@ -290,7 +291,7 @@ class ServiceIA {
 
         if (response.statusCode == 200) {
           final text = jsonDecode(response.body)['content'][0]['text'];
-          final data = _extraireJson(text);
+          final data = extraireJson(text);
           if (data != null) return data;
         } else {
           // On ne bloque pas l'utilisateur, mais on trace l'erreur en debug
@@ -315,7 +316,7 @@ class ServiceIA {
     for (int tentative = 1; tentative <= _maxTentatives; tentative++) {
       try {
         final reponse = await modele.generateContent(contenu);
-        final data = _extraireJson(reponse.text);
+        final data = extraireJson(reponse.text);
         if (data != null) return data;
 
         // Si le JSON est invalide, on réessaie

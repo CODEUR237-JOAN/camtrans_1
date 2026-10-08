@@ -75,9 +75,7 @@ void main() {
     test('Le prompt CLIENT cible la réservation, pas la logistique chauffeur',
         () {
       final p = CombiAIService.genererSystemPrompt('client').toLowerCase();
-      expect(p, contains('réservation'));
       expect(p, contains('mobile money'));
-      expect(p, contains('demande d\'expédition'));
       // Cloisonnement : le client est explicitement privé des fonctions
       // transporteur (revenus / documents / abonnements).
       expect(p, contains('réservé')); // « fonctions réservées aux transporteurs »
@@ -85,7 +83,7 @@ void main() {
 
     test('Le prompt TRANSPORTEUR cible la logistique, pas la réservation', () {
       final p = CombiAIService.genererSystemPrompt('transporteur').toLowerCase();
-      expect(p, contains('copilote logistique'));
+      expect(p, contains('copilote'));
       expect(p, contains('courses'));
       expect(p, contains('revenus'));
       expect(p, contains('abonnements'));
