@@ -201,8 +201,8 @@ class _EcranChatState extends ConsumerState<EcranChat> {
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
                   return const Center(
-                      child:
-                          CircularProgressIndicator(color: CouleursApp.primaire));
+                      child: CircularProgressIndicator(
+                          color: CouleursApp.primaire));
                 }
                 if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
                   return Center(
@@ -346,8 +346,8 @@ class _EcranChatState extends ConsumerState<EcranChat> {
                 height: 220,
                 color: Colors.black26,
                 child: const Center(
-                    child: CircularProgressIndicator(
-                        color: CouleursApp.primaire)),
+                    child:
+                        CircularProgressIndicator(color: CouleursApp.primaire)),
               ),
               errorWidget: (c, u, e) => Container(
                 width: 220,
@@ -360,9 +360,10 @@ class _EcranChatState extends ConsumerState<EcranChat> {
         ),
         if (msg.texte.isNotEmpty)
           Padding(
-            padding: const EdgeInsets.only(top: 6, left: 4, right: 4, bottom: 2),
-            child: Text(msg.texte,
-                style: GoogleFonts.inter(color: Colors.white)),
+            padding:
+                const EdgeInsets.only(top: 6, left: 4, right: 4, bottom: 2),
+            child:
+                Text(msg.texte, style: GoogleFonts.inter(color: Colors.white)),
           ),
       ],
     );

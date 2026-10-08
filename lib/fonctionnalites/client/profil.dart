@@ -33,7 +33,8 @@ class Profil extends ConsumerWidget {
       ),
       body: clientAsync.when(
         loading: () => const Center(child: LoaderPremium()),
-        error: (err, stack) => Center(child: Text("Oups, impossible de charger votre profil. ($err)")),
+        error: (err, stack) => Center(
+            child: Text("Oups, impossible de charger votre profil. ($err)")),
         data: (client) {
           final user = auth.utilisateur;
           final userName = client != null
@@ -94,7 +95,11 @@ class Profil extends ConsumerWidget {
                 Text(
                   "Client CamTrans",
                   style: TextStyle(
-                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), fontWeight: FontWeight.w500),
+                      color: Theme.of(context)
+                          .colorScheme
+                          .onSurface
+                          .withValues(alpha: 0.7),
+                      fontWeight: FontWeight.w500),
                 ),
 
                 const SizedBox(height: 30),
@@ -121,7 +126,8 @@ class Profil extends ConsumerWidget {
                           livrees.fold(0, (sum, c) => sum + c.prixEstime);
                     }
 
-                    return _buildStats(context, 
+                    return _buildStats(
+                      context,
                       courses: livrees.length,
                       depenses: depenses,
                       enCours: enCours.length,
@@ -138,29 +144,41 @@ class Profil extends ConsumerWidget {
                 // Section Infos Contact
                 Container(
                   decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.03),
+                    color: Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withValues(alpha: 0.03),
                     borderRadius: BorderRadius.circular(24),
-                    border:
-                        Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08)),
+                    border: Border.all(
+                        color: Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withValues(alpha: 0.08)),
                   ),
                   child: Column(
                     children: [
-                      _ligneInformation(context, 
-                          Iconsax.call_copy, "Téléphone", userPhone),
+                      _ligneInformation(
+                          context, Iconsax.call_copy, "Téléphone", userPhone),
                       Divider(
-                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1),
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onSurface
+                              .withValues(alpha: 0.1),
                           height: 1,
                           indent: 60,
                           endIndent: 20),
-                      _ligneInformation(context, 
-                          Iconsax.sms_copy, "Adresse e-mail", userEmail),
+                      _ligneInformation(context, Iconsax.sms_copy,
+                          "Adresse e-mail", userEmail),
                       Divider(
-                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1),
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onSurface
+                              .withValues(alpha: 0.1),
                           height: 1,
                           indent: 60,
                           endIndent: 20),
-                      _ligneInformation(context, 
-                          Iconsax.location_copy, "Ville", userVille),
+                      _ligneInformation(
+                          context, Iconsax.location_copy, "Ville", userVille),
                     ],
                   ),
                 ),
@@ -180,10 +198,16 @@ class Profil extends ConsumerWidget {
 
                 Container(
                   decoration: BoxDecoration(
-                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.03),
+                    color: Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withValues(alpha: 0.03),
                     borderRadius: BorderRadius.circular(24),
-                    border:
-                        Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08)),
+                    border: Border.all(
+                        color: Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withValues(alpha: 0.08)),
                   ),
                   child: Column(
                     children: [
@@ -193,7 +217,10 @@ class Profil extends ConsumerWidget {
                           "Mes Adresses",
                           () => context.push("/adresses-favorites")),
                       Divider(
-                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1),
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onSurface
+                              .withValues(alpha: 0.1),
                           height: 1,
                           indent: 60,
                           endIndent: 20),
@@ -203,14 +230,20 @@ class Profil extends ConsumerWidget {
                           "Modifier le profil",
                           () => context.push("/modifier-profil")),
                       Divider(
-                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1),
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onSurface
+                              .withValues(alpha: 0.1),
                           height: 1,
                           indent: 60,
                           endIndent: 20),
                       _ligneAction(context, Iconsax.key_copy, "Mot de passe",
                           () => context.push("/changer-mot-de-passe")),
                       Divider(
-                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1),
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onSurface
+                              .withValues(alpha: 0.1),
                           height: 1,
                           indent: 60,
                           endIndent: 20),
@@ -220,7 +253,10 @@ class Profil extends ConsumerWidget {
                           "Moyens de paiement",
                           () => context.push(RoutesApplication.moyensPaiement)),
                       Divider(
-                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1),
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onSurface
+                              .withValues(alpha: 0.1),
                           height: 1,
                           indent: 60,
                           endIndent: 20),
@@ -230,12 +266,18 @@ class Profil extends ConsumerWidget {
                           "Mes Factures",
                           () => context.push(RoutesApplication.factures)),
                       Divider(
-                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1),
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onSurface
+                              .withValues(alpha: 0.1),
                           height: 1,
                           indent: 60,
                           endIndent: 20),
-                      _ligneAction(context, Iconsax.setting_2_copy,
-                          "Paramètres généraux", () => context.push(RoutesApplication.parametres)),
+                      _ligneAction(
+                          context,
+                          Iconsax.setting_2_copy,
+                          "Paramètres généraux",
+                          () => context.push(RoutesApplication.parametres)),
                     ],
                   ),
                 ),
@@ -278,10 +320,8 @@ class Profil extends ConsumerWidget {
     );
   }
 
-  Widget _buildStats(BuildContext context, 
-      {required int courses,
-      required double depenses,
-      required int enCours}) {
+  Widget _buildStats(BuildContext context,
+      {required int courses, required double depenses, required int enCours}) {
     String depensesText = depenses >= 1000
         ? "${(depenses / 1000).toStringAsFixed(1)}k"
         : depenses.toStringAsFixed(0);
@@ -297,15 +337,15 @@ class Profil extends ConsumerWidget {
           _buildStatCard(context, "Dépenses", depensesText, Iconsax.coin_copy,
               CouleursApp.avertissement),
           const SizedBox(width: 15),
-          _buildStatCard(context, "En cours", enCours.toString(), Iconsax.truck_copy,
-              CouleursApp.primaire),
+          _buildStatCard(context, "En cours", enCours.toString(),
+              Iconsax.truck_copy, CouleursApp.primaire),
         ],
       ),
     );
   }
 
-  Widget _buildStatCard(BuildContext context, 
-      String title, String value, IconData icon, Color color) {
+  Widget _buildStatCard(BuildContext context, String title, String value,
+      IconData icon, Color color) {
     return Container(
       width: 155,
       padding: const EdgeInsets.all(15),
@@ -337,14 +377,18 @@ class Profil extends ConsumerWidget {
           Text(title,
               style: TextStyle(
                   fontSize: 14,
-                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                  color: Theme.of(context)
+                      .colorScheme
+                      .onSurface
+                      .withValues(alpha: 0.7),
                   fontWeight: FontWeight.w600)),
         ],
       ),
     );
   }
 
-  Widget _ligneInformation(BuildContext context, IconData icone, String titre, String valeur) {
+  Widget _ligneInformation(
+      BuildContext context, IconData icone, String titre, String valeur) {
     return ListTile(
       contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
       leading: Container(
@@ -356,10 +400,17 @@ class Profil extends ConsumerWidget {
         child: Icon(icone, color: CouleursApp.primaire, size: 22),
       ),
       title: Text(titre,
-          style: TextStyle(fontSize: 13, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54))),
+          style: TextStyle(
+              fontSize: 13,
+              color: Theme.of(context)
+                  .colorScheme
+                  .onSurface
+                  .withValues(alpha: 0.54))),
       subtitle: Text(valeur,
           style: TextStyle(
-              fontWeight: FontWeight.w600, color: Theme.of(context).colorScheme.onSurface, fontSize: 15)),
+              fontWeight: FontWeight.w600,
+              color: Theme.of(context).colorScheme.onSurface,
+              fontSize: 15)),
     );
   }
 
@@ -367,11 +418,15 @@ class Profil extends ConsumerWidget {
       BuildContext context, IconData icone, String texte, VoidCallback action) {
     return ListTile(
       contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 4),
-      leading: Icon(icone, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), size: 24),
+      leading: Icon(icone,
+          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+          size: 24),
       title: Text(texte,
           style: const TextStyle(fontWeight: FontWeight.w500, fontSize: 16)),
-      trailing:
-          Icon(Icons.arrow_forward_ios, size: 14, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3)),
+      trailing: Icon(Icons.arrow_forward_ios,
+          size: 14,
+          color:
+              Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.3)),
       onTap: action,
     );
   }

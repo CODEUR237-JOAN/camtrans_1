@@ -26,11 +26,11 @@ class PanneauDetailsBottomSheet extends ConsumerWidget {
 
   void _appeler(BuildContext context, String numero) async {
     if (numero.isEmpty) return;
-    
+
     // Nettoyer le numéro (enlever les espaces)
     final numeroPropre = numero.replaceAll(' ', '');
     final Uri url = Uri.parse('tel:$numeroPropre');
-    
+
     try {
       if (await canLaunchUrl(url)) {
         await launchUrl(url);
@@ -41,7 +41,9 @@ class PanneauDetailsBottomSheet extends ConsumerWidget {
     } catch (e) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Impossible de lancer l'appel pour le numéro $numeroPropre.")),
+          SnackBar(
+              content: Text(
+                  "Impossible de lancer l'appel pour le numéro $numeroPropre.")),
         );
       }
     }
@@ -66,18 +68,21 @@ class PanneauDetailsBottomSheet extends ConsumerWidget {
     final transporteurAsync = (!isChauffeur && course.transporteurId.isNotEmpty)
         ? ref.watch(transporteurParIdProvider(course.transporteurId))
         : null;
-    final photoChauffeur =
-        transporteurAsync?.valueOrNull?.photo ?? '';
+    final photoChauffeur = transporteurAsync?.valueOrNull?.photo ?? '';
     final plaqueChauffeur =
         transporteurAsync?.valueOrNull?.immatriculation ?? '';
-    
+
     String titre = "";
     if (etat.phase == PhaseSuivi.recherche) {
       titre = "Recherche d'un transporteur...";
     } else if (etat.phase == PhaseSuivi.approche) {
-      titre = isChauffeur ? "En approche : ${etat.distanceRestanteMetres}m" : "Le chauffeur arrive (${etat.distanceRestanteMetres}m)";
+      titre = isChauffeur
+          ? "En approche : ${etat.distanceRestanteMetres}m"
+          : "Le chauffeur arrive (${etat.distanceRestanteMetres}m)";
     } else {
-      titre = isChauffeur ? "Trajet vers la destination" : "En route vers la destination";
+      titre = isChauffeur
+          ? "Trajet vers la destination"
+          : "En route vers la destination";
     }
 
     return DraggableScrollableSheet(
@@ -135,9 +140,11 @@ class PanneauDetailsBottomSheet extends ConsumerWidget {
                       ),
                       if (etat.tempsRestantSecondes > 0)
                         Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 12, vertical: 6),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFC1652F).withValues(alpha: 0.2),
+                            color:
+                                const Color(0xFFC1652F).withValues(alpha: 0.2),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Text(
@@ -190,7 +197,9 @@ class PanneauDetailsBottomSheet extends ConsumerWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              isChauffeur ? course.nomClient : course.nomTransporteur,
+                              isChauffeur
+                                  ? course.nomClient
+                                  : course.nomTransporteur,
                               style: GoogleFonts.poppins(
                                 color: Colors.white,
                                 fontSize: 16,
@@ -213,20 +222,26 @@ class PanneauDetailsBottomSheet extends ConsumerWidget {
                       ),
                       IconButton(
                         onPressed: () {
-                          GoRouter.of(context).push('/chat', extra: {'courseId': course.id});
+                          GoRouter.of(context)
+                              .push('/chat', extra: {'courseId': course.id});
                         },
                         icon: const Icon(Icons.chat, color: Colors.white),
                         style: IconButton.styleFrom(
-                          backgroundColor: const Color(0xFFC1652F), // Ocre charte
+                          backgroundColor:
+                              const Color(0xFFC1652F), // Ocre charte
                         ),
                       ),
                       const SizedBox(width: 8),
                       IconButton(
-                        onPressed: () => _appeler(context,
-                            isChauffeur ? course.telephoneClient : course.telephoneTransporteur),
+                        onPressed: () => _appeler(
+                            context,
+                            isChauffeur
+                                ? course.telephoneClient
+                                : course.telephoneTransporteur),
                         icon: const Icon(Icons.phone, color: Colors.white),
                         style: IconButton.styleFrom(
-                          backgroundColor: const Color(0xFF145C43), // Vert charte
+                          backgroundColor:
+                              const Color(0xFF145C43), // Vert charte
                         ),
                       ),
                       // Assistant vocal Combi (vue client)
@@ -245,7 +260,8 @@ class PanneauDetailsBottomSheet extends ConsumerWidget {
                       child: ElevatedButton(
                         onPressed: onBoutonAction,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFFC1652F), // Ocre pour attirer l'attention
+                          backgroundColor: const Color(
+                              0xFFC1652F), // Ocre pour attirer l'attention
                           padding: const EdgeInsets.symmetric(vertical: 16),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(16),
@@ -261,7 +277,8 @@ class PanneauDetailsBottomSheet extends ConsumerWidget {
                         ),
                       ),
                     )
-                  else if (isChauffeur && etat.course?.statut == StatutCourse.arriveDestination)
+                  else if (isChauffeur &&
+                      etat.course?.statut == StatutCourse.arriveDestination)
                     Container(
                       width: double.infinity,
                       padding: const EdgeInsets.symmetric(vertical: 16),
@@ -286,7 +303,8 @@ class PanneauDetailsBottomSheet extends ConsumerWidget {
                       child: ElevatedButton(
                         onPressed: onBoutonAction,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF145C43), // Vert charte
+                          backgroundColor:
+                              const Color(0xFF145C43), // Vert charte
                           padding: const EdgeInsets.symmetric(vertical: 16),
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(16),
@@ -302,13 +320,15 @@ class PanneauDetailsBottomSheet extends ConsumerWidget {
                         ),
                       ),
                     )
-                  else if (!isChauffeur && etat.course?.statut == StatutCourse.arriveDestination)
+                  else if (!isChauffeur &&
+                      etat.course?.statut == StatutCourse.arriveDestination)
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
                         onPressed: () {
                           final c = etat.course!;
-                          final double montant = c.prixFinal > 0 ? c.prixFinal : c.prixEstime;
+                          final double montant =
+                              c.prixFinal > 0 ? c.prixFinal : c.prixEstime;
                           GoRouter.of(context).push('/paiement', extra: {
                             'courseId': c.id,
                             'montant': montant,
@@ -332,8 +352,10 @@ class PanneauDetailsBottomSheet extends ConsumerWidget {
                         ),
                       ),
                     ),
-                    
-                  if (isChauffeur && (etat.phase == PhaseSuivi.approche || etat.phase == PhaseSuivi.trajet))
+
+                  if (isChauffeur &&
+                      (etat.phase == PhaseSuivi.approche ||
+                          etat.phase == PhaseSuivi.trajet))
                     Padding(
                       padding: const EdgeInsets.only(top: 16),
                       child: SizedBox(
@@ -341,7 +363,8 @@ class PanneauDetailsBottomSheet extends ConsumerWidget {
                         child: OutlinedButton(
                           onPressed: onAnnulerAction,
                           style: OutlinedButton.styleFrom(
-                            side: const BorderSide(color: CouleursApp.erreur, width: 1.5),
+                            side: const BorderSide(
+                                color: CouleursApp.erreur, width: 1.5),
                             padding: const EdgeInsets.symmetric(vertical: 16),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(16),
@@ -369,7 +392,7 @@ class PanneauDetailsBottomSheet extends ConsumerWidget {
       },
     );
   }
-  
+
   String get distance {
     if (etat.distanceRestanteMetres > 1000) {
       return "${(etat.distanceRestanteMetres / 1000).toStringAsFixed(1)} km";

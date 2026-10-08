@@ -144,7 +144,8 @@ class ServiceFirestore {
       'nombreCoursesSupprimees': docs.length,
       'date': FieldValue.serverTimestamp(),
     });
-    debugPrint('[AUDIT] Purge globale : ${docs.length} courses supprimées par $adminId');
+    debugPrint(
+        '[AUDIT] Purge globale : ${docs.length} courses supprimées par $adminId');
 
     return docs.length;
   }

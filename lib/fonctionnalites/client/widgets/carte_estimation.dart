@@ -42,7 +42,8 @@ class CarteEstimationIntelligente extends StatelessWidget {
                 spacing: 16,
                 runSpacing: 16,
                 children: [
-                  _buildMetricCard(context, 
+                  _buildMetricCard(
+                    context,
                     constraints.maxWidth,
                     icon: Iconsax.routing_2_copy,
                     label: "Distance",
@@ -50,7 +51,8 @@ class CarteEstimationIntelligente extends StatelessWidget {
                     suffix: " km",
                     delay: 100,
                   ),
-                  _buildMetricCard(context, 
+                  _buildMetricCard(
+                    context,
                     constraints.maxWidth,
                     icon: Iconsax.clock_copy,
                     label: "Durée est.",
@@ -58,7 +60,8 @@ class CarteEstimationIntelligente extends StatelessWidget {
                     suffix: " min",
                     delay: 200,
                   ),
-                  _buildMetricCard(context, 
+                  _buildMetricCard(
+                    context,
                     constraints.maxWidth,
                     icon: Iconsax.box_copy,
                     label: "Volume",
@@ -66,7 +69,8 @@ class CarteEstimationIntelligente extends StatelessWidget {
                     suffix: " m³",
                     delay: 300,
                   ),
-                  _buildMetricCard(context, 
+                  _buildMetricCard(
+                    context,
                     constraints.maxWidth,
                     icon: Iconsax.weight_copy,
                     label: "Poids",
@@ -93,7 +97,12 @@ class CarteEstimationIntelligente extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text("Véhicule Recommandé",
-                          style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), fontSize: 13),
+                          style: TextStyle(
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurface
+                                  .withValues(alpha: 0.7),
+                              fontSize: 13),
                           overflow: TextOverflow.ellipsis),
                       const SizedBox(height: 4),
                       Row(
@@ -107,7 +116,8 @@ class CarteEstimationIntelligente extends StatelessWidget {
                               style: TextStyle(
                                   fontWeight: FontWeight.bold,
                                   fontSize: 16,
-                                  color: Theme.of(context).colorScheme.onSurface),
+                                  color:
+                                      Theme.of(context).colorScheme.onSurface),
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
@@ -123,7 +133,12 @@ class CarteEstimationIntelligente extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       Text("Coût Estimé",
-                          style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), fontSize: 13),
+                          style: TextStyle(
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurface
+                                  .withValues(alpha: 0.7),
+                              fontSize: 13),
                           overflow: TextOverflow.ellipsis),
                       const SizedBox(height: 4),
                       // Compteur d'animation pour le prix
@@ -171,16 +186,22 @@ class CarteEstimationIntelligente extends StatelessWidget {
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1)),
+        border: Border.all(
+            color:
+                Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1)),
       ),
       child: Row(
         children: [
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1),
+                color: Theme.of(context)
+                    .colorScheme
+                    .onSurface
+                    .withValues(alpha: 0.1),
                 shape: BoxShape.circle),
-            child: Icon(icon, size: 16, color: Theme.of(context).colorScheme.onSurface),
+            child: Icon(icon,
+                size: 16, color: Theme.of(context).colorScheme.onSurface),
           ),
           const SizedBox(width: 8),
           Expanded(
@@ -189,7 +210,12 @@ class CarteEstimationIntelligente extends StatelessWidget {
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(label,
-                    style: TextStyle(fontSize: 10, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)),
+                    style: TextStyle(
+                        fontSize: 10,
+                        color: Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withValues(alpha: 0.7)),
                     overflow: TextOverflow.ellipsis),
                 FittedBox(
                   fit: BoxFit.scaleDown,
@@ -214,7 +240,11 @@ class CarteEstimationIntelligente extends StatelessWidget {
                       ),
                       Text(suffix,
                           style: TextStyle(
-                              fontSize: 11, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7))),
+                              fontSize: 11,
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurface
+                                  .withValues(alpha: 0.7))),
                     ],
                   ),
                 ),

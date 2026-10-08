@@ -15,8 +15,7 @@ class HistoriqueCourses extends ConsumerStatefulWidget {
   const HistoriqueCourses({super.key});
 
   @override
-  ConsumerState<HistoriqueCourses> createState() =>
-      _HistoriquecoursesState();
+  ConsumerState<HistoriqueCourses> createState() => _HistoriquecoursesState();
 }
 
 class _HistoriquecoursesState extends ConsumerState<HistoriqueCourses> {
@@ -66,9 +65,14 @@ class _HistoriquecoursesState extends ConsumerState<HistoriqueCourses> {
         title: const Text("Historique des courses"),
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         elevation: 0,
-        iconTheme: IconThemeData(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)),
+        iconTheme: IconThemeData(
+            color:
+                Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)),
         titleTextStyle: TextStyle(
-            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), fontWeight: FontWeight.bold, fontSize: 18),
+            color:
+                Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+            fontWeight: FontWeight.bold,
+            fontSize: 18),
         actions: [
           Tooltip(
             message: "Supprimer les courses terminées/annulées",
@@ -102,11 +106,17 @@ class _HistoriquecoursesState extends ConsumerState<HistoriqueCourses> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text("Historique",
-                            style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7))),
+                            style: TextStyle(
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onSurface
+                                    .withValues(alpha: 0.7))),
                         const SizedBox(height: 6),
                         Text(
                           "Glissez vers la gauche pour supprimer une course terminée.",
-                          style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 14),
+                          style: TextStyle(
+                              color: Theme.of(context).colorScheme.onSurface,
+                              fontSize: 14),
                         ),
                       ],
                     ),
@@ -196,7 +206,9 @@ class _HistoriquecoursesState extends ConsumerState<HistoriqueCourses> {
                           onTap: () {
                             showModalBottomSheet(
                               context: context,
-                              backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
+                              backgroundColor: Theme.of(context)
+                                  .colorScheme
+                                  .surfaceContainerHighest,
                               isScrollControlled: true,
                               shape: const RoundedRectangleBorder(
                                 borderRadius: BorderRadius.vertical(
@@ -350,7 +362,10 @@ class _FeuilleDetailsCourse extends StatelessWidget {
                 width: 44,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.24),
+                  color: Theme.of(context)
+                      .colorScheme
+                      .onSurface
+                      .withValues(alpha: 0.24),
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -386,7 +401,11 @@ class _FeuilleDetailsCourse extends StatelessWidget {
                         DateFormat('dd MMMM yyyy – HH:mm')
                             .format(course.dateCreation),
                         style: TextStyle(
-                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 12),
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onSurface
+                                .withValues(alpha: 0.54),
+                            fontSize: 12),
                       ),
                     ],
                   ),
@@ -397,8 +416,7 @@ class _FeuilleDetailsCourse extends StatelessWidget {
 
             // Statut
             Container(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 7),
               decoration: BoxDecoration(
                 color: couleurStatut.withValues(alpha: 0.15),
                 borderRadius: BorderRadius.circular(20),
@@ -416,8 +434,13 @@ class _FeuilleDetailsCourse extends StatelessWidget {
             // Détails
             _ligne(context, Icons.payments_outlined, "Prix",
                 "${prix.toStringAsFixed(0)} FCFA"),
-            _ligne(context, Icons.credit_card_outlined, "Paiement",
-                course.modePaiement.isEmpty ? "Non renseigné" : course.modePaiement),
+            _ligne(
+                context,
+                Icons.credit_card_outlined,
+                "Paiement",
+                course.modePaiement.isEmpty
+                    ? "Non renseigné"
+                    : course.modePaiement),
             if (course.typeVehicule.isNotEmpty)
               _ligne(context, Icons.directions_car_outlined, "Véhicule",
                   course.typeVehicule),
@@ -438,15 +461,26 @@ class _FeuilleDetailsCourse extends StatelessWidget {
     );
   }
 
-  Widget _ligne(BuildContext context, IconData icone, String libelle, String valeur) {
+  Widget _ligne(
+      BuildContext context, IconData icone, String libelle, String valeur) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
         children: [
-          Icon(icone, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), size: 18),
+          Icon(icone,
+              color: Theme.of(context)
+                  .colorScheme
+                  .onSurface
+                  .withValues(alpha: 0.38),
+              size: 18),
           const SizedBox(width: 12),
           Text(libelle,
-              style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 13)),
+              style: TextStyle(
+                  color: Theme.of(context)
+                      .colorScheme
+                      .onSurface
+                      .withValues(alpha: 0.54),
+                  fontSize: 13)),
           const Spacer(),
           Flexible(
             child: Text(

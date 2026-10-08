@@ -161,7 +161,9 @@ class _ParametresState extends ConsumerState<Parametres> {
   void _toast(String message, {bool erreur = false}) {
     if (!mounted) return;
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-      content: Text(message, style: GoogleFonts.inter(color: Theme.of(context).colorScheme.onSurface)),
+      content: Text(message,
+          style: GoogleFonts.inter(
+              color: Theme.of(context).colorScheme.onSurface)),
       backgroundColor: erreur ? CouleursApp.erreur : CouleursApp.succes,
       behavior: SnackBarBehavior.floating,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -180,17 +182,28 @@ class _ParametresState extends ConsumerState<Parametres> {
         title: Text(
           'Déconnexion',
           style: GoogleFonts.inter(
-              color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.bold, fontSize: 18),
+              color: Theme.of(context).colorScheme.onSurface,
+              fontWeight: FontWeight.bold,
+              fontSize: 18),
         ),
         content: Text(
           'Êtes-vous sûr de vouloir vous déconnecter de CamTrans ?',
-          style: GoogleFonts.inter(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), height: 1.5),
+          style: GoogleFonts.inter(
+              color: Theme.of(context)
+                  .colorScheme
+                  .onSurface
+                  .withValues(alpha: 0.7),
+              height: 1.5),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
             child: Text('Annuler',
-                style: GoogleFonts.inter(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5))),
+                style: GoogleFonts.inter(
+                    color: Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withValues(alpha: 0.5))),
           ),
           TextButton(
             onPressed: () => Navigator.pop(context, true),
@@ -245,7 +258,8 @@ class _ParametresState extends ConsumerState<Parametres> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => EcranContenuInfo(titre: titre, contenuMarkdown: contenu),
+        builder: (_) =>
+            EcranContenuInfo(titre: titre, contenuMarkdown: contenu),
       ),
     );
   }
@@ -254,8 +268,8 @@ class _ParametresState extends ConsumerState<Parametres> {
   Future<void> _noterApplication() async {
     const package = 'com.joan.update_camtrans';
     final natif = Uri.parse('market://details?id=$package');
-    final web = Uri.parse(
-        'https://play.google.com/store/apps/details?id=$package');
+    final web =
+        Uri.parse('https://play.google.com/store/apps/details?id=$package');
     if (await canLaunchUrl(natif)) {
       await launchUrl(natif, mode: LaunchMode.externalApplication);
     } else {
@@ -335,7 +349,8 @@ class _ParametresState extends ConsumerState<Parametres> {
           couleur: CouleursApp.erreur,
           onTap: () {
             Navigator.pop(context);
-            _ouvrirUrl('mailto:support@camtrans.cm?subject=Suppression de mon compte');
+            _ouvrirUrl(
+                'mailto:support@camtrans.cm?subject=Suppression de mon compte');
           },
         ),
       ],
@@ -373,7 +388,10 @@ class _ParametresState extends ConsumerState<Parametres> {
                 width: 44,
                 height: 4,
                 decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.2),
+                  color: Theme.of(context)
+                      .colorScheme
+                      .onSurface
+                      .withValues(alpha: 0.2),
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -401,7 +419,12 @@ class _ParametresState extends ConsumerState<Parametres> {
                               fontSize: 18)),
                       Text(sousTitre,
                           style: GoogleFonts.inter(
-                              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5), fontSize: 13, height: 1.4)),
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurface
+                                  .withValues(alpha: 0.5),
+                              fontSize: 13,
+                              height: 1.4)),
                     ],
                   ),
                 ),
@@ -446,10 +469,17 @@ class _ParametresState extends ConsumerState<Parametres> {
                 fontWeight: FontWeight.w600,
                 fontSize: 14)),
         subtitle: Text(sousTitre,
-            style:
-                GoogleFonts.inter(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5), fontSize: 12, height: 1.4)),
-        trailing:
-            Icon(Icons.arrow_forward_ios, size: 13, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4)),
+            style: GoogleFonts.inter(
+                color: Theme.of(context)
+                    .colorScheme
+                    .onSurface
+                    .withValues(alpha: 0.5),
+                fontSize: 12,
+                height: 1.4)),
+        trailing: Icon(Icons.arrow_forward_ios,
+            size: 13,
+            color:
+                Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4)),
         onTap: onTap,
       ),
     );
@@ -493,14 +523,22 @@ class _ParametresState extends ConsumerState<Parametres> {
                           fontSize: 14)),
                   Text(sousTitre,
                       style: GoogleFonts.inter(
-                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5), fontSize: 12, height: 1.4)),
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onSurface
+                              .withValues(alpha: 0.5),
+                          fontSize: 12,
+                          height: 1.4)),
                 ],
               ),
             ),
             Switch(
               value: valeur,
               activeThumbColor: CouleursApp.accentViolet,
-              inactiveTrackColor: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1),
+              inactiveTrackColor: Theme.of(context)
+                  .colorScheme
+                  .onSurface
+                  .withValues(alpha: 0.1),
               onChanged: (v) {
                 setSheetState(() {});
                 onChange(v);
@@ -529,7 +567,12 @@ class _ParametresState extends ConsumerState<Parametres> {
           Expanded(
             child: Text(texte,
                 style: GoogleFonts.inter(
-                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), fontSize: 12.5, height: 1.5)),
+                    color: Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withValues(alpha: 0.7),
+                    fontSize: 12.5,
+                    height: 1.5)),
           ),
         ],
       ),
@@ -554,13 +597,16 @@ class _ParametresState extends ConsumerState<Parametres> {
         systemOverlayStyle: SystemUiOverlayStyle.light,
         centerTitle: true,
         leading: IconButton(
-          icon: Icon(Iconsax.arrow_left_2_copy, color: Theme.of(context).colorScheme.onSurface),
+          icon: Icon(Iconsax.arrow_left_2_copy,
+              color: Theme.of(context).colorScheme.onSurface),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
           'Paramètres',
           style: GoogleFonts.inter(
-              color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.bold, fontSize: 18),
+              color: Theme.of(context).colorScheme.onSurface,
+              fontWeight: FontWeight.bold,
+              fontSize: 18),
         ),
       ),
       body: ListView(
@@ -695,7 +741,11 @@ class _ParametresState extends ConsumerState<Parametres> {
                             fontSize: 14)),
                     Text('1.0.0 — Production',
                         style: GoogleFonts.inter(
-                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5), fontSize: 12)),
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onSurface
+                                .withValues(alpha: 0.5),
+                            fontSize: 12)),
                   ],
                 ),
               ],
@@ -724,7 +774,8 @@ class _ParametresState extends ConsumerState<Parametres> {
                       width: 18,
                       height: 18,
                       child: CircularProgressIndicator(
-                          color: Theme.of(context).colorScheme.onSurface, strokeWidth: 2.5),
+                          color: Theme.of(context).colorScheme.onSurface,
+                          strokeWidth: 2.5),
                     )
                   : Icon(Iconsax.logout_copy),
               label: Text(
@@ -748,7 +799,7 @@ class _ParametresState extends ConsumerState<Parametres> {
   Widget _buildSelecteurLangue() {
     final locale = ref.watch(localeProvider);
     final isFr = locale.languageCode == 'fr';
-    
+
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 14, vertical: 12),
       decoration: BoxDecoration(
@@ -767,7 +818,8 @@ class _ParametresState extends ConsumerState<Parametres> {
                   color: CouleursApp.primaire.withValues(alpha: 0.12),
                   borderRadius: BorderRadius.circular(12),
                 ),
-                child: Icon(Icons.language, color: CouleursApp.primaire, size: 18),
+                child:
+                    Icon(Icons.language, color: CouleursApp.primaire, size: 18),
               ),
               SizedBox(width: 12),
               Column(
@@ -780,7 +832,11 @@ class _ParametresState extends ConsumerState<Parametres> {
                           fontSize: 14)),
                   Text(isFr ? "Français" : "English",
                       style: GoogleFonts.inter(
-                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5), fontSize: 12)),
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onSurface
+                              .withValues(alpha: 0.5),
+                          fontSize: 12)),
                 ],
               ),
             ],
@@ -792,7 +848,9 @@ class _ParametresState extends ConsumerState<Parametres> {
             ],
             selected: {locale.languageCode},
             onSelectionChanged: (Set<String> newSelection) {
-              ref.read(localeProvider.notifier).setLocale(Locale(newSelection.first));
+              ref
+                  .read(localeProvider.notifier)
+                  .setLocale(Locale(newSelection.first));
             },
             style: SegmentedButton.styleFrom(
               backgroundColor: Theme.of(context).colorScheme.surface,
@@ -820,7 +878,8 @@ class _ParametresState extends ConsumerState<Parametres> {
         children: [
           CircleAvatar(
             radius: 28,
-            backgroundColor: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.2),
+            backgroundColor:
+                Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.2),
             child: Text(
               nom.isNotEmpty ? nom[0].toUpperCase() : 'C',
               style: GoogleFonts.inter(
@@ -845,7 +904,12 @@ class _ParametresState extends ConsumerState<Parametres> {
                 SizedBox(height: 2),
                 Text(
                   email,
-                  style: GoogleFonts.inter(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), fontSize: 13),
+                  style: GoogleFonts.inter(
+                      color: Theme.of(context)
+                          .colorScheme
+                          .onSurface
+                          .withValues(alpha: 0.7),
+                      fontSize: 13),
                   overflow: TextOverflow.ellipsis,
                 ),
               ],
@@ -905,7 +969,12 @@ class _ParametresState extends ConsumerState<Parametres> {
                         fontSize: 14)),
                 Text(sousTitre,
                     style: GoogleFonts.inter(
-                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.5), fontSize: 12, height: 1.4)),
+                        color: Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withValues(alpha: 0.5),
+                        fontSize: 12,
+                        height: 1.4)),
               ],
             ),
           ),
@@ -913,7 +982,8 @@ class _ParametresState extends ConsumerState<Parametres> {
             value: valeur,
             onChanged: onChange,
             activeThumbColor: couleur,
-            inactiveTrackColor: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1),
+            inactiveTrackColor:
+                Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1),
           ),
         ],
       ),
@@ -945,10 +1015,14 @@ class _ParametresState extends ConsumerState<Parametres> {
         title: Text(
           titre,
           style: GoogleFonts.inter(
-              color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.w500, fontSize: 14),
+              color: Theme.of(context).colorScheme.onSurface,
+              fontWeight: FontWeight.w500,
+              fontSize: 14),
         ),
         trailing: Icon(Icons.arrow_forward_ios,
-            size: 14, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4)),
+            size: 14,
+            color:
+                Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.4)),
         onTap: () {
           HapticFeedback.selectionClick();
           onTap();

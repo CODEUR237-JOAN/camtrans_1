@@ -46,7 +46,7 @@ class ServiceIA {
 
   // Historique de la conversation pour l'assistant chat (format Gemini)
   final List<Content> _historique = [];
-  
+
   // Historique de la conversation pour Claude
   final List<Map<String, dynamic>> _historiqueClaude = [];
 
@@ -100,7 +100,7 @@ class ServiceIA {
     if (apiKey.isEmpty) throw Exception("Clé Claude absente du .env");
 
     final url = Uri.parse('https://api.anthropic.com/v1/messages');
-    
+
     List<Map<String, dynamic>> contentBlocs = [];
     if (fichiersImages != null && fichiersImages.isNotEmpty) {
       for (final f in fichiersImages) {
@@ -148,7 +148,8 @@ class ServiceIA {
       messages.add({"role": "assistant", "content": text});
       return text;
     } else {
-      throw Exception("Erreur Claude: ${response.statusCode} - ${response.body}");
+      throw Exception(
+          "Erreur Claude: ${response.statusCode} - ${response.body}");
     }
   }
 
@@ -273,8 +274,11 @@ class ServiceIA {
         final requestBody = {
           "model": _nomModeleClaude,
           "max_tokens": 1024,
-          "system": "$contexteSysteme\nIMPORTANT: Réponds UNIQUEMENT en JSON valide. Ne fournis aucune autre explication.",
-          "messages": [{"role": "user", "content": claudeContentBlocs}],
+          "system":
+              "$contexteSysteme\nIMPORTANT: Réponds UNIQUEMENT en JSON valide. Ne fournis aucune autre explication.",
+          "messages": [
+            {"role": "user", "content": claudeContentBlocs}
+          ],
         };
 
         final response = await http.post(
@@ -309,7 +313,8 @@ class ServiceIA {
     try {
       modele = _getModele(modeJson: true, contexteSysteme: contexteSysteme);
     } catch (e) {
-      debugPrint("[IA] Gemini indisponible : $e. Retour de la réponse par défaut.");
+      debugPrint(
+          "[IA] Gemini indisponible : $e. Retour de la réponse par défaut.");
       return reponseParDefaut;
     }
 
@@ -353,13 +358,14 @@ class ServiceIA {
     String prompt, {
     List<XFile>? fichiersImages,
   }) async* {
-    const systemPrompt = "Tu es l'assistant IA officiel de CamTrans, une application camerounaise qui met en relation "
-            "des clients avec des chauffeurs de camions (lourds et légers) sur l'ensemble du territoire camerounais. "
-            "Les services proposés sont : transport de marchandises générales, déménagement, "
-            "matériaux de construction, produits agricoles, transport frigorifique, convoi de véhicules, remorquage. "
-            "Tu peux estimer les prix, recommander le véhicule adapté parmi (Moto, Tricycle, Pick-up, Camionnette, Camion léger, Camion moyen, Dépanneuse, Semi-remorque, Camion Benne, Camion Plateau, Camion Citerne, Fourgon, Conteneur), "
-            "estimer les volumes, et donner des conseils pratiques de transport et d'emballage. "
-            "Sois concis, professionnel et rassurant. Réponds toujours en français.";
+    const systemPrompt =
+        "Tu es l'assistant IA officiel de CamTrans, une application camerounaise qui met en relation "
+        "des clients avec des chauffeurs de camions (lourds et légers) sur l'ensemble du territoire camerounais. "
+        "Les services proposés sont : transport de marchandises générales, déménagement, "
+        "matériaux de construction, produits agricoles, transport frigorifique, convoi de véhicules, remorquage. "
+        "Tu peux estimer les prix, recommander le véhicule adapté parmi (Moto, Tricycle, Pick-up, Camionnette, Camion léger, Camion moyen, Dépanneuse, Semi-remorque, Camion Benne, Camion Plateau, Camion Citerne, Fourgon, Conteneur), "
+        "estimer les volumes, et donner des conseils pratiques de transport et d'emballage. "
+        "Sois concis, professionnel et rassurant. Réponds toujours en français.";
 
     // Tentative Claude en priorité
     final apiKeyClaude = dotenv.env['CLAUDE_API_KEY'] ?? '';

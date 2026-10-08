@@ -148,9 +148,11 @@ class ServiceGps {
           !requete.toLowerCase().contains("cameroon")) {
         requete = "$requete, Cameroun";
       }
-      final url = Uri.parse('https://nominatim.openstreetmap.org/search?q=${Uri.encodeComponent(requete)}&format=json&limit=1');
-      final reponse = await http.get(url, headers: {'User-Agent': 'CamTransApp'});
-      
+      final url = Uri.parse(
+          'https://nominatim.openstreetmap.org/search?q=${Uri.encodeComponent(requete)}&format=json&limit=1');
+      final reponse =
+          await http.get(url, headers: {'User-Agent': 'CamTransApp'});
+
       if (reponse.statusCode == 200) {
         final List donnees = jsonDecode(reponse.body);
         if (donnees.isNotEmpty) {

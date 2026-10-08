@@ -79,7 +79,6 @@ class ThemeApplication {
       colorScheme: colorScheme,
       scaffoldBackgroundColor: background,
       primaryColor: primary,
-
       appBarTheme: AppBarTheme(
         backgroundColor: background,
         foregroundColor: onBackground,
@@ -94,7 +93,6 @@ class ThemeApplication {
         ),
         iconTheme: const IconThemeData(color: onBackground),
       ),
-
       cardTheme: CardThemeData(
         color: surface,
         elevation: 0,
@@ -104,7 +102,6 @@ class ThemeApplication {
           side: const BorderSide(color: outlineVariant),
         ),
       ),
-
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           backgroundColor: primary,
@@ -121,7 +118,6 @@ class ThemeApplication {
           ),
         ),
       ),
-
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: surfaceVariant.withValues(alpha: 0.5),
@@ -143,7 +139,6 @@ class ThemeApplication {
         hintStyle: GoogleFonts.inter(
             fontSize: 15, color: onSurfaceVariant.withValues(alpha: 0.5)),
       ),
-
       bottomNavigationBarTheme: const BottomNavigationBarThemeData(
         backgroundColor: surface,
         selectedItemColor: primary,
@@ -151,7 +146,6 @@ class ThemeApplication {
         type: BottomNavigationBarType.fixed,
         elevation: 0,
       ),
-
       dialogTheme: DialogThemeData(
         backgroundColor: surface,
         surfaceTintColor: Colors.transparent,
@@ -159,7 +153,6 @@ class ThemeApplication {
           borderRadius: BorderRadius.circular(28),
         ),
       ),
-
       bottomSheetTheme: const BottomSheetThemeData(
         backgroundColor: surface,
         surfaceTintColor: Colors.transparent,
@@ -167,13 +160,11 @@ class ThemeApplication {
           borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
         ),
       ),
-
       dividerTheme: const DividerThemeData(
         color: outlineVariant,
         thickness: 1,
         space: 1,
       ),
-
       switchTheme: SwitchThemeData(
         thumbColor: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.selected)) return primary;
@@ -186,14 +177,12 @@ class ThemeApplication {
           return outline;
         }),
       ),
-
       snackBarTheme: SnackBarThemeData(
         backgroundColor: const Color(0xFF2E3133),
         contentTextStyle: GoogleFonts.inter(color: Colors.white, fontSize: 14),
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
-
       textTheme: _buildTextTheme(onBackground, onSurfaceVariant),
     );
   }
@@ -254,7 +243,6 @@ class ThemeApplication {
       colorScheme: colorScheme,
       scaffoldBackgroundColor: background,
       primaryColor: primary,
-
       appBarTheme: AppBarTheme(
         backgroundColor: Colors.transparent,
         foregroundColor: onBackground,
@@ -269,7 +257,6 @@ class ThemeApplication {
         ),
         iconTheme: const IconThemeData(color: onBackground),
       ),
-
       cardTheme: CardThemeData(
         color: surface,
         elevation: 0,
@@ -279,7 +266,6 @@ class ThemeApplication {
           side: const BorderSide(color: outlineVariant),
         ),
       ),
-
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           backgroundColor: primary,
@@ -296,7 +282,6 @@ class ThemeApplication {
           ),
         ),
       ),
-
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
         fillColor: surfaceElevated.withValues(alpha: 0.5),
@@ -318,7 +303,6 @@ class ThemeApplication {
         hintStyle: GoogleFonts.inter(
             fontSize: 15, color: onSurfaceVariant.withValues(alpha: 0.5)),
       ),
-
       bottomNavigationBarTheme: const BottomNavigationBarThemeData(
         backgroundColor: Colors.transparent,
         selectedItemColor: primary,
@@ -326,7 +310,6 @@ class ThemeApplication {
         type: BottomNavigationBarType.fixed,
         elevation: 0,
       ),
-
       dialogTheme: DialogThemeData(
         backgroundColor: surface,
         surfaceTintColor: Colors.transparent,
@@ -334,7 +317,6 @@ class ThemeApplication {
           borderRadius: BorderRadius.circular(28),
         ),
       ),
-
       bottomSheetTheme: const BottomSheetThemeData(
         backgroundColor: surface,
         surfaceTintColor: Colors.transparent,
@@ -342,13 +324,11 @@ class ThemeApplication {
           borderRadius: BorderRadius.vertical(top: Radius.circular(32)),
         ),
       ),
-
       dividerTheme: const DividerThemeData(
         color: outlineVariant,
         thickness: 1,
         space: 1,
       ),
-
       switchTheme: SwitchThemeData(
         thumbColor: WidgetStateProperty.resolveWith((states) {
           if (states.contains(WidgetState.selected)) return primary;
@@ -361,14 +341,12 @@ class ThemeApplication {
           return outline;
         }),
       ),
-
       snackBarTheme: SnackBarThemeData(
         backgroundColor: surfaceElevated,
         contentTextStyle: GoogleFonts.inter(color: onSurface, fontSize: 14),
         behavior: SnackBarBehavior.floating,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       ),
-
       textTheme: _buildTextTheme(onBackground, onSurfaceVariant),
     );
   }
@@ -417,8 +395,7 @@ class ThemeApplication {
     // Corps → Inter
     final corps = GoogleFonts.interTextTheme(
       TextTheme(
-        bodyLarge:
-            TextStyle(fontSize: 17, color: primary, letterSpacing: -0.2),
+        bodyLarge: TextStyle(fontSize: 17, color: primary, letterSpacing: -0.2),
         bodyMedium:
             TextStyle(fontSize: 15, color: secondary, letterSpacing: -0.1),
         bodySmall: TextStyle(fontSize: 13, color: secondary),

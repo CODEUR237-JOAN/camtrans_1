@@ -60,7 +60,8 @@ class _EcranAssistantIAState extends ConsumerState<EcranAssistantIA> {
     } catch (e) {
       if (mounted) {
         setState(() {
-          _messages[iaIndex]["text"] = "Mince, j'ai rencontré un léger souci technique : $e. Pourriez-vous réessayer ?";
+          _messages[iaIndex]["text"] =
+              "Mince, j'ai rencontré un léger souci technique : $e. Pourriez-vous réessayer ?";
         });
       }
     }
@@ -104,7 +105,9 @@ class _EcranAssistantIAState extends ConsumerState<EcranAssistantIA> {
         title: Text(
           "Assistant Intelligent",
           style: GoogleFonts.poppins(
-              fontWeight: FontWeight.w600, fontSize: 18, color: Theme.of(context).colorScheme.onSurface),
+              fontWeight: FontWeight.w600,
+              fontSize: 18,
+              color: Theme.of(context).colorScheme.onSurface),
         ),
         centerTitle: true,
         actions: [
@@ -121,7 +124,10 @@ class _EcranAssistantIAState extends ConsumerState<EcranAssistantIA> {
           Container(
             decoration: BoxDecoration(
               gradient: LinearGradient(
-                colors: [Theme.of(context).scaffoldBackgroundColor, const Color(0xFF111827)],
+                colors: [
+                  Theme.of(context).scaffoldBackgroundColor,
+                  const Color(0xFF111827)
+                ],
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
               ),
@@ -203,7 +209,11 @@ class _EcranAssistantIAState extends ConsumerState<EcranAssistantIA> {
         borderRadius: const BorderRadius.only(
             topLeft: Radius.circular(36), topRight: Radius.circular(36)),
         border: Border(
-            top: BorderSide(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05))),
+            top: BorderSide(
+                color: Theme.of(context)
+                    .colorScheme
+                    .onSurface
+                    .withValues(alpha: 0.05))),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.3),
@@ -228,8 +238,11 @@ class _EcranAssistantIAState extends ConsumerState<EcranAssistantIA> {
                   decoration: BoxDecoration(
                     color: const Color(0xFF1E293B).withValues(alpha: 0.5),
                     shape: BoxShape.circle,
-                    border:
-                        Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1)),
+                    border: Border.all(
+                        color: Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withValues(alpha: 0.1)),
                   ),
                   child: const Icon(Iconsax.camera_copy,
                       color: Color(0xFF94A3B8), size: 22),
@@ -241,13 +254,17 @@ class _EcranAssistantIAState extends ConsumerState<EcranAssistantIA> {
                   decoration: BoxDecoration(
                     color: const Color(0xFF1E293B).withValues(alpha: 0.4),
                     borderRadius: BorderRadius.circular(24),
-                    border:
-                        Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05)),
+                    border: Border.all(
+                        color: Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withValues(alpha: 0.05)),
                   ),
                   child: TextField(
                     controller: _messageController,
-                    style:
-                        GoogleFonts.poppins(color: Theme.of(context).colorScheme.onSurface, fontSize: 14),
+                    style: GoogleFonts.poppins(
+                        color: Theme.of(context).colorScheme.onSurface,
+                        fontSize: 14),
                     decoration: InputDecoration(
                       hintText: "Que souhaitez-vous transporter ?",
                       hintStyle: GoogleFonts.poppins(
@@ -342,7 +359,11 @@ class _MessageBubble extends StatelessWidget {
                 ),
                 border: isUser
                     ? null
-                    : Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05)),
+                    : Border.all(
+                        color: Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withValues(alpha: 0.05)),
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -369,7 +390,9 @@ class _MessageBubble extends StatelessWidget {
                   Text(
                     message["text"],
                     style: GoogleFonts.poppins(
-                      color: isUser ? Theme.of(context).colorScheme.onSurface : const Color(0xFFE2E8F0),
+                      color: isUser
+                          ? Theme.of(context).colorScheme.onSurface
+                          : const Color(0xFFE2E8F0),
                       fontSize: 14,
                       height: 1.5,
                     ),
@@ -400,13 +423,19 @@ class _GlassButton extends StatelessWidget {
         height: 44,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05),
-          border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1)),
+          color:
+              Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05),
+          border: Border.all(
+              color: Theme.of(context)
+                  .colorScheme
+                  .onSurface
+                  .withValues(alpha: 0.1)),
         ),
         child: ClipOval(
           child: BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-            child: Icon(icon, color: Theme.of(context).colorScheme.onSurface, size: 20),
+            child: Icon(icon,
+                color: Theme.of(context).colorScheme.onSurface, size: 20),
           ),
         ),
       ),

@@ -133,8 +133,8 @@ class _EcranSplashState extends ConsumerState<EcranSplash>
                           borderRadius: BorderRadius.circular(30),
                           boxShadow: [
                             BoxShadow(
-                              color:
-                                  CouleursApp.primaireNeon.withValues(alpha: 0.4),
+                              color: CouleursApp.primaireNeon
+                                  .withValues(alpha: 0.4),
                               blurRadius: 50,
                               spreadRadius: 10,
                             ),
@@ -145,7 +145,8 @@ class _EcranSplashState extends ConsumerState<EcranSplash>
                             ),
                           ],
                           image: const DecorationImage(
-                            image: AssetImage('assets/images/logo_camtrans.png'),
+                            image:
+                                AssetImage('assets/images/logo_camtrans.png'),
                             fit: BoxFit.contain,
                           ),
                         ),

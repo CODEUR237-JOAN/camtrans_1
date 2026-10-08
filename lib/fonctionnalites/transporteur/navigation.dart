@@ -43,7 +43,12 @@ class _NavigationTransporteurState
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.map_outlined, size: 80, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54)),
+              Icon(Icons.map_outlined,
+                  size: 80,
+                  color: Theme.of(context)
+                      .colorScheme
+                      .onSurface
+                      .withValues(alpha: 0.54)),
               const SizedBox(height: 20),
               Text("Aucune course active",
                   style: TextStyle(
@@ -53,7 +58,11 @@ class _NavigationTransporteurState
               const SizedBox(height: 10),
               Text("Acceptez une course sur le marché pour commencer.",
                   textAlign: TextAlign.center,
-                  style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54))),
+                  style: TextStyle(
+                      color: Theme.of(context)
+                          .colorScheme
+                          .onSurface
+                          .withValues(alpha: 0.54))),
             ],
           ),
         ),

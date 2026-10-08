@@ -12,7 +12,8 @@ class RetraitAdmin {
   final String adminId;
   final double montant;
   final DateTime date;
-  final String methodePaiement; // 'Orange Money' | 'MTN Mobile Money' | 'Virement bancaire'
+  final String
+      methodePaiement; // 'Orange Money' | 'MTN Mobile Money' | 'Virement bancaire'
   final String statut; // 'succes' | 'en_attente' | 'echoue'
   final String reference;
 

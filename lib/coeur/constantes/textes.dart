@@ -16,7 +16,8 @@ class TextesApp {
 
   static const String nomApplication = "CamTrans";
 
-  static const String slogan = "Votre partenaire transport de confiance au Cameroun, 24h/24";
+  static const String slogan =
+      "Votre partenaire transport de confiance au Cameroun, 24h/24";
 
   // ==========================
   // Boutons

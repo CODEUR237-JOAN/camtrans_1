@@ -192,8 +192,26 @@ exports.crediterPortefeuille = functions.firestore
   });
 
 
+// Calcule la distance entre deux coordonnees GPS en km (Formule de Haversine)
+function getDistanceFromLatLonInKm(lat1, lon1, lat2, lon2) {
+  const R = 6371; // Rayon de la terre en km
+  const dLat = deg2rad(lat2 - lat1);
+  const dLon = deg2rad(lon2 - lon1);
+  const a =
+    Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+    Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
+    Math.sin(dLon / 2) * Math.sin(dLon / 2);
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  const d = R * c;
+  return d;
+}
+
+function deg2rad(deg) {
+  return deg * (Math.PI / 180);
+}
+
 // ============================================================================
-// Attribution Automatique avec algorithme en cascade (OSRM)
+// Attribution Automatique (Auto-Dispatch) Sécurisée
 // ============================================================================
 exports.processusAttribution = functions.firestore
   .document("courses/{courseId}")
@@ -202,29 +220,28 @@ exports.processusAttribution = functions.firestore
 
     const courseData = change.after.data();
     
+    // On ne traite que si c'est en recherche et non attribué
     if (courseData.statut !== "recherche") return null;
     if (courseData.transporteurId && courseData.transporteurId !== "") return null;
 
-    console.log(`Lancement de l'attribution pour la course ${context.params.courseId}`);
+    console.log(`[Auto-Dispatch] Lancement de l'attribution pour la course ${context.params.courseId}`);
 
     const latDepart = courseData.latitudeDepart || 0;
     const lngDepart = courseData.longitudeDepart || 0;
     const typeVehicule = courseData.typeVehicule || "";
-    const transporteursDeclines = courseData.transporteursDeclines || [];
 
     try {
+      // 1. Récupérer les transporteurs en ligne et libres
       const transporteursSnapshot = await admin.firestore().collection("transporteurs")
         .where("disponible", "==", true)
         .where("documentsValides", "==", true)
+        .where("estEnLigne", "==", true)
         .get();
 
-      let nextChauffeurId = "";
-      let nextNom = "";
-      let nextTel = "";
-      let minDuration = Infinity;
+      const candidats = [];
 
+      // 2. Filtrage par type de véhicule et distance
       for (const doc of transporteursSnapshot.docs) {
-        if (transporteursDeclines.includes(doc.id)) continue;
         const t = doc.data();
 
         const tVehicule = t.typeVehicule || "";
@@ -233,39 +250,75 @@ exports.processusAttribution = functions.firestore
         const tLat = t.latitude || 0;
         const tLng = t.longitude || 0;
 
+        let dist = 999.0;
         if (latDepart !== 0 && tLat !== 0) {
-          try {
-            const url = `http://router.project-osrm.org/route/v1/driving/${tLng},${tLat};${lngDepart},${latDepart}?overview=false`;
-            const response = await fetch(url);
-            if (response.ok) {
-              const data = await response.json();
-              if (data.routes && data.routes.length > 0) {
-                const duration = data.routes[0].duration;
-                if (duration < minDuration) {
-                  minDuration = duration;
-                  nextChauffeurId = doc.id;
-                  nextNom = `${t.prenom || ""} ${t.nom || ""}`.trim();
-                  nextTel = t.telephone || "";
-                }
-              }
-            }
-          } catch(e) {
-            console.error("Erreur OSRM", e);
-          }
+          dist = getDistanceFromLatLonInKm(latDepart, lngDepart, tLat, tLng);
+        }
+
+        // Rayon de recherche de 30 km max
+        if (dist <= 30.0) {
+          candidats.push({
+            id: doc.id,
+            distance: dist,
+            nom: `${t.prenom || ""} ${t.nom || ""}`.trim(),
+            telephone: t.telephone || ""
+          });
         }
       }
 
-      if (nextChauffeurId !== "") {
-        console.log(`Course ${context.params.courseId} attribuee a ${nextChauffeurId} (ETA: ${Math.round(minDuration/60)} min)`);
-        await change.after.ref.update({
-          transporteurId: nextChauffeurId,
-          nomTransporteur: nextNom,
-          telephoneTransporteur: nextTel,
-          statut: "attribue"
-        });
-      } else {
-        console.log(`Aucun chauffeur disponible pour la course ${context.params.courseId}`);
+      if (candidats.length === 0) {
+        console.log(`[Auto-Dispatch] Aucun candidat trouvé dans le rayon pour la course ${context.params.courseId}`);
+        return null;
       }
+
+      // 3. Trier par distance (le plus proche en premier)
+      candidats.sort((a, b) => a.distance - b.distance);
+
+      // 4. Attribution avec TRANSACTION Firestore
+      const courseRef = change.after.ref;
+
+      for (const candidat of candidats) {
+        const transporteurRef = admin.firestore().collection("transporteurs").doc(candidat.id);
+
+        try {
+          await admin.firestore().runTransaction(async (transaction) => {
+            // Lecture des deux documents (verrouillage)
+            const tSnap = await transaction.get(transporteurRef);
+            const cSnap = await transaction.get(courseRef);
+
+            if (!tSnap.exists || !cSnap.exists) throw new Error("Document manquant");
+
+            const cData = cSnap.data();
+            if (cData.statut !== "recherche") throw new Error("La course n'est plus en recherche");
+
+            const tData = tSnap.data();
+            // Vérification absolue de la disponibilité au moment T
+            if (tData.disponible !== true || tData.estEnLigne !== true) {
+              throw new Error("Le transporteur n'est plus disponible");
+            }
+
+            // Écriture : verrouiller le transporteur et assigner la course
+            transaction.update(transporteurRef, { disponible: false });
+            transaction.update(courseRef, {
+              transporteurId: candidat.id,
+              nomTransporteur: candidat.nom,
+              telephoneTransporteur: candidat.telephone,
+              statut: "attribue",
+              dateModification: admin.firestore.FieldValue.serverTimestamp()
+            });
+          });
+
+          console.log(`[Auto-Dispatch] Course ${context.params.courseId} attribuée avec succès au transporteur ${candidat.id} (Distance: ${candidat.distance.toFixed(2)} km)`);
+          // Match réussi, on arrête la boucle
+          return null;
+        } catch (err) {
+          console.log(`[Auto-Dispatch] Collision pour le candidat ${candidat.id} : ${err.message}. Essai du suivant...`);
+          // On continue la boucle pour essayer le prochain candidat
+        }
+      }
+
+      console.log(`[Auto-Dispatch] Échec de l'attribution pour la course ${context.params.courseId} (aucun candidat n'a pu être verrouillé).`);
+
     } catch (error) {
       console.error("Erreur lors de l'attribution :", error);
     }

@@ -42,9 +42,8 @@ class GlassContainer extends StatelessWidget {
         ? Colors.white.withValues(alpha: opaciteFond)
         : scheme.surface
             .withValues(alpha: (0.72 + opaciteFond).clamp(0.0, 0.96));
-    final couleurBordure = isDark
-        ? Colors.white.withValues(alpha: 0.15)
-        : scheme.outlineVariant;
+    final couleurBordure =
+        isDark ? Colors.white.withValues(alpha: 0.15) : scheme.outlineVariant;
     final ombre = isDark
         ? Colors.black.withValues(alpha: 0.10)
         : scheme.shadow.withValues(alpha: 0.06);

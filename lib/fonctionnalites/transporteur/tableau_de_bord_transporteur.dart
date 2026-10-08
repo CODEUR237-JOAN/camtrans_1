@@ -104,7 +104,9 @@ class _TableauDeBordTransporteurState
 
     //  PILIER 4: DISPATCH AUTOMATIQUE - Écoute de l'attribution (Subit l'attribution)
     ref.listen<Course?>(activeCourseProvider, (previous, next) {
-      if (next != null && previous?.id != next.id && next.statut == StatutCourse.attribue) {
+      if (next != null &&
+          previous?.id != next.id &&
+          next.statut == StatutCourse.attribue) {
         // Déclencher une alerte sonore/système
         ServiceNotification.afficherNotification(
           titre: 'Nouvelle course attribuée !',
@@ -169,7 +171,11 @@ class _TableauDeBordTransporteurState
       loading: () => const Center(child: LoaderPremium()),
       error: (err, _) => Center(
           child: Text("Oups ! Chargement impossible : $err",
-              style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)))),
+              style: TextStyle(
+                  color: Theme.of(context)
+                      .colorScheme
+                      .onSurface
+                      .withValues(alpha: 0.7)))),
       data: (transporteur) {
         final nomAffichage = transporteur != null
             ? transporteur.prenom
@@ -204,12 +210,18 @@ class _TableauDeBordTransporteurState
                             Text("Compte en attente de validation",
                                 style: TextStyle(
                                     fontWeight: FontWeight.bold,
-                                    color: Theme.of(context).colorScheme.onSurface)),
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurface)),
                             const SizedBox(height: 4),
                             Text(
                               "Vos documents sont en cours d'examen par l'administration.",
                               style: TextStyle(
-                                  fontSize: 12, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)),
+                                  fontSize: 12,
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onSurface
+                                      .withValues(alpha: 0.7)),
                             ),
                           ],
                         ),
@@ -232,7 +244,8 @@ class _TableauDeBordTransporteurState
                     ]),
                     child: CircleAvatar(
                       radius: 28,
-                      backgroundColor: CouleursApp.secondaire.withValues(alpha: 0.5),
+                      backgroundColor:
+                          CouleursApp.secondaire.withValues(alpha: 0.5),
                       backgroundImage:
                           photoUrl.isNotEmpty ? NetworkImage(photoUrl) : null,
                       child: photoUrl.isEmpty
@@ -249,7 +262,12 @@ class _TableauDeBordTransporteurState
                         Text(
                           _salutationDuJour(),
                           style: GoogleFonts.inter(
-                              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6), fontSize: 13, fontWeight: FontWeight.w500),
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurface
+                                  .withValues(alpha: 0.6),
+                              fontSize: 13,
+                              fontWeight: FontWeight.w500),
                         ),
                         const SizedBox(height: 2),
                         Text(
@@ -276,7 +294,10 @@ class _TableauDeBordTransporteurState
                         activeThumbColor: Colors.white,
                         activeTrackColor: CouleursApp.succes,
                         inactiveThumbColor: Colors.white,
-                        inactiveTrackColor: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.2),
+                        inactiveTrackColor: Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withValues(alpha: 0.2),
                         onChanged: _chargementDisponibilite
                             ? null
                             : (value) async {
@@ -294,8 +315,8 @@ class _TableauDeBordTransporteurState
                                   }
                                 } finally {
                                   if (mounted) {
-                                    setState(() =>
-                                        _chargementDisponibilite = false);
+                                    setState(
+                                        () => _chargementDisponibilite = false);
                                   }
                                 }
                               },
@@ -332,7 +353,10 @@ class _TableauDeBordTransporteurState
                     Text(
                       "Revenus du jour",
                       style: GoogleFonts.inter(
-                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onSurface
+                              .withValues(alpha: 0.7),
                           fontSize: 16,
                           fontWeight: FontWeight.w500),
                     ),
@@ -359,10 +383,16 @@ class _TableauDeBordTransporteurState
                       padding: const EdgeInsets.symmetric(
                           horizontal: 12, vertical: 6),
                       decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1),
+                        color: Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(20),
                         border: Border.all(
-                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.2)),
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onSurface
+                                .withValues(alpha: 0.2)),
                       ),
                       child: Row(
                         mainAxisSize: MainAxisSize.min,
@@ -526,36 +556,38 @@ class _TableauDeBordTransporteurState
                                           onPlay: (controller) =>
                                               controller.repeat())
                                       .shimmer(
-                                          color: Theme.of(context).colorScheme.onSurface
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onSurface
                                               .withValues(alpha: 0.08),
                                           duration: 1.5.seconds)),
                         ],
                       ),
                   error: (err, _) => Padding(
-                    padding: const EdgeInsets.all(20.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Icon(Icons.cloud_off_outlined,
-                            size: 20,
-                            color: Theme.of(context)
-                                .colorScheme
-                                .onSurface
-                                .withValues(alpha: 0.6)),
-                        const SizedBox(width: 8),
-                        Flexible(
-                          child: Text(
-                            "Le chargement a échoué. Vérifiez votre connexion, puis réessayez.",
-                            style: TextStyle(
+                        padding: const EdgeInsets.all(20.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Icon(Icons.cloud_off_outlined,
+                                size: 20,
                                 color: Theme.of(context)
                                     .colorScheme
                                     .onSurface
                                     .withValues(alpha: 0.6)),
-                          ),
+                            const SizedBox(width: 8),
+                            Flexible(
+                              child: Text(
+                                "Le chargement a échoué. Vérifiez votre connexion, puis réessayez.",
+                                style: TextStyle(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurface
+                                        .withValues(alpha: 0.6)),
+                              ),
+                            ),
+                          ],
                         ),
-                      ],
-                    ),
-                  ),
+                      ),
                   data: (courses) {
                     if (courses.isEmpty) {
                       return Padding(
@@ -573,7 +605,8 @@ class _TableauDeBordTransporteurState
                               "Aucune course pour le moment.",
                               textAlign: TextAlign.center,
                               style: TextStyle(
-                                  color: Theme.of(context).colorScheme.onSurface,
+                                  color:
+                                      Theme.of(context).colorScheme.onSurface,
                                   fontWeight: FontWeight.w600),
                             ),
                             const SizedBox(height: 4),
@@ -641,7 +674,11 @@ class _TableauDeBordTransporteurState
                     const SizedBox(height: 6),
                     Text(sousTitre,
                         style: TextStyle(
-                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6), fontSize: 13)),
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onSurface
+                                .withValues(alpha: 0.6),
+                            fontSize: 13)),
                   ],
                 ),
               ),
@@ -724,7 +761,12 @@ class _TableauDeBordTransporteurState
                 Text(
                   conseil.description,
                   style: GoogleFonts.inter(
-                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6), fontSize: 12, height: 1.4),
+                      color: Theme.of(context)
+                          .colorScheme
+                          .onSurface
+                          .withValues(alpha: 0.6),
+                      fontSize: 12,
+                      height: 1.4),
                 ),
               ],
             ),

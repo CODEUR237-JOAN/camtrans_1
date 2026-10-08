@@ -51,7 +51,8 @@ class GpsTracker {
     try {
       role = await _ref.read(userRoleProvider.future);
     } catch (_) {}
-    final collectionCible = role == 'transporteur' ? 'transporteurs' : 'clients';
+    final collectionCible =
+        role == 'transporteur' ? 'transporteurs' : 'clients';
 
     _positionSubscription =
         serviceGps.fluxPosition().listen((Position position) {

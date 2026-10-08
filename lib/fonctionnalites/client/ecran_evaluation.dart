@@ -63,7 +63,12 @@ class _EcranEvaluationState extends ConsumerState<EcranEvaluation> {
               Text(
                 "Votre avis nous aide à maintenir notre niveau d'excellence. Comment évaluez-vous le service de votre transporteur ?",
                 textAlign: TextAlign.center,
-                style: GoogleFonts.inter(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 16),
+                style: GoogleFonts.inter(
+                    color: Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withValues(alpha: 0.54),
+                    fontSize: 16),
               ),
 
               const SizedBox(height: 40),
@@ -84,7 +89,10 @@ class _EcranEvaluationState extends ConsumerState<EcranEvaluation> {
                         index < _note ? Icons.star : Icons.star_border,
                         color: index < _note
                             ? CouleursApp.avertissement
-                            : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.24),
+                            : Theme.of(context)
+                                .colorScheme
+                                .onSurface
+                                .withValues(alpha: 0.24),
                         size: 40,
                       )
                           .animate(target: index < _note ? 1 : 0)
@@ -102,10 +110,15 @@ class _EcranEvaluationState extends ConsumerState<EcranEvaluation> {
                 TextField(
                   controller: _commentaireController,
                   maxLines: 3,
-                  style: GoogleFonts.inter(color: Theme.of(context).colorScheme.onSurface),
+                  style: GoogleFonts.inter(
+                      color: Theme.of(context).colorScheme.onSurface),
                   decoration: InputDecoration(
                     hintText: "Laissez un commentaire (optionnel)",
-                    hintStyle: GoogleFonts.inter(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38)),
+                    hintStyle: GoogleFonts.inter(
+                        color: Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withValues(alpha: 0.38)),
                     filled: true,
                     fillColor: const Color(0xFF1A2640).withValues(alpha: 0.05),
                     border: OutlineInputBorder(
@@ -148,10 +161,9 @@ class _EcranEvaluationState extends ConsumerState<EcranEvaluation> {
                                   .collection('courses')
                                   .doc(widget.courseId)
                                   .get();
-                              final transpId = (courseDoc.data()?[
-                                          'transporteurId'] ??
-                                      '')
-                                  .toString();
+                              final transpId =
+                                  (courseDoc.data()?['transporteurId'] ?? '')
+                                      .toString();
                               final clientId =
                                   (courseDoc.data()?['clientId'] ?? '')
                                       .toString();
@@ -190,7 +202,10 @@ class _EcranEvaluationState extends ConsumerState<EcranEvaluation> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: CouleursApp.primaire,
                     foregroundColor: Colors.white,
-                    disabledBackgroundColor: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.12),
+                    disabledBackgroundColor: Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withValues(alpha: 0.12),
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16)),
                   ),

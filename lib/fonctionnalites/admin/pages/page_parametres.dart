@@ -258,8 +258,7 @@ class _PageParametresState extends ConsumerState<PageParametres> {
                   const SizedBox(height: 40),
 
                   // Section Apparence (thème clair/sombre/auto)
-                  _buildSectionTitre(
-                      "Apparence", Icons.palette_outlined),
+                  _buildSectionTitre("Apparence", Icons.palette_outlined),
                   const SizedBox(height: 16),
                   _buildCarte(
                     child: const SelecteurTheme(),

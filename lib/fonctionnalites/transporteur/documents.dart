@@ -166,12 +166,19 @@ class _DocumentsState extends ConsumerState<Documents> {
                       children: [
                         Text(
                           "Documents du transporteur",
-                          style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), fontSize: 16),
+                          style: TextStyle(
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurface
+                                  .withValues(alpha: 0.7),
+                              fontSize: 16),
                         ),
                         const SizedBox(height: 10),
                         Text(
                           "Téléchargez des photos claires de vos documents afin d'être vérifié par l'administration.",
-                          style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 17),
+                          style: TextStyle(
+                              color: Theme.of(context).colorScheme.onSurface,
+                              fontSize: 17),
                         ),
                       ],
                     ),

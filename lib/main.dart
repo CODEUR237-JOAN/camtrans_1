@@ -45,12 +45,14 @@ Future<void> main() async {
       );
       debugPrint("[SUCCÈS] Mode hors-ligne de la base de données activé.");
     } catch (e) {
-      debugPrint("[AVERTISSEMENT] Le mode hors-ligne n'a pas pu être activé (souvent normal sur Web).");
+      debugPrint(
+          "[AVERTISSEMENT] Le mode hors-ligne n'a pas pu être activé (souvent normal sur Web).");
     }
 
     // Enregistrement du service de notifications pour fonctionner en arrière-plan (Mobile uniquement).
     if (!kIsWeb) {
-      FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+      FirebaseMessaging.onBackgroundMessage(
+          _firebaseMessagingBackgroundHandler);
     }
 
     // Initialisation et configuration des notifications locales.
@@ -64,16 +66,19 @@ Future<void> main() async {
     // Chargement des variables d'environnement (ex: clés d'API).
     try {
       await dotenv.load(fileName: ".env");
-      debugPrint("[SUCCÈS] Variables de configuration (.env) chargées avec succès.");
+      debugPrint(
+          "[SUCCÈS] Variables de configuration (.env) chargées avec succès.");
     } catch (e) {
-      debugPrint("[AVERTISSEMENT] Fichier .env non trouvé. Les fonctionnalités IA et Campay seront indisponibles.");
+      debugPrint(
+          "[AVERTISSEMENT] Fichier .env non trouvé. Les fonctionnalités IA et Campay seront indisponibles.");
     }
 
     // Chargement du thème persisté AVANT le premier build
     // pour éviter tout flash blanc au démarrage.
     final themePreCharge = ThemeProvider();
     await themePreCharge.charger();
-    debugPrint("[SUCCÈS] Thème utilisateur chargé (${themePreCharge.modeActuel}).");
+    debugPrint(
+        "[SUCCÈS] Thème utilisateur chargé (${themePreCharge.modeActuel}).");
 
     runApp(
       ProviderScope(

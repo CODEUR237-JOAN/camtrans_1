@@ -33,7 +33,8 @@ class ProfilTransporteur extends ConsumerWidget {
       ),
       body: transporteurAsync.when(
         loading: () => const Center(child: LoaderPremium()),
-        error: (err, stack) => Center(child: Text("Oups, impossible de charger votre profil. ($err)")),
+        error: (err, stack) => Center(
+            child: Text("Oups, impossible de charger votre profil. ($err)")),
         data: (transporteur) {
           if (transporteur == null) {
             return const Center(child: Text("Profil introuvable"));
@@ -88,8 +89,11 @@ class ProfilTransporteur extends ConsumerWidget {
                   elevation: 0,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(20),
-                    side:
-                        BorderSide(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08)),
+                    side: BorderSide(
+                        color: Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withValues(alpha: 0.08)),
                   ),
                   child: Column(
                     children: [
@@ -133,8 +137,11 @@ class ProfilTransporteur extends ConsumerWidget {
                   elevation: 0,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(20),
-                    side:
-                        BorderSide(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08)),
+                    side: BorderSide(
+                        color: Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withValues(alpha: 0.08)),
                   ),
                   child: Column(
                     children: [
@@ -255,7 +262,8 @@ class ProfilTransporteur extends ConsumerWidget {
                                         valeur: v,
                                         icone: Icons.star,
                                         couleurIcone: CouleursApp.avertissement,
-                                        couleurValeur: CouleursApp.avertissement);
+                                        couleurValeur:
+                                            CouleursApp.avertissement);
                                   }),
                                 ),
                               ],
@@ -272,7 +280,10 @@ class ProfilTransporteur extends ConsumerWidget {
 
                 const SizedBox(height: 25),
 
-                _boutonOption(context, Icons.workspace_premium, "Mes abonnements",
+                _boutonOption(
+                    context,
+                    Icons.workspace_premium,
+                    "Mes abonnements",
                     () => context.push(RoutesApplication.abonnement)),
                 _boutonOption(context, Icons.edit, "Modifier le profil",
                     () => context.push(RoutesApplication.modifierProfil)),
@@ -287,7 +298,8 @@ class ProfilTransporteur extends ConsumerWidget {
                   width: double.infinity,
                   child: ElevatedButton.icon(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: CouleursApp.erreur.withValues(alpha: 0.15),
+                      backgroundColor:
+                          CouleursApp.erreur.withValues(alpha: 0.15),
                       foregroundColor: CouleursApp.erreur,
                       minimumSize: const Size(double.infinity, 55),
                       elevation: 0,
@@ -316,19 +328,28 @@ class ProfilTransporteur extends ConsumerWidget {
     );
   }
 
-  Widget _boutonOption(BuildContext context, IconData icone, String texte, VoidCallback action) {
+  Widget _boutonOption(
+      BuildContext context, IconData icone, String texte, VoidCallback action) {
     return Card(
       elevation: 0,
       margin: const EdgeInsets.only(bottom: 12),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(15),
-        side: BorderSide(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.07)),
+        side: BorderSide(
+            color: Theme.of(context)
+                .colorScheme
+                .onSurface
+                .withValues(alpha: 0.07)),
       ),
       child: ListTile(
         leading: Icon(icone, color: CouleursApp.primaire),
         title: Text(texte, style: const TextStyle(fontWeight: FontWeight.w600)),
         trailing: Icon(Icons.arrow_forward_ios,
-            size: 16, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54)),
+            size: 16,
+            color: Theme.of(context)
+                .colorScheme
+                .onSurface
+                .withValues(alpha: 0.54)),
         onTap: action,
       ),
     );
@@ -396,7 +417,12 @@ class ProfilTransporteur extends ConsumerWidget {
             const SizedBox(height: 5),
             Text(
               "Valide jusqu'au ${DateFormat('dd/MM/yyyy à HH:mm').format(transporteur.dateFinAbonnement!)}",
-              style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), fontSize: 13),
+              style: TextStyle(
+                  color: Theme.of(context)
+                      .colorScheme
+                      .onSurface
+                      .withValues(alpha: 0.7),
+                  fontSize: 13),
             ),
           ] else ...[
             Text(
@@ -409,7 +435,12 @@ class ProfilTransporteur extends ConsumerWidget {
             const SizedBox(height: 5),
             Text(
               "Veuillez renouveler votre abonnement pour continuer à recevoir des courses.",
-              style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), fontSize: 13),
+              style: TextStyle(
+                  color: Theme.of(context)
+                      .colorScheme
+                      .onSurface
+                      .withValues(alpha: 0.7),
+                  fontSize: 13),
             ),
           ],
           const SizedBox(height: 15),
@@ -417,7 +448,8 @@ class ProfilTransporteur extends ConsumerWidget {
             onPressed: () => context.push(RoutesApplication.abonnement),
             style: ElevatedButton.styleFrom(
               backgroundColor: Theme.of(context).scaffoldBackgroundColor,
-              foregroundColor: estValide ? CouleursApp.primaire : CouleursApp.erreur,
+              foregroundColor:
+                  estValide ? CouleursApp.primaire : CouleursApp.erreur,
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(10)),
             ),

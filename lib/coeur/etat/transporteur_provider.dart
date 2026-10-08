@@ -97,7 +97,9 @@ final fluxCoursesDisponiblesProvider =
           }
 
           // Filtrage géographique (Max 50 km de rayon)
-          if (transporteur.latitude != 0 && transporteur.longitude != 0 && c.latitudeDepart != 0) {
+          if (transporteur.latitude != 0 &&
+              transporteur.longitude != 0 &&
+              c.latitudeDepart != 0) {
             final distanceReelle = const Distance().as(
                 LengthUnit.Kilometer,
                 LatLng(transporteur.latitude, transporteur.longitude),

@@ -130,7 +130,10 @@ class _EcranPaiementState extends ConsumerState<EcranPaiement> {
           Container(
             decoration: BoxDecoration(
               gradient: LinearGradient(
-                colors: [Theme.of(context).scaffoldBackgroundColor, const Color(0xFF111827)],
+                colors: [
+                  Theme.of(context).scaffoldBackgroundColor,
+                  const Color(0xFF111827)
+                ],
                 begin: Alignment.topCenter,
                 end: Alignment.bottomCenter,
               ),
@@ -172,7 +175,11 @@ class _EcranPaiementState extends ConsumerState<EcranPaiement> {
                             children: [
                               Text(l10n.rideAmount,
                                   style: GoogleFonts.poppins(
-                                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 14)),
+                                      color: Theme.of(context)
+                                          .colorScheme
+                                          .onSurface
+                                          .withValues(alpha: 0.54),
+                                      fontSize: 14)),
                               const SizedBox(height: 8),
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
@@ -183,7 +190,9 @@ class _EcranPaiementState extends ConsumerState<EcranPaiement> {
                                     style: GoogleFonts.poppins(
                                         fontSize: 48,
                                         fontWeight: FontWeight.w900,
-                                        color: Theme.of(context).colorScheme.onSurface,
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onSurface,
                                         height: 1),
                                   ),
                                   const SizedBox(width: 8),
@@ -206,7 +215,8 @@ class _EcranPaiementState extends ConsumerState<EcranPaiement> {
                             style: GoogleFonts.poppins(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 18,
-                                color: Theme.of(context).colorScheme.onSurface)),
+                                color:
+                                    Theme.of(context).colorScheme.onSurface)),
                         const SizedBox(height: 16),
 
                         // Liste des méthodes de paiement
@@ -294,7 +304,10 @@ class _EcranPaiementState extends ConsumerState<EcranPaiement> {
                                         style: GoogleFonts.poppins(
                                             fontWeight: FontWeight.w600,
                                             fontSize: 14,
-                                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)),
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .onSurface
+                                                .withValues(alpha: 0.7)),
                                       ),
                                       const SizedBox(height: 12),
                                       _buildFloatingTextField(
@@ -335,7 +348,12 @@ class _EcranPaiementState extends ConsumerState<EcranPaiement> {
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
                 color: const Color(0xFF0F172A).withValues(alpha: 0.9),
-                border: Border(top: BorderSide(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.12))),
+                border: Border(
+                    top: BorderSide(
+                        color: Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withValues(alpha: 0.12))),
               ),
               child: SafeArea(
                 top: false,
@@ -358,7 +376,9 @@ class _EcranPaiementState extends ConsumerState<EcranPaiement> {
                             children: [
                               const Icon(Iconsax.lock_copy, size: 20),
                               const SizedBox(width: 8),
-                              Text(l10n.payButton(widget.montant.toInt().toString()),
+                              Text(
+                                  l10n.payButton(
+                                      widget.montant.toInt().toString()),
                                   style: GoogleFonts.poppins(
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold)),
@@ -394,11 +414,17 @@ class _EcranPaiementState extends ConsumerState<EcranPaiement> {
                         const SizedBox(width: 12),
                         Expanded(
                             child: Text(etatPaiement.erreur!,
-                                style:
-                                    GoogleFonts.poppins(color: Theme.of(context).colorScheme.onSurface))),
+                                style: GoogleFonts.poppins(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurface))),
                         IconButton(
                           icon: Icon(Icons.close,
-                              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), size: 18),
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurface
+                                  .withValues(alpha: 0.54),
+                              size: 18),
                           onPressed: () => ref
                               .read(paiementProvider.notifier)
                               .reinitialiser(), // Permet de fermer l'erreur
@@ -418,7 +444,9 @@ class _EcranPaiementState extends ConsumerState<EcranPaiement> {
               child: BackdropFilter(
                 filter: ImageFilter.blur(sigmaX: 20, sigmaY: 20),
                 child: Container(
-                  color: Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.85),
+                  color: Theme.of(context)
+                      .scaffoldBackgroundColor
+                      .withValues(alpha: 0.85),
                   child: SafeArea(
                     child: Center(
                       child: TicketRecu(
@@ -447,87 +475,104 @@ class _EcranPaiementState extends ConsumerState<EcranPaiement> {
     return Opacity(
       opacity: isDisabled ? 0.4 : 1.0,
       child: GestureDetector(
-      onTap: isDisabled
-          ? () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text("Le paiement par carte bancaire sera bientôt disponible."),
-                  behavior: SnackBarBehavior.floating,
-                ),
-              );
-            }
-          : () {
-        HapticFeedback.lightImpact();
-        setState(() {
-          _methodeSelectionnee = cle;
-          _telephoneController.clear();
-        });
-      },
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 300),
-        curve: Curves.easeOutQuart,
-        padding: const EdgeInsets.all(20),
-        decoration: BoxDecoration(
-          color: estSelectionne
-              ? brandColor.withValues(alpha: 0.1)
-              : const Color(0xFF1E293B).withValues(alpha: 0.5),
-          borderRadius: BorderRadius.circular(24),
-          border: Border.all(
+        onTap: isDisabled
+            ? () {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text(
+                        "Le paiement par carte bancaire sera bientôt disponible."),
+                    behavior: SnackBarBehavior.floating,
+                  ),
+                );
+              }
+            : () {
+                HapticFeedback.lightImpact();
+                setState(() {
+                  _methodeSelectionnee = cle;
+                  _telephoneController.clear();
+                });
+              },
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeOutQuart,
+          padding: const EdgeInsets.all(20),
+          decoration: BoxDecoration(
             color: estSelectionne
-                ? brandColor
-                : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05),
-            width: estSelectionne ? 2 : 1,
+                ? brandColor.withValues(alpha: 0.1)
+                : const Color(0xFF1E293B).withValues(alpha: 0.5),
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(
+              color: estSelectionne
+                  ? brandColor
+                  : Theme.of(context)
+                      .colorScheme
+                      .onSurface
+                      .withValues(alpha: 0.05),
+              width: estSelectionne ? 2 : 1,
+            ),
+            boxShadow: estSelectionne
+                ? [
+                    BoxShadow(
+                        color: brandColor.withValues(alpha: 0.2),
+                        blurRadius: 20,
+                        offset: const Offset(0, 8))
+                  ]
+                : [],
           ),
-          boxShadow: estSelectionne
-              ? [
-                  BoxShadow(
-                      color: brandColor.withValues(alpha: 0.2),
-                      blurRadius: 20,
-                      offset: const Offset(0, 8))
-                ]
-              : [],
-        ),
-        child: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: estSelectionne
-                    ? brandColor.withValues(alpha: 0.2)
-                    : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(defaultIcon,
-                  color: estSelectionne ? brandColor : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54),
-                  size: 24),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(titre,
-                      style: GoogleFonts.poppins(
-                          fontWeight: FontWeight.bold,
-                          fontSize: 16,
-                          color: Theme.of(context).colorScheme.onSurface)),
-                  Text(sousTitre,
-                      style: GoogleFonts.poppins(
-                          fontSize: 12, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54))),
-                ],
-              ),
-            ),
-            if (estSelectionne)
+          child: Row(
+            children: [
               Container(
-                padding: const EdgeInsets.all(4),
-                decoration:
-                    BoxDecoration(color: brandColor, shape: BoxShape.circle),
-                child: Icon(Icons.check, color: Theme.of(context).colorScheme.onSurface, size: 16),
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: estSelectionne
+                      ? brandColor.withValues(alpha: 0.2)
+                      : Theme.of(context)
+                          .colorScheme
+                          .onSurface
+                          .withValues(alpha: 0.05),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(defaultIcon,
+                    color: estSelectionne
+                        ? brandColor
+                        : Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withValues(alpha: 0.54),
+                    size: 24),
               ),
-          ],
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(titre,
+                        style: GoogleFonts.poppins(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                            color: Theme.of(context).colorScheme.onSurface)),
+                    Text(sousTitre,
+                        style: GoogleFonts.poppins(
+                            fontSize: 12,
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onSurface
+                                .withValues(alpha: 0.54))),
+                  ],
+                ),
+              ),
+              if (estSelectionne)
+                Container(
+                  padding: const EdgeInsets.all(4),
+                  decoration:
+                      BoxDecoration(color: brandColor, shape: BoxShape.circle),
+                  child: Icon(Icons.check,
+                      color: Theme.of(context).colorScheme.onSurface, size: 16),
+                ),
+            ],
+          ),
         ),
       ),
-    ),
     ); // Opacity
   }
 
@@ -542,8 +587,9 @@ class _EcranPaiementState extends ConsumerState<EcranPaiement> {
       controller: controller,
       focusNode: focusNode,
       keyboardType: keyboardType,
-      style:
-          GoogleFonts.poppins(color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.w500),
+      style: GoogleFonts.poppins(
+          color: Theme.of(context).colorScheme.onSurface,
+          fontWeight: FontWeight.w500),
       decoration: InputDecoration(
         hintText: hint,
         hintStyle: GoogleFonts.poppins(
@@ -555,12 +601,18 @@ class _EcranPaiementState extends ConsumerState<EcranPaiement> {
             const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
         border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),
-            borderSide:
-                BorderSide(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05))),
+            borderSide: BorderSide(
+                color: Theme.of(context)
+                    .colorScheme
+                    .onSurface
+                    .withValues(alpha: 0.05))),
         enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),
-            borderSide:
-                BorderSide(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05))),
+            borderSide: BorderSide(
+                color: Theme.of(context)
+                    .colorScheme
+                    .onSurface
+                    .withValues(alpha: 0.05))),
         focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(16),
             borderSide: const BorderSide(color: Color(0xFF3B82F6), width: 1.5)),
@@ -584,9 +636,14 @@ class _GlassButton extends StatelessWidget {
         decoration: BoxDecoration(
           color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1),
           shape: BoxShape.circle,
-          border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1)),
+          border: Border.all(
+              color: Theme.of(context)
+                  .colorScheme
+                  .onSurface
+                  .withValues(alpha: 0.1)),
         ),
-        child: Icon(icon, color: Theme.of(context).colorScheme.onSurface, size: 20),
+        child: Icon(icon,
+            color: Theme.of(context).colorScheme.onSurface, size: 20),
       ),
     );
   }

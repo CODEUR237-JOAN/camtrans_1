@@ -22,7 +22,7 @@ class ServicePaiement {
     final String url = ApiKeys.isCampayProduction
         ? 'https://www.campay.net/api'
         : 'https://demo.campay.net/api';
-    
+
     // N'affecte QUE le web. Sur mobile (Android/iOS), kIsWeb est faux et l'URL normale est utilisée.
     if (kIsWeb) {
       return 'https://corsproxy.io/?$url';
@@ -88,8 +88,9 @@ class ServicePaiement {
         'Authorization': 'Token $token',
       },
       body: jsonEncode({
-        "amount":
-            montantCampay.toInt().toString(), // Campay demande souvent un entier
+        "amount": montantCampay
+            .toInt()
+            .toString(), // Campay demande souvent un entier
         "currency": "XAF",
         "from": phone,
         "description": "Paiement Course CamTrans",
@@ -196,7 +197,8 @@ class ServicePaiement {
     final token = await _obtenirToken();
 
     String phone = telephoneBeneficiaire.replaceAll(RegExp(r'[^0-9]'), '');
-    if (phone.length == 9) phone = "237$phone"; // Ajouter l'indicatif si manquant
+    if (phone.length == 9)
+      phone = "237$phone"; // Ajouter l'indicatif si manquant
 
     final refExterne = "RET-${DateTime.now().millisecondsSinceEpoch}";
     final double montantCampay = ApiKeys.isCampayProduction ? montant : 10.0;
@@ -244,8 +246,8 @@ class ServicePaiement {
         );
 
         if (statusResponse.statusCode == 200) {
-          status =
-              (jsonDecode(statusResponse.body)['status'] ?? 'PENDING').toString();
+          status = (jsonDecode(statusResponse.body)['status'] ?? 'PENDING')
+              .toString();
           if (status == "SUCCESSFUL") {
             return true;
           } else if (status == "FAILED") {
@@ -265,23 +267,30 @@ class ServicePaiement {
         final errorData = jsonDecode(response.body);
         final errorCode = errorData['error_code']?.toString() ?? '';
         final errorMessage = errorData['message']?.toString() ?? '';
-        
-        String messageAmical = "Le service de transfert est momentanément indisponible.";
-        
-        if (errorMessage.contains("Invalid phone number") || errorCode == "ER101") {
-          messageAmical = "Ce numéro de téléphone est invalide. Veuillez entrer un numéro de téléphone correct (ex: 690XXXXXX).";
+
+        String messageAmical =
+            "Le service de transfert est momentanément indisponible.";
+
+        if (errorMessage.contains("Invalid phone number") ||
+            errorCode == "ER101") {
+          messageAmical =
+              "Ce numéro de téléphone est invalide. Veuillez entrer un numéro de téléphone correct (ex: 690XXXXXX).";
         } else if (errorMessage.contains("UNAUTHORIZED")) {
-          messageAmical = "Les retraits sont actuellement désactivés par l'opérateur financier.";
-        } else if (errorMessage.toLowerCase().contains("insufficient") || errorCode == "ER102") {
-          messageAmical = "Le service ne dispose pas d'assez de fonds pour honorer ce retrait.";
+          messageAmical =
+              "Les retraits sont actuellement désactivés par l'opérateur financier.";
+        } else if (errorMessage.toLowerCase().contains("insufficient") ||
+            errorCode == "ER102") {
+          messageAmical =
+              "Le service ne dispose pas d'assez de fonds pour honorer ce retrait.";
         } else if (errorMessage.isNotEmpty) {
           messageAmical = "Erreur de l'opérateur : $errorMessage";
         }
-        
+
         throw Exception(messageAmical);
       } catch (e) {
         if (e is FormatException) {
-          throw Exception("Le service de transfert est injoignable pour le moment.");
+          throw Exception(
+              "Le service de transfert est injoignable pour le moment.");
         }
         rethrow;
       }
@@ -512,11 +521,14 @@ class ServicePaiement {
         );
       }
     }
-    
+
     // Si paiement digital (pas d'espèces), le portefeuille du transporteur sera crédité
     // automatiquement par une Cloud Function sécurisée pour éviter toute fraude.
-    if (methode != "Espèces" && transporteurId.isNotEmpty && !courseId.startsWith('SUB-')) {
-      debugPrint("Paiement digital validé. Le crédit du portefeuille sera effectué par le serveur.");
+    if (methode != "Espèces" &&
+        transporteurId.isNotEmpty &&
+        !courseId.startsWith('SUB-')) {
+      debugPrint(
+          "Paiement digital validé. Le crédit du portefeuille sera effectué par le serveur.");
     }
 
     return paiement;

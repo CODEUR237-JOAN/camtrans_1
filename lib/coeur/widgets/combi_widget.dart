@@ -249,7 +249,8 @@ class _CombiSheetState extends ConsumerState<CombiSheet> {
         child: Text(
           m.texte,
           style: TextStyle(
-            color: estUser ? Colors.white : Colors.white.withValues(alpha: 0.92),
+            color:
+                estUser ? Colors.white : Colors.white.withValues(alpha: 0.92),
             fontSize: 15,
             height: 1.35,
           ),
@@ -346,12 +347,10 @@ class _CombiSheetState extends ConsumerState<CombiSheet> {
                   size: 24,
                 ),
               ),
-            )
-                .animate(target: enEcoute ? 1 : 0)
-                .scale(
-                    begin: const Offset(1, 1),
-                    end: const Offset(1.12, 1.12),
-                    duration: 600.ms),
+            ).animate(target: enEcoute ? 1 : 0).scale(
+                begin: const Offset(1, 1),
+                end: const Offset(1.12, 1.12),
+                duration: 600.ms),
           ],
         ),
       ),

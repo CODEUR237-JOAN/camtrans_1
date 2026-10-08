@@ -2,7 +2,8 @@ import 'package:flutter_tts/flutter_tts.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:update_camtrans/services/service_routage.dart';
 
-final serviceNavigationVocaleProvider = Provider<ServiceNavigationVocale>((ref) {
+final serviceNavigationVocaleProvider =
+    Provider<ServiceNavigationVocale>((ref) {
   return ServiceNavigationVocale();
 });
 
@@ -32,28 +33,34 @@ class ServiceNavigationVocale {
   String humaniserInstruction(EtapeTrajet etape, {required bool estPreAlerte}) {
     String mod = etape.modifier.toLowerCase();
     String type = etape.type.toLowerCase();
-    
+
     if (type == 'arrive') {
-      return estPreAlerte ? "préparez-vous à arriver à destination" : "vous êtes arrivé à destination";
+      return estPreAlerte
+          ? "préparez-vous à arriver à destination"
+          : "vous êtes arrivé à destination";
     }
-    
+
     String action = "tournez";
-    
+
     if (mod.contains("slight")) {
       action = "tournez légèrement";
     } else if (mod.contains("sharp")) {
       action = "tournez serré";
     }
-    
+
     String direction = "";
     if (mod.contains("left")) {
       direction = "à gauche";
     } else if (mod.contains("right")) {
       direction = "à droite";
     } else if (mod.contains("straight")) {
-      return estPreAlerte ? "préparez-vous à continuer tout droit" : "continuez tout droit";
+      return estPreAlerte
+          ? "préparez-vous à continuer tout droit"
+          : "continuez tout droit";
     } else if (mod.contains("uturn")) {
-      return estPreAlerte ? "préparez-vous à faire demi-tour" : "faites demi-tour";
+      return estPreAlerte
+          ? "préparez-vous à faire demi-tour"
+          : "faites demi-tour";
     } else {
       if (etape.instruction.isNotEmpty) {
         return etape.instruction.toLowerCase();
@@ -62,7 +69,7 @@ class ServiceNavigationVocale {
     }
 
     String rue = etape.nomRue.isNotEmpty ? " sur ${etape.nomRue}" : "";
-    
+
     if (estPreAlerte) {
       return "préparez-vous à tourner $direction$rue";
     } else {

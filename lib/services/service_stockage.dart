@@ -19,7 +19,8 @@ class ServiceStockage {
     required String nomFichier,
   }) async {
     try {
-      final url = Uri.parse('https://api.cloudinary.com/v1_1/$cloudName/image/upload');
+      final url =
+          Uri.parse('https://api.cloudinary.com/v1_1/$cloudName/image/upload');
       final request = http.MultipartRequest('POST', url)
         ..fields['upload_preset'] = uploadPreset
         ..fields['folder'] = 'camtrans/$dossier'
@@ -27,9 +28,11 @@ class ServiceStockage {
 
       if (kIsWeb) {
         final bytes = await fichier.readAsBytes();
-        request.files.add(http.MultipartFile.fromBytes('file', bytes, filename: fichier.name));
+        request.files.add(http.MultipartFile.fromBytes('file', bytes,
+            filename: fichier.name));
       } else {
-        request.files.add(await http.MultipartFile.fromPath('file', fichier.path));
+        request.files
+            .add(await http.MultipartFile.fromPath('file', fichier.path));
       }
 
       final response = await request.send();
@@ -49,7 +52,7 @@ class ServiceStockage {
   }
 
   Future<void> supprimerFichier(String url) async {
-    // La suppression directe (Unsigned) n'est pas autorisée par défaut sur Cloudinary 
+    // La suppression directe (Unsigned) n'est pas autorisée par défaut sur Cloudinary
     // pour des raisons de sécurité. Pour l'instant on se contente de l'ignorer.
     debugPrint("Suppression ignorée (Cloudinary Unsigned)");
   }

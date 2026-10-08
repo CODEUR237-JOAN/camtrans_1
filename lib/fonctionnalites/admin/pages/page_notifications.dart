@@ -119,7 +119,6 @@ class _PageNotificationsState extends ConsumerState<PageNotifications> {
     );
   }
 
-
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(

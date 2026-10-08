@@ -76,17 +76,28 @@ class Facture extends ConsumerWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Icon(Icons.wifi_off_rounded,
-                  size: 60, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38)),
+                  size: 60,
+                  color: Theme.of(context)
+                      .colorScheme
+                      .onSurface
+                      .withValues(alpha: 0.38)),
               const SizedBox(height: 16),
               Text("Problème de connexion ",
                   style: GoogleFonts.inter(
-                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                      color: Theme.of(context)
+                          .colorScheme
+                          .onSurface
+                          .withValues(alpha: 0.7),
                       fontSize: 16,
                       fontWeight: FontWeight.bold)),
               const SizedBox(height: 8),
               Text("Réessayez dans quelques instants",
-                  style:
-                      GoogleFonts.inter(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), fontSize: 13)),
+                  style: GoogleFonts.inter(
+                      color: Theme.of(context)
+                          .colorScheme
+                          .onSurface
+                          .withValues(alpha: 0.38),
+                      fontSize: 13)),
             ],
           ),
         ),
@@ -129,7 +140,12 @@ class Facture extends ConsumerWidget {
                     Text(
                       "Vos transactions apparaîtront ici après votre première course. Lancez-vous ! ",
                       style: GoogleFonts.inter(
-                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 14, height: 1.5),
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onSurface
+                              .withValues(alpha: 0.54),
+                          fontSize: 14,
+                          height: 1.5),
                       textAlign: TextAlign.center,
                     ),
                   ],
@@ -189,7 +205,12 @@ class Facture extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text("Montant de la course",
-                      style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), fontSize: 14)),
+                      style: TextStyle(
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onSurface
+                              .withValues(alpha: 0.7),
+                          fontSize: 14)),
                   const SizedBox(height: 6),
                   Text("${c.prixEstime.toInt()} FCFA",
                       style: TextStyle(
@@ -198,16 +219,22 @@ class Facture extends ConsumerWidget {
                           fontWeight: FontWeight.w900)),
                   const SizedBox(height: 20),
                   Text("Statut : ${c.statut}",
-                      style:
-                          TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), fontSize: 13)),
+                      style: TextStyle(
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onSurface
+                              .withValues(alpha: 0.7),
+                          fontSize: 13)),
                 ],
               ),
             ),
             const SizedBox(height: 24),
             _infoTile(context, Icons.location_on, "Départ", c.adresseDepart),
             _infoTile(context, Icons.flag, "Destination", c.adresseArrivee),
-            _infoTile(context, Icons.local_shipping, "Véhicule", c.typeVehicule),
-            _infoTile(context, Icons.category, "Type de service", c.categorieService),
+            _infoTile(
+                context, Icons.local_shipping, "Véhicule", c.typeVehicule),
+            _infoTile(
+                context, Icons.category, "Type de service", c.categorieService),
             _infoTile(context, Icons.calendar_today, "Date",
                 "${c.dateCreation.day}/${c.dateCreation.month}/${c.dateCreation.year}"),
           ],
@@ -216,7 +243,8 @@ class Facture extends ConsumerWidget {
     );
   }
 
-  Widget _infoTile(BuildContext context, IconData icon, String label, String value) {
+  Widget _infoTile(
+      BuildContext context, IconData icon, String label, String value) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(16),
@@ -224,7 +252,12 @@ class Facture extends ConsumerWidget {
         color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(14),
         boxShadow: [
-          BoxShadow(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.07), blurRadius: 8)
+          BoxShadow(
+              color: Theme.of(context)
+                  .colorScheme
+                  .onSurface
+                  .withValues(alpha: 0.07),
+              blurRadius: 8)
         ],
       ),
       child: Row(
@@ -242,7 +275,12 @@ class Facture extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(label,
-                    style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 12)),
+                    style: TextStyle(
+                        color: Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withValues(alpha: 0.54),
+                        fontSize: 12)),
                 Text(value.isNotEmpty ? value : "-",
                     style: TextStyle(
                         fontWeight: FontWeight.bold,
@@ -303,7 +341,10 @@ class Facture extends ConsumerWidget {
             borderRadius: BorderRadius.circular(16),
             boxShadow: [
               BoxShadow(
-                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.07),
+                  color: Theme.of(context)
+                      .colorScheme
+                      .onSurface
+                      .withValues(alpha: 0.07),
                   blurRadius: 10,
                   offset: const Offset(0, 5))
             ]),
@@ -330,8 +371,12 @@ class Facture extends ConsumerWidget {
                   const SizedBox(height: 4),
                   Text(
                       "${paiement.datePaiement.day}/${paiement.datePaiement.month}/${paiement.datePaiement.year}",
-                      style:
-                          TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), fontSize: 13)),
+                      style: TextStyle(
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onSurface
+                              .withValues(alpha: 0.7),
+                          fontSize: 13)),
                 ],
               ),
             ),

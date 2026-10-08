@@ -369,8 +369,8 @@ class _EtatVideRetraits extends StatelessWidget {
             const Text(
                 'Vos retraits apparaîtront ici dès que vous en effectuerez un.',
                 textAlign: TextAlign.center,
-                style:
-                    TextStyle(color: Colors.white54, fontSize: 13, height: 1.5)),
+                style: TextStyle(
+                    color: Colors.white54, fontSize: 13, height: 1.5)),
           ],
         ),
       ),
@@ -452,15 +452,21 @@ class _FeuilleRetraitAdminState extends ConsumerState<_FeuilleRetraitAdmin> {
       if (!mounted) return;
       setState(() => _enCours = false);
       String msg = e.toString().replaceFirst('Exception: ', '');
-      
+
       // Humanisation du message d'erreur pour éviter d'afficher des logs bruts (CORS, fetch, URI...)
       final msgLower = msg.toLowerCase();
-      if (msgLower.contains('failed to fetch') || msgLower.contains('socketexception') || msgLower.contains('xmlhttprequest')) {
-        msg = "Problème de connexion avec le service financier. Veuillez vérifier votre connexion internet et réessayer.";
+      if (msgLower.contains('failed to fetch') ||
+          msgLower.contains('socketexception') ||
+          msgLower.contains('xmlhttprequest')) {
+        msg =
+            "Problème de connexion avec le service financier. Veuillez vérifier votre connexion internet et réessayer.";
       } else if (msgLower.contains('timeout') || msgLower.contains('délai')) {
         msg = "Le serveur a mis trop de temps à répondre. Veuillez réessayer.";
-      } else if (msgLower.contains('corsproxy') || msgLower.contains('campay') || msgLower.contains('api/token')) {
-        msg = "Le service de paiement est temporairement indisponible ou rejette la connexion. Veuillez réessayer plus tard.";
+      } else if (msgLower.contains('corsproxy') ||
+          msgLower.contains('campay') ||
+          msgLower.contains('api/token')) {
+        msg =
+            "Le service de paiement est temporairement indisponible ou rejette la connexion. Veuillez réessayer plus tard.";
       }
 
       showDialog(
@@ -475,8 +481,8 @@ class _FeuilleRetraitAdminState extends ConsumerState<_FeuilleRetraitAdmin> {
             Text('Retrait impossible',
                 style: TextStyle(color: Colors.white, fontSize: 17)),
           ]),
-          content:
-              Text(msg, style: const TextStyle(color: Colors.white70, height: 1.5)),
+          content: Text(msg,
+              style: const TextStyle(color: Colors.white70, height: 1.5)),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(context),
@@ -562,7 +568,8 @@ class _FeuilleRetraitAdminState extends ConsumerState<_FeuilleRetraitAdmin> {
                 keyboardType:
                     const TextInputType.numberWithOptions(decimal: true),
                 style: const TextStyle(color: Colors.white),
-                decoration: _deco('Montant à retirer (FCFA)', Icons.payments_outlined),
+                decoration:
+                    _deco('Montant à retirer (FCFA)', Icons.payments_outlined),
                 validator: (v) {
                   final t = (v ?? '').trim().replaceAll(',', '.');
                   final m = double.tryParse(t);
@@ -583,7 +590,9 @@ class _FeuilleRetraitAdminState extends ConsumerState<_FeuilleRetraitAdmin> {
                   _estMobileMoney
                       ? 'Numéro de téléphone'
                       : 'IBAN / Numéro de compte',
-                  _estMobileMoney ? Icons.phone_outlined : Icons.account_balance_outlined,
+                  _estMobileMoney
+                      ? Icons.phone_outlined
+                      : Icons.account_balance_outlined,
                 ),
                 validator: (v) => (v == null || v.trim().isEmpty)
                     ? 'Champ obligatoire'

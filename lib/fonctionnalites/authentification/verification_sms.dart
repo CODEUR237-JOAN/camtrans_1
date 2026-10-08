@@ -78,7 +78,8 @@ class _VerificationSmsState extends State<VerificationSms> {
 
   Future<void> _validerCode() async {
     if (_verificationId == null) {
-      setState(() => _erreur = "Veuillez patienter, l'envoi du SMS est en cours...");
+      setState(
+          () => _erreur = "Veuillez patienter, l'envoi du SMS est en cours...");
       return;
     }
     final code = _codeController.text.trim();
@@ -151,17 +152,24 @@ class _VerificationSmsState extends State<VerificationSms> {
               mainAxisAlignment: MainAxisAlignment.center,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                const Icon(Icons.security, size: 80, color: CouleursApp.primaire),
+                const Icon(Icons.security,
+                    size: 80, color: CouleursApp.primaire),
                 const SizedBox(height: 24),
                 const Text(
                   "Authentification à double facteur",
-                  style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: CouleursApp.textePrincipal),
+                  style: TextStyle(
+                      fontSize: 22,
+                      fontWeight: FontWeight.bold,
+                      color: CouleursApp.textePrincipal),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 16),
                 Text(
                   "Un code SMS vient d'être envoyé au numéro :\n${widget.telephone}",
-                  style: const TextStyle(fontSize: 16, color: CouleursApp.texteSecondaire, height: 1.5),
+                  style: const TextStyle(
+                      fontSize: 16,
+                      color: CouleursApp.texteSecondaire,
+                      height: 1.5),
                   textAlign: TextAlign.center,
                 ),
                 const SizedBox(height: 32),
@@ -171,11 +179,13 @@ class _VerificationSmsState extends State<VerificationSms> {
                     decoration: BoxDecoration(
                       color: Colors.red.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(8),
-                      border: Border.all(color: Colors.red.withValues(alpha: 0.5)),
+                      border:
+                          Border.all(color: Colors.red.withValues(alpha: 0.5)),
                     ),
                     child: Text(
                       _erreur!,
-                      style: const TextStyle(color: Colors.red, fontWeight: FontWeight.w600),
+                      style: const TextStyle(
+                          color: Colors.red, fontWeight: FontWeight.w600),
                       textAlign: TextAlign.center,
                     ),
                   ),
@@ -197,7 +207,8 @@ class _VerificationSmsState extends State<VerificationSms> {
                 const SizedBox(height: 16),
                 TextButton(
                   onPressed: _chargement ? null : _envoyerSms,
-                  child: const Text("Renvoyer le code", style: TextStyle(color: CouleursApp.primaire)),
+                  child: const Text("Renvoyer le code",
+                      style: TextStyle(color: CouleursApp.primaire)),
                 ),
               ],
             ),

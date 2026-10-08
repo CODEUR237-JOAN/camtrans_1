@@ -263,8 +263,8 @@ class _HistoriqueState extends ConsumerState<Historique> {
               loading: () =>
                   const Center(child: IndicateurChargement(taille: 30)),
               error: (err, stack) => Center(
-                  child: Text(
-                      "Oups, impossible de charger l'historique : $err")),
+                  child:
+                      Text("Oups, impossible de charger l'historique : $err")),
             ),
           ),
         ],
@@ -281,10 +281,17 @@ class _HistoriqueState extends ConsumerState<Historique> {
         margin: const EdgeInsets.only(right: 10),
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
         decoration: BoxDecoration(
-          color: estSelectionne ? CouleursApp.primaire : Theme.of(context).colorScheme.onSurface,
+          color: estSelectionne
+              ? CouleursApp.primaire
+              : Theme.of(context).colorScheme.onSurface,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-              color: estSelectionne ? CouleursApp.primaire : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38)),
+              color: estSelectionne
+                  ? CouleursApp.primaire
+                  : Theme.of(context)
+                      .colorScheme
+                      .onSurface
+                      .withValues(alpha: 0.38)),
           boxShadow: estSelectionne
               ? [
                   BoxShadow(
@@ -297,7 +304,9 @@ class _HistoriqueState extends ConsumerState<Historique> {
         child: Text(
           texte,
           style: TextStyle(
-            color: estSelectionne ? Theme.of(context).colorScheme.onSurface : CouleursApp.texteSecondaire,
+            color: estSelectionne
+                ? Theme.of(context).colorScheme.onSurface
+                : CouleursApp.texteSecondaire,
             fontWeight: estSelectionne ? FontWeight.bold : FontWeight.normal,
           ),
         ),
@@ -331,7 +340,10 @@ class _HistoriqueState extends ConsumerState<Historique> {
         border: Border.all(color: const Color(0xFFEEEEEE)),
         boxShadow: [
           BoxShadow(
-              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.07),
+              color: Theme.of(context)
+                  .colorScheme
+                  .onSurface
+                  .withValues(alpha: 0.07),
               blurRadius: 10,
               offset: const Offset(0, 5))
         ],
@@ -364,7 +376,11 @@ class _HistoriqueState extends ConsumerState<Historique> {
                       const SizedBox(height: 5),
                       Text(dateStr,
                           style: TextStyle(
-                              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), fontSize: 13)),
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurface
+                                  .withValues(alpha: 0.7),
+                              fontSize: 13)),
                     ],
                   ),
                 ),

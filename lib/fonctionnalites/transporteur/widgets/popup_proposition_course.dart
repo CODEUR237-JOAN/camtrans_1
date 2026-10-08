@@ -22,7 +22,6 @@ class PopupPropositionCourse extends ConsumerStatefulWidget {
 
 class _PopupPropositionCourseState
     extends ConsumerState<PopupPropositionCourse> {
-
   @override
   void initState() {
     super.initState();
@@ -64,9 +63,13 @@ class _PopupPropositionCourseState
             mainAxisSize: MainAxisSize.min,
             children: [
               const SizedBox(height: 10),
-              const Icon(Icons.route_rounded, color: CouleursApp.primaire, size: 48)
+              const Icon(Icons.route_rounded,
+                      color: CouleursApp.primaire, size: 48)
                   .animate(onPlay: (c) => c.repeat(reverse: true))
-                  .scale(begin: const Offset(1, 1), end: const Offset(1.2, 1.2), duration: 800.ms),
+                  .scale(
+                      begin: const Offset(1, 1),
+                      end: const Offset(1.2, 1.2),
+                      duration: 800.ms),
               const SizedBox(height: 24),
               Text(
                 "NOUVELLE COURSE ATTRIBUÉE",
@@ -86,7 +89,10 @@ class _PopupPropositionCourseState
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05),
+                  color: Theme.of(context)
+                      .colorScheme
+                      .onSurface
+                      .withValues(alpha: 0.05),
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Column(
@@ -97,12 +103,17 @@ class _PopupPropositionCourseState
                         Row(
                           children: [
                             Icon(Iconsax.routing_2_copy,
-                                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), size: 16),
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onSurface
+                                    .withValues(alpha: 0.54),
+                                size: 16),
                             const SizedBox(width: 8),
                             Text(
                                 "${widget.course.distanceKm.toStringAsFixed(1)} km",
                                 style: TextStyle(
-                                    color: Theme.of(context).colorScheme.onSurface,
+                                    color:
+                                        Theme.of(context).colorScheme.onSurface,
                                     fontWeight: FontWeight.bold)),
                           ],
                         ),
@@ -120,7 +131,12 @@ class _PopupPropositionCourseState
                         ),
                       ],
                     ),
-                    Divider(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1), height: 24),
+                    Divider(
+                        color: Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withValues(alpha: 0.1),
+                        height: 24),
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -130,7 +146,11 @@ class _PopupPropositionCourseState
                         Expanded(
                           child: Text(widget.course.adresseDepart,
                               style: TextStyle(
-                                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), fontSize: 13),
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onSurface
+                                      .withValues(alpha: 0.7),
+                                  fontSize: 13),
                               maxLines: 2,
                               overflow: TextOverflow.ellipsis),
                         ),
@@ -171,8 +191,12 @@ class _PopupPropositionCourseState
                           const SizedBox(height: 2),
                           Text(
                             "Calculé équitablement. Le prix est fixe et non négociable.",
-                            style:
-                                TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), fontSize: 11),
+                            style: TextStyle(
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onSurface
+                                    .withValues(alpha: 0.7),
+                                fontSize: 11),
                           ),
                         ],
                       ),
@@ -195,8 +219,7 @@ class _PopupPropositionCourseState
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12)),
                     elevation: 10,
-                    shadowColor:
-                        CouleursApp.primaire.withValues(alpha: 0.5),
+                    shadowColor: CouleursApp.primaire.withValues(alpha: 0.5),
                   ),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,

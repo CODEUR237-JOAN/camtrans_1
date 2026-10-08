@@ -556,8 +556,7 @@ class NeoContainer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
-    final baseColor =
-        color ?? Theme.of(context).colorScheme.surface;
+    final baseColor = color ?? Theme.of(context).colorScheme.surface;
 
     return Container(
       margin: margin,
@@ -766,8 +765,8 @@ class _FondPremiumAnimeState extends State<FondPremiumAnime>
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final fond = theme.scaffoldBackgroundColor;
-    final fondTeinte = Color.lerp(
-        fond, theme.colorScheme.primary, isDark ? 0.07 : 0.05)!;
+    final fondTeinte =
+        Color.lerp(fond, theme.colorScheme.primary, isDark ? 0.07 : 0.05)!;
     final gradient = widget.gradient ??
         LinearGradient(
           begin: Alignment.topLeft,

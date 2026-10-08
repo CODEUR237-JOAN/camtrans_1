@@ -233,8 +233,7 @@ class RoutesApplication {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.error_outline,
-                          size: 60, color: Colors.red),
+                      Icon(Icons.error_outline, size: 60, color: Colors.red),
                       SizedBox(height: 16),
                       Text("Impossible d'accéder au paiement",
                           style: TextStyle(

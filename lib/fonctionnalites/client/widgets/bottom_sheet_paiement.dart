@@ -234,7 +234,12 @@ class _BottomSheetPaiementState extends ConsumerState<BottomSheetPaiement> {
         const SizedBox(height: 8),
         Text(
           'Merci pour votre confiance ',
-          style: GoogleFonts.inter(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 14),
+          style: GoogleFonts.inter(
+              color: Theme.of(context)
+                  .colorScheme
+                  .onSurface
+                  .withValues(alpha: 0.54),
+              fontSize: 14),
         ).animate().fadeIn(delay: 600.ms),
         const SizedBox(height: 20),
         Container(
@@ -283,7 +288,11 @@ class _BottomSheetPaiementState extends ConsumerState<BottomSheetPaiement> {
             height: 5,
             margin: const EdgeInsets.only(bottom: 20),
             decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.24), borderRadius: BorderRadius.circular(10)),
+                color: Theme.of(context)
+                    .colorScheme
+                    .onSurface
+                    .withValues(alpha: 0.24),
+                borderRadius: BorderRadius.circular(10)),
           ),
         ),
 
@@ -309,8 +318,12 @@ class _BottomSheetPaiementState extends ConsumerState<BottomSheetPaiement> {
                         fontWeight: FontWeight.bold,
                         fontSize: 18)),
                 Text('Choisissez votre mode de paiement',
-                    style:
-                        GoogleFonts.inter(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 12)),
+                    style: GoogleFonts.inter(
+                        color: Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withValues(alpha: 0.54),
+                        fontSize: 12)),
               ],
             ),
           ],
@@ -336,8 +349,12 @@ class _BottomSheetPaiementState extends ConsumerState<BottomSheetPaiement> {
           child: Column(
             children: [
               Text('Montant total',
-                  style:
-                      GoogleFonts.inter(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 13)),
+                  style: GoogleFonts.inter(
+                      color: Theme.of(context)
+                          .colorScheme
+                          .onSurface
+                          .withValues(alpha: 0.54),
+                      fontSize: 13)),
               const SizedBox(height: 4),
               Text(
                 '${widget.montant.toStringAsFixed(0)} FCFA',
@@ -347,8 +364,12 @@ class _BottomSheetPaiementState extends ConsumerState<BottomSheetPaiement> {
                     fontSize: 36),
               ),
               Text('Frais de service inclus',
-                  style:
-                      GoogleFonts.inter(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), fontSize: 11)),
+                  style: GoogleFonts.inter(
+                      color: Theme.of(context)
+                          .colorScheme
+                          .onSurface
+                          .withValues(alpha: 0.38),
+                      fontSize: 11)),
             ],
           ),
         ),
@@ -357,7 +378,10 @@ class _BottomSheetPaiementState extends ConsumerState<BottomSheetPaiement> {
 
         Text('Mode de paiement',
             style: GoogleFonts.inter(
-                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                color: Theme.of(context)
+                    .colorScheme
+                    .onSurface
+                    .withValues(alpha: 0.7),
                 fontWeight: FontWeight.w600,
                 fontSize: 14)),
         const SizedBox(height: 12),
@@ -384,7 +408,10 @@ class _BottomSheetPaiementState extends ConsumerState<BottomSheetPaiement> {
                 _modeSelectionne == null || _enChargement ? null : _payer,
             style: ElevatedButton.styleFrom(
               backgroundColor: CouleursApp.primaire,
-              disabledBackgroundColor: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.12),
+              disabledBackgroundColor: Theme.of(context)
+                  .colorScheme
+                  .onSurface
+                  .withValues(alpha: 0.12),
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16)),
               elevation: 0,
@@ -465,36 +492,56 @@ class _BottomSheetPaiementState extends ConsumerState<BottomSheetPaiement> {
             child: Opacity(
               opacity: isDisabled ? 0.4 : 1.0,
               child: AnimatedContainer(
-              duration: 200.ms,
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
-              decoration: BoxDecoration(
-                color: selected
-                    ? couleur.withValues(alpha: 0.15)
-                    : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05),
-                borderRadius: BorderRadius.circular(14),
-                border: Border.all(
-                  color: selected ? couleur : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.12),
-                  width: selected ? 2 : 1,
+                duration: 200.ms,
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+                decoration: BoxDecoration(
+                  color: selected
+                      ? couleur.withValues(alpha: 0.15)
+                      : Theme.of(context)
+                          .colorScheme
+                          .onSurface
+                          .withValues(alpha: 0.05),
+                  borderRadius: BorderRadius.circular(14),
+                  border: Border.all(
+                    color: selected
+                        ? couleur
+                        : Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withValues(alpha: 0.12),
+                    width: selected ? 2 : 1,
+                  ),
                 ),
-              ),
-              child: Row(
-                children: [
-                  Icon(mode['icon'] as IconData,
-                      color: selected ? couleur : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), size: 20),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      mode['label'] as String,
-                      style: GoogleFonts.inter(
-                        color: selected ? Theme.of(context).colorScheme.onSurface : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
-                        fontWeight:
-                            selected ? FontWeight.bold : FontWeight.normal,
-                        fontSize: 12,
+                child: Row(
+                  children: [
+                    Icon(mode['icon'] as IconData,
+                        color: selected
+                            ? couleur
+                            : Theme.of(context)
+                                .colorScheme
+                                .onSurface
+                                .withValues(alpha: 0.7),
+                        size: 20),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        mode['label'] as String,
+                        style: GoogleFonts.inter(
+                          color: selected
+                              ? Theme.of(context).colorScheme.onSurface
+                              : Theme.of(context)
+                                  .colorScheme
+                                  .onSurface
+                                  .withValues(alpha: 0.6),
+                          fontWeight:
+                              selected ? FontWeight.bold : FontWeight.normal,
+                          fontSize: 12,
+                        ),
                       ),
                     ),
-                  ),
-                ],
-              ), // Row
+                  ],
+                ), // Row
               ), // AnimatedContainer
             ), // Opacity
           ); // GestureDetector
@@ -510,14 +557,24 @@ class _BottomSheetPaiementState extends ConsumerState<BottomSheetPaiement> {
       children: [
         Text(
           isOrange ? 'Numéro Orange Money' : 'Numéro MTN Mobile Money',
-          style: GoogleFonts.inter(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), fontSize: 13),
+          style: GoogleFonts.inter(
+              color: Theme.of(context)
+                  .colorScheme
+                  .onSurface
+                  .withValues(alpha: 0.7),
+              fontSize: 13),
         ),
         const SizedBox(height: 8),
         Container(
           decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.07),
+            color:
+                Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.07),
             borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.12)),
+            border: Border.all(
+                color: Theme.of(context)
+                    .colorScheme
+                    .onSurface
+                    .withValues(alpha: 0.12)),
           ),
           child: TextField(
             controller: _phoneCtrl,
@@ -525,7 +582,11 @@ class _BottomSheetPaiementState extends ConsumerState<BottomSheetPaiement> {
             style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
             decoration: InputDecoration(
               hintText: 'Ex: 6XX XXX XXX',
-              hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38)),
+              hintStyle: TextStyle(
+                  color: Theme.of(context)
+                      .colorScheme
+                      .onSurface
+                      .withValues(alpha: 0.38)),
               prefixIcon: Icon(
                 Iconsax.call_copy,
                 color: isOrange
@@ -549,22 +610,36 @@ class _BottomSheetPaiementState extends ConsumerState<BottomSheetPaiement> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text('Nom du titulaire de la carte',
-            style: GoogleFonts.inter(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), fontSize: 13)),
+            style: GoogleFonts.inter(
+                color: Theme.of(context)
+                    .colorScheme
+                    .onSurface
+                    .withValues(alpha: 0.7),
+                fontSize: 13)),
         const SizedBox(height: 8),
         Container(
           decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.07),
+            color:
+                Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.07),
             borderRadius: BorderRadius.circular(14),
-            border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.12)),
+            border: Border.all(
+                color: Theme.of(context)
+                    .colorScheme
+                    .onSurface
+                    .withValues(alpha: 0.12)),
           ),
           child: TextField(
             controller: _nomCtrl,
             style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
             decoration: InputDecoration(
               hintText: 'Ex: Jean DUPONT',
-              hintStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38)),
-              prefixIcon:
-                  const Icon(Icons.credit_card, color: Color(0xFF6366F1), size: 20),
+              hintStyle: TextStyle(
+                  color: Theme.of(context)
+                      .colorScheme
+                      .onSurface
+                      .withValues(alpha: 0.38)),
+              prefixIcon: const Icon(Icons.credit_card,
+                  color: Color(0xFF6366F1), size: 20),
               border: InputBorder.none,
               contentPadding:
                   const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
@@ -592,7 +667,12 @@ class _BottomSheetPaiementState extends ConsumerState<BottomSheetPaiement> {
           Expanded(
             child: Text(
               'Remettez exactement ${widget.montant.toStringAsFixed(0)} FCFA en espèces à votre chauffeur.',
-              style: GoogleFonts.inter(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), fontSize: 12),
+              style: GoogleFonts.inter(
+                  color: Theme.of(context)
+                      .colorScheme
+                      .onSurface
+                      .withValues(alpha: 0.7),
+                  fontSize: 12),
             ),
           ),
         ],

@@ -35,25 +35,32 @@ class TicketRecu extends StatelessWidget {
               pw.SizedBox(height: 20),
               pw.Image(logoImage, width: 120),
               pw.SizedBox(height: 20),
-              pw.Text('Reçu de Paiement', style: pw.TextStyle(fontSize: 28, fontWeight: pw.FontWeight.bold, color: const PdfColor(0.08, 0.36, 0.26))),
+              pw.Text('Reçu de Paiement',
+                  style: pw.TextStyle(
+                      fontSize: 28,
+                      fontWeight: pw.FontWeight.bold,
+                      color: const PdfColor(0.08, 0.36, 0.26))),
               pw.SizedBox(height: 10),
               pw.Divider(color: PdfColors.grey300),
               pw.SizedBox(height: 30),
-              
-              _buildPdfLigneDetails('Montant Payé', '${paiement.montant.toInt()} ${paiement.devise}', isBold: true, isLarge: true),
+              _buildPdfLigneDetails('Montant Payé',
+                  '${paiement.montant.toInt()} ${paiement.devise}',
+                  isBold: true, isLarge: true),
               pw.SizedBox(height: 20),
-              
-              _buildPdfLigneDetails('Méthode de paiement', paiement.methodePaiement.toUpperCase()),
-              _buildPdfLigneDetails('N° de Transaction', paiement.numeroTransaction),
+              _buildPdfLigneDetails('Méthode de paiement',
+                  paiement.methodePaiement.toUpperCase()),
+              _buildPdfLigneDetails(
+                  'N° de Transaction', paiement.numeroTransaction),
               _buildPdfLigneDetails('Référence Course', paiement.reference),
-              _buildPdfLigneDetails('Date et Heure', "${paiement.datePaiement.day.toString().padLeft(2, '0')}/${paiement.datePaiement.month.toString().padLeft(2, '0')}/${paiement.datePaiement.year} à ${paiement.datePaiement.hour.toString().padLeft(2, '0')}:${paiement.datePaiement.minute.toString().padLeft(2, '0')}"),
-              
+              _buildPdfLigneDetails('Date et Heure',
+                  "${paiement.datePaiement.day.toString().padLeft(2, '0')}/${paiement.datePaiement.month.toString().padLeft(2, '0')}/${paiement.datePaiement.year} à ${paiement.datePaiement.hour.toString().padLeft(2, '0')}:${paiement.datePaiement.minute.toString().padLeft(2, '0')}"),
               pw.SizedBox(height: 40),
               pw.Container(
                 padding: const pw.EdgeInsets.all(10),
                 decoration: pw.BoxDecoration(
                   border: pw.Border.all(color: PdfColors.grey300),
-                  borderRadius: const pw.BorderRadius.all(pw.Radius.circular(10)),
+                  borderRadius:
+                      const pw.BorderRadius.all(pw.Radius.circular(10)),
                 ),
                 child: pw.BarcodeWidget(
                   data: paiement.numeroTransaction,
@@ -63,7 +70,9 @@ class TicketRecu extends StatelessWidget {
                 ),
               ),
               pw.SizedBox(height: 10),
-              pw.Text('TransConnect Cameroun - Merci de votre confiance.', style: const pw.TextStyle(color: PdfColors.grey600, fontSize: 12)),
+              pw.Text('TransConnect Cameroun - Merci de votre confiance.',
+                  style: const pw.TextStyle(
+                      color: PdfColors.grey600, fontSize: 12)),
             ],
           );
         },
@@ -76,16 +85,24 @@ class TicketRecu extends StatelessWidget {
     );
   }
 
-  pw.Widget _buildPdfLigneDetails(String titre, String valeur, {bool isBold = false, bool isLarge = false}) {
+  pw.Widget _buildPdfLigneDetails(String titre, String valeur,
+      {bool isBold = false, bool isLarge = false}) {
     return pw.Padding(
       padding: const pw.EdgeInsets.symmetric(vertical: 8),
       child: pw.Row(
         crossAxisAlignment: pw.CrossAxisAlignment.start,
         children: [
-          pw.Text(titre, style: pw.TextStyle(color: PdfColors.grey700, fontSize: isLarge ? 16 : 14)),
+          pw.Text(titre,
+              style: pw.TextStyle(
+                  color: PdfColors.grey700, fontSize: isLarge ? 16 : 14)),
           pw.SizedBox(width: 16),
           pw.Expanded(
-            child: pw.Text(valeur, textAlign: pw.TextAlign.right, style: pw.TextStyle(fontWeight: isBold ? pw.FontWeight.bold : pw.FontWeight.normal, fontSize: isLarge ? 18 : 14)),
+            child: pw.Text(valeur,
+                textAlign: pw.TextAlign.right,
+                style: pw.TextStyle(
+                    fontWeight:
+                        isBold ? pw.FontWeight.bold : pw.FontWeight.normal,
+                    fontSize: isLarge ? 18 : 14)),
           ),
         ],
       ),
@@ -181,14 +198,30 @@ class TicketRecu extends StatelessWidget {
                       ),
                       const SizedBox(height: 32),
 
-                      _buildLigneDetails(context, 
-                          "Méthode", paiement.methodePaiement.toUpperCase()),
-                      Divider(height: 32, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.12)),
-                      _buildLigneDetails(context, 
-                          "N° Transaction", paiement.numeroTransaction),
-                      Divider(height: 32, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.12)),
-                      _buildLigneDetails(context, "Réf. Course", paiement.reference),
-                      Divider(height: 32, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.12)),
+                      _buildLigneDetails(context, "Méthode",
+                          paiement.methodePaiement.toUpperCase()),
+                      Divider(
+                          height: 32,
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onSurface
+                              .withValues(alpha: 0.12)),
+                      _buildLigneDetails(context, "N° Transaction",
+                          paiement.numeroTransaction),
+                      Divider(
+                          height: 32,
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onSurface
+                              .withValues(alpha: 0.12)),
+                      _buildLigneDetails(
+                          context, "Réf. Course", paiement.reference),
+                      Divider(
+                          height: 32,
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onSurface
+                              .withValues(alpha: 0.12)),
                       _buildLigneDetails(context, "Date",
                           "${paiement.datePaiement.day.toString().padLeft(2, '0')}/${paiement.datePaiement.month.toString().padLeft(2, '0')}/${paiement.datePaiement.year} à ${paiement.datePaiement.hour.toString().padLeft(2, '0')}:${paiement.datePaiement.minute.toString().padLeft(2, '0')}"),
 
@@ -202,7 +235,10 @@ class TicketRecu extends StatelessWidget {
                             borderRadius: BorderRadius.circular(20),
                             boxShadow: [
                               BoxShadow(
-                                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.2),
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onSurface
+                                      .withValues(alpha: 0.2),
                                   blurRadius: 20,
                                   offset: const Offset(0, 5))
                             ]),
@@ -224,19 +260,23 @@ class TicketRecu extends StatelessWidget {
                       Text(
                         "Scannez pour valider avec le transporteur",
                         style: GoogleFonts.poppins(
-                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54),
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onSurface
+                                .withValues(alpha: 0.54),
                             fontSize: 11,
                             fontWeight: FontWeight.w500),
                       ),
 
                       const SizedBox(height: 40),
-                      
+
                       SizedBox(
                         width: double.infinity,
                         height: 56,
                         child: OutlinedButton.icon(
                           onPressed: () => _telechargerPDF(context),
-                          icon: Icon(Icons.picture_as_pdf, color: Theme.of(context).colorScheme.onSurface),
+                          icon: Icon(Icons.picture_as_pdf,
+                              color: Theme.of(context).colorScheme.onSurface),
                           label: Text(
                             "Télécharger le reçu",
                             style: GoogleFonts.poppins(
@@ -245,7 +285,12 @@ class TicketRecu extends StatelessWidget {
                                 color: Theme.of(context).colorScheme.onSurface),
                           ),
                           style: OutlinedButton.styleFrom(
-                            side: BorderSide(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.24), width: 1.5),
+                            side: BorderSide(
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onSurface
+                                    .withValues(alpha: 0.24),
+                                width: 1.5),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(16),
                             ),
@@ -299,7 +344,12 @@ class TicketRecu extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(titre,
-            style: GoogleFonts.poppins(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 14)),
+            style: GoogleFonts.poppins(
+                color: Theme.of(context)
+                    .colorScheme
+                    .onSurface
+                    .withValues(alpha: 0.54),
+                fontSize: 14)),
         const SizedBox(width: 16),
         // La valeur (n° de transaction, référence, date…) peut être longue :
         // elle occupe l'espace restant et passe à la ligne au lieu de déborder.

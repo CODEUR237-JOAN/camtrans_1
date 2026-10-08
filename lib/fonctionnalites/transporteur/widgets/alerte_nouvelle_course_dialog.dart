@@ -100,7 +100,10 @@ class _AlerteNouvelleCourseDialogState
               style: GoogleFonts.inter(
                 fontSize: 14,
                 color: Theme.of(context).brightness == Brightness.dark
-                    ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)
+                    ? Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withValues(alpha: 0.7)
                     : Colors.black87,
               ),
               textAlign: TextAlign.center,

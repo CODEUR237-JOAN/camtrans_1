@@ -2,10 +2,10 @@ import 'package:latlong2/latlong.dart';
 import 'package:update_camtrans/modeles/course.dart';
 
 enum PhaseSuivi {
-  recherche,   // La course cherche un transporteur
-  approche,    // Phase 1 : Le transporteur va vers le client
-  trajet,      // Phase 2 : Le transporteur va vers la destination
-  terminee,    // La course est finie
+  recherche, // La course cherche un transporteur
+  approche, // Phase 1 : Le transporteur va vers le client
+  trajet, // Phase 2 : Le transporteur va vers la destination
+  terminee, // La course est finie
 }
 
 class SuiviCourseEtat {
@@ -58,8 +58,10 @@ class SuiviCourseEtat {
       positionClient: positionClient ?? this.positionClient,
       positionDestination: positionDestination ?? this.positionDestination,
       pointsItineraire: pointsItineraire ?? this.pointsItineraire,
-      instructionVocaleActuelle: instructionVocaleActuelle ?? this.instructionVocaleActuelle,
-      distanceRestanteMetres: distanceRestanteMetres ?? this.distanceRestanteMetres,
+      instructionVocaleActuelle:
+          instructionVocaleActuelle ?? this.instructionVocaleActuelle,
+      distanceRestanteMetres:
+          distanceRestanteMetres ?? this.distanceRestanteMetres,
       tempsRestantSecondes: tempsRestantSecondes ?? this.tempsRestantSecondes,
       isVoixActive: isVoixActive ?? this.isVoixActive,
       isLoading: isLoading ?? this.isLoading,

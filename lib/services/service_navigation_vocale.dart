@@ -174,8 +174,8 @@ class ServiceNavigationVocale extends ChangeNotifier {
     if (_indexEtapeCourante >= etapes.length) return;
 
     final etape = etapes[_indexEtapeCourante];
-    final distance = _distanceTool.as(
-        LengthUnit.Meter, positionActuelle, etape.coordonnee);
+    final distance =
+        _distanceTool.as(LengthUnit.Meter, positionActuelle, etape.coordonnee);
 
     // Les points de départ sont passés silencieusement.
     if (etape.type == 'depart' && distance < 50) {
@@ -187,8 +187,8 @@ class ServiceNavigationVocale extends ChangeNotifier {
 
     // Manœuvre franchie → étape suivante.
     if (distance <= _seuilImmediat) {
-      final etaitDerniere = _indexEtapeCourante >= etapes.length - 1 ||
-          etape.type == 'arrive';
+      final etaitDerniere =
+          _indexEtapeCourante >= etapes.length - 1 || etape.type == 'arrive';
       _passerEtapeSuivante();
       if (etaitDerniere) {
         _parler('Vous êtes arrivé à destination. Bonne fin de course !',
@@ -227,9 +227,7 @@ class ServiceNavigationVocale extends ChangeNotifier {
   // ------------------------------------------------------------------
   void _declencherPaliers(double distance, EtapeTrajet etape) {
     // Palier LOIN (~500 m) : annonce informative.
-    if (!_aAnnonceLoin &&
-        distance <= _seuilLoin &&
-        distance > _bandeLoinMin) {
+    if (!_aAnnonceLoin && distance <= _seuilLoin && distance > _bandeLoinMin) {
       _aAnnonceLoin = true;
       _parler(
           'Dans ${_arrondirDistance(distance)} mètres, ${_instruction(etape, PalierAnnonce.loin)}.');

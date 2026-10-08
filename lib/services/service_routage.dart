@@ -14,7 +14,7 @@ class EtapeTrajet {
   final String type;
   final String modifier;
   final String nomRue;
-  
+
   EtapeTrajet({
     required this.coordonnee,
     required this.instruction,
@@ -74,10 +74,12 @@ class ServiceRoutage {
               for (var step in leg['steps']) {
                 final maneuver = step['maneuver'];
                 final location = maneuver['location'] as List;
-                
+
                 etapes.add(EtapeTrajet(
-                  coordonnee: LatLng((location[1] as num).toDouble(), (location[0] as num).toDouble()),
-                  instruction: maneuver['instruction'] ?? step['name'] ?? 'Continuez',
+                  coordonnee: LatLng((location[1] as num).toDouble(),
+                      (location[0] as num).toDouble()),
+                  instruction:
+                      maneuver['instruction'] ?? step['name'] ?? 'Continuez',
                   distance: (step['distance'] as num).toDouble(),
                   type: maneuver['type'] ?? '',
                   modifier: maneuver['modifier'] ?? '',

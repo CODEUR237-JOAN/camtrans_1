@@ -26,10 +26,13 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: AppBar(
         title: Text("Notifications",
-            style: TextStyle(fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface)),
+            style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: Theme.of(context).colorScheme.onSurface)),
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         elevation: 0,
-        iconTheme: IconThemeData(color: Theme.of(context).colorScheme.onSurface),
+        iconTheme:
+            IconThemeData(color: Theme.of(context).colorScheme.onSurface),
         automaticallyImplyLeading: false,
         actions: [
           notificationsAsync.maybeWhen(
@@ -81,11 +84,17 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
                         children: [
                           Icon(Icons.notifications_none,
                               size: 80,
-                              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1)),
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurface
+                                  .withValues(alpha: 0.1)),
                           const SizedBox(height: 16),
                           Text("Aucune notification",
                               style: TextStyle(
-                                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54),
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onSurface
+                                      .withValues(alpha: 0.54),
                                   fontWeight: FontWeight.bold)),
                         ],
                       ),
@@ -143,7 +152,10 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
         borderRadius: BorderRadius.circular(18),
         side: BorderSide(
             color: notification.lue
-                ? Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05)
+                ? Theme.of(context)
+                    .colorScheme
+                    .onSurface
+                    .withValues(alpha: 0.05)
                 : couleur.withValues(alpha: 0.3)),
       ),
       child: ListTile(
@@ -163,13 +175,22 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
           children: [
             const SizedBox(height: 4),
             Text(notification.message,
-                style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), fontSize: 13)),
+                style: TextStyle(
+                    color: Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withValues(alpha: 0.38),
+                    fontSize: 13)),
             const SizedBox(height: 8),
             Row(
               children: [
                 Text("$dateStr à $timeStr",
-                    style:
-                        TextStyle(fontSize: 11, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54))),
+                    style: TextStyle(
+                        fontSize: 11,
+                        color: Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withValues(alpha: 0.54))),
                 const Spacer(),
                 if (!notification.lue)
                   Container(
@@ -217,8 +238,13 @@ class _NotificationsPageState extends ConsumerState<NotificationsPage> {
           }
         },
         selectedColor: CouleursApp.primaire,
-        labelStyle:
-            TextStyle(color: filtre == valeur ? Theme.of(context).colorScheme.onSurface : Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54)),
+        labelStyle: TextStyle(
+            color: filtre == valeur
+                ? Theme.of(context).colorScheme.onSurface
+                : Theme.of(context)
+                    .colorScheme
+                    .onSurface
+                    .withValues(alpha: 0.54)),
       ),
     );
   }

@@ -61,7 +61,8 @@ class ServiceNotification {
     try {
       if (kIsWeb) {
         return await _messaging.getToken(
-            vapidKey: "BEl62iUYgUivxIkv69yViEuiBIa-Ib9-SkvMeAtA3LFgDyeMGOF-CxgHwBIV_G0Rks4C4f1c1q5g0V-0f_r7W54"); // Optionnel, évite un crash Web
+            vapidKey:
+                "BEl62iUYgUivxIkv69yViEuiBIa-Ib9-SkvMeAtA3LFgDyeMGOF-CxgHwBIV_G0Rks4C4f1c1q5g0V-0f_r7W54"); // Optionnel, évite un crash Web
       }
       return await _messaging.getToken();
     } catch (e) {
@@ -105,9 +106,9 @@ class ServiceNotification {
         badge: true,
         sound: true,
       );
-      final autorise = settings.authorizationStatus ==
-              AuthorizationStatus.authorized ||
-          settings.authorizationStatus == AuthorizationStatus.provisional;
+      final autorise =
+          settings.authorizationStatus == AuthorizationStatus.authorized ||
+              settings.authorizationStatus == AuthorizationStatus.provisional;
       if (!autorise) return false;
       await enregistrerTokenUtilisateur(userId, typeUtilisateur);
       return true;

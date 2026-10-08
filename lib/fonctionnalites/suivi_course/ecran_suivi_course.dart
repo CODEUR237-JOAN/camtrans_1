@@ -33,8 +33,10 @@ class _EcranSuiviCourseState extends ConsumerState<EcranSuiviCourse> {
   @override
   Widget build(BuildContext context) {
     // Écoute des erreurs pour afficher un SnackBar
-    ref.listen<SuiviCourseEtat>(suiviCourseProvider(widget.courseId), (previous, next) {
-      if (next.erreur.isNotEmpty && (previous == null || previous.erreur != next.erreur)) {
+    ref.listen<SuiviCourseEtat>(suiviCourseProvider(widget.courseId),
+        (previous, next) {
+      if (next.erreur.isNotEmpty &&
+          (previous == null || previous.erreur != next.erreur)) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             content: Row(
@@ -49,13 +51,15 @@ class _EcranSuiviCourseState extends ConsumerState<EcranSuiviCourse> {
           ),
         );
       }
-      
+
       // Redirection automatique vers le paiement pour le client
       final role = ref.read(userRoleProvider).valueOrNull;
       final ancienStatut = previous?.course?.statut;
       final nouveauStatut = next.course?.statut;
-      
-      if (role == 'client' && nouveauStatut == 'arrive_destination' && ancienStatut != 'arrive_destination') {
+
+      if (role == 'client' &&
+          nouveauStatut == 'arrive_destination' &&
+          ancienStatut != 'arrive_destination') {
         final c = next.course!;
         final double montant = c.prixFinal > 0 ? c.prixFinal : c.prixEstime;
         // On utilise un PostFrameCallback pour s'assurer que la frame courante est finie
@@ -74,7 +78,8 @@ class _EcranSuiviCourseState extends ConsumerState<EcranSuiviCourse> {
 
       // Gestion côté transporteur de la fin de course et confirmation espèces
       if (role == 'transporteur') {
-        if (nouveauStatut == 'attente_paiement_especes' && ancienStatut != 'attente_paiement_especes') {
+        if (nouveauStatut == 'attente_paiement_especes' &&
+            ancienStatut != 'attente_paiement_especes') {
           final c = next.course!;
           final double montant = c.prixFinal > 0 ? c.prixFinal : c.prixEstime;
           WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -84,7 +89,9 @@ class _EcranSuiviCourseState extends ConsumerState<EcranSuiviCourse> {
               barrierDismissible: false,
               builder: (ctx) => AlertDialog(
                 backgroundColor: CouleursApp.fondSombreSecondaire,
-                title: const Text("Paiement en espèces", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                title: const Text("Paiement en espèces",
+                    style: TextStyle(
+                        color: Colors.white, fontWeight: FontWeight.bold)),
                 content: Text(
                   "Le client a choisi de régler en espèces.\n\nAvez-vous bien reçu la somme de ${montant.toInt()} FCFA de la part du client ?",
                   style: const TextStyle(color: Colors.white70),
@@ -95,33 +102,41 @@ class _EcranSuiviCourseState extends ConsumerState<EcranSuiviCourse> {
                       // Si non, on pourrait gérer un litige, mais pour l'instant on force à résoudre avec le client
                       Navigator.pop(ctx);
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text("Veuillez réclamer le paiement au client avant de valider.")),
+                        const SnackBar(
+                            content: Text(
+                                "Veuillez réclamer le paiement au client avant de valider.")),
                       );
                     },
-                    child: const Text("Non, pas encore", style: TextStyle(color: Colors.grey)),
+                    child: const Text("Non, pas encore",
+                        style: TextStyle(color: Colors.grey)),
                   ),
                   ElevatedButton(
-                    style: ElevatedButton.styleFrom(backgroundColor: CouleursApp.succes),
+                    style: ElevatedButton.styleFrom(
+                        backgroundColor: CouleursApp.succes),
                     onPressed: () {
                       Navigator.pop(ctx);
                       // On valide le paiement en espèces
-                      ref.read(suiviCourseProvider(widget.courseId).notifier).validerPaiementEspeces();
+                      ref
+                          .read(suiviCourseProvider(widget.courseId).notifier)
+                          .validerPaiementEspeces();
                     },
-                    child: const Text("Oui, j'ai reçu l'argent", style: TextStyle(color: Colors.white)),
+                    child: const Text("Oui, j'ai reçu l'argent",
+                        style: TextStyle(color: Colors.white)),
                   ),
                 ],
               ),
             );
           });
         }
-        
+
         // Si la course est terminée (soit paiement digital direct, soit confirmation espèces effectuée)
         if (nouveauStatut == 'terminee' && ancienStatut != 'terminee') {
           WidgetsBinding.instance.addPostFrameCallback((_) {
             if (!mounted) return;
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
-                content: Text("Course terminée avec succès ! Le paiement a été validé."),
+                content: Text(
+                    "Course terminée avec succès ! Le paiement a été validé."),
                 backgroundColor: CouleursApp.succes,
               ),
             );
@@ -152,7 +167,7 @@ class _EcranSuiviCourseState extends ConsumerState<EcranSuiviCourse> {
     final etatSuivi = ref.watch(suiviCourseProvider(widget.courseId));
     final notifier = ref.read(suiviCourseProvider(widget.courseId).notifier);
     final roleAsync = ref.watch(userRoleProvider);
-    
+
     if (roleAsync.isLoading) {
       return const Scaffold(
         backgroundColor: CouleursApp.fondSombre,
@@ -164,8 +179,8 @@ class _EcranSuiviCourseState extends ConsumerState<EcranSuiviCourse> {
     final isClient = roleAsync.valueOrNull == 'client';
 
     // [NOUVEAU] Redirection immédiate si le client ouvre l'écran d'une course déjà à destination
-    if (isClient && 
-        etatSuivi.course?.statut == 'arrive_destination' && 
+    if (isClient &&
+        etatSuivi.course?.statut == 'arrive_destination' &&
         !_redirigeVersPaiement) {
       _redirigeVersPaiement = true;
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -208,7 +223,8 @@ class _EcranSuiviCourseState extends ConsumerState<EcranSuiviCourse> {
                   // Bouton Retour (optionnel, pour forcer la sortie)
                   if (widget.isFullScreen)
                     CircleAvatar(
-                      backgroundColor: CouleursApp.fondSombreSecondaire.withValues(alpha: 0.8),
+                      backgroundColor: CouleursApp.fondSombreSecondaire
+                          .withValues(alpha: 0.8),
                       child: IconButton(
                         icon: const Icon(Icons.arrow_back, color: Colors.white),
                         onPressed: () => Navigator.of(context).pop(),
@@ -216,15 +232,20 @@ class _EcranSuiviCourseState extends ConsumerState<EcranSuiviCourse> {
                     )
                   else
                     const SizedBox.shrink(),
-                  
+
                   // Contrôle vocal (Chauffeur uniquement)
                   if (isChauffeur)
                     CircleAvatar(
-                      backgroundColor: CouleursApp.fondSombreSecondaire.withValues(alpha: 0.8),
+                      backgroundColor: CouleursApp.fondSombreSecondaire
+                          .withValues(alpha: 0.8),
                       child: IconButton(
                         icon: Icon(
-                          etatSuivi.isVoixActive ? Icons.volume_up : Icons.volume_off,
-                          color: etatSuivi.isVoixActive ? const Color(0xFF145C43) : Colors.white54,
+                          etatSuivi.isVoixActive
+                              ? Icons.volume_up
+                              : Icons.volume_off,
+                          color: etatSuivi.isVoixActive
+                              ? const Color(0xFF145C43)
+                              : Colors.white54,
                         ),
                         onPressed: notifier.basculerVoix,
                       ),
@@ -233,7 +254,7 @@ class _EcranSuiviCourseState extends ConsumerState<EcranSuiviCourse> {
               ),
             ),
           ),
-          
+
           // 3. Assistant Kombi Flottant (Chauffeur uniquement)
           if (isChauffeur)
             const Positioned(
@@ -247,7 +268,8 @@ class _EcranSuiviCourseState extends ConsumerState<EcranSuiviCourse> {
             etat: etatSuivi,
             isChauffeur: isChauffeur,
             onBoutonAction: () {
-              debugPrint("CLIC BOUTON : Phase = ${etatSuivi.phase}, Chauffeur = $isChauffeur");
+              debugPrint(
+                  "CLIC BOUTON : Phase = ${etatSuivi.phase}, Chauffeur = $isChauffeur");
               if (etatSuivi.phase == PhaseSuivi.approche) {
                 notifier.commencerCourse();
               } else if (etatSuivi.phase == PhaseSuivi.trajet) {
@@ -261,7 +283,9 @@ class _EcranSuiviCourseState extends ConsumerState<EcranSuiviCourse> {
                 context: context,
                 builder: (ctx) => AlertDialog(
                   backgroundColor: CouleursApp.fondSombreSecondaire,
-                  title: const Text("Annuler la course", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+                  title: const Text("Annuler la course",
+                      style: TextStyle(
+                          color: Colors.white, fontWeight: FontWeight.bold)),
                   content: const Text(
                     "Êtes-vous sûr de vouloir annuler cette course ? Cette action est irréversible.",
                     style: TextStyle(color: Colors.white70),
@@ -269,15 +293,18 @@ class _EcranSuiviCourseState extends ConsumerState<EcranSuiviCourse> {
                   actions: [
                     TextButton(
                       onPressed: () => Navigator.pop(ctx),
-                      child: const Text("Non, retour", style: TextStyle(color: Colors.grey)),
+                      child: const Text("Non, retour",
+                          style: TextStyle(color: Colors.grey)),
                     ),
                     ElevatedButton(
-                      style: ElevatedButton.styleFrom(backgroundColor: CouleursApp.erreur),
+                      style: ElevatedButton.styleFrom(
+                          backgroundColor: CouleursApp.erreur),
                       onPressed: () {
                         Navigator.pop(ctx);
                         notifier.annulerCourse();
                       },
-                      child: const Text("Oui, annuler", style: TextStyle(color: Colors.white)),
+                      child: const Text("Oui, annuler",
+                          style: TextStyle(color: Colors.white)),
                     ),
                   ],
                 ),

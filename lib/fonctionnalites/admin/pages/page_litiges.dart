@@ -68,7 +68,8 @@ class _PageLitigesState extends ConsumerState<PageLitiges>
                                 color: Colors.white,
                                 fontSize: 24,
                                 fontWeight: FontWeight.bold)),
-                        const Text('Accès complet — Courses, Paiements, Messages',
+                        const Text(
+                            'Accès complet — Courses, Paiements, Messages',
                             style:
                                 TextStyle(color: Colors.white54, fontSize: 13)),
                       ],

@@ -34,8 +34,7 @@ class ChampRechercheLieu extends ConsumerStatefulWidget {
   });
 
   @override
-  ConsumerState<ChampRechercheLieu> createState() =>
-      _ChampRechercheLieuState();
+  ConsumerState<ChampRechercheLieu> createState() => _ChampRechercheLieuState();
 }
 
 class _ChampRechercheLieuState extends ConsumerState<ChampRechercheLieu> {
@@ -120,7 +119,8 @@ class _ChampRechercheLieuState extends ConsumerState<ChampRechercheLieu> {
           onChanged: _surSaisie,
           decoration: InputDecoration(
             hintText: widget.hint,
-            hintStyle: TextStyle(color: scheme.onSurface.withValues(alpha: 0.5)),
+            hintStyle:
+                TextStyle(color: scheme.onSurface.withValues(alpha: 0.5)),
             prefixIcon: Icon(widget.iconePrefixe, color: widget.couleurIcone),
             suffixIcon: _enChargement
                 ? const Padding(
@@ -160,8 +160,8 @@ class _ChampRechercheLieuState extends ConsumerState<ChampRechercheLieu> {
             ),
             focusedBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(16),
-              borderSide:
-                  BorderSide(color: CouleursApp.primaire.withValues(alpha: 0.5)),
+              borderSide: BorderSide(
+                  color: CouleursApp.primaire.withValues(alpha: 0.5)),
             ),
           ),
         ),
@@ -173,7 +173,8 @@ class _ChampRechercheLieuState extends ConsumerState<ChampRechercheLieu> {
             decoration: BoxDecoration(
               color: scheme.surface,
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: scheme.onSurface.withValues(alpha: 0.08)),
+              border:
+                  Border.all(color: scheme.onSurface.withValues(alpha: 0.08)),
             ),
             constraints: const BoxConstraints(maxHeight: 240),
             child: ListView.separated(
@@ -189,7 +190,8 @@ class _ChampRechercheLieuState extends ConsumerState<ChampRechercheLieu> {
                 return ListTile(
                   dense: true,
                   leading: Icon(Icons.location_on,
-                      color: scheme.onSurface.withValues(alpha: 0.45), size: 20),
+                      color: scheme.onSurface.withValues(alpha: 0.45),
+                      size: 20),
                   title: Text(
                     lieu.libelle,
                     maxLines: 1,

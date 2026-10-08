@@ -68,22 +68,33 @@ class _SuiviTransportState extends ConsumerState<SuiviTransport> {
       return Scaffold(
         backgroundColor: Theme.of(context).scaffoldBackgroundColor,
         appBar: AppBar(
-          title: Text('Suivi', style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
+          title: Text('Suivi',
+              style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
           backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           elevation: 0,
-          iconTheme: IconThemeData(color: Theme.of(context).colorScheme.onSurface),
+          iconTheme:
+              IconThemeData(color: Theme.of(context).colorScheme.onSurface),
         ),
         body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Icon(Icons.local_shipping_outlined,
-                  size: 80, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54)),
+                  size: 80,
+                  color: Theme.of(context)
+                      .colorScheme
+                      .onSurface
+                      .withValues(alpha: 0.54)),
               const SizedBox(height: 20),
               Text(
                   textes.get('vide_course_client',
                       "Aucune course active à suivre. Où allons-nous aujourd'hui ?"),
-                  style: TextStyle(fontSize: 16, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)),
+                  style: TextStyle(
+                      fontSize: 16,
+                      color: Theme.of(context)
+                          .colorScheme
+                          .onSurface
+                          .withValues(alpha: 0.7)),
                   textAlign: TextAlign.center),
             ],
           ),
@@ -123,7 +134,8 @@ class _SuiviTransportState extends ConsumerState<SuiviTransport> {
         appBar: AppBar(
           backgroundColor: Theme.of(context).scaffoldBackgroundColor,
           elevation: 0,
-          iconTheme: IconThemeData(color: Theme.of(context).colorScheme.onSurface),
+          iconTheme:
+              IconThemeData(color: Theme.of(context).colorScheme.onSurface),
         ),
         body: Center(
           child: Padding(
@@ -131,7 +143,12 @@ class _SuiviTransportState extends ConsumerState<SuiviTransport> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Iconsax.radar_2_copy, size: 80, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.2)),
+                Icon(Iconsax.radar_2_copy,
+                    size: 80,
+                    color: Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withValues(alpha: 0.2)),
                 const SizedBox(height: 24),
                 Text(
                   AppLocalizations.of(context)!.trackingLostSignalTitle,
@@ -147,7 +164,10 @@ class _SuiviTransportState extends ConsumerState<SuiviTransport> {
                   AppLocalizations.of(context)!.trackingLostSignalMessage,
                   style: GoogleFonts.inter(
                     fontSize: 14,
-                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
+                    color: Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withValues(alpha: 0.6),
                   ),
                   textAlign: TextAlign.center,
                 ),
@@ -170,7 +190,9 @@ class _SuiviTransportState extends ConsumerState<SuiviTransport> {
     }
 
     //  PILIER 3: Timeout Global de 5 minutes
-    if (estClient && (course.statut == StatutCourse.recherche || course.statut == StatutCourse.enAttente)) {
+    if (estClient &&
+        (course.statut == StatutCourse.recherche ||
+            course.statut == StatutCourse.enAttente)) {
       if (DateTime.now().difference(course.dateCreation).inMinutes >= 5) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           _afficherTimeoutGlobal(course);
@@ -198,7 +220,8 @@ class _SuiviTransportState extends ConsumerState<SuiviTransport> {
               child: Column(
                 children: [
                   const CircularProgressIndicator(
-                    valueColor: AlwaysStoppedAnimation<Color>(CouleursApp.primaire),
+                    valueColor:
+                        AlwaysStoppedAnimation<Color>(CouleursApp.primaire),
                   ),
                   const SizedBox(height: 20),
                   Text(
@@ -211,7 +234,12 @@ class _SuiviTransportState extends ConsumerState<SuiviTransport> {
                   const SizedBox(height: 8),
                   Text(
                     AppLocalizations.of(context)!.trackingSearchingMessage,
-                    style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), fontSize: 14),
+                    style: TextStyle(
+                        color: Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withValues(alpha: 0.7),
+                        fontSize: 14),
                   ),
                   const SizedBox(height: 20),
                   TextButton(
@@ -303,11 +331,15 @@ class _SuiviTransportState extends ConsumerState<SuiviTransport> {
             shape: BoxShape.circle,
             boxShadow: [
               BoxShadow(
-                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.07),
+                  color: Theme.of(context)
+                      .colorScheme
+                      .onSurface
+                      .withValues(alpha: 0.07),
                   blurRadius: 10,
                   offset: const Offset(0, 4))
             ]),
-        child: Icon(Icons.arrow_back, color: Theme.of(context).colorScheme.onSurface),
+        child: Icon(Icons.arrow_back,
+            color: Theme.of(context).colorScheme.onSurface),
       ),
     );
   }
@@ -326,7 +358,10 @@ class _SuiviTransportState extends ConsumerState<SuiviTransport> {
             shape: BoxShape.circle,
             boxShadow: [
               BoxShadow(
-                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.07),
+                  color: Theme.of(context)
+                      .colorScheme
+                      .onSurface
+                      .withValues(alpha: 0.07),
                   blurRadius: 10,
                   offset: const Offset(0, 4))
             ]),
@@ -377,8 +412,8 @@ class _SuiviTransportState extends ConsumerState<SuiviTransport> {
     );
   }
 
-  Widget _buildTransporteurInfo(
-      BuildContext context, Transporteur transporteur, String? quartier, String courseId) {
+  Widget _buildTransporteurInfo(BuildContext context, Transporteur transporteur,
+      String? quartier, String courseId) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -386,7 +421,10 @@ class _SuiviTransportState extends ConsumerState<SuiviTransport> {
           borderRadius: BorderRadius.circular(16),
           boxShadow: [
             BoxShadow(
-                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.07),
+                color: Theme.of(context)
+                    .colorScheme
+                    .onSurface
+                    .withValues(alpha: 0.07),
                 blurRadius: 20,
                 offset: const Offset(0, 10))
           ]),
@@ -431,8 +469,12 @@ class _SuiviTransportState extends ConsumerState<SuiviTransport> {
                     transporteur.typeVehicule.isEmpty
                         ? "Véhicule utilitaire"
                         : transporteur.typeVehicule,
-                    style:
-                        TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), fontSize: 11)),
+                    style: TextStyle(
+                        color: Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withValues(alpha: 0.7),
+                        fontSize: 11)),
               ],
             ),
           ),
@@ -460,12 +502,15 @@ class _SuiviTransportState extends ConsumerState<SuiviTransport> {
                     if (await canLaunchUrl(telUrl)) {
                       await launchUrl(telUrl);
                     } else {
-                      await launchUrl(telUrl, mode: LaunchMode.externalApplication);
+                      await launchUrl(telUrl,
+                          mode: LaunchMode.externalApplication);
                     }
                   } catch (e) {
                     if (context.mounted) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text("Impossible de lancer l'appel pour $telClean")),
+                        SnackBar(
+                            content: Text(
+                                "Impossible de lancer l'appel pour $telClean")),
                       );
                     }
                   }
@@ -501,7 +546,10 @@ class _SuiviTransportState extends ConsumerState<SuiviTransport> {
           borderRadius: const BorderRadius.vertical(top: Radius.circular(32)),
           boxShadow: [
             BoxShadow(
-                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.07),
+                color: Theme.of(context)
+                    .colorScheme
+                    .onSurface
+                    .withValues(alpha: 0.07),
                 blurRadius: 20,
                 offset: const Offset(0, -5))
           ]),
@@ -528,7 +576,12 @@ class _SuiviTransportState extends ConsumerState<SuiviTransport> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text("Course",
-                      style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 13)),
+                      style: TextStyle(
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onSurface
+                              .withValues(alpha: 0.54),
+                          fontSize: 13)),
                   Text(course.codeSuivi,
                       style: TextStyle(
                           fontWeight: FontWeight.bold,
@@ -558,19 +611,29 @@ class _SuiviTransportState extends ConsumerState<SuiviTransport> {
           // Adresses de la course
           Row(
             children: [
-              const Icon(Icons.location_on, color: CouleursApp.erreur, size: 20),
+              const Icon(Icons.location_on,
+                  color: CouleursApp.erreur, size: 20),
               const SizedBox(width: 8),
               Expanded(
                   child: Text(course.adresseDepart,
                       style: TextStyle(
-                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.87),
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onSurface
+                              .withValues(alpha: 0.87),
                           fontSize: 13,
                           fontWeight: FontWeight.w500))),
             ],
           ),
           Padding(
             padding: const EdgeInsets.only(left: 9.0, top: 2, bottom: 2),
-            child: Container(width: 2, height: 12, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.12)),
+            child: Container(
+                width: 2,
+                height: 12,
+                color: Theme.of(context)
+                    .colorScheme
+                    .onSurface
+                    .withValues(alpha: 0.12)),
           ),
           Row(
             children: [
@@ -579,7 +642,10 @@ class _SuiviTransportState extends ConsumerState<SuiviTransport> {
               Expanded(
                   child: Text(course.adresseArrivee,
                       style: TextStyle(
-                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.87),
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onSurface
+                              .withValues(alpha: 0.87),
                           fontSize: 13,
                           fontWeight: FontWeight.w500))),
             ],
@@ -661,8 +727,7 @@ class _SuiviTransportState extends ConsumerState<SuiviTransport> {
       context: context,
       builder: (ctx) => AlertDialog(
         title: const Text("Annuler la course"),
-        content:
-            const Text("Êtes-vous sûr de vouloir annuler cette course ?"),
+        content: const Text("Êtes-vous sûr de vouloir annuler cette course ?"),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(ctx),
@@ -682,14 +747,17 @@ class _SuiviTransportState extends ConsumerState<SuiviTransport> {
                 );
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-                      content: Text("Course annulée.", style: TextStyle(color: Theme.of(context).colorScheme.onSurface)),
+                      content: Text("Course annulée.",
+                          style: TextStyle(
+                              color: Theme.of(context).colorScheme.onSurface)),
                       backgroundColor: CouleursApp.succes));
                   context.go('/');
                 }
               } catch (e) {
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                      content: Text("Erreur lors de l'annulation : \$e", style: TextStyle(color: Colors.white)),
+                      content: Text("Erreur lors de l'annulation : \$e",
+                          style: TextStyle(color: Colors.white)),
                       backgroundColor: CouleursApp.erreur));
                 }
               }
@@ -739,117 +807,6 @@ class _SuiviTransportState extends ConsumerState<SuiviTransport> {
     );
   }
 
-  bool _rechercheEnCours = false;
-
-  Future<void> _executerAutoDispatch(Course course) async {
-    if (_rechercheEnCours || course.statut != StatutCourse.recherche) return;
-    _rechercheEnCours = true;
-
-    try {
-      final docRef = FirebaseFirestore.instance.collection('courses').doc(course.id);
-      final courseSnapshot = await docRef.get();
-      if (!courseSnapshot.exists) return;
-
-      final data = courseSnapshot.data()!;
-      if (data['statut'] != StatutCourse.recherche) return;
-
-      final List<dynamic> declinesDyn = data['transporteursDeclines'] ?? [];
-      final Set<String> declines = declinesDyn.map((e) => e.toString()).toSet();
-
-      // 1. Récupérer les transporteurs en ligne
-      final transporteursSnap = await FirebaseFirestore.instance
-          .collection('transporteurs')
-          .where('disponible', isEqualTo: true)
-          .where('documentsValides', isEqualTo: true)
-          .get();
-
-      final serviceGps = ref.read(serviceGpsProvider);
-      final List<Map<String, dynamic>> candidats = [];
-
-      // 2. Filtrer
-      for (var doc in transporteursSnap.docs) {
-        if (declines.contains(doc.id)) continue;
-        final t = doc.data();
-        if (t['estEnLigne'] != true) continue;
-        if (course.typeVehicule.isNotEmpty && t['typeVehicule'] != course.typeVehicule) continue;
-
-        final double tLat = t['latitude'] ?? 0.0;
-        final double tLng = t['longitude'] ?? 0.0;
-
-        double dist = 999.0;
-        if (tLat != 0.0) {
-          dist = serviceGps.calculerDistance(
-            latitudeDepart: course.latitudeDepart,
-            longitudeDepart: course.longitudeDepart,
-            latitudeArrivee: tLat,
-            longitudeArrivee: tLng,
-          );
-        }
-
-        candidats.add({
-          'id': doc.id,
-          'distance': dist,
-          'nom': t['prenom'],
-          'telephone': t['telephone'],
-          'doc': t,
-        });
-      }
-
-      if (candidats.isEmpty) {
-        // Personne trouvé. Le timeout global finira par annuler la course.
-        return;
-      }
-
-      // 3. Trier par distance
-      candidats.sort((a, b) => (a['distance'] as double).compareTo(b['distance'] as double));
-
-      // 4. Exécuter l'attribution transactionnelle stricte (Pilier 2)
-      for (final candidat in candidats) {
-        final transporteurId = candidat['id'] as String;
-        final transporteurRef = FirebaseFirestore.instance.collection('transporteurs').doc(transporteurId);
-
-        try {
-          await FirebaseFirestore.instance.runTransaction((transaction) async {
-            // Lecture
-            final tSnap = await transaction.get(transporteurRef);
-            final cSnap = await transaction.get(docRef);
-
-            if (!tSnap.exists || !cSnap.exists) throw Exception("Doc manquant");
-            final cData = cSnap.data()!;
-            if (cData['statut'] != StatutCourse.recherche) throw Exception("Course plus dispo");
-
-            final tData = tSnap.data()!;
-            if (tData['disponible'] != true || tData['estEnLigne'] != true) {
-              throw Exception("Transporteur occupé");
-            }
-
-            // Écriture : verrouiller le chauffeur et attribuer la course
-            transaction.update(transporteurRef, {'disponible': false});
-            transaction.update(docRef, {
-              'statut': StatutCourse.attribue,
-              'transporteurId': transporteurId,
-              'nomTransporteur': "${tData['prenom']} ${tData['nom']}",
-              'telephoneTransporteur': tData['telephone'] ?? "",
-            });
-          });
-          
-          // Match réussi ! L'UI se mettra à jour automatiquement
-          break;
-        } catch (e) {
-          // Transaction échouée (chauffeur a pris une autre course à cette milliseconde)
-          debugPrint("Collision Auto-Dispatch : candidat \$transporteurId déjà pris.");
-          continue;
-        }
-      }
-    } catch (e) {
-      debugPrint("Erreur Auto-Dispatch : \$e");
-    } finally {
-      // Pause de 5 secondes avant la prochaine tentative (Cascade)
-      await Future.delayed(const Duration(seconds: 5));
-      _rechercheEnCours = false;
-    }
-  }
-
   void _afficherTimeoutGlobal(Course course) {
     if (_enCoursDeRedirection) return;
     _enCoursDeRedirection = true;
@@ -867,19 +824,26 @@ class _SuiviTransportState extends ConsumerState<SuiviTransport> {
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
         title: Row(
           children: [
-            const Icon(Icons.info_outline_rounded, color: CouleursApp.erreur, size: 28),
+            const Icon(Icons.info_outline_rounded,
+                color: CouleursApp.erreur, size: 28),
             const SizedBox(width: 10),
             Expanded(
               child: Text(
                 "Aucun véhicule disponible",
-                style: GoogleFonts.inter(fontWeight: FontWeight.bold, color: Theme.of(context).colorScheme.onSurface),
+                style: GoogleFonts.inter(
+                    fontWeight: FontWeight.bold,
+                    color: Theme.of(context).colorScheme.onSurface),
               ),
             ),
           ],
         ),
         content: Text(
           "Malheureusement, aucun transporteur n'a pu accepter votre course dans le temps imparti. Vous pouvez relancer votre recherche.",
-          style: GoogleFonts.inter(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7)),
+          style: GoogleFonts.inter(
+              color: Theme.of(context)
+                  .colorScheme
+                  .onSurface
+                  .withValues(alpha: 0.7)),
         ),
         actions: [
           ElevatedButton(
@@ -890,11 +854,12 @@ class _SuiviTransportState extends ConsumerState<SuiviTransport> {
             style: ElevatedButton.styleFrom(
               backgroundColor: CouleursApp.primaire,
             ),
-            child: Text("Compris", style: GoogleFonts.inter(color: Colors.white, fontWeight: FontWeight.bold)),
+            child: Text("Compris",
+                style: GoogleFonts.inter(
+                    color: Colors.white, fontWeight: FontWeight.bold)),
           ),
         ],
       ),
     );
   }
-
 }

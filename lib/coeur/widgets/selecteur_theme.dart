@@ -142,7 +142,9 @@ class _VignetteTheme extends StatelessWidget {
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         curve: Curves.easeInOut,
-        transform: estActif ? Matrix4.diagonal3Values(1.03, 1.03, 1.0) : Matrix4.identity(),
+        transform: estActif
+            ? Matrix4.diagonal3Values(1.03, 1.03, 1.0)
+            : Matrix4.identity(),
         transformAlignment: Alignment.center,
         decoration: BoxDecoration(
           color: cs.surface,

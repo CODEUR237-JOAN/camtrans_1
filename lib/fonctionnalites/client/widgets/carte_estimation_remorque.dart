@@ -61,8 +61,11 @@ class CarteEstimationRemorque extends StatelessWidget {
                     const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
                 decoration: BoxDecoration(
                   border: Border(
-                    bottom:
-                        BorderSide(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.07)),
+                    bottom: BorderSide(
+                        color: Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withValues(alpha: 0.07)),
                   ),
                 ),
                 child: Row(
@@ -93,7 +96,10 @@ class CarteEstimationRemorque extends StatelessWidget {
                           Text(
                             'Masse estimée : ${masseKg.toInt()} kg',
                             style: GoogleFonts.inter(
-                              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54),
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurface
+                                  .withValues(alpha: 0.54),
                               fontSize: 12,
                             ),
                           ),
@@ -111,7 +117,10 @@ class CarteEstimationRemorque extends StatelessWidget {
                       child: Text(
                         '${resultat.distanceKm.toStringAsFixed(1)} km',
                         style: GoogleFonts.inter(
-                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onSurface
+                              .withValues(alpha: 0.7),
                           fontSize: 12,
                           fontWeight: FontWeight.w600,
                         ),
@@ -130,7 +139,10 @@ class CarteEstimationRemorque extends StatelessWidget {
                     Text(
                       'Estimation de votre dépannage',
                       style: GoogleFonts.inter(
-                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54),
+                        color: Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withValues(alpha: 0.54),
                         fontSize: 13,
                       ),
                       textAlign: TextAlign.center,
@@ -163,7 +175,10 @@ class CarteEstimationRemorque extends StatelessWidget {
                     Text(
                       'Frais de dépannage inclus · Prix ferme',
                       style: GoogleFonts.inter(
-                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38),
+                        color: Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withValues(alpha: 0.38),
                         fontSize: 11,
                       ),
                       textAlign: TextAlign.center,
@@ -192,7 +207,10 @@ class CarteEstimationRemorque extends StatelessWidget {
                         child: Text(
                           'Dépanneuse en route dans ~${resultat.dureeMinutes.toInt()} min',
                           style: GoogleFonts.inter(
-                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onSurface
+                                .withValues(alpha: 0.7),
                             fontSize: 13,
                           ),
                           overflow: TextOverflow.ellipsis,

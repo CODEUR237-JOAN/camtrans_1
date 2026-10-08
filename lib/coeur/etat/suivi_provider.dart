@@ -101,7 +101,8 @@ class SuiviNotifier extends StateNotifier<EtatSuivi> {
   DateTime? _dernierRecalcul;
   bool _recalculEnCours = false;
 
-  SuiviNotifier(this._firestore, this._gps, this._routage, this._navVocale, String courseId)
+  SuiviNotifier(this._firestore, this._gps, this._routage, this._navVocale,
+      String courseId)
       : super(EtatSuivi()) {
     _initialiserEcoute(courseId);
   }
@@ -127,14 +128,18 @@ class SuiviNotifier extends StateNotifier<EtatSuivi> {
           _transporteurSubscription = null;
           _transporteurIdActuel = null;
         }
-        
+
         // Charger l'itinéraire s'il n'est pas encore fait et qu'on a le départ/arrivée
-        if (!_itineraireDemande && course.latitudeDepart != 0 && course.latitudeArrivee != 0) {
+        if (!_itineraireDemande &&
+            course.latitudeDepart != 0 &&
+            course.latitudeArrivee != 0) {
           _itineraireDemande = true;
-          _routage.obtenirItineraire(
+          _routage
+              .obtenirItineraire(
             LatLng(course.latitudeDepart, course.longitudeDepart),
             LatLng(course.latitudeArrivee, course.longitudeArrivee),
-          ).then((infoTrajet) {
+          )
+              .then((infoTrajet) {
             if (infoTrajet != null && mounted) {
               state = state.copierAvec(infoTrajet: infoTrajet);
               // Démarrer la navigation vocale dès que le transporteur est en route
@@ -145,8 +150,11 @@ class SuiviNotifier extends StateNotifier<EtatSuivi> {
                 StatutCourse.enTransit,
               ];
               if (statutsActifs.contains(course.statut)) {
-                final versClient = course.statut == StatutCourse.enRouteDepart || course.statut == StatutCourse.arriveDepart;
-                _navVocale.demarrerNavigation(infoTrajet, versClient: versClient);
+                final versClient =
+                    course.statut == StatutCourse.enRouteDepart ||
+                        course.statut == StatutCourse.arriveDepart;
+                _navVocale.demarrerNavigation(infoTrajet,
+                    versClient: versClient);
               }
             }
           });
@@ -193,7 +201,7 @@ class SuiviNotifier extends StateNotifier<EtatSuivi> {
           distanceRestante = distance.toDouble();
           // Estimation : 30 km/h en moyenne en ville (8.3 m/s)
           tempsRestant = distanceRestante / 8.3;
-          
+
           // Mise à jour de la navigation vocale pour le chauffeur
           final positionChauffeur =
               LatLng(transporteur.latitude, transporteur.longitude);

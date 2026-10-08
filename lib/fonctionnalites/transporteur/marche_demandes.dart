@@ -39,7 +39,8 @@ class _MarcheDemandesState extends ConsumerState<MarcheDemandes> {
           builder: (context, setStateDialog) {
             return AlertDialog(
               backgroundColor: Theme.of(context).colorScheme.surface,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(20)),
               title: Row(
                 children: [
                   Container(
@@ -70,17 +71,25 @@ class _MarcheDemandesState extends ConsumerState<MarcheDemandes> {
                 children: [
                   Text(
                     "Une nouvelle course est disponible près de vous.",
-                    style: GoogleFonts.inter(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), fontSize: 14),
+                    style: GoogleFonts.inter(
+                        color: Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withValues(alpha: 0.7),
+                        fontSize: 14),
                   ),
                   const SizedBox(height: 16),
                   Row(
                     children: [
-                      const Icon(Icons.map_rounded, color: CouleursApp.primaire, size: 20),
+                      const Icon(Icons.map_rounded,
+                          color: CouleursApp.primaire, size: 20),
                       const SizedBox(width: 8),
                       Expanded(
                         child: Text(
                           "${course.distanceKm.toStringAsFixed(1)} km au total",
-                          style: GoogleFonts.inter(color: Theme.of(context).colorScheme.onSurface, fontSize: 14),
+                          style: GoogleFonts.inter(
+                              color: Theme.of(context).colorScheme.onSurface,
+                              fontSize: 14),
                         ),
                       ),
                     ],
@@ -114,9 +123,14 @@ class _MarcheDemandesState extends ConsumerState<MarcheDemandes> {
               ),
               actions: [
                 TextButton(
-                  onPressed: isProcessingDialog ? null : () => Navigator.pop(ctx),
+                  onPressed:
+                      isProcessingDialog ? null : () => Navigator.pop(ctx),
                   child: Text("Décliner",
-                      style: GoogleFonts.inter(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54))),
+                      style: GoogleFonts.inter(
+                          color: Theme.of(context)
+                              .colorScheme
+                              .onSurface
+                              .withValues(alpha: 0.54))),
                 ),
                 ElevatedButton(
                   onPressed: isProcessingDialog
@@ -126,9 +140,12 @@ class _MarcheDemandesState extends ConsumerState<MarcheDemandes> {
                           HapticFeedback.mediumImpact();
 
                           try {
-                            final docRef = FirebaseFirestore.instance.collection('courses').doc(course.id);
+                            final docRef = FirebaseFirestore.instance
+                                .collection('courses')
+                                .doc(course.id);
 
-                            await FirebaseFirestore.instance.runTransaction((transaction) async {
+                            await FirebaseFirestore.instance
+                                .runTransaction((transaction) async {
                               final snapshot = await transaction.get(docRef);
 
                               if (!snapshot.exists || snapshot.data() == null) {
@@ -136,16 +153,20 @@ class _MarcheDemandesState extends ConsumerState<MarcheDemandes> {
                               }
 
                               final data = snapshot.data()!;
-                              if ((data['statut'] != StatutCourse.recherche && data['statut'] != StatutCourse.enAttente) ||
+                              if ((data['statut'] != StatutCourse.recherche &&
+                                      data['statut'] !=
+                                          StatutCourse.enAttente) ||
                                   (data['transporteurId'] != null &&
-                                      (data['transporteurId'] as String).isNotEmpty)) {
+                                      (data['transporteurId'] as String)
+                                          .isNotEmpty)) {
                                 throw Exception(
                                     "Nous sommes désolés, un autre transporteur vient juste d'accepter cette course. Une nouvelle opportunité se présentera très vite !");
                               }
 
                               transaction.update(docRef, {
                                 'transporteurId': transporteur.id,
-                                'nomTransporteur': '${transporteur.prenom} ${transporteur.nom}',
+                                'nomTransporteur':
+                                    '${transporteur.prenom} ${transporteur.nom}',
                                 'telephoneTransporteur': transporteur.telephone,
                                 'statut': StatutCourse.attribue,
                               });
@@ -159,15 +180,21 @@ class _MarcheDemandesState extends ConsumerState<MarcheDemandes> {
                                 SnackBar(
                                   content: Row(
                                     children: [
-                                      Icon(Icons.check_circle_outline, color: Theme.of(context).colorScheme.onSurface),
+                                      Icon(Icons.check_circle_outline,
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onSurface),
                                       const SizedBox(width: 8),
-                                      Text("Parfait, la course vous a été attribuée !",
-                                          style: GoogleFonts.inter(fontWeight: FontWeight.bold)),
+                                      Text(
+                                          "Parfait, la course vous a été attribuée !",
+                                          style: GoogleFonts.inter(
+                                              fontWeight: FontWeight.bold)),
                                     ],
                                   ),
                                   backgroundColor: CouleursApp.succes,
                                   behavior: SnackBarBehavior.floating,
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12)),
                                 ),
                               );
                               context.push('/suivi/${course.id}');
@@ -178,10 +205,13 @@ class _MarcheDemandesState extends ConsumerState<MarcheDemandes> {
                               Navigator.pop(ctx);
                               ScaffoldMessenger.of(context).showSnackBar(
                                 SnackBar(
-                                  content: Text(e.toString().replaceAll('Exception: ', 'Oups — ')),
+                                  content: Text(e
+                                      .toString()
+                                      .replaceAll('Exception: ', 'Oups — ')),
                                   backgroundColor: CouleursApp.erreur,
                                   behavior: SnackBarBehavior.floating,
-                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12)),
                                 ),
                               );
                             }
@@ -198,7 +228,8 @@ class _MarcheDemandesState extends ConsumerState<MarcheDemandes> {
                           height: 20,
                           child: CircularProgressIndicator(
                             strokeWidth: 2,
-                            valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                            valueColor:
+                                AlwaysStoppedAnimation<Color>(Colors.white),
                           ),
                         )
                       : Text(
@@ -271,20 +302,31 @@ class _MarcheDemandesState extends ConsumerState<MarcheDemandes> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(Icons.wifi_off_rounded,
-                      size: 60, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38)),
+                      size: 60,
+                      color: Theme.of(context)
+                          .colorScheme
+                          .onSurface
+                          .withValues(alpha: 0.38)),
                   const SizedBox(height: 16),
                   Text(
                     "Mince, nous avons du mal à joindre le serveur.",
                     style: GoogleFonts.inter(
-                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+                        color: Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withValues(alpha: 0.7),
                         fontSize: 16,
                         fontWeight: FontWeight.bold),
                   ),
                   const SizedBox(height: 8),
                   Text(
                     "Vérifiez votre connexion et réessayez",
-                    style:
-                        GoogleFonts.inter(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), fontSize: 13),
+                    style: GoogleFonts.inter(
+                        color: Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withValues(alpha: 0.38),
+                        fontSize: 13),
                   ),
                 ],
               ),
@@ -329,7 +371,12 @@ class _MarcheDemandesState extends ConsumerState<MarcheDemandes> {
                         Text(
                           "Aucune demande disponible pour l'instant. Restez disponible — votre prochaine course arrive bientôt !",
                           style: GoogleFonts.inter(
-                              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 14, height: 1.5),
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurface
+                                  .withValues(alpha: 0.54),
+                              fontSize: 14,
+                              height: 1.5),
                           textAlign: TextAlign.center,
                         ),
                         const SizedBox(height: 24),
@@ -337,21 +384,35 @@ class _MarcheDemandesState extends ConsumerState<MarcheDemandes> {
                           padding: const EdgeInsets.symmetric(
                               horizontal: 16, vertical: 10),
                           decoration: BoxDecoration(
-                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.05),
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onSurface
+                                .withValues(alpha: 0.05),
                             borderRadius: BorderRadius.circular(12),
                             border: Border.all(
-                                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08)),
+                                color: Theme.of(context)
+                                    .colorScheme
+                                    .onSurface
+                                    .withValues(alpha: 0.08)),
                           ),
                           child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
                               Icon(Icons.refresh_rounded,
-                                  size: 16, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38)),
+                                  size: 16,
+                                  color: Theme.of(context)
+                                      .colorScheme
+                                      .onSurface
+                                      .withValues(alpha: 0.38)),
                               const SizedBox(width: 6),
                               Text(
                                 "Mise à jour automatique en temps réel",
                                 style: GoogleFonts.inter(
-                                    color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), fontSize: 11),
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurface
+                                        .withValues(alpha: 0.38),
+                                    fontSize: 11),
                               ),
                             ],
                           ),
@@ -381,7 +442,11 @@ class _MarcheDemandesState extends ConsumerState<MarcheDemandes> {
                   decoration: BoxDecoration(
                     color: Theme.of(context).colorScheme.surface,
                     borderRadius: BorderRadius.circular(20),
-                    border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.12)),
+                    border: Border.all(
+                        color: Theme.of(context)
+                            .colorScheme
+                            .onSurface
+                            .withValues(alpha: 0.12)),
                     boxShadow: [
                       BoxShadow(
                           color: Colors.black.withValues(alpha: 0.4),
@@ -396,13 +461,18 @@ class _MarcheDemandesState extends ConsumerState<MarcheDemandes> {
                       Text(
                         "Attribution en cours...",
                         style: GoogleFonts.inter(
-                            color: Theme.of(context).colorScheme.onSurface, fontWeight: FontWeight.bold),
+                            color: Theme.of(context).colorScheme.onSurface,
+                            fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 4),
                       Text(
                         "Vérification et sécurisation en cours...",
                         style: GoogleFonts.inter(
-                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 12),
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onSurface
+                                .withValues(alpha: 0.54),
+                            fontSize: 12),
                       ),
                     ],
                   ),
@@ -433,7 +503,11 @@ class _MarcheDemandesState extends ConsumerState<MarcheDemandes> {
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.surface,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.08)),
+        border: Border.all(
+            color: Theme.of(context)
+                .colorScheme
+                .onSurface
+                .withValues(alpha: 0.08)),
         boxShadow: [
           BoxShadow(
             color: CouleursApp.primaire.withValues(alpha: 0.05),
@@ -445,186 +519,202 @@ class _MarcheDemandesState extends ConsumerState<MarcheDemandes> {
       child: Material(
         type: MaterialType.transparency,
         child: InkWell(
-        borderRadius: BorderRadius.circular(20),
-        onTap: () => _ouvrirDetails(course),
-        child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // En-tête : type + prix
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          borderRadius: BorderRadius.circular(20),
+          onTap: () => _ouvrirDetails(course),
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-                  decoration: BoxDecoration(
-                    color: CouleursApp.primaire.withValues(alpha: 0.12),
-                    borderRadius: BorderRadius.circular(20),
-                    border: Border.all(
-                        color: CouleursApp.primaire.withValues(alpha: 0.25)),
-                  ),
-                  child: Text(
-                    course.typeMarchandise.isNotEmpty
-                        ? course.typeMarchandise
-                        : "Marchandise",
-                    style: GoogleFonts.inter(
-                        color: CouleursApp.primaire,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 12),
-                  ),
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
+                // En-tête : type + prix
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      "${course.prixEstime.toInt()} FCFA",
-                      style: GoogleFonts.inter(
-                        fontWeight: FontWeight.w800,
-                        fontSize: 20,
-                        color: CouleursApp.accent,
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 5),
+                      decoration: BoxDecoration(
+                        color: CouleursApp.primaire.withValues(alpha: 0.12),
+                        borderRadius: BorderRadius.circular(20),
+                        border: Border.all(
+                            color:
+                                CouleursApp.primaire.withValues(alpha: 0.25)),
                       ),
-                    ),
-                    Text(
-                      "${course.distanceKm.toStringAsFixed(1)} km",
-                      style: GoogleFonts.inter(
-                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.38), fontSize: 11),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 16),
-
-            // Itinéraire
-            Container(
-              padding: const EdgeInsets.all(14),
-              decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.04),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              child: Column(
-                children: [
-                  Row(
-                    children: [
-                      Container(
-                        width: 10,
-                        height: 10,
-                        decoration: const BoxDecoration(
+                      child: Text(
+                        course.typeMarchandise.isNotEmpty
+                            ? course.typeMarchandise
+                            : "Marchandise",
+                        style: GoogleFonts.inter(
                             color: CouleursApp.primaire,
-                            shape: BoxShape.circle),
+                            fontWeight: FontWeight.bold,
+                            fontSize: 12),
                       ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: Text(
-                          course.adresseDepart,
-                          style: GoogleFonts.inter(
-                              color: Colors.white, fontSize: 13),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                    ],
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 4),
-                    child: Column(
-                      children: List.generate(
-                          3,
-                          (_) => Container(
-                                width: 2,
-                                height: 4,
-                                margin: const EdgeInsets.symmetric(vertical: 2),
-                                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.24),
-                              )),
                     ),
-                  ),
-                  Row(
-                    children: [
-                      Container(
-                        width: 10,
-                        height: 10,
-                        decoration: const BoxDecoration(
-                          color: CouleursApp.accent,
-                          shape: BoxShape.circle,
-                        ),
-                      ),
-                      const SizedBox(width: 10),
-                      Expanded(
-                        child: Text(
-                          course.adresseArrivee,
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Text(
+                          "${course.prixEstime.toInt()} FCFA",
                           style: GoogleFonts.inter(
-                              color: Colors.white, fontSize: 13),
-                          maxLines: 1,
-                          overflow: TextOverflow.ellipsis,
+                            fontWeight: FontWeight.w800,
+                            fontSize: 20,
+                            color: CouleursApp.accent,
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 12),
-
-            // Chips info
-            Wrap(
-              spacing: 8,
-              runSpacing: 8,
-              children: [
-                if (course.typeVehicule.isNotEmpty)
-                  _buildInfoChip(Iconsax.truck_copy, course.typeVehicule),
-                if (course.volumeM3 > 0)
-                  _buildInfoChip(Icons.view_in_ar_rounded,
-                      "${course.volumeM3.toStringAsFixed(1)} m³"),
-                if (course.poidsKg > 0)
-                  _buildInfoChip(Icons.scale_rounded,
-                      "${course.poidsKg.toStringAsFixed(0)} kg"),
-                if (course.fragile)
-                  _buildOptionChip(Icons.warning_amber_rounded, "Fragile", CouleursApp.avertissement),
-                if (course.aideChargement)
-                  _buildOptionChip(Icons.people_alt_outlined, "Aide au chargement", CouleursApp.primaire),
-                if (course.aideDechargement)
-                  _buildOptionChip(Icons.people_alt_outlined, "Aide au déchargement", CouleursApp.primaire),
-              ],
-            ),
-
-            const SizedBox(height: 16),
-
-            // Bouton accepter
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () => _accepterCourse(course),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: CouleursApp.primaire,
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12)),
-                  padding: const EdgeInsets.symmetric(vertical: 14),
-                  elevation: 0,
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.check_circle_outline,
-                        color: Theme.of(context).colorScheme.onSurface, size: 18),
-                    const SizedBox(width: 8),
-                    Text(
-                      "Accepter cette course",
-                      style: GoogleFonts.inter(
-                          fontWeight: FontWeight.bold,
-                          color: Theme.of(context).colorScheme.onSurface,
-                          fontSize: 15),
+                        Text(
+                          "${course.distanceKm.toStringAsFixed(1)} km",
+                          style: GoogleFonts.inter(
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurface
+                                  .withValues(alpha: 0.38),
+                              fontSize: 11),
+                        ),
+                      ],
                     ),
                   ],
                 ),
-              ),
+
+                const SizedBox(height: 16),
+
+                // Itinéraire
+                Container(
+                  padding: const EdgeInsets.all(14),
+                  decoration: BoxDecoration(
+                    color: Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withValues(alpha: 0.04),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Column(
+                    children: [
+                      Row(
+                        children: [
+                          Container(
+                            width: 10,
+                            height: 10,
+                            decoration: const BoxDecoration(
+                                color: CouleursApp.primaire,
+                                shape: BoxShape.circle),
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Text(
+                              course.adresseDepart,
+                              style: GoogleFonts.inter(
+                                  color: Colors.white, fontSize: 13),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(left: 4),
+                        child: Column(
+                          children: List.generate(
+                              3,
+                              (_) => Container(
+                                    width: 2,
+                                    height: 4,
+                                    margin:
+                                        const EdgeInsets.symmetric(vertical: 2),
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurface
+                                        .withValues(alpha: 0.24),
+                                  )),
+                        ),
+                      ),
+                      Row(
+                        children: [
+                          Container(
+                            width: 10,
+                            height: 10,
+                            decoration: const BoxDecoration(
+                              color: CouleursApp.accent,
+                              shape: BoxShape.circle,
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          Expanded(
+                            child: Text(
+                              course.adresseArrivee,
+                              style: GoogleFonts.inter(
+                                  color: Colors.white, fontSize: 13),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 12),
+
+                // Chips info
+                Wrap(
+                  spacing: 8,
+                  runSpacing: 8,
+                  children: [
+                    if (course.typeVehicule.isNotEmpty)
+                      _buildInfoChip(Iconsax.truck_copy, course.typeVehicule),
+                    if (course.volumeM3 > 0)
+                      _buildInfoChip(Icons.view_in_ar_rounded,
+                          "${course.volumeM3.toStringAsFixed(1)} m³"),
+                    if (course.poidsKg > 0)
+                      _buildInfoChip(Icons.scale_rounded,
+                          "${course.poidsKg.toStringAsFixed(0)} kg"),
+                    if (course.fragile)
+                      _buildOptionChip(Icons.warning_amber_rounded, "Fragile",
+                          CouleursApp.avertissement),
+                    if (course.aideChargement)
+                      _buildOptionChip(Icons.people_alt_outlined,
+                          "Aide au chargement", CouleursApp.primaire),
+                    if (course.aideDechargement)
+                      _buildOptionChip(Icons.people_alt_outlined,
+                          "Aide au déchargement", CouleursApp.primaire),
+                  ],
+                ),
+
+                const SizedBox(height: 16),
+
+                // Bouton accepter
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () => _accepterCourse(course),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: CouleursApp.primaire,
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12)),
+                      padding: const EdgeInsets.symmetric(vertical: 14),
+                      elevation: 0,
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.check_circle_outline,
+                            color: Theme.of(context).colorScheme.onSurface,
+                            size: 18),
+                        const SizedBox(width: 8),
+                        Text(
+                          "Accepter cette course",
+                          style: GoogleFonts.inter(
+                              fontWeight: FontWeight.bold,
+                              color: Theme.of(context).colorScheme.onSurface,
+                              fontSize: 15),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ],
-        ),
-      ),
+          ),
         ),
       ),
     )
@@ -639,15 +729,27 @@ class _MarcheDemandesState extends ConsumerState<MarcheDemandes> {
       decoration: BoxDecoration(
         color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.06),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1)),
+        border: Border.all(
+            color:
+                Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1)),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(icon, size: 13, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54)),
+          Icon(icon,
+              size: 13,
+              color: Theme.of(context)
+                  .colorScheme
+                  .onSurface
+                  .withValues(alpha: 0.54)),
           const SizedBox(width: 5),
           Text(label,
-              style: GoogleFonts.inter(fontSize: 12, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54))),
+              style: GoogleFonts.inter(
+                  fontSize: 12,
+                  color: Theme.of(context)
+                      .colorScheme
+                      .onSurface
+                      .withValues(alpha: 0.54))),
         ],
       ),
     );

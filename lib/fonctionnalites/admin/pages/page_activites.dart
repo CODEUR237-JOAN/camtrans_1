@@ -35,9 +35,10 @@ class _PageActivitesState extends ConsumerState<PageActivites> {
     if (confirm != true || !mounted) return;
     setState(() => _purgerEnCours = true);
     try {
-      final nb = await ref.read(serviceFirestoreProvider).purgerHistoriqueGlobal(
-        adminId: FirebaseAuth.instance.currentUser?.uid,
-      );
+      final nb =
+          await ref.read(serviceFirestoreProvider).purgerHistoriqueGlobal(
+                adminId: FirebaseAuth.instance.currentUser?.uid,
+              );
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(

@@ -13,18 +13,21 @@ import 'package:update_camtrans/services/service_gps.dart';
 import 'suivi_course_etat.dart';
 import '../services/service_navigation_vocale.dart';
 
-final suiviCourseProvider = StateNotifierProvider.family<SuiviCourseNotifier, SuiviCourseEtat, String>((ref, courseId) {
+final suiviCourseProvider =
+    StateNotifierProvider.family<SuiviCourseNotifier, SuiviCourseEtat, String>(
+        (ref, courseId) {
   return SuiviCourseNotifier(ref, courseId);
 });
 
 class SuiviCourseNotifier extends StateNotifier<SuiviCourseEtat> {
   final Ref ref;
   final String courseId;
-  
+
   StreamSubscription<DocumentSnapshot>? _courseSub;
   StreamSubscription<Position>? _positionSub;
-  
-  SuiviCourseNotifier(this.ref, this.courseId) : super(const SuiviCourseEtat()) {
+
+  SuiviCourseNotifier(this.ref, this.courseId)
+      : super(const SuiviCourseEtat()) {
     _initialiser();
   }
 
@@ -80,10 +83,13 @@ class SuiviCourseNotifier extends StateNotifier<SuiviCourseEtat> {
           if (state.erreur.isNotEmpty) {
             state = state.copyWith(erreur: '');
           }
-          _mettreAJourPositionChauffeur(LatLng(position.latitude, position.longitude));
+          _mettreAJourPositionChauffeur(
+              LatLng(position.latitude, position.longitude));
         },
         onError: (error) {
-          state = state.copyWith(erreur: "Signal GPS faible ou perdu. Recherche de position en cours...");
+          state = state.copyWith(
+              erreur:
+                  "Signal GPS faible ou perdu. Recherche de position en cours...");
         },
       );
     }
@@ -115,21 +121,27 @@ class SuiviCourseNotifier extends StateNotifier<SuiviCourseEtat> {
   void _mettreAJourCourse(Course course) {
     PhaseSuivi nouvellePhase = PhaseSuivi.recherche;
 
-    if (course.statut == StatutCourse.attribue || course.statut == StatutCourse.enRouteDepart) {
+    if (course.statut == StatutCourse.attribue ||
+        course.statut == StatutCourse.enRouteDepart) {
       nouvellePhase = PhaseSuivi.approche;
-    } else if (course.statut == StatutCourse.arriveDepart || course.statut == StatutCourse.charge || course.statut == StatutCourse.enTransit || course.statut == StatutCourse.arriveDestination) {
+    } else if (course.statut == StatutCourse.arriveDepart ||
+        course.statut == StatutCourse.charge ||
+        course.statut == StatutCourse.enTransit ||
+        course.statut == StatutCourse.arriveDestination) {
       nouvellePhase = PhaseSuivi.trajet;
     } else if (StatutCourse.estTerminee(course.statut)) {
       nouvellePhase = PhaseSuivi.terminee;
     }
 
-    final changementDePhase = state.phase != nouvellePhase && state.phase != PhaseSuivi.recherche;
+    final changementDePhase =
+        state.phase != nouvellePhase && state.phase != PhaseSuivi.recherche;
 
     state = state.copyWith(
       course: course,
       phase: nouvellePhase,
       positionClient: LatLng(course.latitudeDepart, course.longitudeDepart),
-      positionDestination: LatLng(course.latitudeArrivee, course.longitudeArrivee),
+      positionDestination:
+          LatLng(course.latitudeArrivee, course.longitudeArrivee),
       isLoading: false,
     );
 
@@ -137,10 +149,12 @@ class SuiviCourseNotifier extends StateNotifier<SuiviCourseEtat> {
       _annoncerChangementPhase(nouvellePhase);
       _calculerItineraire(); // Recalculer l'itinéraire car la cible a changé
     }
-    
+
     // Si client, écouter le transporteur si la course est assignée
     final role = ref.read(userRoleProvider).valueOrNull;
-    if (role == 'client' && course.transporteurId.isNotEmpty && _transporteurSub == null) {
+    if (role == 'client' &&
+        course.transporteurId.isNotEmpty &&
+        _transporteurSub == null) {
       _ecouterTransporteur(course.transporteurId);
     }
   }
@@ -149,12 +163,13 @@ class SuiviCourseNotifier extends StateNotifier<SuiviCourseEtat> {
     // Éviter de recalculer si la position a très peu changé (moins de 10m)
     if (state.positionChauffeur != null) {
       final distanceGps = ref.read(serviceGpsProvider).calculerDistance(
-        latitudeDepart: state.positionChauffeur!.latitude,
-        longitudeDepart: state.positionChauffeur!.longitude,
-        latitudeArrivee: position.latitude,
-        longitudeArrivee: position.longitude,
-      );
-      if (distanceGps < 0.01) { // Moins de 10 mètres
+            latitudeDepart: state.positionChauffeur!.latitude,
+            longitudeDepart: state.positionChauffeur!.longitude,
+            latitudeArrivee: position.latitude,
+            longitudeArrivee: position.longitude,
+          );
+      if (distanceGps < 0.01) {
+        // Moins de 10 mètres
         return;
       }
     }
@@ -191,8 +206,9 @@ class SuiviCourseNotifier extends StateNotifier<SuiviCourseEtat> {
 
     try {
       final serviceRoutage = ref.read(serviceRoutageProvider);
-      final info = await serviceRoutage.obtenirItineraire(state.positionChauffeur!, cible);
-      
+      final info = await serviceRoutage.obtenirItineraire(
+          state.positionChauffeur!, cible);
+
       if (info != null) {
         _tentativesRoutage = 0; // Succès, on réinitialise
         state = state.copyWith(
@@ -206,22 +222,27 @@ class SuiviCourseNotifier extends StateNotifier<SuiviCourseEtat> {
         if (info.etapes.isNotEmpty) {
           final prochaineEtape = info.etapes.first;
           final svc = ref.read(serviceNavigationVocaleProvider);
-          
+
           if (prochaineEtape.distance <= 500 && prochaineEtape.distance > 150) {
-            final phrase = svc.humaniserInstruction(prochaineEtape, estPreAlerte: true);
-            final texteAnnonce = "Dans environ ${((prochaineEtape.distance/50).round()*50)} mètres, $phrase";
+            final phrase =
+                svc.humaniserInstruction(prochaineEtape, estPreAlerte: true);
+            final texteAnnonce =
+                "Dans environ ${((prochaineEtape.distance / 50).round() * 50)} mètres, $phrase";
             if (state.instructionVocaleActuelle != texteAnnonce) {
               state = state.copyWith(instructionVocaleActuelle: texteAnnonce);
               _annoncer(texteAnnonce);
             }
-          } else if (prochaineEtape.distance <= 100 && prochaineEtape.distance > 25) {
-            final phrase = svc.humaniserInstruction(prochaineEtape, estPreAlerte: false);
+          } else if (prochaineEtape.distance <= 100 &&
+              prochaineEtape.distance > 25) {
+            final phrase =
+                svc.humaniserInstruction(prochaineEtape, estPreAlerte: false);
             final texteAnnonce = "Maintenant, $phrase";
             if (state.instructionVocaleActuelle != texteAnnonce) {
               state = state.copyWith(instructionVocaleActuelle: texteAnnonce);
               _annoncer(texteAnnonce);
             }
-          } else if (prochaineEtape.distance <= 25 && prochaineEtape.type == 'arrive') {
+          } else if (prochaineEtape.distance <= 25 &&
+              prochaineEtape.type == 'arrive') {
             const texteAnnonce = "Vous êtes arrivé à destination.";
             if (state.instructionVocaleActuelle != texteAnnonce) {
               state = state.copyWith(instructionVocaleActuelle: texteAnnonce);
@@ -234,26 +255,31 @@ class SuiviCourseNotifier extends StateNotifier<SuiviCourseEtat> {
       }
     } catch (e) {
       debugPrint("Erreur de calcul d'itinéraire : $e");
-      
+
       // Gestion robuste avec Retry automatique
       if (_tentativesRoutage < 3) {
         _tentativesRoutage++;
-        state = state.copyWith(erreur: "Impossible de calculer le nouvel itinéraire, nouvelle tentative ($_tentativesRoutage/3)...");
+        state = state.copyWith(
+            erreur:
+                "Impossible de calculer le nouvel itinéraire, nouvelle tentative ($_tentativesRoutage/3)...");
         Future.delayed(const Duration(seconds: 3), () {
           if (mounted) _calculerItineraire();
         });
       } else {
-        state = state.copyWith(erreur: "Échec du tracé de l'itinéraire après plusieurs tentatives.");
+        state = state.copyWith(
+            erreur:
+                "Échec du tracé de l'itinéraire après plusieurs tentatives.");
       }
     }
   }
 
   void _verifierProximite() {
-    if (state.positionChauffeur == null || state.distanceRestanteMetres == 0) return;
+    if (state.positionChauffeur == null || state.distanceRestanteMetres == 0)
+      return;
 
     // Si on est à moins de 50 mètres de la cible
     if (state.distanceRestanteMetres < 50) {
-       // La logique d'affichage du bouton "Commencer la course" se fera dans la vue (si phase == approche && distance < 50)
+      // La logique d'affichage du bouton "Commencer la course" se fera dans la vue (si phase == approche && distance < 50)
     }
   }
 
@@ -282,7 +308,10 @@ class SuiviCourseNotifier extends StateNotifier<SuiviCourseEtat> {
   Future<void> commencerCourse() async {
     if (state.course == null) return;
     try {
-      await FirebaseFirestore.instance.collection('courses').doc(courseId).update({
+      await FirebaseFirestore.instance
+          .collection('courses')
+          .doc(courseId)
+          .update({
         'statut': StatutCourse.enTransit,
         'dateModification': FieldValue.serverTimestamp(),
       });
@@ -295,7 +324,10 @@ class SuiviCourseNotifier extends StateNotifier<SuiviCourseEtat> {
     if (state.course == null) return;
     try {
       debugPrint("APPEL DE terminerCourse POUR courseId : $courseId");
-      await FirebaseFirestore.instance.collection('courses').doc(courseId).update({
+      await FirebaseFirestore.instance
+          .collection('courses')
+          .doc(courseId)
+          .update({
         'statut': StatutCourse.arriveDestination,
         'dateModification': FieldValue.serverTimestamp(),
       });
@@ -309,7 +341,10 @@ class SuiviCourseNotifier extends StateNotifier<SuiviCourseEtat> {
   Future<void> annulerCourse() async {
     if (state.course == null) return;
     try {
-      await FirebaseFirestore.instance.collection('courses').doc(courseId).update({
+      await FirebaseFirestore.instance
+          .collection('courses')
+          .doc(courseId)
+          .update({
         'statut': StatutCourse.annulee,
         'dateModification': FieldValue.serverTimestamp(),
       });
@@ -321,7 +356,10 @@ class SuiviCourseNotifier extends StateNotifier<SuiviCourseEtat> {
   Future<void> validerPaiementEspeces() async {
     if (state.course == null) return;
     try {
-      await FirebaseFirestore.instance.collection('courses').doc(courseId).update({
+      await FirebaseFirestore.instance
+          .collection('courses')
+          .doc(courseId)
+          .update({
         'statut': 'terminee',
         'dateModification': FieldValue.serverTimestamp(),
       });

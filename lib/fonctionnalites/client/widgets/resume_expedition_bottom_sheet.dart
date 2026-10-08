@@ -79,11 +79,14 @@ class _ResumeExpeditionBottomSheetState
           ? const EdgeInsets.all(16)
           : EdgeInsets.zero,
       decoration: BoxDecoration(
-        color: Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.95),
+        color:
+            Theme.of(context).scaffoldBackgroundColor.withValues(alpha: 0.95),
         borderRadius: etat.categorieService == "Remorque"
             ? BorderRadius.circular(24.0)
             : const BorderRadius.vertical(top: Radius.circular(24.0)),
-        border: Border.all(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1)),
+        border: Border.all(
+            color:
+                Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.1)),
         boxShadow: [
           BoxShadow(
               color: Colors.black.withValues(alpha: 0.3),
@@ -101,7 +104,10 @@ class _ResumeExpeditionBottomSheetState
               height: 4,
               margin: const EdgeInsets.only(bottom: 12),
               decoration: BoxDecoration(
-                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.24),
+                color: Theme.of(context)
+                    .colorScheme
+                    .onSurface
+                    .withValues(alpha: 0.24),
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -118,16 +124,19 @@ class _ResumeExpeditionBottomSheetState
                       Expanded(
                         child: Text(
                           "Résumé de la course",
-                          style:
-                              Theme.of(context).textTheme.titleLarge?.copyWith(
-                                    fontWeight: FontWeight.bold,
-                                    color: Theme.of(context).colorScheme.onSurface,
-                                  ),
+                          style: Theme.of(context)
+                              .textTheme
+                              .titleLarge
+                              ?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: Theme.of(context).colorScheme.onSurface,
+                              ),
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
                       IconButton(
-                        icon: Icon(Icons.close, color: Theme.of(context).colorScheme.onSurface),
+                        icon: Icon(Icons.close,
+                            color: Theme.of(context).colorScheme.onSurface),
                         onPressed: () => Navigator.pop(context),
                       ),
                     ],
@@ -229,8 +238,7 @@ class _ResumeExpeditionBottomSheetState
                       child: LoaderPremium(size: 24),
                     ))
                   else if (etatEstimation.erreur != null)
-                    Text(
-                        "Oups, un petit imprévu : ${etatEstimation.erreur}",
+                    Text("Oups, un petit imprévu : ${etatEstimation.erreur}",
                         style: const TextStyle(color: Colors.red))
                   else if (etatEstimation.resultat != null)
                     Column(
@@ -282,7 +290,11 @@ class _ResumeExpeditionBottomSheetState
                                     Text(
                                       "Calculé équitablement selon la distance et le volume. Sans négociation.",
                                       style: TextStyle(
-                                          color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), fontSize: 11),
+                                          color: Theme.of(context)
+                                              .colorScheme
+                                              .onSurface
+                                              .withValues(alpha: 0.7),
+                                          fontSize: 11),
                                     ),
                                   ],
                                 ),
@@ -338,8 +350,7 @@ class _ResumeExpeditionBottomSheetState
                   if (courseActive != null) {
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
-                        content: Text(
-                            "Vous avez déjà une course en cours."),
+                        content: Text("Vous avez déjà une course en cours."),
                         backgroundColor: CouleursApp.erreur,
                       ),
                     );
@@ -380,10 +391,11 @@ class _ResumeExpeditionBottomSheetState
                     }
 
                     //  PHASE 4: ALGORTIHME DE DISPATCH - Recherche des transporteurs à proximité
-                    final typeVehiculeRequis = etat.categorieService == 'Remorque'
-                        ? 'Dépanneuse'
-                        : (etatEstimation.resultat?.vehiculeRecommande ??
-                            etat.categorieVehicule);
+                    final typeVehiculeRequis =
+                        etat.categorieService == 'Remorque'
+                            ? 'Dépanneuse'
+                            : (etatEstimation.resultat?.vehiculeRecommande ??
+                                etat.categorieVehicule);
 
                     // 1. Récupérer tous les transporteurs en ligne et valides
                     final transporteursSnap = await FirebaseFirestore.instance
@@ -483,7 +495,9 @@ class _ResumeExpeditionBottomSheetState
                             content: Row(
                               children: [
                                 Icon(Icons.no_transfer_rounded,
-                                    color: Theme.of(context).colorScheme.onSurface),
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurface),
                                 const SizedBox(width: 12),
                                 const Expanded(
                                   child: Text(
@@ -586,7 +600,8 @@ class _ResumeExpeditionBottomSheetState
                           content: Row(
                             children: [
                               Icon(Icons.check_circle,
-                                  color: Theme.of(context).colorScheme.onSurface),
+                                  color:
+                                      Theme.of(context).colorScheme.onSurface),
                               const SizedBox(width: 12),
                               Expanded(
                                   child: Text(
@@ -658,7 +673,12 @@ class _ResumeExpeditionBottomSheetState
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(label,
-                  style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 12)),
+                  style: TextStyle(
+                      color: Theme.of(context)
+                          .colorScheme
+                          .onSurface
+                          .withValues(alpha: 0.54),
+                      fontSize: 12)),
               const SizedBox(height: 2),
               Text(
                 value,

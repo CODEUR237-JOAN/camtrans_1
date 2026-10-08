@@ -77,8 +77,7 @@ class PageVueEnsemble extends ConsumerWidget {
             statsAsync.when(
               loading: () => const _SkeletonVueEnsemble(),
               error: (err, _) => Center(
-                  child: Text(
-                      "Oups ! Chargement des stats impossible : $err ",
+                  child: Text("Oups ! Chargement des stats impossible : $err ",
                       style: const TextStyle(color: Colors.white))),
               data: (stats) {
                 return SingleChildScrollView(

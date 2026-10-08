@@ -328,8 +328,8 @@ class _InscriptionTransporteurState
             child: Text(
               texteConditions,
               style: TextStyle(
-                  height: 1.6, 
-                  fontSize: 14, 
+                  height: 1.6,
+                  fontSize: 14,
                   color: Theme.of(context).colorScheme.onSurface),
             ),
           ),
@@ -337,7 +337,12 @@ class _InscriptionTransporteurState
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context),
-            child: Text("Fermer", style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6))),
+            child: Text("Fermer",
+                style: TextStyle(
+                    color: Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withValues(alpha: 0.6))),
           ),
           ElevatedButton.icon(
             icon: const Icon(Icons.check_circle_outline,

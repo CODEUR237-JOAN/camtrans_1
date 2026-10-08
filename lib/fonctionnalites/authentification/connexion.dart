@@ -80,7 +80,8 @@ class _ConnexionState extends ConsumerState<Connexion> {
   // -----------------------------------------------------------------
   // Routage post-connexion selon le rôle Firestore
   // -----------------------------------------------------------------
-  Future<void> _routerSelonRole(String uid, {bool estConnexionGoogle = false}) async {
+  Future<void> _routerSelonRole(String uid,
+      {bool estConnexionGoogle = false}) async {
     final serviceDb = ref.read(serviceFirestoreProvider);
     String? role;
     String? telephone;
@@ -126,7 +127,8 @@ class _ConnexionState extends ConsumerState<Connexion> {
       await ServiceNotification.enregistrerTokenUtilisateur(uid, 'admin');
       if (estConnexionGoogle && telephone != null && telephone.isNotEmpty) {
         if (mounted) {
-          context.go(RoutesApplication.verificationSms, extra: {'role': role, 'telephone': telephone});
+          context.go(RoutesApplication.verificationSms,
+              extra: {'role': role, 'telephone': telephone});
         }
         return;
       }
@@ -135,16 +137,19 @@ class _ConnexionState extends ConsumerState<Connexion> {
       await ServiceNotification.enregistrerTokenUtilisateur(uid, 'client');
       if (estConnexionGoogle && telephone != null && telephone.isNotEmpty) {
         if (mounted) {
-          context.go(RoutesApplication.verificationSms, extra: {'role': role, 'telephone': telephone});
+          context.go(RoutesApplication.verificationSms,
+              extra: {'role': role, 'telephone': telephone});
         }
         return;
       }
       if (mounted) context.go(RoutesApplication.tableauBordClient);
     } else if (role == 'transporteur') {
-      await ServiceNotification.enregistrerTokenUtilisateur(uid, 'transporteur');
+      await ServiceNotification.enregistrerTokenUtilisateur(
+          uid, 'transporteur');
       if (estConnexionGoogle && telephone != null && telephone.isNotEmpty) {
         if (mounted) {
-          context.go(RoutesApplication.verificationSms, extra: {'role': role, 'telephone': telephone});
+          context.go(RoutesApplication.verificationSms,
+              extra: {'role': role, 'telephone': telephone});
         }
         return;
       }
@@ -213,19 +218,26 @@ class _ConnexionState extends ConsumerState<Connexion> {
 
     try {
       // 1. Chercher dans clients
-      final clientsSnap = await db.collection('clients').where('email', isEqualTo: email).limit(1).get();
+      final clientsSnap = await db
+          .collection('clients')
+          .where('email', isEqualTo: email)
+          .limit(1)
+          .get();
       if (clientsSnap.docs.isNotEmpty) {
         final doc = clientsSnap.docs.first;
         if (doc.id != user.uid) {
           final data = doc.data();
           data['id'] = user.uid; // Mise à jour de l'ID interne si présent
-          
+
           final batch = db.batch();
           batch.set(db.collection('clients').doc(user.uid), data);
           batch.delete(doc.reference);
-          
+
           // Mettre à jour les courses de ce client
-          final courses = await db.collection('courses').where('clientId', isEqualTo: doc.id).get();
+          final courses = await db
+              .collection('courses')
+              .where('clientId', isEqualTo: doc.id)
+              .get();
           for (var c in courses.docs) {
             batch.update(c.reference, {'clientId': user.uid});
           }
@@ -235,19 +247,26 @@ class _ConnexionState extends ConsumerState<Connexion> {
       }
 
       // 2. Chercher dans transporteurs
-      final transpSnap = await db.collection('transporteurs').where('email', isEqualTo: email).limit(1).get();
+      final transpSnap = await db
+          .collection('transporteurs')
+          .where('email', isEqualTo: email)
+          .limit(1)
+          .get();
       if (transpSnap.docs.isNotEmpty) {
         final doc = transpSnap.docs.first;
         if (doc.id != user.uid) {
           final data = doc.data();
           data['id'] = user.uid;
-          
+
           final batch = db.batch();
           batch.set(db.collection('transporteurs').doc(user.uid), data);
           batch.delete(doc.reference);
-          
+
           // Mettre à jour les courses du transporteur
-          final courses = await db.collection('courses').where('transporteurId', isEqualTo: doc.id).get();
+          final courses = await db
+              .collection('courses')
+              .where('transporteurId', isEqualTo: doc.id)
+              .get();
           for (var c in courses.docs) {
             batch.update(c.reference, {'transporteurId': user.uid});
           }
