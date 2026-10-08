@@ -182,13 +182,6 @@ class _SuiviTransportState extends ConsumerState<SuiviTransport> {
 
     final course = etatSuivi.course!;
 
-    //  PILIER 1 & 2: Moteur d'Auto-Dispatch côté Client
-    if (estClient && course.statut == StatutCourse.recherche) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        _executerAutoDispatch(course);
-      });
-    }
-
     //  PILIER 3: Timeout Global de 5 minutes
     if (estClient &&
         (course.statut == StatutCourse.recherche ||

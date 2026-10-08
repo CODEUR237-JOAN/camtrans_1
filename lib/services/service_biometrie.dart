@@ -18,7 +18,6 @@ class ServiceBiometrie {
       final peutVerifier = await _auth.canCheckBiometrics;
       return supporte && peutVerifier;
     } catch (e) {
-      debugPrint('[Biometrie] disponible() erreur : $e');
       return false;
     }
   }
@@ -37,7 +36,6 @@ class ServiceBiometrie {
         ),
       );
     } catch (e) {
-      debugPrint('[Biometrie] authentifier() erreur : $e');
       return false;
     }
   }

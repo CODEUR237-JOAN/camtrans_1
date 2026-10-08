@@ -220,4 +220,9 @@ Travaux de la session (du plus ancien au plus récent) :
     - `firestore.rules` : bloc `match /entretiens/{...}` **supprimé** → ⚠️ à **redéployer** (Console Firebase). La collection `entretiens` restante en base devient inaccessible (plus de règle) — supprimable manuellement si besoin.
     - Pas de provider dédié (l'écran utilisait `serviceFirestore` directement) ; pas de MultiProvider (projet Riverpod) → rien d'autre à nettoyer. Le `.xmi` (UML) garde la trace historique, non bloquant.
 
-Reste connu / pistes : unifier les 2 services vocaux (doublon `suivi_course/services`), supprimer `fix_theme.dart` (script jetable à la racine), brancher le bouton « Paramètres » du **profil transporteur** (encore `() {}`), sécuriser Campay/clés IA côté serveur (nécessite Blaze), durcir les règles `courses`/`paiements` (nécessite serveur pour la confirmation de paiement).
+Reste connu / pistes : sécuriser Campay/clés IA côté serveur (nécessite Blaze), durcir les règles `courses`/`paiements` (nécessite serveur pour la confirmation de paiement).
+
+### Travaux effectués durant la suite de la session
+- ✅ **Unification des services vocaux** : `lib/fonctionnalites/suivi_course/services/service_navigation_vocale.dart` supprimé. Ses méthodes de rétro-compatibilité (`annoncer`, `stop`, `humaniserInstruction`) ont été fusionnées dans `lib/services/service_navigation_vocale.dart`. L'import dans `suivi_course_provider.dart` a été mis à jour.
+- ✅ **Profil transporteur** : le bouton « Paramètres » ouvre maintenant la route `RoutesApplication.parametres`.
+- ✅ **Nettoyage** : le script jetable `fix_theme.dart` à la racine a été supprimé, ainsi que l'ancien écran de chat non utilisé (`lib/fonctionnalites/client/ecran_chat.dart`).

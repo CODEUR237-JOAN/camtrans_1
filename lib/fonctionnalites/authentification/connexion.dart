@@ -94,7 +94,7 @@ class _ConnexionState extends ConsumerState<Connexion> {
         role = 'admin';
         telephone = adminDoc.data()?['telephone'] as String?;
       }
-    } catch (_) {}
+    } catch (_) { /* erreur ignorée */ }
 
     // 2. Transporteur
     if (role == null) {
@@ -105,7 +105,7 @@ class _ConnexionState extends ConsumerState<Connexion> {
           role = 'transporteur';
           telephone = transpDoc.data()?['telephone'] as String?;
         }
-      } catch (_) {}
+      } catch (_) { /* erreur ignorée */ }
     }
 
     // 3. Client
@@ -117,7 +117,7 @@ class _ConnexionState extends ConsumerState<Connexion> {
           role = 'client';
           telephone = clientDoc.data()?['telephone'] as String?;
         }
-      } catch (_) {}
+      } catch (_) { /* erreur ignorée */ }
     }
 
     ref.invalidate(userRoleProvider);
@@ -273,9 +273,7 @@ class _ConnexionState extends ConsumerState<Connexion> {
           await batch.commit();
         }
       }
-    } catch (e) {
-      debugPrint("Erreur lors de la migration du compte: $e");
-    }
+    } catch (e) { /* erreur ignorée */ }
   }
 
   void _afficherErreur(String message) {

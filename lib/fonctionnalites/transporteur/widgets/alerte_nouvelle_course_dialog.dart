@@ -170,9 +170,7 @@ class _AlerteNouvelleCourseDialogState
                           await ref
                               .read(transporteurActionsProvider)
                               .refuserCourse(widget.course.id);
-                        } catch (e) {
-                          debugPrint("Erreur refus course: $e");
-                        }
+                        } catch (e) { /* erreur ignorée */ }
                         if (context.mounted) {
                           Navigator.of(context).pop();
                         }
@@ -205,9 +203,7 @@ class _AlerteNouvelleCourseDialogState
                           await ref
                               .read(transporteurActionsProvider)
                               .accepterCourse(widget.course.id);
-                        } catch (e) {
-                          debugPrint("Erreur acceptation course: $e");
-                        }
+                        } catch (e) { /* erreur ignorée */ }
                         if (context.mounted) {
                           Navigator.of(context).pop();
                         }

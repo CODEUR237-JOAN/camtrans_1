@@ -230,7 +230,6 @@ class DemandeExpeditionNotifier extends StateNotifier<EtatDemandeExpedition> {
       state =
           state.copierAvec(masseEstimeeKg: masse, estEnAttenteMasseIA: false);
     } catch (e) {
-      debugPrint("Erreur estimation masse IA: $e");
       state = state.copierAvec(
           masseEstimeeKg: 1500.0, estEnAttenteMasseIA: false); // Fallback
     }
@@ -269,8 +268,6 @@ class DemandeExpeditionNotifier extends StateNotifier<EtatDemandeExpedition> {
         fichiersImages: state.photos,
       );
     } catch (e) {
-      debugPrint(
-          "️ IA Indisponible (Quota/Erreur), utilisation du fallback : $e");
       final vehiculeParDefaut = state.categorieService == 'Remorque'
           ? "Dépanneuse"
           : (state.categorieVehicule.isNotEmpty
@@ -298,7 +295,7 @@ class DemandeExpeditionNotifier extends StateNotifier<EtatDemandeExpedition> {
           latClient = loc.latitude;
           lngClient = loc.longitude;
         }
-      } catch (_) {}
+      } catch (_) { /* erreur ignorée */ }
     }
 
     // Utilisation de lngClient pour éviter le warning
@@ -317,20 +314,12 @@ class DemandeExpeditionNotifier extends StateNotifier<EtatDemandeExpedition> {
           .get();
 
       List<Transporteur> candidats = [];
-      debugPrint(
-          " RECHERCHE DE CHAUFFEUR : ${query.docs.length} transporteur(s) en ligne trouvé(s). Véhicule requis = '$vehiculeRequis'");
 
       for (var doc in query.docs) {
         final data = doc.data();
         data['id'] = doc.id;
         final t = Transporteur.fromMap(data);
 
-        debugPrint("    Analyse de ${t.prenom} ${t.nom} (ID: ${t.id}) :");
-        debugPrint("      - estEnLigne: ${t.estEnLigne}");
-        debugPrint("      - disponible: ${t.disponible}");
-        debugPrint("      - documentsValides: ${t.documentsValides}");
-        debugPrint(
-            "      - typeVehicule: '${t.typeVehicule}' (Requis: '$vehiculeRequis')");
 
         // Filtrage rigoureux en mémoire
         if (t.estEnLigne &&
@@ -338,9 +327,7 @@ class DemandeExpeditionNotifier extends StateNotifier<EtatDemandeExpedition> {
             t.documentsValides &&
             t.typeVehicule == vehiculeRequis) {
           candidats.add(t);
-          debugPrint("       ACCEPTE comme candidat !");
         } else {
-          debugPrint("       REJETE.");
         }
       }
 
@@ -348,14 +335,9 @@ class DemandeExpeditionNotifier extends StateNotifier<EtatDemandeExpedition> {
       if (candidats.isNotEmpty) {
         candidats.sort((a, b) => a.nombreCourses.compareTo(b.nombreCourses));
         chauffeur = candidats.first;
-        debugPrint(
-            " Chauffeur sélectionné : ${chauffeur.prenom} ${chauffeur.nom}");
       } else {
-        debugPrint("️ Aucun candidat n'a passé tous les filtres.");
       }
-    } catch (e) {
-      debugPrint("Erreur lors de la recherche du chauffeur: $e");
-    }
+    } catch (e) { /* erreur ignorée */ }
 
     state = state.copierAvec(
       estEnAttenteIA: false,

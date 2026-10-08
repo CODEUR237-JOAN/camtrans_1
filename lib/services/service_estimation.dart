@@ -267,14 +267,6 @@ class ServiceEstimation {
     final double coutTotal = (coutBrut / 50).round() * 50.0;
 
     // Log interne debug — jamais affiché dans l'UI
-    debugPrint(
-      '[REMORQUE][TARIF_INTERNE] '
-      'Masse: ${masseKg.toInt()}kg | Dist: ${distanceKm.toStringAsFixed(1)}km | '
-      'FraisBase: ${fraisBase.toInt()} FCFA | '
-      'CoutDist: ${coutDistance.toStringAsFixed(0)} FCFA | '
-      'SurchargeMasse: ${surchargeMasseCarburant.toStringAsFixed(0)} FCFA | '
-      'Total: ${coutTotal.toInt()} FCFA',
-    );
 
     return ResultatEstimation(
       distanceKm: distanceKm,

@@ -113,8 +113,9 @@ class _CreerDemandeState extends ConsumerState<CreerDemande> {
       if (_etapeCourante == 2) {
         message = "Quelle gamme de service vous conviendrait le mieux ?";
       }
-      if (_etapeCourante == 3)
+      if (_etapeCourante == 3) {
         message = "L'itinéraire semble incomplet. Précisez votre destination.";
+      }
 
       _montrerErreur(message);
       return;

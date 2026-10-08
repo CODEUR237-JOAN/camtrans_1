@@ -135,7 +135,6 @@ class ServiceGps {
 
       return locations.first;
     } catch (e) {
-      debugPrint("Erreur geocoding primaire pour $adresse : $e");
       // Fallback vers OpenStreetMap si le geocoder natif échoue (ex: Web ou Google Services manquant)
       return await _geocodingFallback(adresse);
     }
@@ -167,7 +166,6 @@ class ServiceGps {
       }
       return null;
     } catch (e) {
-      debugPrint("Erreur geocoding fallback pour $adresse : $e");
       return null;
     }
   }

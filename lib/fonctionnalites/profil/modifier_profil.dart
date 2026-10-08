@@ -82,9 +82,7 @@ class _ModifierProfilState extends ConsumerState<ModifierProfil> {
           _initialise = true;
         });
       }
-    } catch (e) {
-      debugPrint("Erreur chargement profil: $e");
-    } finally {
+    } catch (e) { /* erreur ignorée */ } finally {
       setState(() => _chargement = false);
     }
   }

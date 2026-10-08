@@ -480,8 +480,6 @@ class _ResumeExpeditionBottomSheetState
                     //  Règle métier : aucun véhicule disponible => AUCUNE course
                     // n'est créée. Le client est informé et renvoyé à l'accueil.
                     if (candidatsFinaux.isEmpty) {
-                      debugPrint(
-                          " Aucun transporteur disponible ($typeVehiculeRequis) : course non créée.");
                       if (context.mounted) {
                         final messenger = ScaffoldMessenger.of(context);
                         final routeur = GoRouter.of(context);
@@ -615,8 +613,6 @@ class _ResumeExpeditionBottomSheetState
                       context.go('/tableau-bord-client');
                     }
                   } catch (e, stacktrace) {
-                    debugPrint(" ERREUR CREATION COURSE: $e");
-                    debugPrint("Stacktrace: $stacktrace");
                     if (context.mounted) {
                       Navigator.pop(context); // Fermer le radar
                       ScaffoldMessenger.of(context).showSnackBar(

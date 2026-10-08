@@ -34,7 +34,6 @@ final gestionTokenFCMProvider = Provider.autoDispose<void>((ref) {
         donnees: {'fcmToken': token},
       ).catchError((_) {});
     }, onError: (e) {
-      debugPrint("Erreur changementToken FCM: $e");
     });
 
     ref.onDispose(() {

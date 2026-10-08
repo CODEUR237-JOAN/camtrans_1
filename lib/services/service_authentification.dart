@@ -114,12 +114,11 @@ class ServiceAuthentification {
         // Numéro déjà pris → on annule le compte à peine créé.
         try {
           await cred.user?.delete();
-        } catch (_) {}
+        } catch (_) { /* erreur ignorée */ }
         rethrow;
       } catch (e) {
         // Index momentanément injoignable : on ne bloque pas l'inscription
         // (l'email reste protégé par FirebaseAuth).
-        debugPrint('[Auth] Réservation téléphone impossible : $e');
       }
     }
 
@@ -164,7 +163,6 @@ class ServiceAuthentification {
       await ServicePresence().arreter();
     } catch (e) {
       //  FIX : Erreur loggée — ne doit pas bloquer la déconnexion
-      debugPrint('[Auth] Avertissement lors de l\'arrêt de présence : $e');
     }
     // 2. Se deconnecter
     await _auth.signOut();
@@ -274,7 +272,6 @@ class ServiceAuthentification {
           }, SetOptions(merge: true));
         } catch (e) {
           // Le profil pourra être recréé plus tard ; ne pas bloquer la connexion.
-          debugPrint('[Auth] Profil Google non enregistré : $e');
         }
       }
 
@@ -288,7 +285,6 @@ class ServiceAuthentification {
           msg.contains('sign_in_canceled')) {
         return null;
       }
-      debugPrint('[Auth] Erreur connexion Google : $e');
       rethrow;
     }
   }
@@ -297,6 +293,6 @@ class ServiceAuthentification {
   Future<void> deconnexionGoogle() async {
     try {
       await _googleSignIn.signOut();
-    } catch (_) {}
+    } catch (_) { /* erreur ignorée */ }
   }
 }

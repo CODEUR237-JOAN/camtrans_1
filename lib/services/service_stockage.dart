@@ -42,11 +42,9 @@ class ServiceStockage {
         final data = jsonDecode(responseBody);
         return data['secure_url']; // Retourne l'URL publique de l'image
       } else {
-        debugPrint("Erreur Cloudinary: $responseBody");
         return null;
       }
     } catch (e) {
-      debugPrint("Erreur lors du téléchargement du fichier: $e");
       return null;
     }
   }
@@ -54,6 +52,5 @@ class ServiceStockage {
   Future<void> supprimerFichier(String url) async {
     // La suppression directe (Unsigned) n'est pas autorisée par défaut sur Cloudinary
     // pour des raisons de sécurité. Pour l'instant on se contente de l'ignorer.
-    debugPrint("Suppression ignorée (Cloudinary Unsigned)");
   }
 }

@@ -87,7 +87,6 @@ class ServiceLieux {
       }
       return resultats;
     } catch (e) {
-      debugPrint('ServiceLieux (Nominatim) indisponible : $e');
       return const [];
     }
   }

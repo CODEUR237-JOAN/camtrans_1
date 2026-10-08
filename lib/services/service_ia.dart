@@ -181,9 +181,7 @@ class ServiceIA {
       );
       final texte = reponse.trim();
       if (texte.isNotEmpty) return texte;
-    } catch (e) {
-      debugPrint("Combi/Claude indisponible, bascule Gemini : $e");
-    }
+    } catch (e) { /* erreur ignorée */ }
 
     // 2) Repli sur Gemini.
     try {
@@ -191,9 +189,7 @@ class ServiceIA {
       final resultat = await modele.generateContent([Content.text(message)]);
       final texte = (resultat.text ?? '').trim();
       if (texte.isNotEmpty) return texte;
-    } catch (e) {
-      debugPrint("Combi/Gemini indisponible : $e");
-    }
+    } catch (e) { /* erreur ignorée */ }
 
     // 3) Dernier recours : message neutre (jamais d'exception vers l'UI).
     return "Je suis désolé, je n'arrive pas à répondre pour le moment. "
@@ -214,7 +210,7 @@ class ServiceIA {
     // Tentative directe : si le texte est déjà un JSON valide
     try {
       return jsonDecode(texte) as Map<String, dynamic>;
-    } catch (_) {}
+    } catch (_) { /* erreur ignorée */ }
 
     // Recherche d'un bloc JSON entouré de backticks (```json ... ```)
     final regexBloc = RegExp(r'```(?:json)?\s*([\s\S]*?)```');
@@ -222,7 +218,7 @@ class ServiceIA {
     if (matchBloc != null) {
       try {
         return jsonDecode(matchBloc.group(1)!) as Map<String, dynamic>;
-      } catch (_) {}
+      } catch (_) { /* erreur ignorée */ }
     }
 
     // Recherche du premier objet JSON dans le texte brut
@@ -231,7 +227,7 @@ class ServiceIA {
     if (matchObjet != null) {
       try {
         return jsonDecode(matchObjet.group(0)!) as Map<String, dynamic>;
-      } catch (_) {}
+      } catch (_) { /* erreur ignorée */ }
     }
 
     return null;
@@ -300,12 +296,8 @@ class ServiceIA {
         } else {
           // On ne bloque pas l'utilisateur, mais on trace l'erreur en debug
           // pour pouvoir diagnostiquer (clé invalide, modèle retiré, quota...).
-          debugPrint(
-              "[IA][Claude JSON] Échec ${response.statusCode} : ${response.body}. Bascule sur Gemini.");
         }
-      } catch (e) {
-        debugPrint("[IA][Claude JSON] Erreur : $e. Bascule sur Gemini.");
-      }
+      } catch (e) { /* erreur ignorée */ }
     }
 
     // 2. Basculement (Fallback) sur Gemini
@@ -313,8 +305,6 @@ class ServiceIA {
     try {
       modele = _getModele(modeJson: true, contexteSysteme: contexteSysteme);
     } catch (e) {
-      debugPrint(
-          "[IA] Gemini indisponible : $e. Retour de la réponse par défaut.");
       return reponseParDefaut;
     }
 
@@ -325,14 +315,9 @@ class ServiceIA {
         if (data != null) return data;
 
         // Si le JSON est invalide, on réessaie
-        debugPrint(
-            "[IA] Tentative $tentative : réponse non JSON reçue. Nouvelle tentative...");
       } catch (e) {
-        debugPrint("[IA] Tentative $tentative échouée : $e");
         if (tentative == _maxTentatives) {
           // Toutes les tentatives sont épuisées : on retourne le défaut
-          debugPrint(
-              "[IA] Toutes les tentatives ont échoué. Retour de la réponse par défaut.");
           return reponseParDefaut;
         }
       }
@@ -387,7 +372,6 @@ class ServiceIA {
         // On continue avec Gemini pour ne pas bloquer l'utilisateur,
         // mais on trace l'erreur en debug pour pouvoir diagnostiquer
         // (clé invalide, modèle retiré, quota dépassé, CORS sur le Web...).
-        debugPrint("[IA][Chat Claude] Erreur : $e. Bascule sur Gemini.");
       }
     }
 
@@ -439,11 +423,9 @@ class ServiceIA {
       _historique.add(Content.model([TextPart(reponseComplete)]));
     } on GenerativeAIException catch (e) {
       // Erreur spécifique à l'API Gemini (quota, clé invalide, etc.)
-      debugPrint("[IA][Chat] Erreur API Gemini : $e");
       yield "\n[IA indisponible] Une erreur est survenue. Réessayez dans un moment.";
     } catch (e) {
       // Toute autre erreur (réseau, timeout, etc.)
-      debugPrint("[IA][Chat] Erreur inattendue : $e");
       yield "\n[IA indisponible] Impossible de contacter le serveur. Vérifiez votre connexion.";
     }
   }
@@ -538,7 +520,6 @@ class ServiceIA {
           1500.0;
     }
 
-    debugPrint("[IA][Masse] Valeur inattendue : $valeur. Retour à 1500 kg.");
     return 1500.0;
   }
 

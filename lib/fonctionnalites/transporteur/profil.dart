@@ -289,7 +289,8 @@ class ProfilTransporteur extends ConsumerWidget {
                     () => context.push(RoutesApplication.modifierProfil)),
                 _boutonOption(context, Icons.lock, "Changer le mot de passe",
                     () => context.push(RoutesApplication.changerMotDePasse)),
-                _boutonOption(context, Icons.settings, "Paramètres", () {}),
+                _boutonOption(context, Icons.settings, "Paramètres",
+                    () => context.push(RoutesApplication.parametres)),
                 _boutonOption(context, Icons.help, "Aide & Support", () {}),
 
                 const SizedBox(height: 25),

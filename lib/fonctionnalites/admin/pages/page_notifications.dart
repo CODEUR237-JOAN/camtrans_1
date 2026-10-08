@@ -97,7 +97,6 @@ class _PageNotificationsState extends ConsumerState<PageNotifications> {
         );
       }
     } catch (e) {
-      debugPrint("Erreur envoi notification : $e");
       if (mounted) {
         _afficherMessage(
           "Impossible d'envoyer le message pour le moment. Vérifiez votre connexion et réessayez.",

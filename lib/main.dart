@@ -20,21 +20,17 @@ import 'package:update_camtrans/coeur/etat/theme_provider.dart';
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   // Initialise l'instance Firebase requise pour traiter le message en tâche de fond.
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
-  debugPrint(
-      "[INFO] Message push reçu en arrière-plan : ${message.notification?.title}");
 }
 
 Future<void> main() async {
   try {
     // S'assure que les liaisons Flutter sont prêtes avant toute initialisation asynchrone.
     WidgetsFlutterBinding.ensureInitialized();
-    debugPrint("[INFO] Démarrage de l'application CamTrans en cours...");
 
     // Initialisation du backend Firebase (authentification, base de données, etc.).
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
-    debugPrint("[SUCCÈS] Service Firebase initialisé.");
 
     // Configuration de Firestore pour permettre un fonctionnement sans connexion internet.
     // Cela garantit que les utilisateurs peuvent consulter leurs données même hors ligne.
@@ -43,11 +39,7 @@ Future<void> main() async {
         persistenceEnabled: true,
         cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED,
       );
-      debugPrint("[SUCCÈS] Mode hors-ligne de la base de données activé.");
-    } catch (e) {
-      debugPrint(
-          "[AVERTISSEMENT] Le mode hors-ligne n'a pas pu être activé (souvent normal sur Web).");
-    }
+    } catch (e) { /* erreur ignorée */ }
 
     // Enregistrement du service de notifications pour fonctionner en arrière-plan (Mobile uniquement).
     if (!kIsWeb) {
@@ -57,7 +49,6 @@ Future<void> main() async {
 
     // Initialisation et configuration des notifications locales.
     await ServiceNotification.initialiser();
-    debugPrint("[SUCCÈS] Service de notifications configuré.");
 
     // Démarrage de l'écoute des nouveaux messages et des actions liées aux notifications.
     ServiceNotification.ecouterMessages();
@@ -66,19 +57,12 @@ Future<void> main() async {
     // Chargement des variables d'environnement (ex: clés d'API).
     try {
       await dotenv.load(fileName: ".env");
-      debugPrint(
-          "[SUCCÈS] Variables de configuration (.env) chargées avec succès.");
-    } catch (e) {
-      debugPrint(
-          "[AVERTISSEMENT] Fichier .env non trouvé. Les fonctionnalités IA et Campay seront indisponibles.");
-    }
+    } catch (e) { /* erreur ignorée */ }
 
     // Chargement du thème persisté AVANT le premier build
     // pour éviter tout flash blanc au démarrage.
     final themePreCharge = ThemeProvider();
     await themePreCharge.charger();
-    debugPrint(
-        "[SUCCÈS] Thème utilisateur chargé (${themePreCharge.modeActuel}).");
 
     runApp(
       ProviderScope(
@@ -89,9 +73,6 @@ Future<void> main() async {
       ),
     );
   } catch (e, stack) {
-    debugPrint("[ERREUR FATALE] Le démarrage a échoué :");
-    debugPrint(e.toString());
-    debugPrint(stack.toString());
 
     // Affichage d'un écran d'erreur convivial pour l'utilisateur en cas de panne au démarrage.
     runApp(EcranErreurDemarrage(erreur: e.toString()));

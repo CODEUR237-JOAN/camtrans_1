@@ -11,7 +11,7 @@ import 'package:update_camtrans/services/service_routage.dart';
 import 'package:update_camtrans/services/service_gps.dart';
 
 import 'suivi_course_etat.dart';
-import '../services/service_navigation_vocale.dart';
+import 'package:update_camtrans/services/service_navigation_vocale.dart';
 
 final suiviCourseProvider =
     StateNotifierProvider.family<SuiviCourseNotifier, SuiviCourseEtat, String>(
@@ -61,7 +61,6 @@ class SuiviCourseNotifier extends StateNotifier<SuiviCourseEtat> {
       onError: (Object e) {
         // Ex. permission-denied après suppression de la course :
         // sans ce handler, l'erreur remonte en "Unhandled Exception".
-        debugPrint("️ Flux course $courseId interrompu : $e");
         if (!mounted) return;
         state = state.copyWith(
           erreur: "Cette course n'est plus accessible.",
@@ -113,7 +112,6 @@ class SuiviCourseNotifier extends StateNotifier<SuiviCourseEtat> {
         }
       },
       onError: (Object e) {
-        debugPrint("️ Flux transporteur $transporteurId interrompu : $e");
       },
     );
   }
@@ -254,7 +252,6 @@ class SuiviCourseNotifier extends StateNotifier<SuiviCourseEtat> {
         throw Exception("Réponse OSRM vide ou invalide");
       }
     } catch (e) {
-      debugPrint("Erreur de calcul d'itinéraire : $e");
 
       // Gestion robuste avec Retry automatique
       if (_tentativesRoutage < 3) {
@@ -274,8 +271,9 @@ class SuiviCourseNotifier extends StateNotifier<SuiviCourseEtat> {
   }
 
   void _verifierProximite() {
-    if (state.positionChauffeur == null || state.distanceRestanteMetres == 0)
+    if (state.positionChauffeur == null || state.distanceRestanteMetres == 0) {
       return;
+    }
 
     // Si on est à moins de 50 mètres de la cible
     if (state.distanceRestanteMetres < 50) {
@@ -323,7 +321,6 @@ class SuiviCourseNotifier extends StateNotifier<SuiviCourseEtat> {
   Future<void> terminerCourse() async {
     if (state.course == null) return;
     try {
-      debugPrint("APPEL DE terminerCourse POUR courseId : $courseId");
       await FirebaseFirestore.instance
           .collection('courses')
           .doc(courseId)
@@ -331,9 +328,7 @@ class SuiviCourseNotifier extends StateNotifier<SuiviCourseEtat> {
         'statut': StatutCourse.arriveDestination,
         'dateModification': FieldValue.serverTimestamp(),
       });
-      debugPrint("MISE A JOUR FIREBASE REUSSIE : arrive_destination");
     } catch (e) {
-      debugPrint("ERREUR DANS terminerCourse : $e");
       state = state.copyWith(erreur: "Erreur lors de la fin de course : $e");
     }
   }

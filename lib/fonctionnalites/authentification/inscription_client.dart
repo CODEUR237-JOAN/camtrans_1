@@ -51,11 +51,9 @@ class _InscriptionClientState extends ConsumerState<InscriptionClient> {
     });
 
     try {
-      debugPrint("--- DÉBUT DE L'INSCRIPTION ---");
       final serviceAuth = ref.read(serviceAuthentificationProvider);
       final serviceDb = ref.read(serviceFirestoreProvider);
 
-      debugPrint("1. Appel de Firebase Auth...");
       // Inscription Firebase Auth avec Timeout
       final userCred = await serviceAuth
           .inscriptionAvecVerifications(
@@ -68,7 +66,6 @@ class _InscriptionClientState extends ConsumerState<InscriptionClient> {
             "Délai d'attente dépassé pour l'authentification (Problème de connexion internet ou serveur Firebase injoignable).");
       });
 
-      debugPrint("2. Auth réussie. UID: ${userCred.user?.uid}");
 
       // Création du document Client
       if (userCred.user != null) {
@@ -93,7 +90,6 @@ class _InscriptionClientState extends ConsumerState<InscriptionClient> {
           dateCreation: DateTime.now(),
         );
 
-        debugPrint("3. Enregistrement dans Firestore...");
         // Sauvegarder dans la collection "clients" avec Timeout
         await serviceDb
             .ajouterDocument(
@@ -106,22 +102,16 @@ class _InscriptionClientState extends ConsumerState<InscriptionClient> {
               "Délai d'attente dépassé pour la base de données (Firestore injoignable).");
         });
 
-        debugPrint("4. Enregistrement du Token FCM...");
         await ServiceNotification.enregistrerTokenUtilisateur(
             client.id, 'client');
 
-        debugPrint("5. Mise à jour du profil Auth...");
         await serviceAuth.mettreAJourProfil(nom: _nom.text.trim());
 
-        debugPrint("6. Envoi de l'email de vérification...");
         // Envoyer l'email de vérification
         await serviceAuth
             .envoyerVerificationEmail()
             .timeout(const Duration(seconds: 10), onTimeout: () {
-          debugPrint(
-              "Attention: L'envoi de l'e-mail a pris trop de temps, mais le compte est créé.");
         });
-        debugPrint("--- FIN DE L'INSCRIPTION ---");
       }
 
       await serviceAuth.deconnexion();

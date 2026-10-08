@@ -40,9 +40,7 @@ class ServiceNotification {
         badge: true,
         sound: true,
       );
-    } catch (e) {
-      debugPrint('️ Permission notification: $e');
-    }
+    } catch (e) { /* erreur ignorée */ }
 
     if (!kIsWeb) {
       const AndroidInitializationSettings androidSettings =
@@ -66,7 +64,6 @@ class ServiceNotification {
       }
       return await _messaging.getToken();
     } catch (e) {
-      debugPrint("Erreur getToken: $e");
       return null;
     }
   }
@@ -89,11 +86,8 @@ class ServiceNotification {
           'fcmToken': token,
           'derniereConnexion': FieldValue.serverTimestamp(),
         }, SetOptions(merge: true));
-        debugPrint(' Token FCM enregistré pour $userId dans $collection');
       }
-    } catch (e) {
-      debugPrint(" Erreur lors de l'enregistrement du token FCM: $e");
-    }
+    } catch (e) { /* erreur ignorée */ }
   }
 
   /// Active les notifications : demande la permission système puis
@@ -113,7 +107,6 @@ class ServiceNotification {
       await enregistrerTokenUtilisateur(userId, typeUtilisateur);
       return true;
     } catch (e) {
-      debugPrint('[Notif] Activation impossible : $e');
       return false;
     }
   }
@@ -131,10 +124,8 @@ class ServiceNotification {
           .set({'fcmToken': FieldValue.delete()}, SetOptions(merge: true));
       try {
         await _messaging.deleteToken();
-      } catch (_) {}
-    } catch (e) {
-      debugPrint('[Notif] Désactivation impossible : $e');
-    }
+      } catch (_) { /* erreur ignorée */ }
+    } catch (e) { /* erreur ignorée */ }
   }
 
   static Stream<String> changementToken() => _messaging.onTokenRefresh;
@@ -179,7 +170,6 @@ class ServiceNotification {
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       final titre = message.notification?.title ?? 'Notification';
       final corps = message.notification?.body ?? '';
-      debugPrint(' FCM foreground: $titre');
       afficherNotification(titre: titre, message: corps);
     });
   }
@@ -190,7 +180,6 @@ class ServiceNotification {
 
   static void ecouterOuverture() {
     FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-      debugPrint(' Notification ouverte : ${message.notification?.title}');
     });
   }
 }

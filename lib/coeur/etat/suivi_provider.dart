@@ -320,9 +320,7 @@ class SuiviNotifier extends StateNotifier<EtatSuivi> {
         // 3. Le guidage suit le nouveau tracé (sans ré-annoncer le démarrage).
         _navVocale.rafraichirItineraire(nouveau);
       }
-    } catch (e) {
-      debugPrint('[Suivi] Échec du recalcul d\'itinéraire : $e');
-    } finally {
+    } catch (e) { /* erreur ignorée */ } finally {
       _recalculEnCours = false;
     }
   }

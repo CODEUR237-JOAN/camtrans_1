@@ -94,7 +94,6 @@ class CoucheTransporteurs extends ConsumerWidget {
       },
       loading: () => const MarkerLayer(markers: []),
       error: (error, stack) {
-        debugPrint("Erreur chargement transporteurs: $error");
         return const MarkerLayer(markers: []);
       },
     );

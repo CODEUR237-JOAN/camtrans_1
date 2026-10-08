@@ -50,7 +50,6 @@ class ServicePaiement {
       final data = jsonDecode(response.body);
       return data['token'];
     } else {
-      debugPrint("Erreur auth Campay: ${response.body}");
       throw Exception("Impossible de s'authentifier auprès de Campay.");
     }
   }
@@ -99,7 +98,6 @@ class ServicePaiement {
     );
 
     if (collectResponse.statusCode != 200) {
-      debugPrint("Erreur de collecte Campay: ${collectResponse.body}");
       throw Exception(
           "Erreur d'initialisation du paiement: ${jsonDecode(collectResponse.body)['message'] ?? 'Erreur inconnue'}");
     }
@@ -197,8 +195,9 @@ class ServicePaiement {
     final token = await _obtenirToken();
 
     String phone = telephoneBeneficiaire.replaceAll(RegExp(r'[^0-9]'), '');
-    if (phone.length == 9)
+    if (phone.length == 9) {
       phone = "237$phone"; // Ajouter l'indicatif si manquant
+    }
 
     final refExterne = "RET-${DateTime.now().millisecondsSinceEpoch}";
     final double montantCampay = ApiKeys.isCampayProduction ? montant : 10.0;
@@ -224,7 +223,7 @@ class ServicePaiement {
       String reference = '';
       try {
         reference = (jsonDecode(response.body)['reference'] ?? '').toString();
-      } catch (_) {}
+      } catch (_) { /* erreur ignorée */ }
 
       // Sans référence, on ne peut pas suivre : on conserve l'ancien
       // comportement (demande acceptée) pour ne pas bloquer l'utilisateur.
@@ -262,7 +261,6 @@ class ServicePaiement {
       throw Exception(
           "Le transfert est encore en cours de traitement. Vérifiez votre solde Mobile Money dans quelques minutes avant de réessayer.");
     } else {
-      debugPrint("Erreur de retrait Campay: ${response.body}");
       try {
         final errorData = jsonDecode(response.body);
         final errorCode = errorData['error_code']?.toString() ?? '';
@@ -409,7 +407,6 @@ class ServicePaiement {
 
       return true;
     } catch (e) {
-      debugPrint("Erreur paiement abonnement: $e");
       throw Exception(e);
     }
   }
@@ -527,8 +524,6 @@ class ServicePaiement {
     if (methode != "Espèces" &&
         transporteurId.isNotEmpty &&
         !courseId.startsWith('SUB-')) {
-      debugPrint(
-          "Paiement digital validé. Le crédit du portefeuille sera effectué par le serveur.");
     }
 
     return paiement;

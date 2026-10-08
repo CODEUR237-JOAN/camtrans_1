@@ -753,7 +753,6 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
   }
 
   void _confirmerAnnulation(BuildContext context, String courseId) {
-    debugPrint("OUVERTURE DU DIALOG D'ANNULATION POUR LA COURSE \$courseId");
     showDialog(
       context: context,
       builder: (ctx) => AlertDialog(
@@ -766,10 +765,8 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
           ),
           ElevatedButton(
             onPressed: () async {
-              debugPrint("CLIC SUR OUI, ANNULER !");
               Navigator.pop(ctx);
               try {
-                debugPrint("LANCEMENT DE LA MISE A JOUR FIRESTORE...");
                 await ref.read(serviceFirestoreProvider).modifierDocument(
                   collection: 'courses',
                   id: courseId,
@@ -777,7 +774,6 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
                     'statut': StatutCourse.annulee,
                   },
                 );
-                debugPrint("MISE A JOUR REUSSIE !");
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                       content: Text("La course a été annulée.",
@@ -786,7 +782,6 @@ class _TableauDeBordClientState extends ConsumerState<TableauDeBordClient> {
                       backgroundColor: CouleursApp.succes));
                 }
               } catch (e) {
-                debugPrint("ERREUR FIRESTORE LORS DE L'ANNULATION : $e");
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                       content: Text("Erreur : $e",

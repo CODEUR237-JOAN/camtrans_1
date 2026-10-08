@@ -111,9 +111,7 @@ class ServiceNavigationVocale extends ChangeNotifier {
       } catch (_) {/* iOS uniquement */}
 
       _ttsPret = true;
-    } catch (e) {
-      debugPrint('[NavVocale] Échec init TTS : $e');
-    }
+    } catch (e) { /* erreur ignorée */ }
   }
 
   // ------------------------------------------------------------------
@@ -391,14 +389,73 @@ class ServiceNavigationVocale extends ChangeNotifier {
         await _tts.stop();
       }
       await _tts.speak(propre);
-    } catch (e) {
-      debugPrint('[NavVocale] Erreur TTS : $e');
-    }
+    } catch (e) { /* erreur ignorée */ }
   }
 
   @override
   void dispose() {
     _tts.stop();
     super.dispose();
+  }
+
+  // ------------------------------------------------------------------
+  // 5. RÉTRO-COMPATIBILITÉ AVEC L'ANCIEN SERVICE
+  // ------------------------------------------------------------------
+  Future<void> annoncer(String texte, {bool isVoixActive = true}) async {
+    if (!isVoixActive) return;
+    await _parler(texte);
+  }
+
+  void stop() {
+    _tts.stop();
+  }
+
+  String humaniserInstruction(EtapeTrajet etape, {required bool estPreAlerte}) {
+    String mod = etape.modifier.toLowerCase();
+    String type = etape.type.toLowerCase();
+
+    if (type == 'arrive') {
+      return estPreAlerte
+          ? "préparez-vous à arriver à destination"
+          : "vous êtes arrivé à destination";
+    }
+
+    String action = "tournez";
+
+    if (mod.contains("slight")) {
+      action = "tournez légèrement";
+    } else if (mod.contains("sharp")) {
+      action = "tournez serré";
+    }
+
+    String direction = "";
+    if (mod.contains("left")) {
+      direction = "à gauche";
+    } else if (mod.contains("right")) {
+      direction = "à droite";
+    } else if (mod.contains("straight")) {
+      return estPreAlerte
+          ? "préparez-vous à continuer tout droit"
+          : "continuez tout droit";
+    } else if (mod.contains("uturn")) {
+      return estPreAlerte
+          ? "préparez-vous à faire demi-tour"
+          : "faites demi-tour";
+    } else {
+      if (etape.instruction.isNotEmpty) {
+        return nettoyerInstruction(etape.instruction).toLowerCase();
+      }
+      return "continuez";
+    }
+
+    String rue = etape.nomRue.isNotEmpty
+        ? " sur ${nettoyerInstruction(etape.nomRue)}"
+        : "";
+
+    if (estPreAlerte) {
+      return "préparez-vous à tourner $direction$rue";
+    } else {
+      return "$action $direction$rue";
+    }
   }
 }

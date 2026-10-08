@@ -99,7 +99,6 @@ class ServiceRoutage {
       }
       return null;
     } catch (e) {
-      debugPrint("Erreur de routage OSRM : $e");
       return null;
     }
   }

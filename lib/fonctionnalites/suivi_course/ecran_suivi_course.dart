@@ -268,12 +268,9 @@ class _EcranSuiviCourseState extends ConsumerState<EcranSuiviCourse> {
             etat: etatSuivi,
             isChauffeur: isChauffeur,
             onBoutonAction: () {
-              debugPrint(
-                  "CLIC BOUTON : Phase = ${etatSuivi.phase}, Chauffeur = $isChauffeur");
               if (etatSuivi.phase == PhaseSuivi.approche) {
                 notifier.commencerCourse();
               } else if (etatSuivi.phase == PhaseSuivi.trajet) {
-                debugPrint("LANCEMENT DE terminerCourse()...");
                 notifier.terminerCourse();
                 // On ne fait pas pop() ici : on attend le paiement du client.
               }
