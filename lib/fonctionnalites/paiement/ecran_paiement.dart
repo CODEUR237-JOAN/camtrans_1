@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:update_camtrans/l10n/app_localizations.dart';
 
 import 'package:update_camtrans/coeur/etat/paiement_provider.dart';
 import 'package:update_camtrans/coeur/constantes/couleurs.dart';
@@ -97,6 +98,7 @@ class _EcranPaiementState extends ConsumerState<EcranPaiement> {
   @override
   Widget build(BuildContext context) {
     final etatPaiement = ref.watch(paiementProvider);
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       extendBodyBehindAppBar: true,
@@ -115,7 +117,7 @@ class _EcranPaiementState extends ConsumerState<EcranPaiement> {
             },
           ),
         ),
-        title: Text("Paiement Sécurisé",
+        title: Text(l10n.securePayment,
             style: GoogleFonts.poppins(
                 color: Theme.of(context).colorScheme.onSurface,
                 fontWeight: FontWeight.bold,
@@ -168,7 +170,7 @@ class _EcranPaiementState extends ConsumerState<EcranPaiement> {
                         Center(
                           child: Column(
                             children: [
-                              Text("Montant de la course",
+                              Text(l10n.rideAmount,
                                   style: GoogleFonts.poppins(
                                       color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.54), fontSize: 14)),
                               const SizedBox(height: 8),
@@ -200,7 +202,7 @@ class _EcranPaiementState extends ConsumerState<EcranPaiement> {
                         ),
                         const SizedBox(height: 40),
 
-                        Text("Méthode de paiement",
+                        Text(l10n.paymentMethod,
                             style: GoogleFonts.poppins(
                                 fontWeight: FontWeight.bold,
                                 fontSize: 18,
@@ -213,7 +215,7 @@ class _EcranPaiementState extends ConsumerState<EcranPaiement> {
                             _buildMethodeCard(
                                 "om",
                                 "Orange Money",
-                                "Paiement Mobile",
+                                l10n.mobilePayment,
                                 "assets/om.png",
                                 Iconsax.mobile_copy,
                                 const Color(0xFFFF7900)),
@@ -221,7 +223,7 @@ class _EcranPaiementState extends ConsumerState<EcranPaiement> {
                             _buildMethodeCard(
                                 "mtn",
                                 "MTN Mobile Money",
-                                "Paiement Mobile",
+                                l10n.mobilePayment,
                                 "assets/mtn.png",
                                 Iconsax.mobile_copy,
                                 const Color(0xFFFFCC00)),
@@ -229,16 +231,16 @@ class _EcranPaiementState extends ConsumerState<EcranPaiement> {
                             //  P1-2 : Carte bancaire désactivée (non implémentée)
                             _buildMethodeCard(
                                 "carte",
-                                "Carte Bancaire",
-                                "Bientôt disponible",
+                                l10n.bankCard,
+                                l10n.comingSoon,
                                 "",
                                 Iconsax.card_copy,
                                 Colors.grey),
                             const SizedBox(height: 12),
                             _buildMethodeCard(
                                 "especes",
-                                "Espèces",
-                                "Paiement direct au chauffeur",
+                                l10n.cash,
+                                l10n.directToDriver,
                                 "",
                                 Iconsax.money_3_copy,
                                 CouleursApp.succes),
@@ -272,7 +274,7 @@ class _EcranPaiementState extends ConsumerState<EcranPaiement> {
                                         const SizedBox(width: 12),
                                         Expanded(
                                           child: Text(
-                                            "Vous réglerez le montant directement au chauffeur lors de la prestation.",
+                                            l10n.cashInstructions,
                                             style: GoogleFonts.poppins(
                                                 color: CouleursApp.succes,
                                                 fontSize: 13),
@@ -287,8 +289,8 @@ class _EcranPaiementState extends ConsumerState<EcranPaiement> {
                                     children: [
                                       Text(
                                         _methodeSelectionnee == "carte"
-                                            ? "Nom sur la carte"
-                                            : "Numéro de téléphone",
+                                            ? l10n.nameOnCard
+                                            : l10n.phoneNumber,
                                         style: GoogleFonts.poppins(
                                             fontWeight: FontWeight.w600,
                                             fontSize: 14,
@@ -356,7 +358,7 @@ class _EcranPaiementState extends ConsumerState<EcranPaiement> {
                             children: [
                               const Icon(Iconsax.lock_copy, size: 20),
                               const SizedBox(width: 8),
-                              Text("Payer ${widget.montant.toInt()} FCFA",
+                              Text(l10n.payButton(widget.montant.toInt().toString()),
                                   style: GoogleFonts.poppins(
                                       fontSize: 16,
                                       fontWeight: FontWeight.bold)),

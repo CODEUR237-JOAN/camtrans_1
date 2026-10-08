@@ -10,5 +10,28 @@
   "driver": "Transporteur",
   "pending": "En attente",
   "cancel": "Annuler",
-  "confirm": "Confirmer"
+  "confirm": "Confirmer",
+  "securePayment": "Paiement Sécurisé",
+  "rideAmount": "Montant de la course",
+  "paymentMethod": "Méthode de paiement",
+  "mobilePayment": "Paiement Mobile",
+  "bankCard": "Carte Bancaire",
+  "comingSoon": "Bientôt disponible",
+  "cash": "Espèces",
+  "directToDriver": "Paiement direct au chauffeur",
+  "cashInstructions": "Vous réglerez le montant directement au chauffeur lors de la prestation.",
+  "nameOnCard": "Nom sur la carte",
+  "phoneNumber": "Numéro de téléphone",
+  "payButton": "Payer {amount} FCFA",
+  "@payButton": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "trackingLostSignalTitle": "Oups, nous avons perdu le signal",
+  "trackingLostSignalMessage": "La connexion est momentanément interrompue. Nous tentons de rétablir le suivi de votre course...",
+  "trackingSearchingTitle": "Recherche du transporteur idéal en cours...",
+  "trackingSearchingMessage": "Notre algorithme sélectionne le meilleur véhicule à proximité."
 }

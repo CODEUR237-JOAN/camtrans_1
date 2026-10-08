@@ -10,5 +10,28 @@
   "driver": "Driver",
   "pending": "Pending",
   "cancel": "Cancel",
-  "confirm": "Confirm"
+  "confirm": "Confirm",
+  "securePayment": "Secure Payment",
+  "rideAmount": "Ride Amount",
+  "paymentMethod": "Payment Method",
+  "mobilePayment": "Mobile Payment",
+  "bankCard": "Bank Card",
+  "comingSoon": "Coming Soon",
+  "cash": "Cash",
+  "directToDriver": "Direct payment to driver",
+  "cashInstructions": "You will pay the amount directly to the driver during the service.",
+  "nameOnCard": "Name on card",
+  "phoneNumber": "Phone number",
+  "payButton": "Pay {amount} XAF",
+  "@payButton": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "trackingLostSignalTitle": "Oops, we lost the signal",
+  "trackingLostSignalMessage": "The connection is temporarily interrupted. We are trying to restore tracking for your ride...",
+  "trackingSearchingTitle": "Searching for the ideal driver...",
+  "trackingSearchingMessage": "Our algorithm is selecting the best nearby vehicle."
 }

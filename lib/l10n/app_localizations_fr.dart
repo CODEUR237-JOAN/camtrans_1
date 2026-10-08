@@ -40,4 +40,58 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get confirm => 'Confirmer';
+
+  @override
+  String get securePayment => 'Paiement Sécurisé';
+
+  @override
+  String get rideAmount => 'Montant de la course';
+
+  @override
+  String get paymentMethod => 'Méthode de paiement';
+
+  @override
+  String get mobilePayment => 'Paiement Mobile';
+
+  @override
+  String get bankCard => 'Carte Bancaire';
+
+  @override
+  String get comingSoon => 'Bientôt disponible';
+
+  @override
+  String get cash => 'Espèces';
+
+  @override
+  String get directToDriver => 'Paiement direct au chauffeur';
+
+  @override
+  String get cashInstructions =>
+      'Vous réglerez le montant directement au chauffeur lors de la prestation.';
+
+  @override
+  String get nameOnCard => 'Nom sur la carte';
+
+  @override
+  String get phoneNumber => 'Numéro de téléphone';
+
+  @override
+  String payButton(String amount) {
+    return 'Payer $amount FCFA';
+  }
+
+  @override
+  String get trackingLostSignalTitle => 'Oups, nous avons perdu le signal';
+
+  @override
+  String get trackingLostSignalMessage =>
+      'La connexion est momentanément interrompue. Nous tentons de rétablir le suivi de votre course...';
+
+  @override
+  String get trackingSearchingTitle =>
+      'Recherche du transporteur idéal en cours...';
+
+  @override
+  String get trackingSearchingMessage =>
+      'Notre algorithme sélectionne le meilleur véhicule à proximité.';
 }

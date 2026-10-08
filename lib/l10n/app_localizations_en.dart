@@ -40,4 +40,57 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get confirm => 'Confirm';
+
+  @override
+  String get securePayment => 'Secure Payment';
+
+  @override
+  String get rideAmount => 'Ride Amount';
+
+  @override
+  String get paymentMethod => 'Payment Method';
+
+  @override
+  String get mobilePayment => 'Mobile Payment';
+
+  @override
+  String get bankCard => 'Bank Card';
+
+  @override
+  String get comingSoon => 'Coming Soon';
+
+  @override
+  String get cash => 'Cash';
+
+  @override
+  String get directToDriver => 'Direct payment to driver';
+
+  @override
+  String get cashInstructions =>
+      'You will pay the amount directly to the driver during the service.';
+
+  @override
+  String get nameOnCard => 'Name on card';
+
+  @override
+  String get phoneNumber => 'Phone number';
+
+  @override
+  String payButton(String amount) {
+    return 'Pay $amount XAF';
+  }
+
+  @override
+  String get trackingLostSignalTitle => 'Oops, we lost the signal';
+
+  @override
+  String get trackingLostSignalMessage =>
+      'The connection is temporarily interrupted. We are trying to restore tracking for your ride...';
+
+  @override
+  String get trackingSearchingTitle => 'Searching for the ideal driver...';
+
+  @override
+  String get trackingSearchingMessage =>
+      'Our algorithm is selecting the best nearby vehicle.';
 }

@@ -163,6 +163,102 @@ abstract class AppLocalizations {
   /// In fr, this message translates to:
   /// **'Confirmer'**
   String get confirm;
+
+  /// No description provided for @securePayment.
+  ///
+  /// In fr, this message translates to:
+  /// **'Paiement Sécurisé'**
+  String get securePayment;
+
+  /// No description provided for @rideAmount.
+  ///
+  /// In fr, this message translates to:
+  /// **'Montant de la course'**
+  String get rideAmount;
+
+  /// No description provided for @paymentMethod.
+  ///
+  /// In fr, this message translates to:
+  /// **'Méthode de paiement'**
+  String get paymentMethod;
+
+  /// No description provided for @mobilePayment.
+  ///
+  /// In fr, this message translates to:
+  /// **'Paiement Mobile'**
+  String get mobilePayment;
+
+  /// No description provided for @bankCard.
+  ///
+  /// In fr, this message translates to:
+  /// **'Carte Bancaire'**
+  String get bankCard;
+
+  /// No description provided for @comingSoon.
+  ///
+  /// In fr, this message translates to:
+  /// **'Bientôt disponible'**
+  String get comingSoon;
+
+  /// No description provided for @cash.
+  ///
+  /// In fr, this message translates to:
+  /// **'Espèces'**
+  String get cash;
+
+  /// No description provided for @directToDriver.
+  ///
+  /// In fr, this message translates to:
+  /// **'Paiement direct au chauffeur'**
+  String get directToDriver;
+
+  /// No description provided for @cashInstructions.
+  ///
+  /// In fr, this message translates to:
+  /// **'Vous réglerez le montant directement au chauffeur lors de la prestation.'**
+  String get cashInstructions;
+
+  /// No description provided for @nameOnCard.
+  ///
+  /// In fr, this message translates to:
+  /// **'Nom sur la carte'**
+  String get nameOnCard;
+
+  /// No description provided for @phoneNumber.
+  ///
+  /// In fr, this message translates to:
+  /// **'Numéro de téléphone'**
+  String get phoneNumber;
+
+  /// No description provided for @payButton.
+  ///
+  /// In fr, this message translates to:
+  /// **'Payer {amount} FCFA'**
+  String payButton(String amount);
+
+  /// No description provided for @trackingLostSignalTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Oups, nous avons perdu le signal'**
+  String get trackingLostSignalTitle;
+
+  /// No description provided for @trackingLostSignalMessage.
+  ///
+  /// In fr, this message translates to:
+  /// **'La connexion est momentanément interrompue. Nous tentons de rétablir le suivi de votre course...'**
+  String get trackingLostSignalMessage;
+
+  /// No description provided for @trackingSearchingTitle.
+  ///
+  /// In fr, this message translates to:
+  /// **'Recherche du transporteur idéal en cours...'**
+  String get trackingSearchingTitle;
+
+  /// No description provided for @trackingSearchingMessage.
+  ///
+  /// In fr, this message translates to:
+  /// **'Notre algorithme sélectionne le meilleur véhicule à proximité.'**
+  String get trackingSearchingMessage;
 }
 
 class _AppLocalizationsDelegate

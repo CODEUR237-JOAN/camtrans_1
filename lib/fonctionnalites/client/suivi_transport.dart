@@ -23,6 +23,7 @@ import 'widgets/bottom_sheet_paiement.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:update_camtrans/l10n/app_localizations.dart';
 import 'widgets/recherche_radar.dart';
 
 class SuiviTransport extends ConsumerStatefulWidget {
@@ -133,7 +134,7 @@ class _SuiviTransportState extends ConsumerState<SuiviTransport> {
                 Icon(Iconsax.radar_2_copy, size: 80, color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.2)),
                 const SizedBox(height: 24),
                 Text(
-                  'Oups, nous avons perdu le signal',
+                  AppLocalizations.of(context)!.trackingLostSignalTitle,
                   style: GoogleFonts.poppins(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -143,7 +144,7 @@ class _SuiviTransportState extends ConsumerState<SuiviTransport> {
                 ),
                 const SizedBox(height: 12),
                 Text(
-                  'La connexion est momentanément interrompue. Nous tentons de rétablir le suivi de votre course...',
+                  AppLocalizations.of(context)!.trackingLostSignalMessage,
                   style: GoogleFonts.inter(
                     fontSize: 14,
                     color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
@@ -201,7 +202,7 @@ class _SuiviTransportState extends ConsumerState<SuiviTransport> {
                   ),
                   const SizedBox(height: 20),
                   Text(
-                    "Recherche du transporteur idéal en cours...",
+                    AppLocalizations.of(context)!.trackingSearchingTitle,
                     style: TextStyle(
                         color: Theme.of(context).colorScheme.onSurface,
                         fontSize: 18,
@@ -209,7 +210,7 @@ class _SuiviTransportState extends ConsumerState<SuiviTransport> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    "Notre algorithme sélectionne le meilleur véhicule à proximité.",
+                    AppLocalizations.of(context)!.trackingSearchingMessage,
                     style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7), fontSize: 14),
                   ),
                   const SizedBox(height: 20),
