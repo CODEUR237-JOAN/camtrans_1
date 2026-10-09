@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:latlong2/latlong.dart';
@@ -111,8 +110,7 @@ class SuiviCourseNotifier extends StateNotifier<SuiviCourseEtat> {
           }
         }
       },
-      onError: (Object e) {
-      },
+      onError: (Object e) {},
     );
   }
 
@@ -252,7 +250,6 @@ class SuiviCourseNotifier extends StateNotifier<SuiviCourseEtat> {
         throw Exception("Réponse OSRM vide ou invalide");
       }
     } catch (e) {
-
       // Gestion robuste avec Retry automatique
       if (_tentativesRoutage < 3) {
         _tentativesRoutage++;

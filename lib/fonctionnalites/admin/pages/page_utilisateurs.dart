@@ -9,6 +9,7 @@ import 'package:update_camtrans/coeur/widgets/etats_ui.dart';
 import 'package:update_camtrans/services/service_firestore.dart';
 import 'package:update_camtrans/coeur/constantes/couleurs.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:update_camtrans/l10n/app_localizations.dart';
 
 class PageUtilisateurs extends ConsumerStatefulWidget {
   const PageUtilisateurs({super.key});
@@ -297,7 +298,7 @@ class _PageUtilisateursState extends ConsumerState<PageUtilisateurs>
         actions: [
           TextButton(
               onPressed: () => Navigator.pop(context, false),
-              child: const Text("Annuler",
+              child: Text(AppLocalizations.of(context)!.cancel,
                   style: TextStyle(color: Colors.white54))),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
@@ -703,7 +704,7 @@ class _GlassListItem extends StatelessWidget {
                           : CouleursApp.erreur.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: Text(documentsValides! ? "Approuvé" : "En attente",
+                    child: Text(documentsValides! ? "Approuvé" : AppLocalizations.of(context)!.pending,
                         style: GoogleFonts.inter(
                             color: documentsValides!
                                 ? CouleursApp.succes

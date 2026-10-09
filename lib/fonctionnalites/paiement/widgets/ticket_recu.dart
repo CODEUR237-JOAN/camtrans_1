@@ -9,6 +9,7 @@ import 'package:printing/printing.dart';
 
 import 'package:update_camtrans/modeles/paiement.dart';
 import 'package:update_camtrans/coeur/constantes/couleurs.dart';
+import 'package:update_camtrans/l10n/app_localizations.dart';
 
 class TicketRecu extends StatelessWidget {
   final Paiement paiement;
@@ -47,7 +48,7 @@ class TicketRecu extends StatelessWidget {
                   '${paiement.montant.toInt()} ${paiement.devise}',
                   isBold: true, isLarge: true),
               pw.SizedBox(height: 20),
-              _buildPdfLigneDetails('Méthode de paiement',
+              _buildPdfLigneDetails(AppLocalizations.of(context)!.paymentMethod,
                   paiement.methodePaiement.toUpperCase()),
               _buildPdfLigneDetails(
                   'N° de Transaction', paiement.numeroTransaction),

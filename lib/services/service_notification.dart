@@ -40,7 +40,7 @@ class ServiceNotification {
         badge: true,
         sound: true,
       );
-    } catch (e) { /* erreur ignorée */ }
+    } catch (e) {/* erreur ignorée */}
 
     if (!kIsWeb) {
       const AndroidInitializationSettings androidSettings =
@@ -87,7 +87,7 @@ class ServiceNotification {
           'derniereConnexion': FieldValue.serverTimestamp(),
         }, SetOptions(merge: true));
       }
-    } catch (e) { /* erreur ignorée */ }
+    } catch (e) {/* erreur ignorée */}
   }
 
   /// Active les notifications : demande la permission système puis
@@ -124,8 +124,8 @@ class ServiceNotification {
           .set({'fcmToken': FieldValue.delete()}, SetOptions(merge: true));
       try {
         await _messaging.deleteToken();
-      } catch (_) { /* erreur ignorée */ }
-    } catch (e) { /* erreur ignorée */ }
+      } catch (_) {/* erreur ignorée */}
+    } catch (e) {/* erreur ignorée */}
   }
 
   static Stream<String> changementToken() => _messaging.onTokenRefresh;
@@ -179,7 +179,6 @@ class ServiceNotification {
   // ===========================
 
   static void ecouterOuverture() {
-    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
-    });
+    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {});
   }
 }

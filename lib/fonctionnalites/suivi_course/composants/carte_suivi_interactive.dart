@@ -4,7 +4,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:update_camtrans/coeur/constantes/couleurs.dart';
 
-import '../etat/suivi_course_etat.dart';
+import 'package:update_camtrans/fonctionnalites/suivi_course/etat/suivi_course_etat.dart';
 
 // =====================================================================
 // CARTE DE SUIVI INTERACTIVE (flutter_map / OpenStreetMap)

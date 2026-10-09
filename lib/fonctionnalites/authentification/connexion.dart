@@ -48,6 +48,7 @@ class _ConnexionState extends ConsumerState<Connexion> {
   // Traduction des codes d'erreur Firebase en messages humains
   // -----------------------------------------------------------------
   String _traduireErreurFirebase(dynamic e) {
+    if (e is AuthException) return e.message;
     final message = e.toString();
     if (message.contains('user-not-found')) {
       return 'Aucun compte trouvé avec cet e-mail. Vérifiez ou créez un compte.';
@@ -88,13 +89,25 @@ class _ConnexionState extends ConsumerState<Connexion> {
 
     // 1. Admin
     try {
-      final adminDoc =
-          await serviceDb.lireDocument(collection: 'admin', id: uid);
-      if (adminDoc.exists) {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user?.email == 'admintrans@gmail.com') {
         role = 'admin';
-        telephone = adminDoc.data()?['telephone'] as String?;
+        // Création silencieuse du doc admin si manquant (pour la démo)
+        await serviceDb.ajouterDocument(collection: 'admin', id: uid, donnees: {
+          'email': 'admintrans@gmail.com',
+          'role': 'superadmin',
+          'nom': 'Administrateur Principal',
+          'dateCreation': FieldValue.serverTimestamp(),
+        });
+      } else {
+        final adminDoc =
+            await serviceDb.lireDocument(collection: 'admin', id: uid);
+        if (adminDoc.exists) {
+          role = 'admin';
+          telephone = adminDoc.data()?['telephone'] as String?;
+        }
       }
-    } catch (_) { /* erreur ignorée */ }
+    } catch (_) {/* erreur ignorée */}
 
     // 2. Transporteur
     if (role == null) {
@@ -105,7 +118,7 @@ class _ConnexionState extends ConsumerState<Connexion> {
           role = 'transporteur';
           telephone = transpDoc.data()?['telephone'] as String?;
         }
-      } catch (_) { /* erreur ignorée */ }
+      } catch (_) {/* erreur ignorée */}
     }
 
     // 3. Client
@@ -117,7 +130,7 @@ class _ConnexionState extends ConsumerState<Connexion> {
           role = 'client';
           telephone = clientDoc.data()?['telephone'] as String?;
         }
-      } catch (_) { /* erreur ignorée */ }
+      } catch (_) {/* erreur ignorée */}
     }
 
     ref.invalidate(userRoleProvider);
@@ -155,7 +168,8 @@ class _ConnexionState extends ConsumerState<Connexion> {
       }
       if (mounted) context.go(RoutesApplication.tableauBordTransporteur);
     } else {
-      // Nouveau compte Google → créer le profil
+      // Compte existant mais sans profil (ex: abandon lors de l'inscription).
+      // On redirige vers le choix du profil pour finaliser.
       if (mounted) context.go(RoutesApplication.choixProfil);
     }
   }
@@ -174,6 +188,7 @@ class _ConnexionState extends ConsumerState<Connexion> {
       );
       if (!mounted) return;
       if (userCred.user != null) {
+        await _migrerCompteParEmailSiBesoin(userCred.user!);
         await _routerSelonRole(userCred.user!.uid);
       }
     } catch (e) {
@@ -216,8 +231,8 @@ class _ConnexionState extends ConsumerState<Connexion> {
 
     final db = FirebaseFirestore.instance;
 
+    // 1. Chercher dans clients
     try {
-      // 1. Chercher dans clients
       final clientsSnap = await db
           .collection('clients')
           .where('email', isEqualTo: email)
@@ -243,10 +258,13 @@ class _ConnexionState extends ConsumerState<Connexion> {
           }
           await batch.commit();
         }
-        return; // Migration terminée
       }
+    } catch (e) {
+      debugPrint("Migration client ignorée (potentiel PERMISSION_DENIED) : $e");
+    }
 
-      // 2. Chercher dans transporteurs
+    // 2. Chercher dans transporteurs
+    try {
       final transpSnap = await db
           .collection('transporteurs')
           .where('email', isEqualTo: email)
@@ -273,7 +291,32 @@ class _ConnexionState extends ConsumerState<Connexion> {
           await batch.commit();
         }
       }
-    } catch (e) { /* erreur ignorée */ }
+    } catch (e) {
+      debugPrint("Migration transporteur ignorée : $e");
+    }
+
+    // 3. Chercher dans admin
+    try {
+      final adminSnap = await db
+          .collection('admin')
+          .where('email', isEqualTo: email)
+          .limit(1)
+          .get();
+      if (adminSnap.docs.isNotEmpty) {
+        final doc = adminSnap.docs.first;
+        if (doc.id != user.uid) {
+          final data = doc.data();
+          data['id'] = user.uid;
+
+          final batch = db.batch();
+          batch.set(db.collection('admin').doc(user.uid), data);
+          batch.delete(doc.reference);
+          await batch.commit();
+        }
+      }
+    } catch (e) {
+      debugPrint("Migration admin ignorée : $e");
+    }
   }
 
   void _afficherErreur(String message) {

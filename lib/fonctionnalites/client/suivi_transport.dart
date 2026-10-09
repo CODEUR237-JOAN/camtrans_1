@@ -6,9 +6,9 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import '../../coeur/etat/textes_app_provider.dart';
-import '../../coeur/etat/utilisateur_provider.dart';
-import '../../modeles/textes_app.dart';
+import 'package:update_camtrans/coeur/etat/textes_app_provider.dart';
+import 'package:update_camtrans/coeur/etat/utilisateur_provider.dart';
+import 'package:update_camtrans/modeles/textes_app.dart';
 import 'package:update_camtrans/coeur/etat/suivi_provider.dart';
 import 'package:update_camtrans/services/service_gps.dart';
 import 'package:update_camtrans/modeles/transporteur.dart';
@@ -568,7 +568,7 @@ class _SuiviTransportState extends ConsumerState<SuiviTransport> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text("Course",
+                  Text(AppLocalizations.of(context)!.course,
                       style: TextStyle(
                           color: Theme.of(context)
                               .colorScheme

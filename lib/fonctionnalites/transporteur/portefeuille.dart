@@ -9,6 +9,7 @@ import 'package:update_camtrans/coeur/constantes/tailles.dart';
 import 'package:update_camtrans/coeur/widgets/bouton_principal.dart';
 import 'package:update_camtrans/coeur/etat/transporteur_provider.dart';
 import 'package:update_camtrans/coeur/widgets/loader_premium.dart';
+import 'package:update_camtrans/l10n/app_localizations.dart';
 
 class Portefeuille extends ConsumerWidget {
   const Portefeuille({super.key});
@@ -214,7 +215,7 @@ class Portefeuille extends ConsumerWidget {
                       decoration: InputDecoration(
                         labelText: methode == "Virement bancaire"
                             ? "IBAN / Numéro de compte"
-                            : "Numéro de téléphone",
+                            : AppLocalizations.of(context)!.phoneNumber,
                         labelStyle: TextStyle(
                             color: Theme.of(context)
                                 .colorScheme

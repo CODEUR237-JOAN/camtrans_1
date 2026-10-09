@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/gestures.dart';
 import 'package:go_router/go_router.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 import 'package:update_camtrans/coeur/constantes/couleurs.dart';
 import 'package:update_camtrans/coeur/constantes/tailles.dart';
@@ -11,6 +12,7 @@ import 'package:update_camtrans/coeur/utilitaires/validateurs.dart';
 import 'package:update_camtrans/coeur/widgets/bouton_principal.dart';
 import 'package:update_camtrans/coeur/widgets/champ_texte.dart';
 import 'package:update_camtrans/coeur/widgets/page_responsive.dart';
+import 'package:update_camtrans/coeur/widgets/selecteur_compte_google.dart';
 
 import 'package:update_camtrans/services/service_authentification.dart';
 import 'package:update_camtrans/services/service_firestore.dart';
@@ -29,7 +31,6 @@ class _InscriptionClientState extends ConsumerState<InscriptionClient> {
   final _cleFormulaire = GlobalKey<FormState>();
   final TextEditingController _nom = TextEditingController();
   final TextEditingController _telephone = TextEditingController();
-  final TextEditingController _email = TextEditingController();
   final TextEditingController _ville = TextEditingController();
   final TextEditingController _adresse = TextEditingController();
   final TextEditingController _motDePasse = TextEditingController();
@@ -37,8 +38,38 @@ class _InscriptionClientState extends ConsumerState<InscriptionClient> {
   bool _conditionsAcceptees = false;
   bool _chargement = false;
 
+  /// Compte Google choisi : seule source autorisée pour l'adresse e-mail.
+  GoogleSignInAccount? _compteGoogle;
+  bool _selectionGoogleEnCours = false;
+
+  Future<void> _choisirCompteGoogle() async {
+    setState(() => _selectionGoogleEnCours = true);
+    try {
+      final compte = await ref
+          .read(serviceAuthentificationProvider)
+          .selectionnerCompteGoogle();
+      if (!mounted || compte == null) return;
+      setState(() {
+        _compteGoogle = compte;
+        // Pré-remplissage du nom si l'utilisateur ne l'a pas encore saisi.
+        if (_nom.text.trim().isEmpty && (compte.displayName ?? '').isNotEmpty) {
+          _nom.text = compte.displayName!;
+        }
+      });
+    } catch (e) {
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.toString()), backgroundColor: Colors.red),
+      );
+    } finally {
+      if (mounted) setState(() => _selectionGoogleEnCours = false);
+    }
+  }
+
   void _creerCompte() async {
     if (!_cleFormulaire.currentState!.validate()) return;
+    final compteGoogle = _compteGoogle;
+    if (compteGoogle == null) return; // garanti par le validateur du sélecteur
     if (!_conditionsAcceptees) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -54,18 +85,17 @@ class _InscriptionClientState extends ConsumerState<InscriptionClient> {
       final serviceAuth = ref.read(serviceAuthentificationProvider);
       final serviceDb = ref.read(serviceFirestoreProvider);
 
-      // Inscription Firebase Auth avec Timeout
+      // Inscription Firebase Auth via le compte Google vérifié (avec Timeout)
       final userCred = await serviceAuth
-          .inscriptionAvecVerifications(
-        email: _email.text,
+          .inscriptionAvecCompteGoogle(
+        compteGoogle: compteGoogle,
         motDePasse: _motDePasse.text,
         telephone: _telephone.text.trim(),
       )
-          .timeout(const Duration(seconds: 20), onTimeout: () {
+          .timeout(const Duration(seconds: 30), onTimeout: () {
         throw Exception(
             "Délai d'attente dépassé pour l'authentification (Problème de connexion internet ou serveur Firebase injoignable).");
       });
-
 
       // Création du document Client
       if (userCred.user != null) {
@@ -79,14 +109,14 @@ class _InscriptionClientState extends ConsumerState<InscriptionClient> {
           id: userCred.user!.uid,
           nom: nom,
           prenom: prenom,
-          email: _email.text.trim(),
+          email: userCred.user!.email ?? compteGoogle.email,
           telephone: _telephone.text.trim(),
-          photo: "",
+          photo: compteGoogle.photoUrl ?? "",
           adresse: _adresse.text.trim(),
           ville: _ville.text.trim(),
           role: "client",
           actif: true,
-          emailVerifie: false,
+          emailVerifie: true, // adresse vérifiée par Google
           dateCreation: DateTime.now(),
         );
 
@@ -106,12 +136,6 @@ class _InscriptionClientState extends ConsumerState<InscriptionClient> {
             client.id, 'client');
 
         await serviceAuth.mettreAJourProfil(nom: _nom.text.trim());
-
-        // Envoyer l'email de vérification
-        await serviceAuth
-            .envoyerVerificationEmail()
-            .timeout(const Duration(seconds: 10), onTimeout: () {
-        });
       }
 
       await serviceAuth.deconnexion();
@@ -234,7 +258,6 @@ class _InscriptionClientState extends ConsumerState<InscriptionClient> {
   void dispose() {
     _nom.dispose();
     _telephone.dispose();
-    _email.dispose();
     _ville.dispose();
     _adresse.dispose();
     _motDePasse.dispose();
@@ -329,12 +352,10 @@ class _InscriptionClientState extends ConsumerState<InscriptionClient> {
                           validateur: Validateurs.telephone,
                         ),
                         const SizedBox(height: 16),
-                        ChampTexte(
-                          controleur: _email,
-                          libelle: TextesApp.adresseEmail,
-                          icone: Icons.email_outlined,
-                          typeClavier: TextInputType.emailAddress,
-                          validateur: Validateurs.email,
+                        SelecteurCompteGoogle(
+                          compte: _compteGoogle,
+                          chargement: _selectionGoogleEnCours,
+                          auClic: _choisirCompteGoogle,
                         ),
                         const SizedBox(height: 16),
                         Row(

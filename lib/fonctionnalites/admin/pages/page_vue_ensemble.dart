@@ -18,6 +18,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:update_camtrans/coeur/widgets/loader_premium.dart';
+import 'package:update_camtrans/l10n/app_localizations.dart';
 
 class PageVueEnsemble extends ConsumerWidget {
   const PageVueEnsemble({super.key});

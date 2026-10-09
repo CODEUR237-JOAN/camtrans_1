@@ -39,7 +39,7 @@ Future<void> main() async {
         persistenceEnabled: true,
         cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED,
       );
-    } catch (e) { /* erreur ignorée */ }
+    } catch (e) {/* erreur ignorée */}
 
     // Enregistrement du service de notifications pour fonctionner en arrière-plan (Mobile uniquement).
     if (!kIsWeb) {
@@ -57,7 +57,7 @@ Future<void> main() async {
     // Chargement des variables d'environnement (ex: clés d'API).
     try {
       await dotenv.load(fileName: ".env");
-    } catch (e) { /* erreur ignorée */ }
+    } catch (e) {/* erreur ignorée */}
 
     // Chargement du thème persisté AVANT le premier build
     // pour éviter tout flash blanc au démarrage.
@@ -72,8 +72,7 @@ Future<void> main() async {
         child: const MonApplication(),
       ),
     );
-  } catch (e, stack) {
-
+  } catch (e) {
     // Affichage d'un écran d'erreur convivial pour l'utilisateur en cas de panne au démarrage.
     runApp(EcranErreurDemarrage(erreur: e.toString()));
   }

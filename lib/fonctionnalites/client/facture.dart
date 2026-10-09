@@ -13,6 +13,7 @@ import 'package:update_camtrans/modeles/paiement.dart';
 import 'package:update_camtrans/modeles/course.dart';
 import 'package:update_camtrans/fonctionnalites/paiement/widgets/ticket_recu.dart';
 import 'package:update_camtrans/coeur/widgets/loader_premium.dart';
+import 'package:update_camtrans/l10n/app_localizations.dart';
 
 // Provider filtré par l'UID de l'utilisateur connecté
 final listePaiementsProvider =
@@ -204,7 +205,7 @@ class Facture extends ConsumerWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text("Montant de la course",
+                  Text(AppLocalizations.of(context)!.rideAmount,
                       style: TextStyle(
                           color: Theme.of(context)
                               .colorScheme

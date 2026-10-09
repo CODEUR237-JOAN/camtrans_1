@@ -12,6 +12,7 @@ import 'package:update_camtrans/coeur/etat/course_provider.dart';
 import 'package:update_camtrans/coeur/constantes/statuts.dart';
 import 'package:iconsax_flutter/iconsax_flutter.dart';
 import 'package:update_camtrans/coeur/routes/routes.dart';
+import 'package:update_camtrans/l10n/app_localizations.dart';
 
 class Profil extends ConsumerWidget {
   const Profil({super.key});
@@ -53,34 +54,37 @@ class Profil extends ConsumerWidget {
                 const SizedBox(height: 10),
 
                 Center(
-                  child: Stack(
-                    children: [
-                      CircleAvatar(
-                        radius: 60,
-                        backgroundColor:
-                            CouleursApp.primaire.withValues(alpha: 0.1),
-                        backgroundImage:
-                            userPhoto != null && userPhoto.isNotEmpty
-                                ? NetworkImage(userPhoto)
-                                : null,
-                        child: (userPhoto == null || userPhoto.isEmpty)
-                            ? const Icon(Icons.person,
-                                size: 60, color: CouleursApp.primaire)
-                            : null,
-                      ),
-                      Positioned(
-                        bottom: 0,
-                        right: 0,
-                        child: Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: const BoxDecoration(
-                              color: CouleursApp.primaire,
-                              shape: BoxShape.circle),
-                          child: const Icon(Icons.camera_alt,
-                              color: Colors.white, size: 20),
+                  child: GestureDetector(
+                    onTap: () => context.push("/modifier-profil"),
+                    child: Stack(
+                      children: [
+                        CircleAvatar(
+                          radius: 60,
+                          backgroundColor:
+                              CouleursApp.primaire.withValues(alpha: 0.1),
+                          backgroundImage:
+                              userPhoto != null && userPhoto.isNotEmpty
+                                  ? NetworkImage(userPhoto)
+                                  : null,
+                          child: (userPhoto == null || userPhoto.isEmpty)
+                              ? const Icon(Icons.person,
+                                  size: 60, color: CouleursApp.primaire)
+                              : null,
                         ),
-                      ),
-                    ],
+                        Positioned(
+                          bottom: 0,
+                          right: 0,
+                          child: Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: const BoxDecoration(
+                                color: CouleursApp.primaire,
+                                shape: BoxShape.circle),
+                            child: const Icon(Icons.camera_alt,
+                                color: Colors.white, size: 20),
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
 
@@ -188,7 +192,7 @@ class Profil extends ConsumerWidget {
                 // Section Gestion & Paramètres
                 Align(
                   alignment: Alignment.centerLeft,
-                  child: Text("Paramètres",
+                  child: Text(AppLocalizations.of(context)!.settings,
                       style: TextStyle(
                           fontSize: 18,
                           fontWeight: FontWeight.bold,

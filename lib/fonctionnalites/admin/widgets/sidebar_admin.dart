@@ -6,6 +6,7 @@ import 'package:update_camtrans/coeur/constantes/couleurs.dart';
 import 'package:update_camtrans/coeur/etat/admin_provider.dart';
 import 'package:update_camtrans/coeur/etat/notification_provider.dart';
 import 'package:update_camtrans/coeur/routes/routes.dart';
+import 'package:update_camtrans/l10n/app_localizations.dart';
 
 class SidebarAdmin extends ConsumerWidget {
   const SidebarAdmin({super.key});
@@ -16,6 +17,11 @@ class SidebarAdmin extends ConsumerWidget {
     final pendingCount =
         ref.watch(adminPendingApprovalsCountProvider).valueOrNull ?? 0;
     final notifAdminCount = ref.watch(badgeNotificationsAdminProvider);
+    
+    // Check si le compte est superadmin (pas un assistant)
+    final adminData = ref.watch(currentAdminProvider).valueOrNull;
+    final estSuperAdmin = adminData?['role'] != 'assistant';
+
     // La gestion Desktop/Mobile est faite dans le parent (TableauDeBordAdmin)
     // Nous retournons toujours le contenu du menu ici.
     return Container(
@@ -124,14 +130,16 @@ class SidebarAdmin extends ConsumerWidget {
                   onTap: () =>
                       ref.read(adminMenuIndexProvider.notifier).state = 5,
                 ),
-                _MenuItem(
-                  titre: "Paramètres",
-                  icone: Icons.settings_outlined,
-                  index: 6,
-                  currentIndex: indexSelectionne,
-                  onTap: () =>
-                      ref.read(adminMenuIndexProvider.notifier).state = 6,
-                ),
+                if (estSuperAdmin) ...[
+                  _MenuItem(
+                    titre: AppLocalizations.of(context)!.settings,
+                    icone: Icons.settings_outlined,
+                    index: 6,
+                    currentIndex: indexSelectionne,
+                    onTap: () =>
+                        ref.read(adminMenuIndexProvider.notifier).state = 6,
+                  ),
+                ],
                 _MenuItem(
                   titre: "Abonnements",
                   icone: Icons.workspace_premium_outlined,
@@ -149,25 +157,36 @@ class SidebarAdmin extends ConsumerWidget {
                   onTap: () =>
                       ref.read(adminMenuIndexProvider.notifier).state = 8,
                 ),
-                _MenuItem(
-                  titre: "Gestion des Textes",
-                  icone: Icons.text_fields_rounded,
-                  index: 9,
-                  currentIndex: indexSelectionne,
-                  onTap: () =>
-                      ref.read(adminMenuIndexProvider.notifier).state = 9,
-                ),
-                const SizedBox(height: 20),
-
-                const _SectionTitle(titre: "FINANCES"),
-                _MenuItem(
-                  titre: "Mon Portefeuille",
-                  icone: Icons.account_balance_wallet_outlined,
-                  index: 10,
-                  currentIndex: indexSelectionne,
-                  onTap: () =>
-                      ref.read(adminMenuIndexProvider.notifier).state = 10,
-                ),
+                if (estSuperAdmin) ...[
+                  _MenuItem(
+                    titre: "Gestion des Textes",
+                    icone: Icons.text_fields_rounded,
+                    index: 9,
+                    currentIndex: indexSelectionne,
+                    onTap: () =>
+                        ref.read(adminMenuIndexProvider.notifier).state = 9,
+                  ),
+                  const SizedBox(height: 20),
+                  const _SectionTitle(titre: "FINANCES"),
+                  _MenuItem(
+                    titre: "Mon Portefeuille",
+                    icone: Icons.account_balance_wallet_outlined,
+                    index: 10,
+                    currentIndex: indexSelectionne,
+                    onTap: () =>
+                        ref.read(adminMenuIndexProvider.notifier).state = 10,
+                  ),
+                  const SizedBox(height: 30),
+                  const _SectionTitle(titre: "ÉQUIPE"),
+                  _MenuItem(
+                    titre: "Assistants",
+                    icone: Icons.admin_panel_settings_outlined,
+                    index: 11,
+                    currentIndex: indexSelectionne,
+                    onTap: () =>
+                        ref.read(adminMenuIndexProvider.notifier).state = 11,
+                  ),
+                ],
                 const SizedBox(height: 30),
 
                 // Add more items like signalements, paiements here in the future

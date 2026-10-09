@@ -13,6 +13,7 @@ import 'package:update_camtrans/modeles/course.dart';
 import 'package:update_camtrans/services/service_authentification.dart';
 import 'package:update_camtrans/services/service_firestore.dart';
 import 'package:update_camtrans/coeur/widgets/loader_premium.dart';
+import 'package:update_camtrans/l10n/app_localizations.dart';
 
 class Historique extends ConsumerStatefulWidget {
   const Historique({super.key});
@@ -481,7 +482,7 @@ class _DialogConfirmation extends StatelessWidget {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context, false),
-          child: const Text("Annuler"),
+          child: Text(AppLocalizations.of(context)!.cancel),
         ),
         ElevatedButton(
           style: ElevatedButton.styleFrom(

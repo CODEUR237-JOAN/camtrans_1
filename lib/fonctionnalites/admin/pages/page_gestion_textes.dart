@@ -2,9 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
 
-import '../../../coeur/constantes/couleurs.dart';
-import '../../../coeur/etat/textes_app_provider.dart';
-import '../../../modeles/textes_app.dart';
+import 'package:update_camtrans/coeur/constantes/couleurs.dart';
+import 'package:update_camtrans/coeur/etat/textes_app_provider.dart';
+import 'package:update_camtrans/modeles/textes_app.dart';
 import 'package:update_camtrans/coeur/widgets/loader_premium.dart';
 
 class PageGestionTextes extends ConsumerStatefulWidget {

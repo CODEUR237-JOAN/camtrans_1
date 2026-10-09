@@ -10,6 +10,7 @@ import 'package:update_camtrans/modeles/course.dart';
 import 'package:update_camtrans/services/service_authentification.dart';
 import 'package:update_camtrans/services/service_firestore.dart';
 import 'package:update_camtrans/coeur/widgets/loader_premium.dart';
+import 'package:update_camtrans/l10n/app_localizations.dart';
 
 class HistoriqueCourses extends ConsumerStatefulWidget {
   const HistoriqueCourses({super.key});
@@ -313,7 +314,7 @@ class _DialogConfirmation extends StatelessWidget {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context, false),
-          child: const Text("Annuler"),
+          child: Text(AppLocalizations.of(context)!.cancel),
         ),
         ElevatedButton(
           style: ElevatedButton.styleFrom(
@@ -448,7 +449,7 @@ class _FeuilleDetailsCourse extends StatelessWidget {
               _ligne(context, Icons.straighten_outlined, "Distance",
                   "${course.distanceKm.toStringAsFixed(1)} km"),
             if (course.nomClient.isNotEmpty)
-              _ligne(context, Icons.person_outline, "Client", course.nomClient),
+              _ligne(context, Icons.person_outline, AppLocalizations.of(context)!.client, course.nomClient),
             if (course.telephoneClient.isNotEmpty)
               _ligne(context, Icons.phone_outlined, "Téléphone",
                   course.telephoneClient),

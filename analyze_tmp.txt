@@ -1,0 +1,14 @@
+﻿Analyzing lib...
+
+  error - services\service_authentification.dart:27:38 - The class 'GoogleSignIn' doesn't have an unnamed constructor. Try using one of the named constructors defined in 'GoogleSignIn'. - new_with_undefined_constructor_default
+  error - services\service_authentification.dart:241:46 - The method 'signIn' isn't defined for the type 'GoogleSignIn'. Try correcting the name to the name of an existing method, or defining a method named 'signIn'. - undefined_method
+  error - services\service_biometrie.dart:31:9 - The named parameter 'options' isn't defined. Try correcting the name to an existing named parameter's name, or defining a named parameter with the name 'options'. - undefined_named_parameter
+  error - services\service_biometrie.dart:31:24 - The name 'AuthenticationOptions' isn't a class. Try correcting the name to match an existing class. - creation_with_non_type
+  error - services\service_gps.dart:80:28 - The method 'placemarkFromCoordinates' isn't defined for the type 'ServiceGps'. Try correcting the name to the name of an existing method, or defining a method named 'placemarkFromCoordinates'. - undefined_method
+  error - services\service_gps.dart:127:31 - The method 'locationFromAddress' isn't defined for the type 'ServiceGps'. Try correcting the name to the name of an existing method, or defining a method named 'locationFromAddress'. - undefined_method
+  error - services\service_notification.dart:50:28 - The named parameter 'settings' is required, but there's no corresponding argument. Try adding the required argument. - missing_required_argument
+  error - services\service_notification.dart:50:39 - Too many positional arguments: 0 expected, but 1 found. Try removing the extra positional arguments, or specifying the name for named arguments. - extra_positional_arguments_could_be_named
+  error - services\service_notification.dart:156:28 - The named parameter 'id' is required, but there's no corresponding argument. Try adding the required argument. - missing_required_argument
+  error - services\service_notification.dart:157:9 - Too many positional arguments: 0 expected, but 4 found. Try removing the extra positional arguments, or specifying the name for named arguments. - extra_positional_arguments_could_be_named
+
+10 issues found.

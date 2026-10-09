@@ -1,6 +1,6 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../modeles/textes_app.dart';
-import '../../services/service_firestore.dart';
+import 'package:update_camtrans/modeles/textes_app.dart';
+import 'package:update_camtrans/services/service_firestore.dart';
 
 // Provider pour récupérer les textes globaux de l'application depuis Firestore
 final textesAppProvider = StreamProvider<TextesApp>((ref) {

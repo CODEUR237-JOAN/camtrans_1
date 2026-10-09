@@ -22,11 +22,6 @@ class ServicePaiement {
     final String url = ApiKeys.isCampayProduction
         ? 'https://www.campay.net/api'
         : 'https://demo.campay.net/api';
-
-    // N'affecte QUE le web. Sur mobile (Android/iOS), kIsWeb est faux et l'URL normale est utilisée.
-    if (kIsWeb) {
-      return 'https://corsproxy.io/?$url';
-    }
     return url;
   }
 
@@ -98,8 +93,21 @@ class ServicePaiement {
     );
 
     if (collectResponse.statusCode != 200) {
-      throw Exception(
-          "Erreur d'initialisation du paiement: ${jsonDecode(collectResponse.body)['message'] ?? 'Erreur inconnue'}");
+      String messageAmical = "Le service de paiement est momentanément indisponible.";
+      try {
+        final errorData = jsonDecode(collectResponse.body);
+        final errorMessage = errorData['message']?.toString() ?? '';
+        
+        if (errorMessage.toLowerCase().contains("invalid phone number")) {
+           messageAmical = "Ce numéro de téléphone est invalide. Veuillez vérifier le numéro.";
+        } else if (errorMessage.toLowerCase().contains("insufficient")) {
+           messageAmical = "Votre solde Mobile Money semble insuffisant pour cette opération.";
+        } else if (errorMessage.isNotEmpty) {
+           // Ne pas montrer le JSON brut, juste le texte de l'opérateur
+           messageAmical = "Refus de l'opérateur : $errorMessage";
+        }
+      } catch (_) {}
+      throw Exception(messageAmical);
     }
 
     final collectData = jsonDecode(collectResponse.body);
@@ -139,15 +147,15 @@ class ServicePaiement {
           );
         } else if (status == "FAILED") {
           throw Exception(
-              "Le paiement a échoué ou a été refusé par l'utilisateur.");
+              "Le paiement a échoué ou vous l'avez annulé sur votre téléphone. Veuillez réessayer.");
         }
       }
     }
 
     if (status == "PENDING") {
-      throw Exception("Délai d'attente dépassé. Veuillez réessayer.");
+      throw Exception("Délai d'attente dépassé (vous n'avez pas validé sur le téléphone). Veuillez réessayer.");
     }
-    throw Exception("Erreur lors de la validation du paiement.");
+    throw Exception("Une erreur est survenue lors de la validation. Veuillez réessayer.");
   }
 
   /// Traitement d'un paiement Orange Money
@@ -407,7 +415,7 @@ class ServicePaiement {
 
       return true;
     } catch (e) {
-      throw Exception(e);
+      rethrow;
     }
   }
 

@@ -8,7 +8,8 @@ import 'package:go_router/go_router.dart';
 import 'package:update_camtrans/coeur/constantes/statuts.dart';
 import 'package:update_camtrans/coeur/etat/transporteurs_provider.dart';
 import 'package:update_camtrans/coeur/widgets/combi_widget.dart';
-import '../etat/suivi_course_etat.dart';
+import 'package:update_camtrans/fonctionnalites/suivi_course/etat/suivi_course_etat.dart';
+import 'package:update_camtrans/l10n/app_localizations.dart';
 
 class PanneauDetailsBottomSheet extends ConsumerWidget {
   final SuiviCourseEtat etat;
@@ -208,7 +209,7 @@ class PanneauDetailsBottomSheet extends ConsumerWidget {
                             ),
                             Text(
                               isChauffeur
-                                  ? "Client"
+                                  ? AppLocalizations.of(context)!.client
                                   : (plaqueChauffeur.isNotEmpty
                                       ? "${course.typeVehicule} • $plaqueChauffeur"
                                       : "${course.typeVehicule} - ${course.prixFinal} FCFA"),

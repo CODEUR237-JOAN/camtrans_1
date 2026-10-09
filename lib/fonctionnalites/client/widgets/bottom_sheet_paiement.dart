@@ -10,6 +10,7 @@ import 'package:update_camtrans/coeur/widgets/progression_paiement.dart';
 import 'package:update_camtrans/services/service_paiement.dart';
 import 'package:update_camtrans/services/service_notification.dart';
 import 'package:update_camtrans/services/service_authentification.dart';
+import 'package:update_camtrans/l10n/app_localizations.dart';
 
 /// Bottom sheet de paiement affiché à la fin de la course.
 /// Non-dismissable (barrierDismissible: false).
@@ -125,7 +126,7 @@ class _BottomSheetPaiementState extends ConsumerState<BottomSheetPaiement> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Paiement échoué : ${e.toString()}'),
+            content: Text('Paiement échoué : ${e.toString().replaceAll('Exception: ', '')}'),
             backgroundColor: CouleursApp.erreur,
             behavior: SnackBarBehavior.floating,
             shape:
@@ -456,7 +457,7 @@ class _BottomSheetPaiementState extends ConsumerState<BottomSheetPaiement> {
       },
       {
         'id': 'especes',
-        'label': 'Espèces',
+        'label': AppLocalizations.of(context)!.cash,
         'icon': Iconsax.money_2_copy,
         'couleur': CouleursApp.succes,
       },

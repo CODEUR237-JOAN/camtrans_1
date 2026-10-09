@@ -82,7 +82,7 @@ class _ModifierProfilState extends ConsumerState<ModifierProfil> {
           _initialise = true;
         });
       }
-    } catch (e) { /* erreur ignorée */ } finally {
+    } catch (e) {/* erreur ignorée */} finally {
       setState(() => _chargement = false);
     }
   }
@@ -113,7 +113,7 @@ class _ModifierProfilState extends ConsumerState<ModifierProfil> {
         final url = await stockage.uploaderFichier(
           fichier: _nouvellePhoto!,
           dossier: 'avatars',
-          nomFichier: userId,
+          nomFichier: '${userId}_${DateTime.now().millisecondsSinceEpoch}',
         );
         if (url != null) photoFinale = url;
       }
@@ -121,7 +121,8 @@ class _ModifierProfilState extends ConsumerState<ModifierProfil> {
       // 2. Déterminer la collection
       final clientDoc =
           await firestore.lireDocument(collection: 'clients', id: userId);
-      final collection = clientDoc.exists ? 'clients' : 'transporteurs';
+      final transpDoc =
+          await firestore.lireDocument(collection: 'transporteurs', id: userId);
 
       // 3. Mettre à jour Firestore
       final Map<String, dynamic> donnees = {
@@ -133,11 +134,20 @@ class _ModifierProfilState extends ConsumerState<ModifierProfil> {
         'photo': photoFinale,
       };
 
-      await firestore.modifierDocument(
-        collection: collection,
-        id: userId,
-        donnees: donnees,
-      );
+      if (clientDoc.exists) {
+        await firestore.modifierDocument(
+          collection: 'clients',
+          id: userId,
+          donnees: donnees,
+        );
+      }
+      if (transpDoc.exists) {
+        await firestore.modifierDocument(
+          collection: 'transporteurs',
+          id: userId,
+          donnees: donnees,
+        );
+      }
 
       // Mettre à jour le profil Firebase Auth aussi (nom d'affichage)
       await ref
@@ -209,30 +219,30 @@ class _ModifierProfilState extends ConsumerState<ModifierProfil> {
 
                   // Photo de profil
                   Center(
-                    child: Stack(
-                      children: [
-                        CircleAvatar(
-                          radius: 65,
-                          backgroundColor:
-                              CouleursApp.primaire.withValues(alpha: 0.1),
-                          backgroundImage: _nouvellePhoto != null
-                              ? (kIsWeb
-                                  ? NetworkImage(_nouvellePhoto!.path)
-                                  : FileImage(io.File(_nouvellePhoto!.path))
-                                      as ImageProvider)
-                              : (_photoUrl.isNotEmpty
-                                  ? NetworkImage(_photoUrl)
-                                  : null),
-                          child: (_nouvellePhoto == null && _photoUrl.isEmpty)
-                              ? const Icon(Icons.person,
-                                  size: 65, color: CouleursApp.primaire)
-                              : null,
-                        ),
-                        Positioned(
-                          bottom: 0,
-                          right: 0,
-                          child: GestureDetector(
-                            onTap: _choisirPhoto,
+                    child: GestureDetector(
+                      onTap: _choisirPhoto,
+                      child: Stack(
+                        children: [
+                          CircleAvatar(
+                            radius: 65,
+                            backgroundColor:
+                                CouleursApp.primaire.withValues(alpha: 0.1),
+                            backgroundImage: _nouvellePhoto != null
+                                ? (kIsWeb
+                                    ? NetworkImage(_nouvellePhoto!.path)
+                                    : FileImage(io.File(_nouvellePhoto!.path))
+                                        as ImageProvider)
+                                : (_photoUrl.isNotEmpty
+                                    ? NetworkImage(_photoUrl)
+                                    : null),
+                            child: (_nouvellePhoto == null && _photoUrl.isEmpty)
+                                ? const Icon(Icons.person,
+                                    size: 65, color: CouleursApp.primaire)
+                                : null,
+                          ),
+                          Positioned(
+                            bottom: 0,
+                            right: 0,
                             child: Container(
                               padding: const EdgeInsets.all(10),
                               decoration: BoxDecoration(
@@ -247,8 +257,8 @@ class _ModifierProfilState extends ConsumerState<ModifierProfil> {
                                   color: Colors.white, size: 20),
                             ),
                           ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
 

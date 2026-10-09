@@ -111,7 +111,7 @@ class ServiceNavigationVocale extends ChangeNotifier {
       } catch (_) {/* iOS uniquement */}
 
       _ttsPret = true;
-    } catch (e) { /* erreur ignorée */ }
+    } catch (e) {/* erreur ignorée */}
   }
 
   // ------------------------------------------------------------------
@@ -389,7 +389,7 @@ class ServiceNavigationVocale extends ChangeNotifier {
         await _tts.stop();
       }
       await _tts.speak(propre);
-    } catch (e) { /* erreur ignorée */ }
+    } catch (e) {/* erreur ignorée */}
   }
 
   @override

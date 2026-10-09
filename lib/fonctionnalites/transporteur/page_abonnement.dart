@@ -12,6 +12,7 @@ import 'package:update_camtrans/modeles/parametres_app.dart';
 import 'package:update_camtrans/services/service_authentification.dart';
 import 'package:update_camtrans/services/service_paiement.dart';
 import 'package:update_camtrans/coeur/widgets/loader_premium.dart';
+import 'package:update_camtrans/l10n/app_localizations.dart';
 
 class PageAbonnement extends ConsumerStatefulWidget {
   const PageAbonnement({super.key});
@@ -676,7 +677,7 @@ class _DialogPaiementAbonnementState extends State<_DialogPaiementAbonnement> {
             const _ResultatDialogPaiement(
                 confirme: false, telephone: '', operateur: ''),
           ),
-          child: Text("Annuler",
+          child: Text(AppLocalizations.of(context)!.cancel,
               style: GoogleFonts.inter(
                   color: Theme.of(context)
                       .colorScheme

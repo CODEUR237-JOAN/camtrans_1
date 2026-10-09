@@ -8,6 +8,7 @@ import 'package:update_camtrans/coeur/etat/admin_portefeuille_provider.dart';
 import 'package:update_camtrans/coeur/widgets/loader_premium.dart';
 import 'package:update_camtrans/modeles/retrait_admin.dart';
 import 'package:update_camtrans/services/service_paiement.dart';
+import 'package:update_camtrans/l10n/app_localizations.dart';
 
 // =====================================================================
 // ÉCRAN : Portefeuille Administrateur
@@ -292,7 +293,7 @@ class _LigneRetrait extends StatelessWidget {
     final libelleStatut = echoue
         ? 'Échoué'
         : enAttente
-            ? 'En attente'
+            ? AppLocalizations.of(context)!.pending
             : 'Effectué';
 
     return Container(
@@ -588,7 +589,7 @@ class _FeuilleRetraitAdminState extends ConsumerState<_FeuilleRetraitAdmin> {
                 style: const TextStyle(color: Colors.white),
                 decoration: _deco(
                   _estMobileMoney
-                      ? 'Numéro de téléphone'
+                      ? AppLocalizations.of(context)!.phoneNumber
                       : 'IBAN / Numéro de compte',
                   _estMobileMoney
                       ? Icons.phone_outlined

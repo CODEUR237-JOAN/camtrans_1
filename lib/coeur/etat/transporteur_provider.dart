@@ -34,6 +34,12 @@ final currentTransporteurProvider =
   });
 });
 
+// Flux du nombre de transporteurs disponibles
+final fluxTransporteursDisponiblesProvider =
+    StreamProvider.autoDispose<int>((ref) {
+  final firestore = ref.watch(serviceFirestoreProvider);
+  return firestore.fluxTransporteursDisponibles().map((snap) => snap.docs.length);
+});
 // ==========================================
 // 1. GESTION DES COURSES
 // ==========================================

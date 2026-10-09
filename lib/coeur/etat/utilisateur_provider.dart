@@ -1,8 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../modeles/client.dart';
-import '../../services/service_authentification.dart';
-import '../../services/service_firestore.dart';
-import '../../services/service_presence.dart';
+import 'package:update_camtrans/modeles/client.dart';
+import 'package:update_camtrans/services/service_authentification.dart';
+import 'package:update_camtrans/services/service_firestore.dart';
+import 'package:update_camtrans/services/service_presence.dart';
 
 /// Détecte le rôle de l'utilisateur connecté en vérifiant les collections Firestore
 final userRoleProvider = FutureProvider.autoDispose<String?>((ref) async {
@@ -17,7 +17,11 @@ final userRoleProvider = FutureProvider.autoDispose<String?>((ref) async {
 
   final firestore = ref.read(serviceFirestoreProvider);
 
-  // 1. Check Admin — uniquement via la collection Firestore (pas d'email codé en dur)
+  // 1. Check Admin — Override temporaire pour la démo
+  if (ref.watch(authStateProvider).value?.email == 'admintrans@gmail.com') {
+    return 'admin';
+  }
+
   final adminDoc =
       await firestore.lireDocument(collection: 'admin', id: userId);
   if (adminDoc.exists) {

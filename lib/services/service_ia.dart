@@ -181,7 +181,7 @@ class ServiceIA {
       );
       final texte = reponse.trim();
       if (texte.isNotEmpty) return texte;
-    } catch (e) { /* erreur ignorée */ }
+    } catch (e) {/* erreur ignorée */}
 
     // 2) Repli sur Gemini.
     try {
@@ -189,7 +189,7 @@ class ServiceIA {
       final resultat = await modele.generateContent([Content.text(message)]);
       final texte = (resultat.text ?? '').trim();
       if (texte.isNotEmpty) return texte;
-    } catch (e) { /* erreur ignorée */ }
+    } catch (e) {/* erreur ignorée */}
 
     // 3) Dernier recours : message neutre (jamais d'exception vers l'UI).
     return "Je suis désolé, je n'arrive pas à répondre pour le moment. "
@@ -210,7 +210,7 @@ class ServiceIA {
     // Tentative directe : si le texte est déjà un JSON valide
     try {
       return jsonDecode(texte) as Map<String, dynamic>;
-    } catch (_) { /* erreur ignorée */ }
+    } catch (_) {/* erreur ignorée */}
 
     // Recherche d'un bloc JSON entouré de backticks (```json ... ```)
     final regexBloc = RegExp(r'```(?:json)?\s*([\s\S]*?)```');
@@ -218,7 +218,7 @@ class ServiceIA {
     if (matchBloc != null) {
       try {
         return jsonDecode(matchBloc.group(1)!) as Map<String, dynamic>;
-      } catch (_) { /* erreur ignorée */ }
+      } catch (_) {/* erreur ignorée */}
     }
 
     // Recherche du premier objet JSON dans le texte brut
@@ -227,7 +227,7 @@ class ServiceIA {
     if (matchObjet != null) {
       try {
         return jsonDecode(matchObjet.group(0)!) as Map<String, dynamic>;
-      } catch (_) { /* erreur ignorée */ }
+      } catch (_) {/* erreur ignorée */}
     }
 
     return null;
@@ -297,7 +297,7 @@ class ServiceIA {
           // On ne bloque pas l'utilisateur, mais on trace l'erreur en debug
           // pour pouvoir diagnostiquer (clé invalide, modèle retiré, quota...).
         }
-      } catch (e) { /* erreur ignorée */ }
+      } catch (e) {/* erreur ignorée */}
     }
 
     // 2. Basculement (Fallback) sur Gemini
@@ -421,7 +421,7 @@ class ServiceIA {
 
       // Ajout de la réponse complète dans l'historique
       _historique.add(Content.model([TextPart(reponseComplete)]));
-    } on GenerativeAIException catch (e) {
+    } on GenerativeAIException {
       // Erreur spécifique à l'API Gemini (quota, clé invalide, etc.)
       yield "\n[IA indisponible] Une erreur est survenue. Réessayez dans un moment.";
     } catch (e) {

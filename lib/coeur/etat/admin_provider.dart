@@ -7,6 +7,17 @@ import 'package:update_camtrans/modeles/course.dart';
 import 'package:update_camtrans/modeles/paiement.dart';
 import 'package:update_camtrans/modeles/parametres_app.dart';
 
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+
+// Fournit les données de l'administrateur connecté actuel (dont ses permissions d'assistant)
+final currentAdminProvider = FutureProvider.autoDispose<Map<String, dynamic>?>((ref) async {
+  final user = FirebaseAuth.instance.currentUser;
+  if (user == null) return null;
+  final doc = await FirebaseFirestore.instance.collection('admin').doc(user.uid).get();
+  return doc.exists ? doc.data() : null;
+});
+
 // Providers pour lire toutes les données via Firebase (simulées ou réelles)
 
 final adminClientsProvider = StreamProvider.autoDispose<List<Client>>((ref) {

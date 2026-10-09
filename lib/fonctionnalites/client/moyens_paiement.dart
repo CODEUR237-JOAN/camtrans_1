@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:update_camtrans/coeur/constantes/couleurs.dart';
 import 'package:update_camtrans/coeur/widgets/loader_page.dart';
 import 'package:update_camtrans/services/service_authentification.dart';
+import 'package:update_camtrans/l10n/app_localizations.dart';
 
 // =====================================================================
 // ÉCRAN : Moyens de paiement (client)
@@ -107,7 +108,7 @@ class MoyensPaiement extends ConsumerWidget {
           TextButton(
             onPressed: () => Navigator.pop(context, false),
             child:
-                const Text('Annuler', style: TextStyle(color: Colors.white54)),
+                Text(AppLocalizations.of(context)!.cancel, style: TextStyle(color: Colors.white54)),
           ),
           ElevatedButton(
             style: ElevatedButton.styleFrom(
@@ -336,7 +337,7 @@ class _FeuilleAjoutState extends State<_FeuilleAjout> {
               controller: _numero,
               keyboardType: TextInputType.phone,
               style: const TextStyle(color: Colors.white),
-              decoration: _deco('Numéro de téléphone', Icons.phone_outlined),
+              decoration: _deco(AppLocalizations.of(context)!.phoneNumber, Icons.phone_outlined),
               validator: (v) {
                 final t = (v ?? '').replaceAll(RegExp(r'[^0-9]'), '');
                 if (t.length < 9) return 'Numéro invalide';

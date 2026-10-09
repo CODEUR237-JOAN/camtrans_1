@@ -142,7 +142,7 @@ service cloud.firestore {
         resource.data.clientId == request.auth.uid ||
         resource.data.transporteurId == request.auth.uid
       );
-      allow create: if estConnecte() && (estClient() || estAdmin());
+      allow create: if estConnecte() && (estClient() || estAdmin() || estTransporteur());
       allow update: if estAdmin();
       allow delete: if estAdmin();
     }

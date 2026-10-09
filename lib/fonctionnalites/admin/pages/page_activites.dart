@@ -14,6 +14,7 @@ import 'package:update_camtrans/modeles/course.dart';
 import 'package:update_camtrans/services/service_firestore.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:update_camtrans/coeur/widgets/loader_premium.dart';
+import 'package:update_camtrans/l10n/app_localizations.dart';
 
 class PageActivites extends ConsumerStatefulWidget {
   const PageActivites({super.key});
@@ -171,7 +172,7 @@ class _PageActivitesState extends ConsumerState<PageActivites> {
                                     TextButton(
                                         onPressed: () =>
                                             Navigator.pop(context, false),
-                                        child: const Text("Annuler")),
+                                        child: Text(AppLocalizations.of(context)!.cancel)),
                                     ElevatedButton(
                                       style: ElevatedButton.styleFrom(
                                           minimumSize: const Size(0, 48),
@@ -343,7 +344,7 @@ class _DialogPurgeState extends State<_DialogPurge> {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context, false),
-          child: const Text("Annuler"),
+          child: Text(AppLocalizations.of(context)!.cancel),
         ),
         ValueListenableBuilder(
           valueListenable: _ctrl,

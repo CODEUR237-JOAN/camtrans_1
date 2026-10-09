@@ -28,8 +28,9 @@ class ServiceStockage {
 
       if (kIsWeb) {
         final bytes = await fichier.readAsBytes();
-        request.files.add(http.MultipartFile.fromBytes('file', bytes,
-            filename: fichier.name));
+        request.files.add(
+          http.MultipartFile.fromBytes('file', bytes, filename: fichier.name),
+        );
       } else {
         request.files
             .add(await http.MultipartFile.fromPath('file', fichier.path));
@@ -42,10 +43,10 @@ class ServiceStockage {
         final data = jsonDecode(responseBody);
         return data['secure_url']; // Retourne l'URL publique de l'image
       } else {
-        return null;
+        throw Exception('Erreur Cloudinary: ${response.statusCode} - $responseBody');
       }
     } catch (e) {
-      return null;
+      throw Exception('Erreur lors de l\'upload: $e');
     }
   }
 

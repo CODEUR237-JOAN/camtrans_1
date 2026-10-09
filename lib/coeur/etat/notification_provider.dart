@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:update_camtrans/modeles/notification.dart';
 import 'package:update_camtrans/services/service_authentification.dart';
@@ -33,8 +32,7 @@ final gestionTokenFCMProvider = Provider.autoDispose<void>((ref) {
         id: userId,
         donnees: {'fcmToken': token},
       ).catchError((_) {});
-    }, onError: (e) {
-    });
+    }, onError: (e) {});
 
     ref.onDispose(() {
       sub.cancel();

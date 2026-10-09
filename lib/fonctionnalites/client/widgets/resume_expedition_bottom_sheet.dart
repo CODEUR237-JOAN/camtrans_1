@@ -23,6 +23,7 @@ import 'carte_estimation.dart';
 import 'recherche_radar.dart';
 import 'carte_estimation_remorque.dart';
 import 'package:update_camtrans/coeur/widgets/loader_premium.dart';
+import 'package:update_camtrans/l10n/app_localizations.dart';
 
 class ResumeExpeditionBottomSheet extends ConsumerStatefulWidget {
   const ResumeExpeditionBottomSheet({super.key});
@@ -168,7 +169,7 @@ class _ResumeExpeditionBottomSheetState
                       context,
                       Iconsax.user_copy,
                       "Chauffeur assigné",
-                      "${etat.chauffeurPropose!.prenom} ${etat.chauffeurPropose!.nom} · ${etat.chauffeurPropose!.typeVehicule.isNotEmpty ? etat.chauffeurPropose!.typeVehicule : 'Transporteur'} · ${etat.distanceApprocheKm.toStringAsFixed(1)} km",
+                      "${etat.chauffeurPropose!.prenom} ${etat.chauffeurPropose!.nom} · ${etat.chauffeurPropose!.typeVehicule.isNotEmpty ? etat.chauffeurPropose!.typeVehicule : AppLocalizations.of(context)!.driver} · ${etat.distanceApprocheKm.toStringAsFixed(1)} km",
                     ),
                     const SizedBox(height: 16),
                   ],
@@ -612,7 +613,7 @@ class _ResumeExpeditionBottomSheetState
                       );
                       context.go('/tableau-bord-client');
                     }
-                  } catch (e, stacktrace) {
+                  } catch (e) {
                     if (context.mounted) {
                       Navigator.pop(context); // Fermer le radar
                       ScaffoldMessenger.of(context).showSnackBar(

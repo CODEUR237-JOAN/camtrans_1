@@ -78,19 +78,21 @@ class ServicePresence with WidgetsBindingObserver {
       return;
     }
 
-    _firestore.collection(collection).doc(user.uid).update({
-      'derniereConnexion': FieldValue.serverTimestamp(),
-      'estEnLigne': true,
-    }).then((_) {
-    }).catchError((e) {
-    });
+    _firestore
+        .collection(collection)
+        .doc(user.uid)
+        .update({
+          'derniereConnexion': FieldValue.serverTimestamp(),
+          'estEnLigne': true,
+        })
+        .then((_) {})
+        .catchError((e) {});
   }
 
   Future<void> _setEnLigne(bool enLigne) async {
     final user = _auth.currentUser;
     final collection = _collection;
     if (user == null || collection == null) return;
-
 
     final donnees = <String, dynamic>{
       'estEnLigne': enLigne,
@@ -101,8 +103,7 @@ class ServicePresence with WidgetsBindingObserver {
         .collection(collection)
         .doc(user.uid)
         .update(donnees)
-        .then((_) {
-    }).catchError((e) {
-    });
+        .then((_) {})
+        .catchError((e) {});
   }
 }

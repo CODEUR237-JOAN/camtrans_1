@@ -295,7 +295,7 @@ class DemandeExpeditionNotifier extends StateNotifier<EtatDemandeExpedition> {
           latClient = loc.latitude;
           lngClient = loc.longitude;
         }
-      } catch (_) { /* erreur ignorée */ }
+      } catch (_) {/* erreur ignorée */}
     }
 
     // Utilisation de lngClient pour éviter le warning
@@ -320,24 +320,21 @@ class DemandeExpeditionNotifier extends StateNotifier<EtatDemandeExpedition> {
         data['id'] = doc.id;
         final t = Transporteur.fromMap(data);
 
-
         // Filtrage rigoureux en mémoire
         if (t.estEnLigne &&
             t.disponible &&
             t.documentsValides &&
             t.typeVehicule == vehiculeRequis) {
           candidats.add(t);
-        } else {
-        }
+        } else {}
       }
 
       // Règle d'équité CamTrans : Priorité au transporteur ayant le moins de courses
       if (candidats.isNotEmpty) {
         candidats.sort((a, b) => a.nombreCourses.compareTo(b.nombreCourses));
         chauffeur = candidats.first;
-      } else {
-      }
-    } catch (e) { /* erreur ignorée */ }
+      } else {}
+    } catch (e) {/* erreur ignorée */}
 
     state = state.copierAvec(
       estEnAttenteIA: false,

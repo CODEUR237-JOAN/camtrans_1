@@ -6,6 +6,7 @@ import 'package:intl/intl.dart';
 import 'package:update_camtrans/coeur/constantes/couleurs.dart';
 import 'package:update_camtrans/coeur/etat/admin_provider.dart';
 import 'package:update_camtrans/coeur/widgets/loader_premium.dart';
+import 'package:update_camtrans/l10n/app_localizations.dart';
 
 class PageAbonnementsAdmin extends ConsumerWidget {
   const PageAbonnementsAdmin({super.key});

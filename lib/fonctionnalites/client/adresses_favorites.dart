@@ -9,6 +9,7 @@ import 'package:update_camtrans/coeur/constantes/couleurs.dart';
 import 'package:update_camtrans/coeur/widgets/loader_page.dart';
 import 'package:update_camtrans/coeur/etat/utilisateur_provider.dart';
 import 'package:update_camtrans/services/service_firestore.dart';
+import 'package:update_camtrans/l10n/app_localizations.dart';
 
 // =====================================================================
 // Page : Adresses Favorites
@@ -103,7 +104,7 @@ class _AdressesFavoritesPageState extends ConsumerState<AdressesFavoritesPage> {
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: Text('Annuler',
+            child: Text(AppLocalizations.of(context)!.cancel,
                 style: GoogleFonts.inter(
                     color: Theme.of(context)
                         .colorScheme

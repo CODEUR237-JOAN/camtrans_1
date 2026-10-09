@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:math' as math;
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:update_camtrans/coeur/constantes/statuts.dart';
@@ -320,7 +319,7 @@ class SuiviNotifier extends StateNotifier<EtatSuivi> {
         // 3. Le guidage suit le nouveau tracé (sans ré-annoncer le démarrage).
         _navVocale.rafraichirItineraire(nouveau);
       }
-    } catch (e) { /* erreur ignorée */ } finally {
+    } catch (e) {/* erreur ignorée */} finally {
       _recalculEnCours = false;
     }
   }

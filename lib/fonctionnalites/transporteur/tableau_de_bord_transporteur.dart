@@ -12,7 +12,7 @@ import 'package:update_camtrans/coeur/widgets/carte_information.dart';
 import 'package:update_camtrans/coeur/widgets/effets_visuels.dart';
 import 'package:update_camtrans/coeur/widgets/glass_container.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../../coeur/etat/transporteur_provider.dart';
+import 'package:update_camtrans/coeur/etat/transporteur_provider.dart';
 import 'package:update_camtrans/coeur/routes/routes.dart';
 import 'package:update_camtrans/coeur/etat/gps_provider.dart';
 import 'package:update_camtrans/services/service_authentification.dart';
@@ -29,6 +29,7 @@ import 'package:update_camtrans/coeur/widgets/page_responsive.dart';
 import 'package:update_camtrans/fonctionnalites/transporteur/widgets/popup_proposition_course.dart';
 import 'page_abonnement.dart';
 import 'package:update_camtrans/coeur/widgets/loader_premium.dart';
+import 'package:update_camtrans/l10n/app_localizations.dart';
 
 /// Salutation adaptée à l'heure (matin / après-midi / soir).
 String _salutationDuJour() {
@@ -179,7 +180,7 @@ class _TableauDeBordTransporteurState
       data: (transporteur) {
         final nomAffichage = transporteur != null
             ? transporteur.prenom
-            : (utilisateur?.displayName ?? "Transporteur");
+            : (utilisateur?.displayName ?? AppLocalizations.of(context)!.driver);
         final photoUrl = transporteur?.photo ?? utilisateur?.photoURL ?? "";
 
         return SingleChildScrollView(
@@ -249,8 +250,14 @@ class _TableauDeBordTransporteurState
                       backgroundImage:
                           photoUrl.isNotEmpty ? NetworkImage(photoUrl) : null,
                       child: photoUrl.isEmpty
-                          ? const Icon(Iconsax.truck_fast_copy,
-                              color: CouleursApp.accent, size: 28)
+                          ? ClipOval(
+                              child: Image.asset(
+                                'assets/images/logo_camtrans.png',
+                                width: 56,
+                                height: 56,
+                                fit: BoxFit.cover,
+                              ),
+                            )
                           : null,
                     ),
                   ),
@@ -260,7 +267,7 @@ class _TableauDeBordTransporteurState
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          _salutationDuJour(),
+                          "Bienvenue,",
                           style: GoogleFonts.inter(
                               color: Theme.of(context)
                                   .colorScheme

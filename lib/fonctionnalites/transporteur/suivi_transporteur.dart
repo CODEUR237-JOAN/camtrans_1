@@ -15,6 +15,7 @@ import 'package:update_camtrans/services/service_firestore.dart';
 import 'package:update_camtrans/services/service_gps.dart';
 import 'package:update_camtrans/fonctionnalites/client/widgets/carte_suivi_abstraite.dart';
 import 'package:update_camtrans/services/service_navigation_vocale.dart';
+import 'package:update_camtrans/l10n/app_localizations.dart';
 
 class SuiviTransporteur extends ConsumerStatefulWidget {
   final String courseId;
@@ -290,12 +291,12 @@ class _SuiviTransporteurState extends ConsumerState<SuiviTransporteur> {
                       Text(
                           course.nomClient.isNotEmpty
                               ? course.nomClient
-                              : "Client",
+                              : AppLocalizations.of(context)!.client,
                           style: GoogleFonts.poppins(
                               color: Theme.of(context).colorScheme.onSurface,
                               fontWeight: FontWeight.bold,
                               fontSize: 15)),
-                      Text("Client",
+                      Text(AppLocalizations.of(context)!.client,
                           style: GoogleFonts.inter(
                               color: Theme.of(context)
                                   .colorScheme

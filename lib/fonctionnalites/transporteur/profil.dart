@@ -13,6 +13,7 @@ import 'package:update_camtrans/coeur/widgets/loader_premium.dart';
 import 'package:update_camtrans/coeur/widgets/carte_information.dart';
 import 'package:update_camtrans/coeur/widgets/selecteur_theme.dart';
 import 'package:update_camtrans/coeur/constantes/statuts.dart';
+import 'package:update_camtrans/l10n/app_localizations.dart';
 
 class ProfilTransporteur extends ConsumerWidget {
   const ProfilTransporteur({super.key});
@@ -289,7 +290,7 @@ class ProfilTransporteur extends ConsumerWidget {
                     () => context.push(RoutesApplication.modifierProfil)),
                 _boutonOption(context, Icons.lock, "Changer le mot de passe",
                     () => context.push(RoutesApplication.changerMotDePasse)),
-                _boutonOption(context, Icons.settings, "Paramètres",
+                _boutonOption(context, Icons.settings, AppLocalizations.of(context)!.settings,
                     () => context.push(RoutesApplication.parametres)),
                 _boutonOption(context, Icons.help, "Aide & Support", () {}),
 

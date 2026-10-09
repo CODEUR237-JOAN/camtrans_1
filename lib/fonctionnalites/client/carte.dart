@@ -10,6 +10,7 @@ import 'package:update_camtrans/services/service_gps.dart';
 import 'widgets/couche_transporteurs.dart';
 import 'package:update_camtrans/coeur/widgets/loader_premium.dart';
 import 'package:update_camtrans/coeur/widgets/marqueur_premium.dart';
+import 'package:update_camtrans/l10n/app_localizations.dart';
 
 class VueCarte extends ConsumerStatefulWidget {
   const VueCarte({super.key});
@@ -123,7 +124,7 @@ class _VueCarteState extends ConsumerState<VueCarte>
                       await serviceGps.ouvrirParametresApplication();
                       ref.read(carteProvider.notifier).actualiserPosition();
                     },
-                    child: const Text("Paramètres"),
+                    child: Text(AppLocalizations.of(context)!.settings),
                   ),
                 ],
               ),
